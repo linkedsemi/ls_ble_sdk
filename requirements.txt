@@ -1,0 +1,6 @@
+ecdsa
+PyXB
+scons
+sphinx
+sphinx_rtd_theme
+exhale
