@@ -54,6 +54,50 @@ struct ble_stack_cfg
 	bool controller_privacy;
 };
 
+enum uuid_length
+{
+	UUID_LEN_16BIT = 0,
+	UUID_LEN_32BIT,
+	UUID_LEN_128BIT,
+};
+
+struct char_properties
+{
+	uint8_t broadcast:1,
+			rd_en:1,
+			wr_cmd:1,
+			wr_req:1,
+			ntf_en:1,
+			ind_en:1,			
+			wr_signed:1,
+			ext_prop:1;
+};
+
+struct char_permissions
+{
+	uint8_t rd_perm:2,
+			wr_perm:2,
+			ind_perm:2,
+			ntf_perm:2;
+};
+
+struct att_decl
+{
+	uint8_t *uuid;
+	struct char_permissions char_perm;
+	struct char_properties char_prop; 
+	enum uuid_length uuid_len;
+};
+
+struct svc_decl
+{
+	uint8_t *uuid;
+	struct att_decl *att;
+	uint8_t nb_att;
+	uint8_t	sec_lvl:2,
+			uuid_len:2,
+			secondary:1;
+};
 
 enum gap_evt_type
 {
@@ -63,9 +107,9 @@ enum gap_evt_type
 	SLAVE_SECURITY_REQ,
 	PAIR_DONE,
 	ENCRYPT_DONE,
+	GET_LEGACY_OOB,
 	DISPLAY_PASSWORD,
 	INPUT_PASSWORD,
-	
 };
 
 struct pair_feature
@@ -112,6 +156,11 @@ struct gap_encrypt_done
 	uint8_t auth;
 };
 
+struct gap_display_password
+{
+	uint32_t password;
+};
+
 union gap_evt_u
 {
 	struct gap_connected connected;
@@ -120,13 +169,13 @@ union gap_evt_u
 	struct gap_slave_security_req slave_security_req;
 	struct gap_pair_done pair_done;
 	struct gap_encrypt_done encrypt_done;
-	
+	struct gap_display_password display_pwd;
 };
 
-void dev_init(struct ble_stack_cfg *cfg,void (*cb)(enum dev_evt_type,union dev_evt_u *));
+void dev_manager_init(struct ble_stack_cfg *cfg,void (*cb)(enum dev_evt_type,union dev_evt_u *));
 
 void gap_manager_init(void (*evt_cb)(enum gap_evt_type,union gap_evt_u *,uint8_t));
 
-void gap_manager_pairing_response_send(uint8_t accept,struct pair_feature *feat);
+void gap_manager_pairing_response_send(uint8_t con_idx,uint8_t accept,struct pair_feature *feat);
 
 #endif

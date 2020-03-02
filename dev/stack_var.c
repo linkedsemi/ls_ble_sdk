@@ -216,6 +216,13 @@ void main_task_itf_init()
     rwip_eif_get_fn = uart_itf_get;
 }
 
+uint8_t peer_id_buf[SDK_MAX_CONN_NUM];
+
+uint8_t *get_peer_id_buf()
+{
+	return peer_id_buf;
+}
+
 #define EM_MACRO_0 (MAX_ACT_NUM + 2)
 const uint32_t em_end = ((((((((((((((((((((((((((112 * (MAX_ACT_NUM + 4) + 339) & 0xFFFFFFFC) + 12 * EM_MACRO_0 + 3) & 0xFFFFFFFC)
                                + 56 * SDK_MAX_RAL_NUM
