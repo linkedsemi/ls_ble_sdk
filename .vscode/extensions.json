@@ -4,6 +4,7 @@
       "marus25.cortex-debug",
       "zixuanwang.linkerscript",
       "keroc.hex-fmt",
-      "ms-python.python"
+      "ms-python.python",
+      "lextudio.restructuredtext"
     ]
   }

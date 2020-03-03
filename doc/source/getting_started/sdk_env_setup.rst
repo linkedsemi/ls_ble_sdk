@@ -19,12 +19,13 @@ Python 3 + VS Code + GCC(ARM)
 
 * 进入SDK根目录，打开命令行，执行:
 
-	::
-	
-		pip install -r requirements.txt
+    ::
+        pip install -r requirements.txt
 
-	安装Python依赖库
-	
+安装Python依赖库
+
+*  编辑tools/arm-gcc.py，修改env['TOOLCHAIN_PATH']为GCC解压后可执行文件所在目录
+
 * 打开VS Code，点击左侧Extensions，安装所有Workspace Recommendations插件
 
 

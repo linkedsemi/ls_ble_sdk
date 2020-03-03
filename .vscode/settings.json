@@ -4,4 +4,5 @@
     "files.associations": {
         "ls_ble.h": "c"
     },
+    "restructuredtext.confPath": "${workspaceFolder}\\doc\\source",
 }
