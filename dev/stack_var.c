@@ -220,7 +220,7 @@ uint8_t peer_id_buf[SDK_MAX_CONN_NUM];
 
 uint8_t *get_peer_id_buf()
 {
-	return peer_id_buf;
+    return peer_id_buf;
 }
 
 #define EM_MACRO_0 (MAX_ACT_NUM + 2)

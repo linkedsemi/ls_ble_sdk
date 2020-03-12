@@ -10,7 +10,7 @@ GCC(ARM) ：https://developer.arm.com/-/media/Files/downloads/gnu-rm/9-2019q4/gc
 
 VS Code ：https://go.microsoft.com/fwlink/?Linkid=852157
 
-Python 3 : https://www.python.org/ftp/python/3.8.2/python-3.8.2.exe
+Python 3 : https://www.python.org/ftp/python/3.8.2/python-3.8.2-amd64.exe (64bit)
 
 Python 3 + VS Code + GCC(ARM)
 ##############################

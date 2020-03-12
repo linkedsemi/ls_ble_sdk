@@ -2,7 +2,17 @@
     "C_Cpp.errorSquiggles": "Disabled",
     "python.pythonPath": "C:\\Users\\lszxt\\AppData\\Local\\Programs\\Python\\Python38\\python.exe",
     "files.associations": {
-        "ls_ble.h": "c"
+        "ls_ble.h": "c",
+        "linked_buffer.h": "c",
+        "co_list.h": "c",
+        "co_math.h": "c",
+        "co_utils.h": "c",
+        "rwip_config.h": "c",
+        "ls_dbg.h": "c",
+        "nvds_default_param.h": "c",
+        "prf_diss.h": "c",
+        "tinyfs_write_cache.h": "c"
     },
     "restructuredtext.confPath": "${workspaceFolder}\\doc\\source",
+	"editor.detectIndentation": false,
 }
