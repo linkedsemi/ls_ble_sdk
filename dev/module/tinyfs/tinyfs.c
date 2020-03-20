@@ -12,6 +12,7 @@
 #include "common.h"
 #include "ls_dbg.h"
 #include "crc16.h"
+#include "co_math.h"
 
 #define TINYFS_ASSERT(...) LS_ASSERT(__VA_ARGS__)
 
@@ -245,7 +246,7 @@ static uint16_t get_first_valid_section(uint8_t *valid_mask)
     uint16_t i;
     for(i=0;i<CEILING(TINYFS_SECTION_NUM,8);++i)
     {
-        uint32_t trailing_zeros = count_trailing_zeros(valid_mask[i]);
+        uint32_t trailing_zeros = co_ctz(valid_mask[i]);
         if(trailing_zeros!=32)
         {
             return trailing_zeros + i*8;
@@ -318,7 +319,7 @@ static tinyfs_node_t *node_alloc()
 
 static void node_free(tinyfs_node_t *ptr)
 {
-    linked_buf_release(&tinyfs_node,ptr);
+    linked_buf_release(&tinyfs_node,&ptr->hdr);
 }
 
 static uint16_t node_total_length(const tinyfs_node_t *const ptr)
@@ -995,7 +996,7 @@ static void garbage_collect_try(uint16_t size)
 static bool if_dir_exist(tinyfs_node_t *dir)
 {
     bool exist = false;
-    if(linked_buf_contain_element(&tinyfs_node,dir))
+    if(linked_buf_contain_element(&tinyfs_node,&dir->hdr))
     {
         if(dir->child)
         {

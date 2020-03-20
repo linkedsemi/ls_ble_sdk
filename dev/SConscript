@@ -1,0 +1,31 @@
+
+Import('dev_env','target_fw','target_lib')
+
+module_src,module_inc = SConscript(dirs='module',exports = ['dev_env'])
+peripheral_src,peripheral_inc = SConscript(dirs='peripheral',exports = ['dev_env'])
+soc_src,soc_inc = SConscript(dirs='soc',exports = ['dev_env'])
+sdk_src = module_src + peripheral_src + soc_src
+sdk_inc = module_inc + peripheral_inc + soc_inc
+sdk_inc += Dir(['.'])
+dev_env.Append(CPPPATH = list(map(lambda x:'#/'+x.srcnode().path,sdk_inc)))
+dev_env.Append(LINKFLAGS = ' $GC_OPTION bin/fw_${COMPILER}.sym ')
+dev_env.Append(LIBPATH = Dir('#').Dir('bin'))
+dev_env.Append(LIBS = ['fw_export.strip'])
+
+def app_build(app_name,src,inc):
+    global dev_env
+    global sdk_src
+    global target_fw
+    global target_lib
+    app_env = dev_env.Clone()
+    src_files = File(src)
+    inc_dirs = Dir(inc)
+    app_env.Append(CPPPATH = list(map(lambda x:'#/'+x.srcnode().path,inc_dirs)))
+    target_name = '#build/examples/'+app_name
+    app_target = app_env.Program(target_name,sdk_src + src_files)
+    app_env.AddPostAction(app_target,Action('$OBJDUMP -d -x $TARGET > ${TARGET.base}.asm'))
+    app_env.AddPostAction(app_target,Action('$OBJCOPY -O ihex $TARGET ${TARGET.base}.hex'))
+    app_env.Depends(app_target,[target_fw,target_lib,app_env['LINKSCRIPT']])
+    app_env.Clean(app_target,[target_name+'.asm',target_name+'.hex'])
+
+SConscript(dirs = 'examples',exports=['app_build'])

@@ -1,0 +1,10 @@
+src = [
+
+]
+inc = [
+
+]
+src_files = File(src)
+inc_dirs = Dir(inc)
+
+Return("src_files","inc_dirs")

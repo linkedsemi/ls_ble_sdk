@@ -1,0 +1,5 @@
+Import('app_build')
+
+SConscript(dirs = 'ble_ancs_c',exports=['app_build'])
+SConscript(dirs = 'ble_dis',exports=['app_build'])
+SConscript(dirs = 'host_test',exports=['app_build'])

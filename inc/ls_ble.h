@@ -280,7 +280,25 @@ union gap_evt_u
 	struct gap_display_password display_pwd;
 };
 
-void dev_manager_init(struct ble_stack_cfg *cfg,void (*cb)(enum dev_evt_type,union dev_evt_u *));
+enum gatt_evt_type
+{
+	GATT_0,
+
+};
+
+
+union gatt_evt_u
+{
+	uint8_t evt0;
+};
+
+void ble_init(void);
+
+void ble_loop(void);
+
+void dev_manager_init(void (*cb)(enum dev_evt_type,union dev_evt_u *));
+
+void dev_manager_stack_init(struct ble_stack_cfg *cfg);
 
 void dev_manager_add_service(struct svc_decl *svc);
 
@@ -315,4 +333,6 @@ void gap_manager_slave_pair_response_send(uint8_t con_idx,uint8_t accept,struct 
 uint8_t gap_manager_get_role(uint8_t con_idx);
 
 uint8_t gap_manager_get_sec_lvl(uint8_t con_idx);
+
+void gatt_manager_init(void (*evt_cb)(enum gatt_evt_type,union gatt_evt_u *,uint8_t));
 #endif

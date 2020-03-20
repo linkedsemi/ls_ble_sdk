@@ -4,13 +4,13 @@
     .thumb
     .thumb_func
     .align 1
-    .globl rwip_assert_asm
-    .type rwip_assert_asm,%function
-rwip_assert_asm:
+    .globl stack_assert_asm
+    .type stack_assert_asm,%function
+stack_assert_asm:
 
     PUSH {LR}
     MOV R3,LR
-    BL rwip_assert_c
+    BL stack_assert_c
     POP {PC}
 
     .thumb_func

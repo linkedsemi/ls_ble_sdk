@@ -1,0 +1,13 @@
+Import("dev_env")
+src = [
+    'platform.c',
+    'stack_var.c',
+    'compiler/$COMPILER/startup.s',
+]
+inc = [
+    '.',
+]
+src_files = File(dev_env.subst(src))
+inc_dirs = Dir(inc)
+dev_env['LINKSCRIPT'] = File(dev_env.subst("compiler/$COMPILER/link_script.txt"))
+Return("src_files","inc_dirs")

@@ -1,0 +1,23 @@
+Import('dev_env')
+src = [
+    'crc/crc16.c',
+    'debug/log.c',
+    'debug/ls_dbg.c',
+    'debug/asm/$COMPILER/ls_dbg_asm.s',
+    'debug/RTT/SEGGER_RTT_printf.c',
+    'debug/RTT/SEGGER_RTT.c',
+    'static_buffer/linked_buffer.c',
+    'tinyfs/tinyfs_nvm.c',
+    'tinyfs/tinyfs_write_cache.c',
+    'tinyfs/tinyfs.c',
+]
+inc = [
+    'crc',
+    'debug',
+    'debug/RTT',
+    'static_buffer',
+    'tinyfs',
+]
+src_files = File(dev_env.subst(src))
+inc_dirs = Dir(inc)
+Return("src_files","inc_dirs")

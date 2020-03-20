@@ -34,7 +34,7 @@ void log_output(bool linefeed,const char *format,...)
     if(LOG_BACKEND&RAM_LOG)
     {
         va_start(args,format);
-        ram_log_print(linefeed,format,&args);
+//        ram_log_print(linefeed,format,&args);
     }
     va_end(args);
 }

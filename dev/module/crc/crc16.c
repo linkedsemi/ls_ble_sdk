@@ -35,7 +35,7 @@ static const uint16_t crc16_ccitt_table[256]={
 
 };
 
-uint16_t crc16_lookup(uint16_t crc, const void *in_data, uint32_t len,uint16_t crc16_table[256]) 
+uint16_t crc16_lookup(uint16_t crc, const void *in_data, uint32_t len,const uint16_t crc16_table[256]) 
 {
     const uint8_t *data = in_data;
     for (uint32_t i = 0; i < len; i++) {

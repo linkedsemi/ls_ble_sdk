@@ -1,0 +1,40 @@
+MEMORY
+{
+  RAM (rwx) : ORIGIN = 0x00000, LENGTH = 0xc000
+  FLASH (rx) : ORIGIN = 0x18040000, LENGTH = 0x40000
+}
+
+SECTIONS
+{
+
+	CODE :
+	{
+        KEEP(*(.isr_vector))
+		__copy_table_start__ = .;
+		LONG(__data_start__)
+		LONG(__data_end__ - __data_start__)
+		__copy_table_end__ = .;
+		__zero_table_start__ = .;
+		LONG(__bss_start)
+		LONG(__bss_end__ - __bss_start)		
+		__zero_table_end__ = .;
+        *(.init)
+        *(.fini)
+		*(.eh_frame*)
+		*(.text* .rodata*)
+	}>FLASH
+	
+	DATA :
+	{
+		__data_start__ = .;
+		*(.data*) 
+		__data_end__ = ALIGN(4);
+	}>RAM AT>FLASH
+
+    BSS :
+    {
+    	__bss_start = .;
+		*(.bss* COMMON)
+		__bss_end__ = ALIGN(4);
+    }>RAM AT>FLASH
+}

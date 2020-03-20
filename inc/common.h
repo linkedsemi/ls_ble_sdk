@@ -17,9 +17,7 @@
 
 #define MIN(a,b) ((a)<(b)?(a):(b))
 
-uint8_t count_trailing_zeros(uint32_t x);
-
-uint8_t count_leading_zeros(uint32_t x);
+#define CEILING(dividend,divisor) ((dividend)/(divisor) + (((dividend)%(divisor))?1:0))
 
 void *ll_malloc(uint32_t size);
 

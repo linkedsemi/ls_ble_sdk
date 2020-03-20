@@ -1,6 +1,8 @@
-#include <assert.h>
+#include <stdarg.h>
 #include <string.h>
 #include "linked_buffer.h"
+#include "ls_dbg.h"
+#define LINKED_BUF_ASSERT(...) LS_ASSERT(__VA_ARGS__)
 
 void linked_buf_init(linked_buffer_t *ptr,uint16_t element_size,uint16_t buf_length,uint8_t *buf,uint8_t *ref_cnt)
 {
@@ -44,9 +46,9 @@ static bool linked_buf_hdl_sanity_check(linked_buffer_t *buf_hdl,uint8_t *ptr)
 
 uint8_t linked_buf_release(linked_buffer_t *ptr,struct co_list_hdr * hdr)
 {
-	assert(linked_buf_hdl_sanity_check(ptr,(uint8_t *)hdr));	
-	assert(ptr->ref_cnt[idx]);
+	LINKED_BUF_ASSERT(linked_buf_hdl_sanity_check(ptr,(uint8_t *)hdr));
 	uint16_t idx = linked_buf_get_elem_idx(ptr,hdr);
+	LINKED_BUF_ASSERT(ptr->ref_cnt[idx]);
 	co_list_push_back(&ptr->allocatable, hdr);
 	return --ptr->ref_cnt[idx];
 }
@@ -54,7 +56,7 @@ uint8_t linked_buf_release(linked_buffer_t *ptr,struct co_list_hdr * hdr)
 uint16_t linked_buf_get_elem_idx(linked_buffer_t *ptr,struct co_list_hdr *hdr)
 {
 	uint8_t *elem = (uint8_t *)hdr;
-	assert((elem-(uint8_t *)ptr->buf)%ptr->element_size==0);
+	LINKED_BUF_ASSERT((elem-(uint8_t *)ptr->buf)%ptr->element_size==0);
 	return (elem-(uint8_t *)ptr->buf)/ptr->element_size;
 }
 
@@ -78,20 +80,21 @@ uint8_t linked_buf_get_ref_cnt_by_idx(linked_buffer_t *ptr,uint16_t idx)
 	return ptr->ref_cnt[idx];
 }
 
-uint8_t linked_buf_retain(linked_buffer_t *ptr,co_list_hdr *hdr)
+uint8_t linked_buf_retain(linked_buffer_t *ptr,struct co_list_hdr *hdr)
 {
-	assert(linked_buf_hdl_sanity_check(ptr,(uint8_t *)hdr));
+	LINKED_BUF_ASSERT(linked_buf_hdl_sanity_check(ptr,(uint8_t *)hdr));
 	uint16_t idx = linked_buf_get_elem_idx(ptr,hdr);
 	return ++ptr->ref_cnt[idx];
 }
 
-bool linked_buf_contain_element(linked_buffer_t *ptr,co_list_hdr *hdr)
+bool linked_buf_contain_element(linked_buffer_t *ptr,struct co_list_hdr *hdr)
 {
 	bool contain = false;
-	if(linked_buf_hdl_sanity_check(ptr,hdr))
+	if(linked_buf_hdl_sanity_check(ptr,(uint8_t *)hdr))
 	{
 		uint16_t idx = linked_buf_get_elem_idx(ptr,hdr);
 		contain = linked_buf_get_ref_cnt_by_idx(ptr,idx) ? true : false;
 	}
 	return contain;
 }
+
