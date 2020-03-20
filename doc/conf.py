@@ -28,8 +28,37 @@ author = 'linkedsemi'
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
+    'breathe',
+    'exhale',
     "sphinx_rtd_theme",
 ]
+
+breathe_projects = {
+    "ls_sdk": "../build/doc/doxyoutput/xml"
+}
+breathe_default_project = "ls_sdk"
+
+# Setup the exhale extension
+exhale_args = {
+    # These arguments are required
+    "containmentFolder":     "./api",
+    "rootFileName":          "api_root.rst",
+    "rootFileTitle":         "API Reference",
+    "doxygenStripFromPath":  "..",
+    # Suggested optional arguments
+    "createTreeView":        True,
+    # TIP: if using the sphinx-bootstrap-theme, you need
+    # "treeViewIsBootstrap": True,
+    "exhaleExecutesDoxygen": True,
+    "exhaleDoxygenStdin":    "INPUT = ../inc/le501x.h"
+    #"exhaleUseDoxyfile":     True,
+}
+
+# Tell sphinx what the primary language being documented is.
+primary_domain = 'c'
+
+# Tell sphinx what the pygments highlight language should be.
+highlight_language = 'c'
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']

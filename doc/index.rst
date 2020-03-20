@@ -11,6 +11,7 @@ Welcome to ls_sdk's documentation!
    :caption: Contents:
    
    getting_started/index
+   api/api_root
    
 
 
