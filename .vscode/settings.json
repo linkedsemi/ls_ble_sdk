@@ -11,8 +11,9 @@
         "ls_dbg.h": "c",
         "nvds_default_param.h": "c",
         "prf_diss.h": "c",
-        "tinyfs_write_cache.h": "c"
+        "tinyfs_write_cache.h": "c",
+        "platform.h": "c"
     },
-    "restructuredtext.confPath": "${workspaceFolder}\\doc\\source",
-	"editor.detectIndentation": false,
+    "editor.detectIndentation": false,
+    "restructuredtext.confPath": "${workspaceFolder}\\doc",
 }

@@ -56,7 +56,7 @@ void dev_event_callback(enum dev_evt_type type,union dev_evt_u *evt)
 
 void main()
 {
-	sys_init();
+	sys_init(true);
 	ble_init();
     dev_manager_init(dev_event_callback);
 	gap_manager_init(gap_manager_callback);

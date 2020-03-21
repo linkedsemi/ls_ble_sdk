@@ -14,6 +14,7 @@ SECTIONS
 		__data_start__ = .;
         KEEP(*(.isr_vector))
 		*(.data*) 
+        *(.xip_banned)
 		__data_end__ = ALIGN(4);
 	}>RAM AT>FLASH
 	
