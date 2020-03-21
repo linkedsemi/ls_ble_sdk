@@ -23,7 +23,7 @@ def app_build(app_name,src,inc):
     app_env.Append(CPPPATH = list(map(lambda x:'#/'+x.srcnode().path,inc_dirs)))
     target_name = '#build/examples/'+app_name
     app_target = app_env.Program(target_name,sdk_src + src_files)
-    app_env.AddPostAction(app_target,Action('$OBJDUMP -d -x $TARGET > ${TARGET.base}.asm'))
+    app_env.AddPostAction(app_target,Action('$OBJDUMP -d -z -x $TARGET > ${TARGET.base}.asm'))
     app_env.AddPostAction(app_target,Action('$OBJCOPY -O ihex $TARGET ${TARGET.base}.hex'))
     app_env.Depends(app_target,[target_fw,target_lib,app_env['LINKSCRIPT']])
     app_env.Clean(app_target,[target_name+'.asm',target_name+'.hex'])
