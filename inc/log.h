@@ -48,7 +48,14 @@ void log_hex_output(const void * data_pointer , uint16_t data_length);
 #define LOG_I(...)  log_i(LOG_TAG,__VA_ARGS__)
 #define LOG_W(...)  log_w(LOG_TAG,__VA_ARGS__)
 #define LOG_E(...)  log_e(LOG_TAG,__VA_ARGS__)
+#if (GLOBAL_OUTPUT_LVL)
 #define LOG_RAW(...)                        log_output(false, __VA_ARGS__)
 #define LOG_HEX(data_pointer,data_length)   log_hex_output(data_pointer,data_length)
 #define LOG_INIT()  log_init()
+#else
+#define LOG_RAW(...)             
+#define LOG_HEX(data_pointer,data_length)  
+#define LOG_INIT()  
+
+#endif
 #endif

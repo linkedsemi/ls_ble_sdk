@@ -575,7 +575,7 @@ static void nodes_info_load(section_head_data_t *section_head_data,uint8_t *vali
                 {
                     break;
                 }
-                offset =  offset+TINYFS_WRITE_CACHE_SIZE &~(TINYFS_WRITE_CACHE_SIZE-1);
+                offset =  (offset+TINYFS_WRITE_CACHE_SIZE) &~(TINYFS_WRITE_CACHE_SIZE-1);
             }
         }
     }while(i!=tinyfs_env.tail_section);
@@ -668,7 +668,6 @@ static void dir_tree_link(tinyfs_node_t *const parent,tinyfs_node_t *const start
 {
     TINYFS_ASSERT(parent->child);
     tinyfs_node_t *first_child = start;
-    node_idx_t parent_idx = node_idx(parent);
     while(first_child&&first_child->parent_dir!=parent->u.id)
     {
         first_child = node_ptr(first_child->next_sibling);
@@ -978,7 +977,7 @@ static bool section_wipe_check(uint16_t size,uint16_t *num)
 
 static void garbage_collect_try(uint16_t size)
 {
-    uint16_t num;
+    uint16_t num = 0;
     bool wipe = section_wipe_check(size, &num);
     TINYFS_ASSERT(wipe);
     uint16_t i=0;

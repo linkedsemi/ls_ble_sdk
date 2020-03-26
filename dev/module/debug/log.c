@@ -17,7 +17,6 @@ void rtt_output(bool linefeed,const char *format,va_list *args)
     }
 }
 
-
 void log_output(bool linefeed,const char *format,...)
 {
     va_list args;
@@ -98,7 +97,6 @@ void log_hex_output(const void * data_pointer , uint16_t data_length)
         //ram_log_write_buff(log_format_buff,total_length);
     }
 }
-
 
 
 

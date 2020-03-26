@@ -30,7 +30,3 @@ Python 3 + VS Code + GCC(ARM)
 
 
 
-
-
-
-

@@ -11,6 +11,8 @@
 #define LVL_INFO 3
 #define LVL_DBG  4
 
+#ifndef GLOBAL_OUTPUT_LVL
 #define GLOBAL_OUTPUT_LVL     LVL_DBG
+#endif
 
 #endif

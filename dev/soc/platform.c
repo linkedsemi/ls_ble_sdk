@@ -38,7 +38,7 @@ void uart_eif_flow_on(void)
 
 bool uart_eif_flow_off(void)
 {
-
+	return true;
 }
 
 void platform_reset(uint32_t error)
@@ -61,13 +61,13 @@ void true_rand_init(unsigned int seed)
 int true_rand_gen(void)
 {
 
-
+	return 0;
 }
 
 uint64_t idiv_acc(uint32_t dividend,uint32_t divisor,bool signed_int)
 {
 
-
+	return 0;
 }
 
 void SystemInit()
@@ -78,4 +78,5 @@ void SystemInit()
 uint32_t plf_get_reset_error()
 {
 
+	return 0;
 }

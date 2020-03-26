@@ -58,10 +58,10 @@ void tinyfs_nvm_read_with_cache(uint32_t offset, uint32_t length, uint8_t *buffe
     {
         if(offset<tinyfs_wr_cache_env.current_buf_offset)
         {
-            nvm_read_length = length - (offset+length&TINYFS_WRITE_CACHE_SIZE-1);
+            nvm_read_length = length - ((offset+length)&(TINYFS_WRITE_CACHE_SIZE-1));
         }else
         {
-            cache_src += offset & TINYFS_WRITE_CACHE_SIZE-1;
+            cache_src += offset & (TINYFS_WRITE_CACHE_SIZE-1);
             nvm_read_length = 0;
         }       
     }else

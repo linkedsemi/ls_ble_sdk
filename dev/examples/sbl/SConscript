@@ -1,0 +1,9 @@
+Import('sbl_build')
+src = [
+    'sbl.c'
+]
+inc = [
+    '.'
+]
+
+sbl_build('sbl',src,inc,'sbl_link.txt','0x18000000')

@@ -44,30 +44,23 @@ void hardfault_print(void)
     xPSR_INSTACK,
     };
 
-    uint32_t msp = hardfault_env.msp;
-    uint32_t psp = hardfault_env.psp;
-    uint32_t lr = hardfault_env.lr;
-    uint32_t r4 = hardfault_env.r4;
-    uint32_t r5 = hardfault_env.r5;
-    uint32_t r6 = hardfault_env.r6;
-    uint32_t r7 = hardfault_env.r7;
     LOG_RAW( "!!!!!!!!!!HardFault Handler is triggered!!!!!!!!!!\r\n");
     LOG_RAW( "Prolog:\r\n");
-    LOG_RAW( "R4   = 0x%08x\r\n", r4);
-    LOG_RAW( "R5   = 0x%08x\r\n", r5);
-    LOG_RAW( "R6   = 0x%08x\r\n", r6);
-    LOG_RAW( "R7   = 0x%08x\r\n", r7);
-    LOG_RAW( "lr   = 0x%08x\r\n", lr);
-    LOG_RAW( "msp  = 0x%08x\r\n", msp);
-    LOG_RAW( "psp  = 0x%08x\r\n", psp);
-    uint32_t *sp = 0;
-    if(lr==0xfffffffd)
+    LOG_RAW( "R4   = 0x%08x\r\n", hardfault_env.r4);
+    LOG_RAW( "R5   = 0x%08x\r\n", hardfault_env.r5);
+    LOG_RAW( "R6   = 0x%08x\r\n", hardfault_env.r6);
+    LOG_RAW( "R7   = 0x%08x\r\n", hardfault_env.r7);
+    LOG_RAW( "lr   = 0x%08x\r\n", hardfault_env.lr);
+    LOG_RAW( "msp  = 0x%08x\r\n", hardfault_env.msp);
+    LOG_RAW( "psp  = 0x%08x\r\n", hardfault_env.psp);
+    uint32_t *sp;
+    if(hardfault_env.lr==0xfffffffd)
     {
-        sp = (uint32_t*)psp;
+        sp = (uint32_t*)hardfault_env.psp;
         LOG_RAW("PSP Stack Info:\r\n");
     }
     else{
-        sp = (uint32_t*)msp;
+        sp = (uint32_t*)hardfault_env.msp;
         LOG_RAW("MSP Stack Info:\r\n");
     }
 

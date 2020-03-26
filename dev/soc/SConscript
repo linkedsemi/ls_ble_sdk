@@ -3,9 +3,11 @@ src = [
     'platform.c',
     'stack_var.c',
     'compiler/$COMPILER/startup.s',
+    'integration/lsqspi_param.c',
 ]
 inc = [
     '.',
+    'integration',
 ]
 src_files = File(dev_env.subst(src))
 inc_dirs = Dir(inc)

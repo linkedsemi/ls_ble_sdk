@@ -1,7 +1,7 @@
 #include "ls_ble.h"
 #include "platform.h"
 
-void main()
+int main()
 {
 	sys_init(false);
 	ble_init();
@@ -9,5 +9,6 @@ void main()
 	{
 		ble_loop();
 	}
+	return 0;
 }
 
