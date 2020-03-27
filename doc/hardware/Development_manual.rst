@@ -10,7 +10,7 @@
 1.1 功能介绍
 +++++++++++++
 
-LE5010芯片支持天猫mesh，有19 个外置I/O，供电电压在1.7V-3.6V，可以使用干电池或者对应电压的锂电池供电。
+LE5010芯片支持天猫mesh，有21 个外置I/O，供电电压在1.7V-3.6V，可以使用干电池或者对应电压的锂电池供电。
 
 +++++++++++++++
 1.2 引脚定义图
@@ -31,9 +31,9 @@ GPIO 具有全功能映射。
 3         PA07       IO
 4         PA08       IO
 5         PA09       IO
-6         DCDC_V33   DCDC_V33
+6         DCDC_V33   DCDC_V33，必须与PIN27相接
 7         DCDC_VSW   DCDC输出
-8         DCDC_VFB   DCDC反馈输入
+8         DCDC_VFB   DCDC反馈输入，必须与PIN24相接
 9         PA13       IO
 10        PA14       IO
 11        PA15       IO
@@ -41,7 +41,7 @@ GPIO 具有全功能映射。
 13        PB01       IO /UART1_RX
 14        PB05       IO /SWCLK
 15        PB06       IO /SWDIO
-16        NRST       IO
+16        NRST       复位引脚
 17        PB08       IO
 18        PB09       IO
 19        PB10       IO
@@ -49,10 +49,10 @@ GPIO 具有全功能映射。
 21        VDD12      1.2V电源
 22        RF_P       ANT
 23        VDD_PAHP   RF滤波
-24        VDD15      1.5V电压输入，与PIN8相接
+24        VDD15      1.5V电压输入，必须与PIN8相接
 25        XO16M_O    晶振接口0
 26        XO16M_I    晶振接口1
-27        VDD33      3.3V电源接口、与PIN6相接，再接电源
+27        VDD33      3.3V电源接口，必须与PIN6相接
 28        PB12       IO
 29        PB13       IO
 30        PB14       IO
@@ -81,9 +81,11 @@ GPIO 具有全功能映射。
 
 4、若未使用DCDC降低功耗，将L1换成0欧电阻，C4电容可省略
 
-5、如果未使用大PA（TX功率在10dBm以下），则C5电容可省略
+5、若使用时，TX功率大于10dBm以上，必须在VDD_PAHP外围加一个1uF的电容
 
 
 sch_CN  :download:`sch <./PAGE.pdf>` 
+
 sch_EN  :download:`sch<./PAGE_EN.pdf>`
+
 PcbLib  :download:`pcblib<./LE5010_QFN32.PcbLib>`
