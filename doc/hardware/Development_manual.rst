@@ -84,8 +84,17 @@ GPIO 具有全功能映射。
 5、若使用时，TX功率大于10dBm以上，必须在VDD_PAHP外围加一个1uF的电容
 
 
-sch_CN  :download:`sch <./PAGE.pdf>` 
+-------------------
+三、封装尺寸
+-------------------
 
-sch_EN  :download:`sch<./PAGE_EN.pdf>`
+外形尺寸：
 
-PcbLib  :download:`pcblib<./LE5010_QFN32.PcbLib>`
+..  image::  LE5010_QFN3_Size.png
+
+
+sch_CN  :download:`sch <./PAGE_CN.pdf>` 
+
+sch_EN  :download:`sch <./PAGE_EN.pdf>` 
+
+ADLib  :download:`lib<./LIB.rar>`
