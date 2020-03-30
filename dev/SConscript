@@ -8,10 +8,7 @@ sdk_src = module_src + peripheral_src + soc_src
 sdk_inc = module_inc + peripheral_inc + soc_inc
 sdk_inc += Dir(['.'])
 dev_env.Append(CPPPATH = list(map(lambda x:'#/'+x.srcnode().path,sdk_inc)))
-dev_env.Append(LINKFLAGS = ' $GC_OPTION bin/fw_${COMPILER}.sym ')
-dev_env.Append(LIBPATH = Dir('#').Dir('bin'))
-dev_env.Append(LIBS = ['fw_export.strip'])
-
+dev_env.Append(LINKFLAGS = ' $GC_OPTION dev/soc/bin/libfw.o ')
 
     
 def image_build(name,src,inc,linkscript = '',objprefix = ''):

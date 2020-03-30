@@ -5,6 +5,7 @@
       "zixuanwang.linkerscript",
       "keroc.hex-fmt",
       "ms-python.python",
-      "lextudio.restructuredtext"
+      "lextudio.restructuredtext",
+      "dan-c-underwood.arm"
     ]
   }

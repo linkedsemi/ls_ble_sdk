@@ -7,9 +7,11 @@
 void lsqspi_init(struct lsqspi_instance *inst)
 {
 	inst->mem_base = LSQSPI_MEM_MAP_BASE_ADDR;
+	lsqspi_clk_set(inst,true);
+	lsqspi_sw_rst(inst);
+   	inst->reg->RDCAP = FIELD_BUILD(LSQSPI_DLY_RD_CAP, lsqspi_rd_cap_dly_get(inst));
 	inst->reg->CFG = FIELD_BUILD(LSQSPI_BAUDRATE,lsqspi_baudrate_get(inst))|FIELD_BUILD(LSQSPI_DAC_ENABLE,1)
 		|FIELD_BUILD(LSQSPI_CPHA,0)|FIELD_BUILD(LSQSPI_CPOL,0)|FIELD_BUILD(LSQSPI_ENABLE,1);
-	inst->reg->RDCAP = FIELD_BUILD(LSQSPI_DLY_RD_CAP, lsqspi_rd_cap_dly_get(inst));
 }
 
 void lsqspi_direct_read_config(struct lsqspi_instance *inst,struct lsqspi_direct_read_config_param *param)

@@ -1,6 +1,5 @@
 {
     "C_Cpp.errorSquiggles": "Disabled",
-    "python.pythonPath": "C:\\Users\\lszxt\\AppData\\Local\\Programs\\Python\\Python38\\python.exe",
     "files.associations": {
         "ls_ble.h": "c",
         "linked_buffer.h": "c",

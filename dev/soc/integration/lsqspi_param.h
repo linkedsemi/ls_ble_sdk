@@ -4,6 +4,10 @@
 #define LSQSPI_MEM_MAP_BASE_ADDR (void *)0x18000000
 #define LSQSPI_DUMMY_BYTES_CONVERT(x) ((x)-1)
 
+void lsqspi_sw_rst(struct lsqspi_instance *inst);
+
+void lsqspi_clk_set(struct lsqspi_instance *inst,bool enable);
+
 uint8_t lsqspi_rd_cap_dly_get(struct lsqspi_instance *inst);
 
 uint8_t lsqspi_baudrate_get(struct lsqspi_instance *inst);

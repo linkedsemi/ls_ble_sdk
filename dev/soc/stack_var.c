@@ -29,10 +29,10 @@ extern void *_hci_env_ble_con_state_ptr;
 extern void *_hci_tl_env_per_adv_rep_chain_stat_ptr;
 extern void *_sch_slice_env_ble_ptr;
 extern void *_ke_task_env_task_list_ptr;
-extern void *_rwip_heap_env_ptr;
-extern void *_rwip_heap_db_ptr;
-extern void *_rwip_heap_msg_ptr;
-extern void *_rwip_heap_non_ret_ptr;
+extern void *_heap_env_ptr;
+extern void *_heap_db_ptr;
+extern void *_heap_msg_ptr;
+extern void *_heap_non_ret_ptr;
 
 
 extern void (*rwip_assert_asm_fn)(uint32_t,uint32_t,uint32_t);
@@ -50,13 +50,13 @@ extern uint8_t max_profile_num;
 extern uint8_t max_ral_num;
 extern uint8_t max_user_task_num;
 
-extern uint32_t rwip_heap_env_size; 
+extern uint32_t heap_env_size; 
 
-extern uint32_t rwip_heap_db_size;
+extern uint32_t heap_db_size;
 
-extern uint32_t rwip_heap_msg_size;
+extern uint32_t heap_msg_size;
 
-extern uint32_t rwip_heap_non_ret_size;
+extern uint32_t heap_non_ret_size;
 
 
 uint32_t ke_task_env_task_list_buf[9 + SDK_MAX_PROFILE_NUM + SDK_MAX_USER_TASK_NUM];
@@ -139,13 +139,13 @@ struct
 #define MSG_BUF_SIZE 4096
 #define NON_RET_BUF_SIZE 0
 
-uint32_t rwip_heap_env_buf[ENV_BUF_SIZE/sizeof(uint32_t)];
+uint32_t heap_env_buf[ENV_BUF_SIZE/sizeof(uint32_t)];
 
-uint32_t rwip_heap_db_buf[DB_BUF_SIZE/sizeof(uint32_t)];
+uint32_t heap_db_buf[DB_BUF_SIZE/sizeof(uint32_t)];
 
-uint32_t rwip_heap_msg_buf[MSG_BUF_SIZE/sizeof(uint32_t)];
+uint32_t heap_msg_buf[MSG_BUF_SIZE/sizeof(uint32_t)];
 
-uint32_t rwip_heap_non_ret_buf[NON_RET_BUF_SIZE/sizeof(uint32_t)];
+uint32_t heap_non_ret_buf[NON_RET_BUF_SIZE/sizeof(uint32_t)];
 
 void stack_var_ptr_init()
 {
@@ -176,10 +176,10 @@ void stack_var_ptr_init()
     _hci_tl_env_per_adv_rep_chain_stat_ptr = &hci_tl_env_per_adv_rep_chain_stat_buf;
     _sch_slice_env_ble_ptr = &sch_slice_env_ble_buf;
     _ke_task_env_task_list_ptr = &ke_task_env_task_list_buf;
-    _rwip_heap_env_ptr = &rwip_heap_env_buf;
-    _rwip_heap_db_ptr = &rwip_heap_db_buf;
-    _rwip_heap_msg_ptr = &rwip_heap_msg_buf;
-    _rwip_heap_non_ret_ptr = &rwip_heap_non_ret_buf;
+    _heap_env_ptr = &heap_env_buf;
+    _heap_db_ptr = &heap_db_buf;
+    _heap_msg_ptr = &heap_msg_buf;
+    _heap_non_ret_ptr = &heap_non_ret_buf;
 
 
     rwip_assert_asm_fn = stack_assert_asm;
@@ -194,10 +194,10 @@ void stack_var_ptr_init()
     max_ral_num = SDK_MAX_RAL_NUM;
     max_user_task_num = SDK_MAX_USER_TASK_NUM;
 
-	rwip_heap_env_size = ENV_BUF_SIZE;
-	rwip_heap_db_size = DB_BUF_SIZE;
-	rwip_heap_msg_size = MSG_BUF_SIZE;
-	rwip_heap_non_ret_size = NON_RET_BUF_SIZE;
+	heap_env_size = ENV_BUF_SIZE;
+	heap_db_size = DB_BUF_SIZE;
+	heap_msg_size = MSG_BUF_SIZE;
+	heap_non_ret_size = NON_RET_BUF_SIZE;
 }
 
 static bool dummy()

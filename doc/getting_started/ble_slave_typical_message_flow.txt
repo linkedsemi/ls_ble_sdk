@@ -1,0 +1,46 @@
+title BLE TYPICAL MESSAGE FLOW
+participant Slave App
+participant Slave Stack
+participant Master Stack
+participant Master App
+
+Slave App->Slave Stack: dev_manager_init
+Slave App->Slave Stack: gap_manager_init
+Slave App->Slave Stack: gatt_manager_init
+Slave Stack-->Slave App: dev event: STACK_INIT
+Slave App->+Slave Stack: dev_manager_stack_init
+Slave Stack-->-Slave App: dev event: STACK_READY
+opt ADD SERVICE
+    Slave App->+Slave Stack: dev_manager_add_service
+    Slave Stack-->-Slave App: dev event: SERVICE_ADDED
+end
+opt ADD PROFILE
+    Slave App->Slave Stack: prf_xxx_callback_init
+    Slave App->+Slave Stack: prf_xxx_add
+    Slave Stack-->-Slave App: prf xxx event: XXX_PROFILE_ADDED
+end
+Slave App->+Slave Stack: dev_manager_create_legacy_adv_object
+Slave Stack-->-Slave App: dev event: ADV_OBJ_CREATED
+Slave App->+Slave Stack: dev_manager_start_adv
+Master Stack->Slave Stack: CONNECT REQUEST
+note over Master App,Master Stack,Slave Stack,Slave App: CONNECTION ESTABLISHED
+Slave Stack-->-Slave App: dev event: ADV_STOPPED
+Slave Stack-->Slave App: gap event: CONNECTED
+opt BOND PROCEDURE
+    opt SLAVE INITIAE SECURITY PROCEDURE
+        Slave App->Slave Stack: gap_manager_slave_security_req
+        Slave Stack->Master Stack: SECURITY REQUEST
+    end
+    Master Stack->Slave Stack: PAIR REQUEST
+    Slave Stack-->Slave App: gap event: MASTER_PAIR_REQ
+    Slave App->Slave Stack: gap_manager_slave_pair_response_send
+    Slave Stack->Master Stack: PAIR RESPONSE
+    alt DISPLAY PASSWORD
+        Slave Stack->Slave App: text
+    else INPUT PASSWORD
+        Slave Stack->Slave App: text
+    end
+end
+Master Stack->Slave Stack: DISCONNECT
+Slave Stack-->Slave App: gap event: DISCONNECTED
+Slave App->Slave Stack: dev_manager_start_adv

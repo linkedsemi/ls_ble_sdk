@@ -4,6 +4,8 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
+
+    
         {
             "name": "Python: 当前文件",
             "type": "python",
@@ -11,6 +13,33 @@
             "program": "${file}",
             "console": "integratedTerminal",
             "args":["build/examples/sbl.bin","0x18000000","bin/info_sbl.hex"]
+        },
+        {
+            "type": "cortex-debug",
+            "request": "launch",
+            "servertype": "jlink",
+            "cwd": "${workspaceRoot}",
+            "executable": "./build/examples/sbl.elf",
+            "name": "Debug SBL",
+            "device": "LE501X",
+            "interface": "swd",
+            "runToMain": true,
+        },
+        {
+            "type": "cortex-debug",
+            "request": "launch",
+            "servertype": "jlink",
+            "cwd": "${workspaceRoot}",
+            "executable": "./build/examples/host_test.elf",
+            "name": "Debug HOST_TEST",
+            "device": "LE501X",
+            "interface": "swd",
+            "runToMain": false,
+            "preLaunchCommands" :[
+                "monitor reset",
+                "load",
+                
+            ]
         }
     ]
 }

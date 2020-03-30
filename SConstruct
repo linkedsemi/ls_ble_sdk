@@ -19,8 +19,8 @@ dev_env = env.Clone()
 stack = SConscript('build/stack/SConscript',exports=['env'],must_exist=False)
 
 if stack is None:
-    target_fw = '#bin/fw.hex'
-    target_lib = '#bin/libfw_export.strip.a'
+    target_fw = '#dev/soc/bin/fw.hex'
+    target_lib = '#dev/soc/bin/libfw.o'
 else:
     target_fw = stack[0]
     target_lib = stack[1]
