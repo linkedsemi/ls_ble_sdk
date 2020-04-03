@@ -33,7 +33,7 @@ struct lsqspi_stig_read_data_param
 	uint32_t addr:24,
 			opcode:8;
 	uint16_t size;
-	uint8_t dummy_bytes:2,
+	uint8_t dummy_bytes:3,
 			quad_addr:1,
 			quad_data:1,
 			mode_bits_en:1;

@@ -292,6 +292,21 @@ union gatt_evt_u
 	uint8_t evt0;
 };
 
+struct gatt_svc_cb
+{
+    void *hdr;
+    void (*read)(uint8_t);
+    void (*write)(uint8_t,uint16_t,uint16_t,uint8_t *);
+    uint16_t start_hdl;
+    uint8_t att_num;
+};
+
+#define DEF_GATT_SVC_CALLBACK(svc,read_cb,write_cb) \
+    static struct gatt_svc_cb svc##_cb_env = { \
+        .read = (read_cb), \
+        .write = (write_cb), \
+    };
+
 void ble_init(void);
 
 void ble_loop(void);
@@ -335,4 +350,6 @@ uint8_t gap_manager_get_role(uint8_t con_idx);
 uint8_t gap_manager_get_sec_lvl(uint8_t con_idx);
 
 void gatt_manager_init(void (*evt_cb)(enum gatt_evt_type,union gatt_evt_u *,uint8_t));
+
+void gatt_manager_svc_callback_register(uint16_t start_hdl,uint8_t att_num,struct gatt_svc_cb *svc_cb);
 #endif

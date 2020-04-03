@@ -22,3 +22,8 @@ uint8_t lsqspi_baudrate_get(struct lsqspi_instance *inst)
 {
 	return 15;
 }
+
+uint32_t lsqspi_dly_get(struct lsqspi_instance *inst)
+{
+    return FIELD_BUILD(LSQSPI_DLY_NSS,5) | FIELD_BUILD(LSQSPI_DLY_AFTER,3) | FIELD_BUILD(LSQSPI_DLY_INIT, 5);
+}

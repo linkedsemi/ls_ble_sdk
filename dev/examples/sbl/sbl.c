@@ -6,6 +6,7 @@
 int main()
 {
 	spi_flash_init();
+    spi_flash_qe_status_read_and_set();
 	spi_flash_xip_start();
 	LSCACHE_PREFETCH_ON();
 	LSCACHE_ENABLE();

@@ -1,6 +1,7 @@
 #ifndef SPI_FLASH_H_
 #define SPI_FLASH_H_
 #include <stdint.h>
+#include <stdbool.h>
 
 void spi_flash_init(void);
 
@@ -22,7 +23,7 @@ void spi_flash_chip_erase(void);
 
 void spi_flash_quad_io_read(uint32_t offset,uint8_t *data,uint16_t length);
 
-void spi_flash_std_fast_read(uint32_t offset,uint8_t *data,uint16_t length);
+void spi_flash_fast_read(uint32_t offset,uint8_t *data,uint16_t length);
 
 void spi_flash_deep_power_down(void);
 
@@ -39,6 +40,14 @@ void spi_flash_program_security_area(uint8_t idx,uint16_t addr,uint8_t *data,uin
 void spi_flash_read_security_area(uint8_t idx,uint16_t addr,uint8_t *data,uint16_t length);
 
 void spi_flash_software_reset(void);
+
+void spi_flash_qe_status_read_and_set(void);
+
+void spi_flash_prog_erase_suspend(void);
+
+void spi_flash_prog_erase_resume(void);
+
+bool spi_flash_writing_busy(void);
 
 #endif
 

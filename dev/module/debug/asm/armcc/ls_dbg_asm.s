@@ -1,14 +1,14 @@
     PRESERVE8
     THUMB
-    AREA    |RWIP_ASSERT_ASM|, CODE, READONLY
+    AREA    |STACK_ASSERT_ASM|, CODE, READONLY
     FRAME UNWIND ON
-rwip_assert_asm PROC
-    EXPORT rwip_assert_asm
-    IMPORT rwip_assert_c
+stack_assert_asm PROC
+    EXPORT stack_assert_asm
+    IMPORT stack_assert_c
     PUSH {LR}
     FRAME PUSH {LR}
     MOV R3,LR
-    BL rwip_assert_c
+    BL stack_assert_c
     POP {PC}
     ENDP
 

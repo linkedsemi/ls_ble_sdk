@@ -1,6 +1,8 @@
 #include <stddef.h>
 #include "spi_flash.h"
 #include "lsqspi.h"
+#include "flash_svcall.h"
+#include "cpu.h"
 #define WRITE_STATUS_REGISTER_OPCODE 0x01
 #define READ_STATUS_REGISTER_0_OPCODE 0x05
 #define READ_STATUS_REGISTER_1_OPCODE 0x35
@@ -20,12 +22,16 @@
 #define READ_SECURITY_AREA_OPCODE 0x48
 #define RESET_EN_OPCODE 0x66
 #define RESET_OPCODE 0x99
+#define PROG_ERASE_SUSPEND 0x75
+#define PROG_ERASE_RESUME 0x7a
 
 #define XIP_MODE_BITS 0x20
 static struct lsqspi_instance lsqspi_inst;
+static bool flash_writing;
 
 void spi_flash_init()
 {
+	flash_writing = false;
 	lsqspi_inst.reg = LSQSPI;
 	lsqspi_init(&lsqspi_inst);
 }
@@ -83,16 +89,39 @@ static void spi_flash_write_status_check()
 	while(spi_flash_write_in_process());
 }
 
-void spi_flash_write_status_register(uint16_t status)
+static void flash_writing_critical(void (*func)(void *),void *param)
 {
+	enter_critical();
 	spi_flash_write_enable();
-	lsqspi_stig_write_register(&lsqspi_inst,WRITE_STATUS_REGISTER_OPCODE,(uint8_t *)&status, sizeof(uint16_t));
+	func(param);
+	flash_writing = true;
+	exit_critical();
 	spi_flash_write_status_check();
+	flash_writing = false;
 }
 
-static void spi_flash_program(uint32_t offset,uint8_t *data,uint16_t length,bool quad)
+static void do_spi_flash_write_status_reg_func(void * param)
 {
-	spi_flash_write_enable();
+	lsqspi_stig_write_register(&lsqspi_inst,WRITE_STATUS_REGISTER_OPCODE,param, sizeof(uint16_t));
+}
+
+void do_spi_flash_write_status_reg(uint16_t status)
+{
+	flash_writing_critical(do_spi_flash_write_status_reg_func,&status);
+}
+
+void spi_flash_write_status_register(uint16_t status)
+{
+	spi_flash_write_status_reg_operation(status);
+}
+
+static void do_spi_flash_prog_func(void *param)
+{
+	lsqspi_direct_write_data(&lsqspi_inst, param);
+}
+
+void do_spi_flash_program(uint32_t offset,uint8_t *data,uint16_t length,bool quad)
+{
 	struct lsqspi_direct_write_data_param param = {
 		.data = data,
 		.addr = offset,
@@ -100,39 +129,54 @@ static void spi_flash_program(uint32_t offset,uint8_t *data,uint16_t length,bool
 		.size = length,
 		.quad_data = quad,
 	};
-	lsqspi_direct_write_data(&lsqspi_inst, &param);
-	spi_flash_write_status_check();
+	flash_writing_critical(do_spi_flash_prog_func,&param);
 }
 
 void spi_flash_quad_page_program(uint32_t offset,uint8_t *data,uint16_t length)
 {
-	spi_flash_program(offset,data,length,true);
+	spi_flash_program_operation(offset,data,length,true);
 }
 
 void spi_flash_page_program(uint32_t offset,uint8_t *data,uint16_t length)
 {
-	spi_flash_program(offset,data,length,false);
+	spi_flash_program_operation(offset,data,length,false);
 }
 
-void spi_flash_sector_erase(uint32_t offset)
+static void do_spi_flash_sector_erase_func(void *addr_buf)
 {
-	spi_flash_write_enable();
+	lsqspi_stig_write_register(&lsqspi_inst,SECTOR_ERASE_OPCODE, addr_buf, 3);
+}
+
+void do_spi_flash_sector_erase(uint32_t offset)
+{
 	uint8_t addr[3];
 	addr[0] = offset>>16&0xff;
 	addr[1] = offset>>8&0xff;
 	addr[2] = offset&0xff;
-	lsqspi_stig_write_register(&lsqspi_inst,SECTOR_ERASE_OPCODE, addr, 3);
-	spi_flash_write_status_check();
+	flash_writing_critical(do_spi_flash_sector_erase_func,addr);
+}
+
+void spi_flash_sector_erase(uint32_t offset)
+{
+	spi_flash_sector_erase_operation(offset);
+}
+
+static void do_spi_flash_chip_erase_func(void *param)
+{
+	lsqspi_stig_write_register(&lsqspi_inst,CHIP_ERASE_OPCODE,NULL,0);
+}
+
+void do_spi_flash_chip_erase()
+{
+	flash_writing_critical(do_spi_flash_chip_erase_func,NULL);
 }
 
 void spi_flash_chip_erase()
 {
-	spi_flash_write_enable();
-	lsqspi_stig_write_register(&lsqspi_inst,CHIP_ERASE_OPCODE,NULL,0);
-	spi_flash_write_status_check();
+	spi_flash_chip_erase_operation();
 }
 
-void spi_flash_quad_io_read(uint32_t offset,uint8_t *data,uint16_t length)
+void do_spi_flash_quad_io_read(uint32_t offset,uint8_t *data,uint16_t length)
 {
 	lsqspi_mode_bits_set(&lsqspi_inst,0);
 	struct lsqspi_stig_read_data_param param = {
@@ -148,7 +192,12 @@ void spi_flash_quad_io_read(uint32_t offset,uint8_t *data,uint16_t length)
 	lsqspi_stig_read_data(&lsqspi_inst,&param);
 }
 
-void spi_flash_std_fast_read(uint32_t offset,uint8_t *data,uint16_t length)
+void spi_flash_quad_io_read(uint32_t offset, uint8_t * data, uint16_t length)
+{
+	spi_flash_quad_io_read_operation( offset,  data,  length);
+}
+
+void do_spi_flash_fast_read(uint32_t offset,uint8_t *data,uint16_t length)
 {
 	struct lsqspi_stig_read_data_param param = {
 		.data = data,
@@ -161,6 +210,11 @@ void spi_flash_std_fast_read(uint32_t offset,uint8_t *data,uint16_t length)
 		.mode_bits_en = 0,
 	};
 	lsqspi_stig_read_data(&lsqspi_inst,&param);
+}
+
+void spi_flash_fast_read(uint32_t offset, uint8_t * data, uint16_t length)
+{
+	spi_flash_fast_read_operation(offset, data, length);
 }
 
 void spi_flash_deep_power_down()
@@ -197,20 +251,32 @@ void spi_flash_read_unique_id(uint8_t unique_serial_id[16])
 	lsqspi_stig_read_data(&lsqspi_inst, &param);
 }
 
-void spi_flash_erase_security_area(uint8_t idx,uint16_t addr)
+static void do_spi_flash_erase_security_area_func(void *param)
 {
-	spi_flash_write_enable();
+	lsqspi_stig_write_register(&lsqspi_inst,ERASE_SECURITY_AREA_OPCODE,param,3);
+}
+
+void do_spi_flash_erase_security_area(uint8_t idx,uint16_t addr)
+{
 	uint8_t buf[3];
 	buf[0] = 0;
 	buf[1] = idx<<4 | (addr>>8 & 0x1);
 	buf[2] = addr & 0xff;
-	lsqspi_stig_write_register(&lsqspi_inst,ERASE_SECURITY_AREA_OPCODE,buf,3);
-	spi_flash_write_status_check();
+	flash_writing_critical(do_spi_flash_erase_security_area_func,buf);
 }
 
-void spi_flash_program_security_area(uint8_t idx,uint16_t addr,uint8_t *data,uint16_t length)
+void spi_flash_erase_security_area(uint8_t idx,uint16_t addr)
 {
-	spi_flash_write_enable();
+	spi_flash_erase_security_area_operation(idx, addr);
+}
+
+static void do_spi_flash_program_security_area_func(void *param)
+{
+	lsqspi_direct_write_data(&lsqspi_inst, param);
+}
+
+void do_spi_flash_program_security_area(uint8_t idx,uint16_t addr,uint8_t *data,uint16_t length)
+{
 	struct lsqspi_direct_write_data_param param = {
 		.data = data,
 		.addr = idx<<12 | (addr&0x1ff),
@@ -218,8 +284,12 @@ void spi_flash_program_security_area(uint8_t idx,uint16_t addr,uint8_t *data,uin
 		.size = length,
 		.quad_data = false,
 	};
-	lsqspi_direct_write_data(&lsqspi_inst, &param);
-	spi_flash_write_status_check();
+	flash_writing_critical(do_spi_flash_program_security_area_func, &param);
+}
+
+void spi_flash_program_security_area(uint8_t idx,uint16_t addr,uint8_t *data,uint16_t length)
+{
+	spi_flash_program_security_area_operation(idx, addr,data,length);
 }
 
 void spi_flash_read_security_area(uint8_t idx,uint16_t addr,uint8_t *data,uint16_t length)
@@ -241,4 +311,30 @@ void spi_flash_software_reset()
 {
 	lsqspi_stig_write_register(&lsqspi_inst,RESET_EN_OPCODE, NULL, 0);
 	lsqspi_stig_write_register(&lsqspi_inst,RESET_OPCODE, NULL, 0);
+}
+
+void spi_flash_qe_status_read_and_set()
+{
+    uint8_t status_reg[2];
+    spi_flash_read_status_register_0(&status_reg[0]);
+    spi_flash_read_status_register_1(&status_reg[1]);
+    if((status_reg[1]&0x02) == 0)
+    {
+        spi_flash_write_status_register(status_reg[1]<<8|status_reg[0]|0x200);
+    }
+}
+
+void spi_flash_prog_erase_suspend()
+{
+	lsqspi_stig_write_register(&lsqspi_inst,PROG_ERASE_SUSPEND,NULL,0);
+}
+
+void spi_flash_prog_erase_resume()
+{
+	lsqspi_stig_write_register(&lsqspi_inst,PROG_ERASE_RESUME,NULL,0);
+}
+
+bool spi_flash_writing_busy()
+{
+	return flash_writing;
 }

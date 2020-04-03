@@ -1,44 +1,14 @@
 #include <stdint.h>
 #include "sdk_config.h"
 #include "platform.h"
+#define ENV_BUF_SIZE 2048
+#define DB_BUF_SIZE 4096
+#define MSG_BUF_SIZE 4096
+#define NON_RET_BUF_SIZE 0
 
-extern void *_gapc_env_ptr;
-extern void *_gapc_state_ptr;
-extern void *_gattc_env_ptr;
-extern void *_gapm_env_actvs_ptr;
-extern void *_prf_env_tag_ptr;
-extern void *_gattc_state_ptr;
-extern void *_l2cc_env_ptr;
-extern void *_l2cc_state_ptr;
-extern void *_ble_util_buf_env_llcp_tx_pool_ptr;
-extern void *_ble_util_buf_env_rx_pool_ptr;
-extern void *_ble_util_buf_env_acl_tx_pool_ptr;
-extern void *_ble_util_buf_env_adv_tx_pool_ptr;
-
-extern void *_llc_env_ptr;
-extern void *_llc_state_ptr;
-extern void *_lld_env_adv_sids_ptr;
-extern void *_lld_adv_env_ptr;
-extern void *_lld_con_env_ptr;
-extern void *_lld_per_adv_env_ptr;
-extern void *_lld_sync_env_ptr;
-extern void *_llm_env_ral_ptr;
-extern void *_llm_env_act_info_ptr;
-extern void *_llm_env_dev_list_ptr;
-extern void *_hci_env_ble_con_state_ptr;
-extern void *_hci_tl_env_per_adv_rep_chain_stat_ptr;
-extern void *_sch_slice_env_ble_ptr;
-extern void *_ke_task_env_task_list_ptr;
-extern void *_heap_env_ptr;
-extern void *_heap_db_ptr;
-extern void *_heap_msg_ptr;
-extern void *_heap_non_ret_ptr;
-
-
-extern void (*rwip_assert_asm_fn)(uint32_t,uint32_t,uint32_t);
+extern void (*stack_assert_asm_fn)(uint32_t,uint32_t,uint32_t);
 extern void (*app_init_fn)(void); 
 extern void (*platform_reset_fn)(uint32_t);
-extern struct rwip_eif_api* (*rwip_eif_get_fn)(uint8_t idx);
 extern void (*rand_init_fn) (unsigned int seed);
 extern int (*rand_fn) (void);
 extern uint64_t (*idiv_acc_fn)(uint32_t,uint32_t,bool);
@@ -50,20 +20,11 @@ extern uint8_t max_profile_num;
 extern uint8_t max_ral_num;
 extern uint8_t max_user_task_num;
 
-extern uint32_t heap_env_size; 
-
-extern uint32_t heap_db_size;
-
-extern uint32_t heap_msg_size;
-
-extern uint32_t heap_non_ret_size;
-
-
-uint32_t ke_task_env_task_list_buf[9 + SDK_MAX_PROFILE_NUM + SDK_MAX_USER_TASK_NUM];
+uint32_t task_list_buf[9 + SDK_MAX_PROFILE_NUM + SDK_MAX_USER_TASK_NUM];
 
 struct {
 	uint32_t env[5];
-}prf_env_tag_buf[SDK_MAX_PROFILE_NUM];
+}prf_buf[SDK_MAX_PROFILE_NUM];
 
 void* gapc_env_buf[SDK_MAX_CONN_NUM];
 
@@ -75,51 +36,51 @@ void *gapm_env_actvs_buf[SDK_MAX_ACT_NUM];
 
 void* llc_env_buf[SDK_MAX_ACT_NUM];
 
-void* lld_adv_env_buf[SDK_MAX_ACT_NUM];
+void* adv_env_buf[SDK_MAX_ACT_NUM];
 
-void* lld_con_env_buf[SDK_MAX_ACT_NUM];
+void* con_env_buf[SDK_MAX_ACT_NUM];
 
-void* lld_per_adv_env_buf[SDK_MAX_ACT_NUM];
+void* per_adv_env_buf[SDK_MAX_ACT_NUM];
 
-void* lld_sync_env_buf[SDK_MAX_ACT_NUM];
+void* sync_env_buf[SDK_MAX_ACT_NUM];
 
 struct 
 {
 	uint32_t env[18];
-}llm_env_act_info_buf[SDK_MAX_ACT_NUM];
+}act_info_buf[SDK_MAX_ACT_NUM];
 
 struct{
 	uint32_t env[2];
-}sch_slice_env_ble_buf[SDK_MAX_ACT_NUM];
+}slice_buf[SDK_MAX_ACT_NUM];
 
 struct
 {
 	uint32_t env[2];
-}ble_util_buf_env_llcp_tx_pool_buf[(2*SDK_MAX_ACT_NUM)];
+}llcp_tx_buf[(2*SDK_MAX_ACT_NUM)];
 
 struct 
 {
 	uint32_t env[2];
-}ble_util_buf_env_rx_pool_buf[9];
+}rx_buf[9];
 
 struct{
 	uint32_t env[2];
-}ble_util_buf_env_acl_tx_pool_buf[(SDK_MAX_ACT_NUM + 2)];
+}acl_tx_buf[(SDK_MAX_ACT_NUM + 2)];
 
 struct{
 	uint32_t env[2];
-}ble_util_buf_env_adv_tx_pool_buf[SDK_MAX_ACT_NUM];
+}adv_tx_buf[SDK_MAX_ACT_NUM];
 
 struct 
 {
 	uint16_t env[5];
-}llm_env_dev_list_buf[(SDK_MAX_ACT_NUM + 2)];
+}dev_list_buf[(SDK_MAX_ACT_NUM + 2)];
 
-uint16_t lld_env_adv_sids_buf[(SDK_MAX_ACT_NUM + 2)];
+uint16_t adv_sids_buf[(SDK_MAX_ACT_NUM + 2)];
 
-bool hci_env_ble_con_state_buf[SDK_MAX_ACT_NUM];
+bool ble_con_state_buf[SDK_MAX_ACT_NUM];
 
-uint8_t hci_tl_env_per_adv_rep_chain_stat_buf[SDK_MAX_ACT_NUM];
+uint8_t per_adv_rep_chain_stat_buf[SDK_MAX_ACT_NUM];
 
 uint8_t llc_state_buf[SDK_MAX_ACT_NUM];
 
@@ -132,12 +93,7 @@ uint8_t l2cc_state_buf[SDK_MAX_CONN_NUM];
 struct
 {
 	uint8_t env[39];
-}llm_env_ral_buf[SDK_MAX_RAL_NUM];
-
-#define ENV_BUF_SIZE 2048
-#define DB_BUF_SIZE 4096
-#define MSG_BUF_SIZE 4096
-#define NON_RET_BUF_SIZE 0
+}ral_buf[SDK_MAX_RAL_NUM];
 
 uint32_t heap_env_buf[ENV_BUF_SIZE/sizeof(uint32_t)];
 
@@ -147,42 +103,14 @@ uint32_t heap_msg_buf[MSG_BUF_SIZE/sizeof(uint32_t)];
 
 uint32_t heap_non_ret_buf[NON_RET_BUF_SIZE/sizeof(uint32_t)];
 
+
+void statck_buffer_init(uint32_t,uint32_t,uint32_t,uint32_t);
+
+void prf_fn_init(void);
+
 void stack_var_ptr_init()
 {
-    _gapc_env_ptr = &gapc_env_buf;
-    _gapc_state_ptr = &gapc_state_buf;
-    _gattc_env_ptr = &gattc_env_buf;
-    _gapm_env_actvs_ptr = &gapm_env_actvs_buf;
-    _prf_env_tag_ptr = &prf_env_tag_buf;
-    _gattc_state_ptr = &gattc_state_buf;
-    _l2cc_env_ptr = &l2cc_env_buf;
-    _l2cc_state_ptr = &l2cc_state_buf;
-    _ble_util_buf_env_llcp_tx_pool_ptr = &ble_util_buf_env_llcp_tx_pool_buf;
-    _ble_util_buf_env_rx_pool_ptr = &ble_util_buf_env_rx_pool_buf;
-    _ble_util_buf_env_acl_tx_pool_ptr = &ble_util_buf_env_acl_tx_pool_buf;
-    _ble_util_buf_env_adv_tx_pool_ptr = &ble_util_buf_env_adv_tx_pool_buf;
-	
-    _llc_env_ptr = &llc_env_buf;
-    _llc_state_ptr = &llc_state_buf;
-    _lld_env_adv_sids_ptr = &lld_env_adv_sids_buf;
-    _lld_adv_env_ptr = &lld_adv_env_buf;
-    _lld_con_env_ptr = &lld_con_env_buf;
-    _lld_per_adv_env_ptr = &lld_per_adv_env_buf;
-    _lld_sync_env_ptr = &lld_sync_env_buf;
-    _llm_env_ral_ptr = &llm_env_ral_buf;
-    _llm_env_act_info_ptr = &llm_env_act_info_buf;
-    _llm_env_dev_list_ptr = &llm_env_dev_list_buf;
-    _hci_env_ble_con_state_ptr = &hci_env_ble_con_state_buf;
-    _hci_tl_env_per_adv_rep_chain_stat_ptr = &hci_tl_env_per_adv_rep_chain_stat_buf;
-    _sch_slice_env_ble_ptr = &sch_slice_env_ble_buf;
-    _ke_task_env_task_list_ptr = &ke_task_env_task_list_buf;
-    _heap_env_ptr = &heap_env_buf;
-    _heap_db_ptr = &heap_db_buf;
-    _heap_msg_ptr = &heap_msg_buf;
-    _heap_non_ret_ptr = &heap_non_ret_buf;
-
-
-    rwip_assert_asm_fn = stack_assert_asm;
+    stack_assert_asm_fn = stack_assert_asm;
     platform_reset_fn = platform_reset;
     ecc_calc_fn = ecc_calc_start;
 	rand_init_fn = true_rand_init;
@@ -194,10 +122,8 @@ void stack_var_ptr_init()
     max_ral_num = SDK_MAX_RAL_NUM;
     max_user_task_num = SDK_MAX_USER_TASK_NUM;
 
-	heap_env_size = ENV_BUF_SIZE;
-	heap_db_size = DB_BUF_SIZE;
-	heap_msg_size = MSG_BUF_SIZE;
-	heap_non_ret_size = NON_RET_BUF_SIZE;
+	statck_buffer_init(ENV_BUF_SIZE,DB_BUF_SIZE,MSG_BUF_SIZE,NON_RET_BUF_SIZE);
+	prf_fn_init();
 }
 
 static bool dummy()
@@ -210,7 +136,7 @@ extern void (*eif_write)(uint8_t *bufptr, uint32_t size, void (*callback)(void *
 extern void (*eif_flow_on)(void);
 extern bool (*eif_flow_off)(void);
 
-extern void app_init(void);
+void app_init(void);
 
 void main_task_app_init()
 {

@@ -1,5 +1,7 @@
 Import("dev_env")
 src = [
+    'cpu.c',
+    'flash_svcall.c',
     'platform.c',
     'stack_var.c',
     'compiler/$COMPILER/startup.s',

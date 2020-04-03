@@ -11,7 +11,10 @@
         "nvds_default_param.h": "c",
         "prf_diss.h": "c",
         "tinyfs_write_cache.h": "c",
-        "platform.h": "c"
+        "platform.h": "c",
+        "lsqspi_param.h": "c",
+        "lsqspi.h": "c",
+        "reg_lsqspi.h": "c"
     },
     "editor.detectIndentation": false,
     "restructuredtext.confPath": "${workspaceFolder}\\doc",
