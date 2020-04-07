@@ -5,21 +5,21 @@
 #include "common.h"
 
 typedef struct{
-	struct co_list allocatable;
-	uint8_t *buf;
-	uint8_t *ref_cnt;
+    struct co_list allocatable;
+    uint8_t *buf;
+    uint8_t *ref_cnt;
     uint16_t element_size;
     uint16_t buf_length;
 }linked_buffer_t;
 
 #define DEF_LINKED_BUF(buf_hdl,type,size) \
-	_Static_assert(offsetof(type,hdr)==0);\
-	static type _##buf_hdl##_array[(size)]; \
-	static uint8_t _##buf_hdl##_ref_cnt[(size)];\
-	linked_buffer_t buf_hdl
+    _Static_assert(offsetof(type,hdr)==0);\
+    static type _##buf_hdl##_array[(size)]; \
+    static uint8_t _##buf_hdl##_ref_cnt[(size)];\
+    linked_buffer_t buf_hdl
 
 #define INIT_LINKED_BUF(buf_hdl)\
-	linked_buf_init(&buf_hdl,sizeof(_##buf_hdl##_array[0]),ARRAY_LEN(_##buf_hdl##_array),(uint8_t *)_##buf_hdl##_array,_##buf_hdl##_ref_cnt)
+    linked_buf_init(&buf_hdl,sizeof(_##buf_hdl##_array[0]),ARRAY_LEN(_##buf_hdl##_array),(uint8_t *)_##buf_hdl##_array,_##buf_hdl##_ref_cnt)
 
 void linked_buf_init(linked_buffer_t *ptr,uint16_t element_size,uint16_t buf_length,uint8_t *buf,uint8_t *ref_cnt);
 

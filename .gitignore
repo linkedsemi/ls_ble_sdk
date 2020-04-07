@@ -1,4 +1,5 @@
 .sconsign.dblite
 *__pycache__/
-*build/
+build/
 doc/api/
+doc/_build/

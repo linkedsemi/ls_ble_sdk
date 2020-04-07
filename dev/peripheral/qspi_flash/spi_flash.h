@@ -7,6 +7,8 @@ void spi_flash_init(void);
 
 void spi_flash_xip_start(void);
 
+void spi_flash_xip_stop(void);
+
 void spi_flash_read_status_register_0(uint8_t *status_reg_0);
 
 void spi_flash_read_status_register_1(uint8_t *status_reg_1);

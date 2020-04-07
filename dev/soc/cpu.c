@@ -4,16 +4,16 @@ static uint8_t primask_stat;
 
 void enter_critical()
 {
-	primask_stat = __get_PRIMASK();
-	__disable_irq();
+    primask_stat = __get_PRIMASK();
+    __disable_irq();
 }
 
 void exit_critical()
 {
-	if(primask_stat == 0)
-	{
-		__enable_irq();
-	}
+    if(primask_stat == 0)
+    {
+        __enable_irq();
+    }
 }
 
 bool in_interrupt()

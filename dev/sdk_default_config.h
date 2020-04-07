@@ -25,7 +25,7 @@
 #define SDK_MAX_RAL_NUM 1
 #endif
 
-#define SDK_MAX_ACT_NUM	(SDK_MAX_CONN_NUM + 1)
+#define SDK_MAX_ACT_NUM    (SDK_MAX_CONN_NUM + 1)
 
 #endif
 

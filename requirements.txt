@@ -1,7 +1,7 @@
 ecdsa
 PyXB
 scons
-sphinx
+sphinx==2.4.0
 sphinx_rtd_theme
 exhale
 intelhex

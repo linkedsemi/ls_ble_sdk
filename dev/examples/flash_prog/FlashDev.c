@@ -38,6 +38,6 @@ struct FlashDevice const FlashDevice  __attribute__ ((section ("DevDscr")))  =  
    3000,                       // Erase Sector Timeout 3000 mSec
 
 // Specify Size and Address of Sectors
-	0x001000, 0,                // sectors are 4 KB
-	SECTOR_END
+    0x001000, 0,                // sectors are 4 KB
+    SECTOR_END
 };

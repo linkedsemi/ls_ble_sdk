@@ -10,11 +10,13 @@
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
-# import os
-# import sys
-# sys.path.insert(0, os.path.abspath('.'))
 import sphinx_rtd_theme
-
+import textwrap
+#import os
+#import sys
+#sys.path.insert(0, os.path.abspath('.'))
+#sys.path.insert(0, os.path.abspath('../build/doc/'))
+#sys.path.insert(0, os.path.abspath('../inc/'))
 # -- Project information -----------------------------------------------------
 
 project = 'ls_sdk'
@@ -34,11 +36,11 @@ extensions = [
 ]
 
 breathe_projects = {
-    "ls_sdk": "../build/doc/doxyoutput/xml"
+    "ls_sdk": "./_build/doxyoutput/xml"
 }
 breathe_default_project = "ls_sdk"
 
-# Setup the exhale extension
+#Setup the exhale extension
 exhale_args = {
     # These arguments are required
     "containmentFolder":     "./api",
@@ -50,8 +52,11 @@ exhale_args = {
     # TIP: if using the sphinx-bootstrap-theme, you need
     # "treeViewIsBootstrap": True,
     "exhaleExecutesDoxygen": True,
-    "exhaleDoxygenStdin":    "INPUT = ../inc/le501x.h"
+    "exhaleDoxygenStdin":    textwrap.dedent('''
+                                    INPUT = ../inc/le501x.h
+                                    '''),
     #"exhaleUseDoxyfile":     True,
+    "verboseBuild":          True,
 }
 
 # Tell sphinx what the primary language being documented is.

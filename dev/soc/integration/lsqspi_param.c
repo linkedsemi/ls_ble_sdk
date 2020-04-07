@@ -4,23 +4,23 @@
 
 void lsqspi_sw_rst(struct lsqspi_instance *inst)
 {
-	REG_FIELD_WR(RCC->APB2RST, RCC_QSPI, 1);
-	REG_FIELD_WR(RCC->APB2RST, RCC_QSPI, 0);
+    REG_FIELD_WR(RCC->APB2RST, RCC_QSPI, 1);
+    REG_FIELD_WR(RCC->APB2RST, RCC_QSPI, 0);
 }
 
 void lsqspi_clk_set(struct lsqspi_instance *inst,bool enable)
 {
-	REG_FIELD_WR(RCC->APB2EN, RCC_QSPI, enable);
+    REG_FIELD_WR(RCC->APB2EN, RCC_QSPI, enable);
 }
 
 uint8_t lsqspi_rd_cap_dly_get(struct lsqspi_instance *inst)
 {
-	return 0;
+    return 0;
 }
 
 uint8_t lsqspi_baudrate_get(struct lsqspi_instance *inst)
 {
-	return 15;
+    return 15;
 }
 
 uint32_t lsqspi_dly_get(struct lsqspi_instance *inst)

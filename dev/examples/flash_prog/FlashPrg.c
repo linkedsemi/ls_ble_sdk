@@ -26,6 +26,7 @@
 #include "spi_flash.h"
 #include "lsqspi_param.h"
 #include "spi_flash_int.h"
+
 /* 
    Mandatory Flash Programming Functions (Called by FlashOS):
                 int Init        (unsigned long adr,   // Initialize Flash
@@ -61,12 +62,12 @@
  */
 
 int Init (unsigned long adr, unsigned long clk, unsigned long fnc) {
-	spi_flash_init();
-	spi_flash_software_reset();
-	spi_flash_release_from_deep_power_down();
-	spi_flash_qe_status_read_and_set();
-//	spi_flash_xip_start();
-  return (0);                                  // Finished without Errors
+    spi_flash_init();
+    spi_flash_software_reset();
+    spi_flash_release_from_deep_power_down();
+    spi_flash_qe_status_read_and_set();
+    spi_flash_xip_start();
+    return (0);                                  // Finished without Errors
 }
 
 
@@ -77,7 +78,6 @@ int Init (unsigned long adr, unsigned long clk, unsigned long fnc) {
  */
 
 int UnInit (unsigned long fnc) {
-
   return (0);                                  // Finished without Errors
 }
 
@@ -88,8 +88,8 @@ int UnInit (unsigned long fnc) {
  */
 
 int EraseChip (void) {
-	do_spi_flash_chip_erase();
-  return (0);                                  // Finished without Errors
+    do_spi_flash_chip_erase();
+    return (0);                                  // Finished without Errors
 }
 
 
@@ -100,8 +100,8 @@ int EraseChip (void) {
  */
 
 int EraseSector (unsigned long adr) {
-	do_spi_flash_sector_erase(adr - LSQSPI_MEM_MAP_BASE_ADDR);
-  return (0);                                  // Finished without Errors
+    do_spi_flash_sector_erase(adr - LSQSPI_MEM_MAP_BASE_ADDR);
+    return (0);                                  // Finished without Errors
 }
 
 
@@ -114,6 +114,6 @@ int EraseSector (unsigned long adr) {
  */
 
 int ProgramPage (unsigned long adr, unsigned long sz, unsigned char *buf) {
-	do_spi_flash_program(adr - LSQSPI_MEM_MAP_BASE_ADDR, buf, sz, true);
-  return (0);                                  // Finished without Errors
+    do_spi_flash_program(adr - LSQSPI_MEM_MAP_BASE_ADDR, buf, sz, true);
+    return (0);                                  // Finished without Errors
 }

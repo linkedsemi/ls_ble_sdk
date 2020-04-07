@@ -23,7 +23,7 @@ extern uint8_t max_user_task_num;
 uint32_t task_list_buf[9 + SDK_MAX_PROFILE_NUM + SDK_MAX_USER_TASK_NUM];
 
 struct {
-	uint32_t env[5];
+    uint32_t env[5];
 }prf_buf[SDK_MAX_PROFILE_NUM];
 
 void* gapc_env_buf[SDK_MAX_CONN_NUM];
@@ -46,34 +46,34 @@ void* sync_env_buf[SDK_MAX_ACT_NUM];
 
 struct 
 {
-	uint32_t env[18];
+    uint32_t env[18];
 }act_info_buf[SDK_MAX_ACT_NUM];
 
 struct{
-	uint32_t env[2];
+    uint32_t env[2];
 }slice_buf[SDK_MAX_ACT_NUM];
 
 struct
 {
-	uint32_t env[2];
+    uint32_t env[2];
 }llcp_tx_buf[(2*SDK_MAX_ACT_NUM)];
 
 struct 
 {
-	uint32_t env[2];
+    uint32_t env[2];
 }rx_buf[9];
 
 struct{
-	uint32_t env[2];
+    uint32_t env[2];
 }acl_tx_buf[(SDK_MAX_ACT_NUM + 2)];
 
 struct{
-	uint32_t env[2];
+    uint32_t env[2];
 }adv_tx_buf[SDK_MAX_ACT_NUM];
 
 struct 
 {
-	uint16_t env[5];
+    uint16_t env[5];
 }dev_list_buf[(SDK_MAX_ACT_NUM + 2)];
 
 uint16_t adv_sids_buf[(SDK_MAX_ACT_NUM + 2)];
@@ -92,7 +92,7 @@ uint8_t l2cc_state_buf[SDK_MAX_CONN_NUM];
 
 struct
 {
-	uint8_t env[39];
+    uint8_t env[39];
 }ral_buf[SDK_MAX_RAL_NUM];
 
 uint32_t heap_env_buf[ENV_BUF_SIZE/sizeof(uint32_t)];
@@ -113,8 +113,8 @@ void stack_var_ptr_init()
     stack_assert_asm_fn = stack_assert_asm;
     platform_reset_fn = platform_reset;
     ecc_calc_fn = ecc_calc_start;
-	rand_init_fn = true_rand_init;
-	rand_fn = true_rand_gen;
+    rand_init_fn = true_rand_init;
+    rand_fn = true_rand_gen;
     idiv_acc_fn = idiv_acc;
 
     max_activity_num = SDK_MAX_ACT_NUM;
@@ -122,13 +122,13 @@ void stack_var_ptr_init()
     max_ral_num = SDK_MAX_RAL_NUM;
     max_user_task_num = SDK_MAX_USER_TASK_NUM;
 
-	statck_buffer_init(ENV_BUF_SIZE,DB_BUF_SIZE,MSG_BUF_SIZE,NON_RET_BUF_SIZE);
-	prf_fn_init();
+    statck_buffer_init(ENV_BUF_SIZE,DB_BUF_SIZE,MSG_BUF_SIZE,NON_RET_BUF_SIZE);
+    prf_fn_init();
 }
 
 static bool dummy()
 {
-	return true;
+    return true;
 }
 
 extern void (*eif_read) (uint8_t *bufptr, uint32_t size, void (*callback)(void *,uint8_t), void* dummy);
@@ -142,21 +142,21 @@ void main_task_app_init()
 {
     main_task = 3;
     app_init_fn = app_init;
-	eif_read = (void *)dummy;
-	eif_write = (void *)dummy;
-	eif_flow_on = (void *)dummy;
-	eif_flow_off = (void *)dummy;
+    eif_read = (void *)dummy;
+    eif_write = (void *)dummy;
+    eif_flow_on = (void *)dummy;
+    eif_flow_off = (void *)dummy;
 }
 
 
 void main_task_itf_init()
 {
     main_task = 9;
-	app_init_fn = (void *)dummy;
-	eif_read = uart_eif_read;
-	eif_write = uart_eif_write;
-	eif_flow_on = uart_eif_flow_on;
-	eif_flow_off = uart_eif_flow_off;
+    app_init_fn = (void *)dummy;
+    eif_read = uart_eif_read;
+    eif_write = uart_eif_write;
+    eif_flow_on = uart_eif_flow_on;
+    eif_flow_off = uart_eif_flow_off;
 }
 
 uint8_t peer_id_buf[SDK_MAX_CONN_NUM];
