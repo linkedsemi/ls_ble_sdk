@@ -6,3 +6,4 @@
    :maxdepth: 1
    
    sdk_env_setup
+   memory

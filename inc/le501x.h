@@ -50,29 +50,38 @@ typedef enum IRQn
   SysTick_IRQn                  =  -1,      /* 15 System Tick Interrupt */
 
 /* ----------------------  ARMCM0 Specific Interrupt Numbers  --------------------- */
-  WDT_IRQn                      =   0,      /* Watchdog Timer Interrupt */
-  RTC_IRQn                      =   1,      /* Real Time Clock Interrupt */
-  TIM0_IRQn                     =   2,      /* Timer0 / Timer1 Interrupt */
-  TIM2_IRQn                     =   3,      /* Timer2 / Timer3 Interrupt */
-  MCIA_IRQn                     =   4,      /* MCIa Interrupt */
-  MCIB_IRQn                     =   5,      /* MCIb Interrupt */
-  UART0_IRQn                    =   6,      /* UART0 Interrupt */
-  UART1_IRQn                    =   7,      /* UART1 Interrupt */
-  UART2_IRQn                    =   8,      /* UART2 Interrupt */
-  UART4_IRQn                    =   9,      /* UART4 Interrupt */
-  AACI_IRQn                     =  10,      /* AACI / AC97 Interrupt */
-  CLCD_IRQn                     =  11,      /* CLCD Combined Interrupt */
-  ENET_IRQn                     =  12,      /* Ethernet Interrupt */
-  USBDC_IRQn                    =  13,      /* USB Device Interrupt */
-  USBHC_IRQn                    =  14,      /* USB Host Controller Interrupt */
-  CHLCD_IRQn                    =  15,      /* Character LCD Interrupt */
-  FLEXRAY_IRQn                  =  16,      /* Flexray Interrupt */
-  CAN_IRQn                      =  17,      /* CAN Interrupt */
-  LIN_IRQn                      =  18,      /* LIN Interrupt */
-  I2C_IRQn                      =  19,      /* I2C ADC/DAC Interrupt */
-  CPU_CLCD_IRQn                 =  28,      /* CPU CLCD Combined Interrupt */
-  UART3_IRQn                    =  30,      /* UART3 Interrupt */
-  SPI_IRQn                      =  31       /* SPI Touchscreen Interrupt */
+  EXTI_IRQn                      =   0,
+  WWDT_IRQn                      =   1,
+  LPWKUP_IRQn                    =   2,
+  BLE_IRQn                       =   3,
+  RTC_IRQn                       =   4,
+  DMA_IRQn                       =   5,
+  QSPI_IRQn                      =   6,
+  ECC_IRQn                       =   7,
+  CACHE_IRQn                     =   8,
+  TRNG_IRQn                      =   9,
+  IWDT_IRQn                      =  10,
+  CRYPT_IRQn                     =  11,
+  PDM_IRQn                       =  12,
+  BLE_WKUP_IRQn                  =  13,
+  ADC_IRQn                       =  14,
+  ADTIM1_IRQn                    =  15,
+  BSTIM1_IRQn                    =  16,
+  GPTIMA1_IRQn                   =  17,
+  GPTIMB1_IRQn                   =  18,
+  BLE_ERR_IRQn                   =  19,
+  LVD33_IRQn                     =  20,
+  GPTIMC1_IRQn                   =  21,
+  LPTIM_IRQn                     =  22,
+  I2C1_IRQn                      =  23,
+  I2C2_IRQn                      =  24,
+  SPI1_IRQn                      =  25,
+  SPI2_IRQn                      =  26,
+  UART1_IRQn                     =  27,
+  UART2_IRQn                     =  28,
+  UART3_IRQn                     =  29,
+  BLE_FIFO_IRQn                  =  30,
+  BLE_CRYPT_IRQn                 =  31,
 } IRQn_Type;
 
 

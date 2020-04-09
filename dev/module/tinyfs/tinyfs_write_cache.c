@@ -20,7 +20,7 @@ void tinyfs_nvm_write_through()
         {
             memset(&tinyfs_wr_cache_env.buf[tinyfs_wr_cache_env.idx],0xff,TINYFS_WRITE_CACHE_SIZE-tinyfs_wr_cache_env.idx);
         }
-        nvm_program(tinyfs_wr_cache_env.current_buf_offset,TINYFS_WRITE_CACHE_SIZE,tinyfs_wr_cache_env.buf);
+        nvm_program(tinyfs_wr_cache_env.current_buf_offset,tinyfs_wr_cache_env.buf,TINYFS_WRITE_CACHE_SIZE);
         tinyfs_wr_cache_env.idx = 0;
     }
 }
@@ -70,7 +70,7 @@ void tinyfs_nvm_read_with_cache(uint32_t offset, uint32_t length, uint8_t *buffe
     }
     if(nvm_read_length)
     {
-        nvm_read(offset,nvm_read_length,buffer);
+        nvm_read(offset,buffer,nvm_read_length);
         buffer += nvm_read_length;
         length -= nvm_read_length;
     }

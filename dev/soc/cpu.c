@@ -1,14 +1,15 @@
 #include "le501x.h"
 #include "cpu.h"
+#include "section_def.h"
 static uint8_t primask_stat;
 
-void enter_critical()
+XIP_BANNED void enter_critical()
 {
     primask_stat = __get_PRIMASK();
     __disable_irq();
 }
 
-void exit_critical()
+XIP_BANNED void exit_critical()
 {
     if(primask_stat == 0)
     {

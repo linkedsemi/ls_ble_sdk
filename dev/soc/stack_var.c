@@ -12,7 +12,8 @@ extern void (*platform_reset_fn)(uint32_t);
 extern void (*rand_init_fn) (unsigned int seed);
 extern int (*rand_fn) (void);
 extern uint64_t (*idiv_acc_fn)(uint32_t,uint32_t,bool);
-extern void (*ecc_calc_fn)(const uint8_t*,const uint8_t*,const uint8_t*,uint8_t*,uint8_t*,void *);
+extern void (*ecc_calc_fn)(const uint8_t*,const uint8_t*,const uint8_t*,uint8_t*,uint8_t*,void (*)(void *),void *);
+
 
 extern uint8_t main_task;
 extern uint8_t max_activity_num;

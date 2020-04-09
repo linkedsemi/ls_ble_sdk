@@ -17,7 +17,7 @@ void stack_assert_asm(uint32_t,uint32_t,uint32_t);
 
 void platform_reset(uint32_t error);
 
-void ecc_calc_start(const uint8_t* secret_key,const uint8_t* pub_x,const uint8_t* pub_y,uint8_t* result_x,uint8_t* result_y,void *param);
+void ecc_calc_start(const uint8_t* secret_key,const uint8_t* pub_x,const uint8_t* pub_y,uint8_t* result_x,uint8_t* result_y,void (*cb)(void *),void *param);
 
 void true_rand_init(unsigned int seed);
 

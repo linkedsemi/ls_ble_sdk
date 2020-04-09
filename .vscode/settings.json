@@ -14,7 +14,9 @@
         "platform.h": "c",
         "lsqspi_param.h": "c",
         "lsqspi.h": "c",
-        "reg_lsqspi.h": "c"
+        "reg_lsqspi.h": "c",
+        "spi_flash_int.h": "c",
+        "spi_flash.h": "c"
     },
     "editor.detectIndentation": false,
     "restructuredtext.confPath": "${workspaceFolder}\\doc",

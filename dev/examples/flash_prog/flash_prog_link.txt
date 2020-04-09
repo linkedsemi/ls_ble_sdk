@@ -13,6 +13,8 @@ SECTIONS
 		KEEP(*(.text.ProgramPage))
 		KEEP(*(.text.Verify))
 		*(.text* .rodata*)
+		*(.xip_banned)
+
 	}
 	PrgData :
 	{

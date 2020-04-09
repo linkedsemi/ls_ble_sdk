@@ -5,6 +5,7 @@
     "version": "0.2.0",
     "configurations": [
 
+
     
         {
             "name": "Python: 当前文件",
@@ -27,6 +28,16 @@
         },
         {
             "type": "cortex-debug",
+            "request": "attach",
+            "servertype": "jlink",
+            "cwd": "${workspaceRoot}",
+            "executable": "./build/examples/sbl.elf",
+            "name": "Attach SBL",
+            "device": "LE501X",
+            "interface": "swd",
+        },
+        {
+            "type": "cortex-debug",
             "request": "launch",
             "servertype": "jlink",
             "cwd": "${workspaceRoot}",
@@ -40,6 +51,51 @@
                 "load",
                 
             ]
-        }
+        },
+        {
+            "type": "cortex-debug",
+            "request": "launch",
+            "servertype": "jlink",
+            "cwd": "${workspaceRoot}",
+            "executable": "./build/examples/ram_test.elf",
+            "name": "Debug RAM_TEST",
+            "device": "LE501X",
+            "interface": "swd",
+            "runToMain": false,
+            "preLaunchCommands" :[
+                "monitor reset",
+                "load",
+            ],
+            "postLaunchCommands" :[
+                "monitor memU32 0x40021400 = 0x5",
+                "monitor memU32 0x40021410 = 0x5fa0001",
+                "monitor reg sp = (0x0)",
+                "monitor reg pc = (0x4)",
+            ]
+        },
+        {
+            "type": "cortex-debug",
+            "request": "launch",
+            "servertype": "jlink",
+            "cwd": "${workspaceRoot}",
+            "executable": "./build/examples/ble_dis.elf",
+            "name": "Debug BLE_DIS",
+            "device": "LE501X",
+            "interface": "swd",
+            "runToMain": false,
+            "preLaunchCommands" :[
+                "load",                
+            ]
+        },
+        {
+            "type": "cortex-debug",
+            "request": "attach",
+            "servertype": "jlink",
+            "cwd": "${workspaceRoot}",
+            "executable": "./build/examples/ble_dis.elf",
+            "name": "Attach BLE_DIS",
+            "device": "LE501X",
+            "interface": "swd",
+        },
     ]
 }

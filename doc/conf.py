@@ -56,7 +56,7 @@ exhale_args = {
                                     INPUT = ../inc/le501x.h
                                     '''),
     #"exhaleUseDoxyfile":     True,
-    "verboseBuild":          True,
+    #"verboseBuild":          True,
 }
 
 # Tell sphinx what the primary language being documented is.

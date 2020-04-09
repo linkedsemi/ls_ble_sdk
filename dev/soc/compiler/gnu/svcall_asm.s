@@ -1,7 +1,7 @@
     .syntax unified
     .arch armv6-m
 
-    .text
+    .section .text.SVC_Handler
     .thumb
     .thumb_func
     .align 1
@@ -19,4 +19,4 @@ stacking_used_MSP:
 SVC_C_Routine:
     LDR R1,=SVC_Handler_C
     BX R1
-    
+    .size	SVC_Handler, . - SVC_Handler

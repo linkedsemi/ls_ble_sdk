@@ -27,12 +27,33 @@ struct dev_addr
     uint8_t addr[BLE_ADDR_LEN];
 };
 
+enum sec_lvl_type
+{
+    NO_SEC,
+    UNAUTH_SEC,
+    AUTH_SEC,
+    SEC_CON_SEC,
+};
+
 struct legacy_adv_prop
 {
     uint8_t connectable:1,
             scannable:1,
             directed:1,
             high_duty_cycle:1;
+};
+
+enum adv_disc_mode
+{
+    /// Mode in non-discoverable
+    ADV_MODE_NON_DISC = 0,
+    /// Mode in general discoverable
+    ADV_MODE_GEN_DISC,
+    /// Mode in limited discoverable
+    ADV_MODE_LIM_DISC,
+    /// Broadcast mode without presence of AD_TYPE_FLAG in advertising data
+    ADV_MODE_BEACON,
+    ADV_MODE_MAX,
 };
 
 struct legacy_adv_obj_param
@@ -44,7 +65,7 @@ struct legacy_adv_obj_param
     enum gap_peer_addr_type peer_addr_type;
     uint8_t filter_policy;
     uint8_t ch_map;
-    uint8_t disc_mode;
+    enum adv_disc_mode disc_mode;
     struct legacy_adv_prop prop;
 };
 
@@ -102,6 +123,7 @@ enum dev_evt_type
 {
     STACK_INIT,
     STACK_READY,
+    PROFILE_ADDED,
     SERVICE_ADDED,
     ADV_OBJ_CREATED,
     SCAN_OBJ_CREATED,
@@ -110,6 +132,18 @@ enum dev_evt_type
     SCAN_STOPPED,
     INIT_STOPPED,
     ADV_REPORT,
+};
+
+enum prf_id
+{
+    PRF_DIS_SERVER,
+};
+
+struct profile_added_evt
+{
+    uint16_t start_hdl;
+    enum prf_id id;
+    
 };
 
 struct service_added_evt
@@ -151,6 +185,7 @@ struct adv_report_evt
 
 union dev_evt_u
 {
+    struct profile_added_evt profile_added;
     struct service_added_evt service_added;
     struct obj_created_evt obj_created;
     struct stopped_evt stopped;
@@ -366,4 +401,6 @@ uint8_t gap_manager_get_sec_lvl(uint8_t con_idx);
 void gatt_manager_init(void (*evt_cb)(enum gatt_evt_type,union gatt_evt_u *,uint8_t));
 
 void gatt_manager_svc_callback_register(uint16_t start_hdl,uint8_t att_num,struct gatt_svc_env *svc_cb);
+
 #endif
+
