@@ -7,3 +7,4 @@
    
    sdk_env_setup
    memory
+   ble_flow

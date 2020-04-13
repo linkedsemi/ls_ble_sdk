@@ -1,0 +1,16 @@
+Import('dev_env')
+
+le501x_src,le501x_inc = SConscript(dirs='le501x',exports = ['dev_env'])
+
+src = [
+    'flash_svcall.c',
+    'svcall.c',
+]
+inc = [
+    '.',
+]
+
+src_files = File(src) + le501x_src
+inc_dirs = Dir(inc) + le501x_inc
+
+Return("src_files","inc_dirs")

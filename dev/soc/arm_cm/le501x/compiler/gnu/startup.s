@@ -36,7 +36,7 @@
 	.section .stack
 	.align	3
 
-	.equ	Stack_Size, 0xc00
+	.equ	Stack_Size, 0x1000
 
 	.globl	__StackTop
 	.globl	__StackLimit

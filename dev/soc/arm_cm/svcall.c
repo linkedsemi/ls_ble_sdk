@@ -1,4 +1,5 @@
 #include "svcall.h"
+#include "spi_flash_int.h"
 
 typedef uint32_t (*svcall_fn_t)(uint32_t,uint32_t,uint32_t,uint32_t);
 

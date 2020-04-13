@@ -1,25 +1,28 @@
 MEMORY
 {
   RAM (rwx) : ORIGIN = 0x0000, LENGTH = 0xc000
+  FLASH (rx) : ORIGIN = 0x18001000, LENGTH = 0x40000
 }
 
 SECTIONS
 {
-	PROVIDE(__data_lma__ = .);
+	__data_lma__ = ORIGIN(FLASH);
+
 	.data :
 	{
 		. = ALIGN(4);
-		PROVIDE(__data_start__ = .);
-		PROVIDE(__data_end__ = .);		
+		__data_start__ = .;
         KEEP(*(.isr_vector))
 		*(.data*)
 		*(.xip_banned)
-	}>RAM
-	
+		*(.text.memcpy)
+		__data_end__ = ALIGN(4);
+	}>RAM AT> FLASH
+
 	.text :
 	{
 	
-        KEEP(*(.init))
+		KEEP(*(.init))
 		KEEP(*(.fini))
 
 /* 
@@ -38,7 +41,7 @@ SECTIONS
 */
 		*(.eh_frame*)
 		*(.text* .rodata*)
-	}>RAM
+	}>FLASH
 	
     .bss (NOLOAD):
     {

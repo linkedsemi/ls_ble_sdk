@@ -97,7 +97,7 @@ XIP_BANNED void lsqspi_stig_read_data(struct lsqspi_instance *inst,struct lsqspi
 
 XIP_BANNED void lsqspi_stig_write_register(struct lsqspi_instance *inst,uint8_t opcode,uint8_t *data,uint8_t length)
 {
-    LS_ASSERT(length <= 4);
+    LS_RAM_ASSERT(length <= 4);
     if(length)
     {
         inst->reg->STIG_CMD = FIELD_BUILD(LSQSPI_CMD_OPCODE, opcode) | FIELD_BUILD(LSQSPI_NUM_WDATA_BYTES, length - 1)
@@ -117,7 +117,7 @@ XIP_BANNED void lsqspi_stig_write_register(struct lsqspi_instance *inst,uint8_t 
 
 XIP_BANNED void lsqspi_stig_read_register(struct lsqspi_instance *inst,uint8_t opcode,uint8_t *data,uint8_t length)
 {
-    LS_ASSERT(length && length <= 8);
+    LS_RAM_ASSERT(length && length <= 8);
     inst->reg->STIG_CMD = FIELD_BUILD(LSQSPI_CMD_OPCODE, opcode) | FIELD_BUILD(LSQSPI_NUM_RDATA_BYTES, length - 1)
             | FIELD_BUILD(LSQSPI_RDATA_EN, 1 ) | FIELD_BUILD(LSQSPI_OPCODE_EN, 1);
     inst->reg->STIG_GO = FIELD_BUILD(LSQSPI_STIG_GO, 1);

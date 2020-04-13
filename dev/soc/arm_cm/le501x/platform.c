@@ -9,6 +9,10 @@
 #include "le501x.h"
 #include "log.h"
 #include "lsqspi_param.h"
+#include "spi_flash.h"
+#include "section_def.h"
+#include "lscache.h"
+#define IRQ_NVIC_PRIO(IRQn,priority) (((priority << (8U - __NVIC_PRIO_BITS)) & (uint32_t)0xFFUL) << _BIT_SHIFT(IRQn))
 
 void stack_var_ptr_init(void);
 
@@ -19,35 +23,14 @@ void main_task_itf_init(void);
 static void irq_priority()
 {
     __NVIC_SetPriority(SVCall_IRQn,1);
-    __NVIC_SetPriority(EXTI_IRQn,2);
-    __NVIC_SetPriority(WWDT_IRQn,2);
-    __NVIC_SetPriority(LPWKUP_IRQn,2);
-    __NVIC_SetPriority(BLE_IRQn,0);
-    __NVIC_SetPriority(RTC_IRQn,2);
-    __NVIC_SetPriority(DMA_IRQn,2);
-    __NVIC_SetPriority(QSPI_IRQn,2);
-    __NVIC_SetPriority(ECC_IRQn,2);
-    __NVIC_SetPriority(CACHE_IRQn,2);
-    __NVIC_SetPriority(TRNG_IRQn,2);
-    __NVIC_SetPriority(IWDT_IRQn,2);
-    __NVIC_SetPriority(CRYPT_IRQn,2);
-    __NVIC_SetPriority(PDM_IRQn,2);
-    __NVIC_SetPriority(BLE_WKUP_IRQn,0);
-    __NVIC_SetPriority(ADC_IRQn,2);
-    __NVIC_SetPriority(ADTIM1_IRQn,2);
-    __NVIC_SetPriority(BSTIM1_IRQn,2);
-    __NVIC_SetPriority(GPTIMA1_IRQn,2);
-    __NVIC_SetPriority(GPTIMB1_IRQn,2);
-    __NVIC_SetPriority(BLE_ERR_IRQn,0);
-    __NVIC_SetPriority(LVD33_IRQn,2);
-    __NVIC_SetPriority(GPTIMC1_IRQn,2);
-    __NVIC_SetPriority(LPTIM_IRQn,2);
-    __NVIC_SetPriority(I2C1_IRQn,2);
-    __NVIC_SetPriority(I2C2_IRQn,2);
-    __NVIC_SetPriority(SPI1_IRQn,2);
-    __NVIC_SetPriority(SPI2_IRQn,2);
-    __NVIC_SetPriority(BLE_FIFO_IRQn,0);
-    __NVIC_SetPriority(BLE_CRYPT_IRQn,0);
+    NVIC->IP[0] = IRQ_NVIC_PRIO(EXTI_IRQn,2) | IRQ_NVIC_PRIO(WWDT_IRQn,2) | IRQ_NVIC_PRIO(LPWKUP_IRQn,2) | IRQ_NVIC_PRIO(BLE_IRQn,0);
+    NVIC->IP[1] = IRQ_NVIC_PRIO(RTC_IRQn,2) | IRQ_NVIC_PRIO(DMA_IRQn,2) | IRQ_NVIC_PRIO(QSPI_IRQn,2) | IRQ_NVIC_PRIO(ECC_IRQn,2);
+    NVIC->IP[2] = IRQ_NVIC_PRIO(CACHE_IRQn,2) | IRQ_NVIC_PRIO(TRNG_IRQn,2) | IRQ_NVIC_PRIO(IWDT_IRQn,2) | IRQ_NVIC_PRIO(CRYPT_IRQn,2);
+    NVIC->IP[3] = IRQ_NVIC_PRIO(PDM_IRQn,2) | IRQ_NVIC_PRIO(BLE_WKUP_IRQn,0) | IRQ_NVIC_PRIO(ADC_IRQn,2) | IRQ_NVIC_PRIO(ADTIM1_IRQn,2);
+    NVIC->IP[4] = IRQ_NVIC_PRIO(BSTIM1_IRQn,2) | IRQ_NVIC_PRIO(GPTIMA1_IRQn,2) | IRQ_NVIC_PRIO(GPTIMB1_IRQn,2) | IRQ_NVIC_PRIO(BLE_ERR_IRQn,0);
+    NVIC->IP[5] = IRQ_NVIC_PRIO(LVD33_IRQn,2) | IRQ_NVIC_PRIO(GPTIMC1_IRQn,2) | IRQ_NVIC_PRIO(LPTIM_IRQn,2) | IRQ_NVIC_PRIO(I2C1_IRQn,2);
+    NVIC->IP[6] = IRQ_NVIC_PRIO(I2C2_IRQn,2) | IRQ_NVIC_PRIO(SPI1_IRQn,2) | IRQ_NVIC_PRIO(SPI2_IRQn,2) | IRQ_NVIC_PRIO(UART1_IRQn,2);
+    NVIC->IP[7] = IRQ_NVIC_PRIO(UART2_IRQn,2) | IRQ_NVIC_PRIO(UART3_IRQn,2) | IRQ_NVIC_PRIO(BLE_FIFO_IRQn,0) | IRQ_NVIC_PRIO(BLE_CRYPT_IRQn,0);
 }
 
 static void stack_data_bss_init()
@@ -63,17 +46,10 @@ static void stack_data_bss_init()
 
 static void ble_irq_enable()
 {
-    __NVIC_ClearPendingIRQ(BLE_IRQn);
-    __NVIC_EnableIRQ(BLE_IRQn);
-    __NVIC_ClearPendingIRQ(BLE_ERR_IRQn);
-    __NVIC_EnableIRQ(BLE_ERR_IRQn);
-    __NVIC_ClearPendingIRQ(BLE_WKUP_IRQn);
-    __NVIC_EnableIRQ(BLE_WKUP_IRQn);
-    __NVIC_ClearPendingIRQ(BLE_FIFO_IRQn);
-    __NVIC_EnableIRQ(BLE_FIFO_IRQn);
-    __NVIC_ClearPendingIRQ(BLE_CRYPT_IRQn);
-    __NVIC_EnableIRQ(BLE_CRYPT_IRQn);
-
+    //clear ble irq
+    NVIC->ICPR[0] = 1<<BLE_IRQn | 1<<BLE_ERR_IRQn | 1<<BLE_WKUP_IRQn | 1<<BLE_FIFO_IRQn | 1<<BLE_CRYPT_IRQn;
+    //enable ble irq
+    NVIC->ISER[0] = 1<<BLE_IRQn | 1<<BLE_ERR_IRQn | 1<<BLE_WKUP_IRQn | 1<<BLE_FIFO_IRQn | 1<<BLE_CRYPT_IRQn;
 }
 
 static uint32_t flash_data_storage_base_offset()
@@ -83,27 +59,46 @@ static uint32_t flash_data_storage_base_offset()
         - TINYFS_SECTION_NUM*TINYFS_SECTION_SIZE - LSQSPI_MEM_MAP_BASE_ADDR;
 }
 
-void sys_init(bool app)
+void irq_init()
 {
-    stack_data_bss_init();
-    stack_var_ptr_init();
-    if(app)
-    {
-        main_task_app_init();
-    }else
-    {
-        main_task_itf_init();
-    }
+    irq_priority();
+    ble_irq_enable();
+}
+
+static void module_init()
+{
     //TODO
     LOG_INIT();
     LOG_I("sys init");
-    irq_priority();
-    ble_irq_enable();
+    irq_init();
+
     cpu_sleep_recover_init();
     uint32_t base_offset = flash_data_storage_base_offset();
     tinyfs_init(base_offset);
     
 }
+
+static void var_init()
+{
+    stack_data_bss_init();
+    stack_var_ptr_init();
+    spi_flash_drv_var_init();
+}
+
+void sys_init_itf()
+{
+    var_init();
+    main_task_itf_init();
+    module_init();
+}
+
+void sys_init_app()
+{
+    var_init();
+    main_task_app_init();
+    module_init();
+}
+
 
 void uart_eif_read(uint8_t *bufptr, uint32_t size, void (*callback)(void *,uint8_t), void* dummy)
 {

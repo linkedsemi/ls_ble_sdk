@@ -12,17 +12,17 @@ SECTIONS
 	{
 		. = ALIGN(4);
 		__data_start__ = .;
-        KEEP(*(.isr_vector))
+		KEEP(*(.isr_vector))
 		*(.data*)
-        *(.xip_banned)
-        *(.text.memcpy)
+		*(.xip_banned)
+		*(.text.memcpy)
 		__data_end__ = ALIGN(4);
 	}>RAM AT> FLASH
 
 	.text :
 	{
 	
-        KEEP(*(.init))
+		KEEP(*(.init))
 		KEEP(*(.fini))
 
 /* 
@@ -76,4 +76,5 @@ SECTIONS
 	
 	/* Check if data + heap + stack exceeds RAM limit */
 	ASSERT(__StackLimit >= __HeapLimit, "region RAM overflowed with stack")
+	
 }

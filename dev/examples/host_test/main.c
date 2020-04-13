@@ -3,7 +3,7 @@
 
 int main()
 {
-    sys_init(false);
+    sys_init_itf();
     ble_init();
     while(1)
     {

@@ -1,19 +1,5 @@
-Import("dev_env")
-src = [
-    'cpu.c',
-    'flash_svcall.c',
-    'platform.c',
-    'stack_var.c',
-    'compiler/$COMPILER/startup.s',
-    'compiler/$COMPILER/sleep_asm.s',
-    'integration/lsqspi_param.c',
-    'sleep.c',
-]
-inc = [
-    '.',
-    'integration',
-]
-src_files = File(dev_env.subst(src))
-inc_dirs = Dir(inc)
-dev_env['LINKSCRIPT'] = File(dev_env.subst("compiler/$COMPILER/link_script.txt"))
-Return("src_files","inc_dirs")
+Import('dev_env')
+
+cm_src,cm_inc = SConscript(dirs='arm_cm',exports = ['dev_env'])
+
+Return('cm_src','cm_inc')

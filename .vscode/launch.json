@@ -24,7 +24,7 @@
             "name": "Debug SBL",
             "device": "LE501X",
             "interface": "swd",
-            "runToMain": true,
+            "runToMain": false,
         },
         {
             "type": "cortex-debug",
@@ -84,7 +84,8 @@
             "interface": "swd",
             "runToMain": false,
             "preLaunchCommands" :[
-                "load",                
+                "load", 
+                "add-symbol-file build/fw.elf",               
             ]
         },
         {

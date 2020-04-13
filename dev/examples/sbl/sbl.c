@@ -1,9 +1,10 @@
 #include "spi_flash.h"
 #include "le501x.h"
 #include "lscache.h"
+#include "section_def.h"
 #define APP_IMAGE_BASE (0x18036000)
 
-int main()
+XIP_BANNED int main()
 {
     __disable_irq();
     spi_flash_init();

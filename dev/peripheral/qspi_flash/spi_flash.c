@@ -31,11 +31,17 @@ static struct lsqspi_instance lsqspi_inst;
 static bool flash_writing;
 static bool flash_xip_status;
 
-XIP_BANNED void spi_flash_init()
+
+XIP_BANNED void spi_flash_drv_var_init()
 {
     flash_writing = false;
     flash_xip_status = false;
     lsqspi_inst.reg = LSQSPI;
+}
+
+XIP_BANNED void spi_flash_init()
+{
+    spi_flash_drv_var_init();
     lsqspi_init(&lsqspi_inst);
 }
 
@@ -63,14 +69,12 @@ XIP_BANNED void spi_flash_xip_start()
     }
     lsqspi_mode_bits_set(&lsqspi_inst,XIP_MODE_BITS);
     quad_io_read_dummy();
-    struct lsqspi_direct_read_config_param direct_read_param = 
-    {
-        .opcode = QUAD_IO_READ_OPCODE,
-        .dummy_bytes = 2,
-        .quad_addr = 1,
-        .quad_data = 1,
-        .mode_bits_en = 1,
-    };
+    struct lsqspi_direct_read_config_param direct_read_param; //do not initialize this variable with a const struct
+    direct_read_param.opcode = QUAD_IO_READ_OPCODE;
+    direct_read_param.dummy_bytes = 2;
+    direct_read_param.quad_addr = 1;
+    direct_read_param.quad_data = 1;
+    direct_read_param.mode_bits_en = 1;
     lsqspi_direct_read_config(&lsqspi_inst,&direct_read_param);
     flash_xip_status = true;
 }
@@ -96,7 +100,7 @@ XIP_BANNED void spi_flash_read_status_register_0(uint8_t *status_reg_0)
     lsqspi_stig_read_register(&lsqspi_inst,READ_STATUS_REGISTER_0_OPCODE,status_reg_0,sizeof(uint8_t));
 }
 
-void spi_flash_read_status_register_1(uint8_t *status_reg_1)
+XIP_BANNED void spi_flash_read_status_register_1(uint8_t *status_reg_1)
 {
     lsqspi_stig_read_register(&lsqspi_inst,READ_STATUS_REGISTER_1_OPCODE,status_reg_1,sizeof(uint8_t));
 }
@@ -243,12 +247,12 @@ void spi_flash_fast_read(uint32_t offset, uint8_t * data, uint16_t length)
     spi_flash_fast_read_operation(offset, data, length);
 }
 
-void spi_flash_deep_power_down()
+XIP_BANNED void spi_flash_deep_power_down()
 {
     lsqspi_stig_write_register(&lsqspi_inst, DEEP_POWER_DOWN_OPCODE,NULL, 0);
 }
 
-void spi_flash_release_from_deep_power_down()
+XIP_BANNED void spi_flash_release_from_deep_power_down()
 {
     lsqspi_stig_write_register(&lsqspi_inst,RELEASE_FROM_DEEP_POWER_DOWN_OPCODE,NULL,0);
 }
@@ -339,7 +343,7 @@ void spi_flash_software_reset()
     lsqspi_stig_write_register(&lsqspi_inst,RESET_OPCODE, NULL, 0);
 }
 
-void spi_flash_qe_status_read_and_set()
+XIP_BANNED void spi_flash_qe_status_read_and_set()
 {
     uint8_t status_reg[2];
     spi_flash_read_status_register_1(&status_reg[1]);

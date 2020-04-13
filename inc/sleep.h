@@ -4,7 +4,7 @@
 
 void cpu_sleep_recover_init(void);
 
-void cpu_deep_sleep_and_recover(void);
+void deep_sleep(void);
 
 #endif
 

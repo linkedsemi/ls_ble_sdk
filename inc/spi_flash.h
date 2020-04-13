@@ -3,6 +3,8 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+void spi_flash_drv_var_init(void);
+
 void spi_flash_init(void);
 
 void spi_flash_xip_start(void);

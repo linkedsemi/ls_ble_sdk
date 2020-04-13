@@ -53,7 +53,7 @@ static void prf_dis_server_callback(enum diss_evt_type type,union diss_evt_u *ev
     }
 }
 
-static void start_adv()
+static void create_adv_obj()
 {
     struct legacy_adv_obj_param adv_param = {
         .adv_intv_min = 0x20,
@@ -79,7 +79,7 @@ static void prf_added_handler(struct profile_added_evt *evt)
     {
     case PRF_DIS_SERVER:
         prf_dis_server_callback_init(prf_dis_server_callback);
-        start_adv();
+        create_adv_obj();
     break;
     default:
 
@@ -129,7 +129,7 @@ static void dev_manager_callback(enum dev_evt_type type,union dev_evt_u *evt)
 
 int main()
 {
-    sys_init(true);
+    sys_init_app();
     ble_init();
     dev_manager_init(dev_manager_callback);
     gap_manager_init(gap_manager_callback);

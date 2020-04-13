@@ -9,7 +9,7 @@ sbl_data = fh_i.read()
 
 test_word0 = 0xa5a53c3c
 test_word1 = 0x5a5ac3c3
-cap_delay = 2
+cap_delay = 4
 spi_clk = 0
 cfg_info = 0xffffffff
 image_crypt = 0xffffffff
