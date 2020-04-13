@@ -4,6 +4,8 @@
 #include "lscache.h"
 #include "platform.h"
 
+#define BLE_MAC_REG_BASE 0x50000000
+#define BLE_MAC_REG_OFFSET_WORD_MAX (0x18C/4)
 #define ISR_VECTOR_ADDR ((uint32_t *)(0x0))
 void cpu_sleep_asm(void);
 
@@ -26,11 +28,20 @@ XIP_BANNED static void cpu_flash_deep_sleep_and_recover()
     LSCACHE_CTRL_SET(1,1);
 }
 
+static void memcpy32(uint32_t *dest, const uint32_t *src, uint32_t size_word)
+{
+    while(size_word--)
+    {
+        *dest++ = *src++;
+    }
+}
+
 void deep_sleep()
 {
-    uint32_t ble_retetion[100];
-    
+    uint32_t ble_retetion[BLE_MAC_REG_OFFSET_WORD_MAX];
+    memcpy32(&ble_retetion[0], (uint32_t*)BLE_MAC_REG_BASE, BLE_MAC_REG_OFFSET_WORD_MAX);
     cpu_flash_deep_sleep_and_recover();
+    memcpy32((uint32_t*)BLE_MAC_REG_BASE, &ble_retetion[0], BLE_MAC_REG_OFFSET_WORD_MAX);
     irq_init();
     
 }
