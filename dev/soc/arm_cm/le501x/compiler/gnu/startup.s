@@ -49,7 +49,7 @@ __StackTop:
 	.section .heap
 	.align	3
 
-	.equ	Heap_Size, 0
+	.equ	Heap_Size, 0x800
 
 	.globl	__HeapBase
 	.globl	__HeapLimit

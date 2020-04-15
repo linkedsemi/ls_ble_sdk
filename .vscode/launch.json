@@ -8,10 +8,10 @@
 
     
         {
-            "name": "Python: 当前文件",
+            "name": "Python: info sbl merge",
             "type": "python",
             "request": "launch",
-            "program": "${file}",
+            "program": "tools/info_sbl_merge.py",
             "console": "integratedTerminal",
             "args":["build/examples/sbl.bin","0x18000000","bin/info_sbl.hex"]
         },

@@ -1,6 +1,6 @@
 #include "le501x.h"
 #include "cpu.h"
-#include "section_def.h"
+#include "compile_flag.h"
 static uint8_t primask_stat;
 
 XIP_BANNED void enter_critical()

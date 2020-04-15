@@ -1,7 +1,7 @@
 #include "lsqspi_param.h"
 #include "reg_rcc.h"
 #include "field_manipulate.h"
-#include "section_def.h"
+#include "compile_flag.h"
 
 XIP_BANNED void lsqspi_sw_rst(struct lsqspi_instance *inst)
 {

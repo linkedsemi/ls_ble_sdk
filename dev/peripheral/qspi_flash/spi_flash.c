@@ -3,7 +3,7 @@
 #include "lsqspi.h"
 #include "flash_svcall.h"
 #include "cpu.h"
-#include "section_def.h"
+#include "compile_flag.h"
 #define WRITE_STATUS_REGISTER_OPCODE 0x01
 #define READ_STATUS_REGISTER_0_OPCODE 0x05
 #define READ_STATUS_REGISTER_1_OPCODE 0x35
@@ -41,7 +41,6 @@ XIP_BANNED void spi_flash_drv_var_init()
 
 XIP_BANNED void spi_flash_init()
 {
-    spi_flash_drv_var_init();
     lsqspi_init(&lsqspi_inst);
 }
 

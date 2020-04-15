@@ -3,7 +3,7 @@
 #include "field_manipulate.h"
 #include "ls_dbg.h"
 #include "lsqspi_param.h"
-#include "section_def.h"
+#include "compile_flag.h"
 
 XIP_BANNED void lsqspi_init(struct lsqspi_instance *inst)
 {

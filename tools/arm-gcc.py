@@ -13,7 +13,7 @@ def generate(env):
     env['AR'] = 'arm-none-eabi-ar'
     env['OBJDUMP'] = 'arm-none-eabi-objdump'
     env['OBJCOPY'] = 'arm-none-eabi-objcopy'
-    env['NM'] = 'arm-none-eabi-nm'
+    env['READELF'] = 'arm-none-eabi-readelf'
     env['PROGSUFFIX'] = '.elf'    
     
 def exists(env):

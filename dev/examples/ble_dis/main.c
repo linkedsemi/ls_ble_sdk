@@ -1,3 +1,4 @@
+#define LOG_TAG "MAIN"
 #include "ls_ble.h"
 #include "platform.h"
 #include "prf_diss.h"

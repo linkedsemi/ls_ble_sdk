@@ -4,7 +4,7 @@
 #define ENV_BUF_SIZE 2048
 #define DB_BUF_SIZE 4096
 #define MSG_BUF_SIZE 4096
-#define NON_RET_BUF_SIZE 0
+#define NON_RET_BUF_SIZE 12
 
 extern void (*stack_assert_asm_fn)(uint32_t,uint32_t,uint32_t);
 extern void (*app_init_fn)(void); 
@@ -96,14 +96,7 @@ struct
     uint8_t env[39];
 }ral_buf[SDK_MAX_RAL_NUM];
 
-uint32_t heap_env_buf[ENV_BUF_SIZE/sizeof(uint32_t)];
-
-uint32_t heap_db_buf[DB_BUF_SIZE/sizeof(uint32_t)];
-
-uint32_t heap_msg_buf[MSG_BUF_SIZE/sizeof(uint32_t)];
-
-uint32_t heap_non_ret_buf[NON_RET_BUF_SIZE/sizeof(uint32_t)];
-
+uint32_t heap_buf[ENV_BUF_SIZE/sizeof(uint32_t)+DB_BUF_SIZE/sizeof(uint32_t)+MSG_BUF_SIZE/sizeof(uint32_t)+NON_RET_BUF_SIZE/sizeof(uint32_t)];
 
 void statck_buffer_init(uint32_t,uint32_t,uint32_t,uint32_t);
 

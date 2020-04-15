@@ -55,7 +55,7 @@ __initial_sp
 ;   <o>  Heap Size (in Bytes) <0x0-0xFFFFFFFF:8>
 ; </h>
 
-Heap_Size       EQU     0x00000100
+Heap_Size       EQU     0x00000800
 
                 AREA    HEAP, NOINIT, READWRITE, ALIGN=3
 __heap_base
@@ -93,27 +93,39 @@ __Vectors       DCD     __initial_sp              ; Top of Stack
 
                 ; External Interrupts
 
-                DCD     WDT_IRQHandler
-				DCD     BLE_LP_IRQHandler
-				DCD     BLE_MAC_IRQHandler
-				DCD    	RTC_IRQHandler
-				DCD     EXT_INTR_IRQHandler
-				DCD     ECC_IRQHandler
-				DCD     DMAC_IRQHandler
-				DCD     QSPI_IRQHandler
-				DCD     SPIM0_IRQHandler
-				DCD     SPIM1_IRQHandler
-				DCD     SPIS_IRQHandler
-				DCD     UART0_IRQHandler
-				DCD     UART1_IRQHandler
-				DCD     IIC0_IRQHandler
-				DCD     IIC1_IRQHandler
-				DCD     GPIO_IRQHandler
-				DCD     TIMER_IRQHandler
-				DCD		SFT_IRQHandler
-				DCD		PGSPY_IRQHandler				
-				
-				
+                DCD    EXTI_Handler
+                DCD    WWDT_Handler
+                DCD    LPWKUP_Handler
+                DCD    BLE_Handler
+                DCD    RTC_Handler
+                DCD    DMA_Handler
+                DCD    QSPI_Handler
+                DCD    ECC_Handler
+                DCD    CACHE_Handler
+                DCD    TRNG_Handler
+                DCD    IWDT_Handler
+                DCD    CRYPT_Handler
+                DCD    PDM_Handler
+                DCD    BLE_Handler
+                DCD    ADC_Handler
+                DCD    ADTIM1_Handler
+                DCD    BSTIM1_Handler
+                DCD    GPTIMA1_Handler
+                DCD    GPTIMB1_Handler
+                DCD    BLE_Handler
+                DCD    LVD33_Handler
+                DCD    GPTIMC1_Handler
+                DCD    LPTIM_Handler
+                DCD    I2C1_Handler
+                DCD    I2C2_Handler
+                DCD    SPI1_Handler
+                DCD    SPI2_Handler
+                DCD    UART1_Handler
+                DCD    UART2_Handler
+                DCD    UART3_Handler
+                DCD    BLE_Handler
+                DCD    BLE_Handler
+
 __Vectors_End
 
 __Vectors_Size  EQU     __Vectors_End - __Vectors
@@ -139,54 +151,71 @@ Reset_Handler   PROC
 
 Default_Handler PROC
                 EXPORT  NMI_Handler               [WEAK]
-                EXPORT  HardFault_Handler               [WEAK]
+                EXPORT  HardFault_Handler         [WEAK]
                 EXPORT  SVC_Handler               [WEAK]
                 EXPORT  PendSV_Handler            [WEAK]
                 EXPORT  SysTick_Handler           [WEAK]
                 
-                EXPORT  WDT_IRQHandler       		  [WEAK]
-				EXPORT  BLE_LP_IRQHandler       	  [WEAK]
-				EXPORT  BLE_MAC_IRQHandler       	  [WEAK]
-				EXPORT  RTC_IRQHandler       		  [WEAK]
-				EXPORT  EXT_INTR_IRQHandler       	  [WEAK]
-				EXPORT  ECC_IRQHandler		       	  [WEAK]
-				EXPORT  DMAC_IRQHandler       		  [WEAK]
-				EXPORT  QSPI_IRQHandler       		  [WEAK]
-				EXPORT  SPIM0_IRQHandler       		  [WEAK]
-				EXPORT  SPIM1_IRQHandler       		  [WEAK]
-				EXPORT  SPIS_IRQHandler      		  [WEAK]
-				EXPORT  UART0_IRQHandler      		  [WEAK]
-				EXPORT  UART1_IRQHandler      		  [WEAK]
-				EXPORT  IIC0_IRQHandler      		  [WEAK]
-				EXPORT  IIC1_IRQHandler      		  [WEAK]
-				EXPORT  GPIO_IRQHandler      		  [WEAK]
-				EXPORT  TIMER_IRQHandler      		  [WEAK]
-				EXPORT  SFT_IRQHandler      		  [WEAK]
-                EXPORT  PGSPY_IRQHandler      		  [WEAK]          
-NMI_Handler
-HardFault_Handler
-SVC_Handler
-PendSV_Handler
-SysTick_Handler
-WDT_IRQHandler
-BLE_LP_IRQHandler
-BLE_MAC_IRQHandler
-RTC_IRQHandler
-EXT_INTR_IRQHandler
-ECC_IRQHandler
-DMAC_IRQHandler
-QSPI_IRQHandler
-SPIM0_IRQHandler
-SPIM1_IRQHandler
-SPIS_IRQHandler
-UART0_IRQHandler
-UART1_IRQHandler
-IIC0_IRQHandler
-IIC1_IRQHandler
-GPIO_IRQHandler
-TIMER_IRQHandler
-SFT_IRQHandler
-PGSPY_IRQHandler
+                EXPORT  EXTI_Handler              [WEAK]
+                EXPORT  WWDT_Handler              [WEAK]
+                EXPORT  LPWKUP_Handler            [WEAK]
+                EXPORT  BLE_Handler               [WEAK]
+                EXPORT  RTC_Handler               [WEAK]
+                EXPORT  DMA_Handler               [WEAK]
+                EXPORT  QSPI_Handler              [WEAK]
+                EXPORT  ECC_Handler               [WEAK]
+                EXPORT  CACHE_Handler             [WEAK]
+                EXPORT  TRNG_Handler              [WEAK]
+                EXPORT  IWDT_Handler              [WEAK]
+                EXPORT  CRYPT_Handler             [WEAK]
+                EXPORT  PDM_Handler               [WEAK]
+                EXPORT  BLE_Handler               [WEAK]
+                EXPORT  ADC_Handler               [WEAK]
+                EXPORT  ADTIM1_Handler            [WEAK]
+                EXPORT  BSTIM1_Handler            [WEAK]
+                EXPORT  GPTIMA1_Handler           [WEAK]
+                EXPORT  GPTIMB1_Handler           [WEAK]
+                EXPORT  BLE_Handler               [WEAK]
+                EXPORT  LVD33_Handler             [WEAK]
+                EXPORT  GPTIMC1_Handler           [WEAK]
+                EXPORT  LPTIM_Handler             [WEAK]
+                EXPORT  I2C1_Handler              [WEAK]
+                EXPORT  I2C2_Handler              [WEAK]
+                EXPORT  SPI1_Handler              [WEAK]
+                EXPORT  SPI2_Handler              [WEAK]
+                EXPORT  UART1_Handler             [WEAK]
+                EXPORT  UART2_Handler             [WEAK]
+                EXPORT  UART3_Handler             [WEAK]
+                EXPORT  BLE_Handler               [WEAK]
+                EXPORT  BLE_Handler               [WEAK]
+EXTI_Handler
+WWDT_Handler
+LPWKUP_Handler
+BLE_Handler
+RTC_Handler
+DMA_Handler
+QSPI_Handler
+ECC_Handler
+CACHE_Handler
+TRNG_Handler
+IWDT_Handler
+CRYPT_Handler
+PDM_Handler
+ADC_Handler
+ADTIM1_Handler
+BSTIM1_Handler
+GPTIMA1_Handler
+GPTIMB1_Handler
+LVD33_Handler
+GPTIMC1_Handler
+LPTIM_Handler
+I2C1_Handler
+I2C2_Handler
+SPI1_Handler
+SPI2_Handler
+UART1_Handler
+UART2_Handler
+UART3_Handler
                 B       .
                 ENDP
                 

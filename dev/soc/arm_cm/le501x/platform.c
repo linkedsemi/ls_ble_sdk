@@ -10,9 +10,13 @@
 #include "log.h"
 #include "lsqspi_param.h"
 #include "spi_flash.h"
-#include "section_def.h"
+#include "compile_flag.h"
 #include "lscache.h"
+#include "reg_rcc.h"
+#include "modem_rf_le501x.h"
 #define IRQ_NVIC_PRIO(IRQn,priority) (((priority << (8U - __NVIC_PRIO_BITS)) & (uint32_t)0xFFUL) << _BIT_SHIFT(IRQn))
+
+RESET_RETAIN uint32_t reset_reason;
 
 void stack_var_ptr_init(void);
 
@@ -65,6 +69,13 @@ void irq_init()
     ble_irq_enable();
 }
 
+static void mac_init()
+{
+    RCC->BLECFG = 1<<RCC_BLE_MRST_POS | 1<<RCC_BLE_CRYPT_RST_POS | 1<<RCC_BLE_LCK_RST_POS | 1<<RCC_BLE_AHB_RST_POS | 1<<RCC_BLE_WKUP_RST_POS
+        | 1<<RCC_BLE_LPWR_CKEN_POS | 1<<RCC_BLE_AHBEN_POS | 1<<RCC_BLE_MDM_REFCLK_CKEN_POS;
+    RCC->BLECFG &= ~(1<<RCC_BLE_MRST_POS | 1<<RCC_BLE_CRYPT_RST_POS | 1<<RCC_BLE_LCK_RST_POS | 1<<RCC_BLE_AHB_RST_POS | 1<<RCC_BLE_WKUP_RST_POS);
+}
+
 static void module_init()
 {
     //TODO
@@ -75,7 +86,8 @@ static void module_init()
     cpu_sleep_recover_init();
     uint32_t base_offset = flash_data_storage_base_offset();
     tinyfs_init(base_offset);
-    
+    mac_init();
+    modem_rf_init();
 }
 
 static void var_init()
@@ -124,7 +136,8 @@ bool uart_eif_flow_off(void)
 
 void platform_reset(uint32_t error)
 {
-
+    reset_reason = error;
+    while(1);
 }
 
 void ecc_calc_start(const uint8_t* secret_key,const uint8_t* pub_x,const uint8_t* pub_y,uint8_t* result_x,uint8_t* result_y,void (*cb)(void *),void *param)
@@ -165,6 +178,5 @@ void SystemInit()
 
 uint32_t plf_get_reset_error()
 {
-
-    return 0;
+    return reset_reason;
 }

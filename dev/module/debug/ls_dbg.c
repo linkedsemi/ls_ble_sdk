@@ -1,7 +1,7 @@
 #include "le501x.h"
 #include <stdarg.h>
 #include "log.h"
-#include "section_def.h"
+#include "compile_flag.h"
 
 void ls_assert(const char *expr,const char *file,int line)
 {

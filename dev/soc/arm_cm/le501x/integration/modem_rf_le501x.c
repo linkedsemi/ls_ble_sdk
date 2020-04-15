@@ -90,18 +90,17 @@ uint8_t rf_txpwr_cs_get(int8_t txpwr_dbm, bool high)
 
 static void rf_reg_init()
 {
-    REG_FIELD_WR(RCC->APB1EN, RCC_RF, 1);
 
 }
 
 static void modem_reg_init()
 {
-    REG_FIELD_WR(RCC->APB1EN, RCC_MDM2, 1);
 
 }
 
 void modem_rf_init()
 {
+    RCC->APB1EN |= 1<<RCC_RF_POS | 1<<RCC_MDM2_POS;
     rf_reg_init();
     modem_reg_init();
 }

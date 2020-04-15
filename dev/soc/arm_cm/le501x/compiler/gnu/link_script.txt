@@ -7,7 +7,7 @@ MEMORY
 SECTIONS
 {
 	__data_lma__ = ORIGIN(FLASH);
-    
+
 	.data :
 	{
 		. = ALIGN(4);
@@ -25,7 +25,6 @@ SECTIONS
 		KEEP(*(.init))
 		KEEP(*(.fini))
 
-/* 
 		*crtbegin.o(.ctors)
 		*crtbegin?.o(.ctors)
 		*(EXCLUDE_FILE(*crtend?.o *crtend.o) .ctors)
@@ -33,25 +32,30 @@ SECTIONS
 		*(.ctors)
 
 
- 		*crtbegin.o(.dtors)
- 		*crtbegin?.o(.dtors)
- 		*(EXCLUDE_FILE(*crtend?.o *crtend.o) .dtors)
- 		*(SORT(.dtors.*))
- 		*(.dtors)
-*/
+		*crtbegin.o(.dtors)
+		*crtbegin?.o(.dtors)
+		*(EXCLUDE_FILE(*crtend?.o *crtend.o) .dtors)
+		*(SORT(.dtors.*))
+		*(.dtors)
+
 		*(.eh_frame*)
 		*(.text* .rodata*)
 	}>FLASH
 	
-    .bss (NOLOAD):
-    {
-    	__bss_start__ = .;
+	.bss (NOLOAD):
+	{
+		__bss_start__ = .;
 		*(.bss*)
 		*(COMMON)
 		*(SECTION_RTT)
 		__bss_end__ = ALIGN(4);
-    }>RAM
-		
+	}>RAM
+
+	.reset_retain (COPY) :
+	{
+		*(.reset_retain)
+	}
+
 	.heap (COPY):
 	{
 		__end__ = .;

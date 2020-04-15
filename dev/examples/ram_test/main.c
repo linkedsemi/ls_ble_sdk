@@ -6,6 +6,7 @@
 uint8_t test_buf[1024];
 int main()
 {
+    spi_flash_drv_var_init();
     spi_flash_init();
     spi_flash_qe_status_read_and_set();
     spi_flash_xip_start();
@@ -14,3 +15,4 @@ int main()
     while(1);
     return 0;
 }
+
