@@ -84,6 +84,8 @@
             "interface": "swd",
             "runToMain": false,
             "preLaunchCommands" :[
+                "monitor flash breakpoints = 0",
+                "monitor reset",
                 "load", 
                 "add-symbol-file build/fw.elf",               
             ]
@@ -97,6 +99,10 @@
             "name": "Attach BLE_DIS",
             "device": "LE501X",
             "interface": "swd",
+            "preAttachCommands":[
+                "monitor flash breakpoints = 0",
+                "add-symbol-file build/fw.elf", 
+            ]
         },
     ]
 }

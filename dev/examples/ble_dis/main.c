@@ -6,7 +6,7 @@
 #include "ls_dbg.h"
 
 static uint8_t adv_obj_hdl;
-static uint8_t advertising_data[31];
+static uint8_t advertising_data[28];
 static uint8_t scan_response_data[31];
 
 static void gap_manager_callback(enum gap_evt_type type,union gap_evt_u *evt,uint8_t con_idx)
@@ -111,6 +111,7 @@ static void dev_manager_callback(enum dev_evt_type type,union dev_evt_u *evt)
         prf_added_handler(&evt->profile_added);
     break;
     case ADV_OBJ_CREATED:
+        LS_ASSERT(evt->obj_created.status == 0);
         adv_obj_hdl = evt->obj_created.handle;
         dev_manager_start_adv(adv_obj_hdl,advertising_data,sizeof(advertising_data),scan_response_data,sizeof(scan_response_data));
     break;
