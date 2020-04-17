@@ -17,7 +17,9 @@
 Python 3 + VS Code + GCC(ARM)
 ##############################
 
-* 安装Python 3、VS Code
+* 安装Python 3(勾选安装pip模块、添加Python到PATH)、VS Code
+
+* 设置后缀名为.py的文件默认打开方式为Python
 
 * 解压GCC，将 ``{GCC_ROOT}/bin`` 路径添加到系统环境变量PATH中
 
@@ -25,7 +27,7 @@ Python 3 + VS Code + GCC(ARM)
 
     pip install -r requirements.txt
 
-* 打开VS Code，点击左侧Extensions，安装所有Workspace Recommendations插件
+* 打开VS Code，点击左侧Extensions（快捷键 ``Ctrl + Shift + X`` ），安装所有Workspace Recommendations插件
 
 
 

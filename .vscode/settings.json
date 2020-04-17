@@ -20,4 +20,5 @@
     },
     "editor.detectIndentation": false,
     "restructuredtext.confPath": "${workspaceFolder}\\doc",
+    "python.pythonPath": "C:\\Program Files\\Python38\\python.exe",
 }
