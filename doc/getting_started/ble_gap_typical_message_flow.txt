@@ -47,11 +47,32 @@ opt BOND PROCEDURE
     Slave Stack-->Slave App: gap event: MASTER_PAIR_REQ
     Slave App->Slave Stack: gap_manager_slave_pair_response_send
     Slave Stack->Master Stack: PAIR RESPONSE
-    alt PASSKEY: SLAVE INPUT,MASTER OUTPUT
+    alt Just Works
 
-    else PASSKEY: SLAVE OUTPUT,MASTER INPUT
+    else Passkey Entry: responder displays, initiator inputs
+        Slave Stack-->Slave App: gap event: DISPLAY_PASSKEY
+        Master Stack-->+Master App: gap event: REQUEST_PASSKEY
+        Master App->-Master Stack: gap_manager_passkey_input
+    else Passkey Entry: initiator displays, responder inputs
+        Master Stack-->Master App: gap event: DISPLAY_PASSKEY
+        Slave Stack-->+Slave App: gap event: REQUEST_PASSKEY
+        Slave App->-Slave Stack: gap_manager_passkey_intput
+    else Passkey Entry: initiator and responder inputs
+        Slave Stack-->+Slave App: gap event: REQUEST_PASSKEY
+        Master Stack-->+Master App: gap event: REQUEST_PASSKEY
+        Slave App->-Slave Stack: gap_manager_passkey_intput
+        Master App->-Master Stack: gap_manager_passkey_input
+    else Numeric Comparison
+        Slave Stack-->+Slave App: gap event: NUMERIC_COMPARE
+        Master Stack-->+Master App: gap event: NUMERIC_COMPARE
+        Slave App->-Slave Stack: gap_manager_numeric_compare_set
+        Master App->-Master Stack: gap_manager_numeric_compare_set
+    else OOB(Legacy)
 
+    else OOB(Secure Connection)
+        
     end
+    note over Master Stack,Slave Stack: Authentication and Encryption
     Slave Stack-->Slave App: gap event: PAIR_DONE
     Master Stack-->Master App: gap event: PAIR_DONE
 end

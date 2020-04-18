@@ -252,9 +252,20 @@ enum gap_evt_type
     SLAVE_SECURITY_REQ,
     PAIR_DONE,
     ENCRYPT_DONE,
-    GET_LEGACY_OOB,
     DISPLAY_PASSKEY,
     REQUEST_PASSKEY,
+    NUMERIC_COMPARE,
+    REQUEST_LEGACY_OOB,
+    REQUEST_SC_OOB,
+
+};
+
+struct gap_sc_oob
+{
+    /// Confirm Value
+    uint8_t conf[BLE_KEY_LEN];
+    /// Random Number
+    uint8_t rand[BLE_KEY_LEN];
 };
 
 struct pair_feature
@@ -301,7 +312,7 @@ struct gap_encrypt_done
     uint8_t auth;
 };
 
-struct gap_passkey
+struct gap_pin_str
 {
     char pin[6];
     char str_pad;
@@ -309,7 +320,12 @@ struct gap_passkey
 
 struct gap_display_passkey
 {
-    struct gap_passkey passkey;
+    struct gap_pin_str passkey;
+};
+
+struct gap_numeric_compare
+{
+    struct gap_pin_str number;
 };
 
 union gap_evt_u
@@ -321,34 +337,62 @@ union gap_evt_u
     struct gap_pair_done pair_done;
     struct gap_encrypt_done encrypt_done;
     struct gap_display_passkey display_passkey;
+    struct gap_numeric_compare numeric_compare;
 };
 
 enum gatt_evt_type
 {
-    GATT_0,
-
-};
-
-
-union gatt_evt_u
-{
-    uint8_t evt0;
+    SERVER_READ_REQ,
+    SERVER_WRITE_REQ,
+    SERVER_NOTIFICATION_DONE,
+    SERVER_INDICATION_DONE,
+    CLIENT_RECV_NOTIFICATION,
+    CLIENT_RECV_INDICATION,
 };
 
 struct gatt_svc_env
 {
     void *hdr;
-    void (*read)(uint8_t,uint8_t);
-    uint8_t (*write)(uint8_t,uint8_t,uint16_t,uint16_t,uint8_t const*);
     uint16_t start_hdl;
     uint8_t att_num;
 };
 
-#define DEF_GATT_SVC_CALLBACK(svc,read_cb,write_cb) \
-    static struct gatt_svc_env svc##_cb_env = { \
-        .read = (read_cb), \
-        .write = (write_cb), \
-    };
+struct gatt_server_read_req
+{
+    struct gatt_svc_env *svc;
+    uint8_t att_idx;
+};
+
+struct gatt_server_write_req
+{
+    struct gatt_svc_env const *svc;
+    uint8_t *value;
+    uint16_t offset;
+    uint16_t length;
+    uint8_t att_idx;
+};
+
+struct gatt_server_notify_indicate_done
+{
+    uint16_t transaction_id;
+    uint8_t status;
+};
+
+struct gatt_client_recv_notify_indicate
+{
+    uint16_t handle;
+    uint16_t length;
+    uint8_t *value;
+};
+
+union gatt_evt_u
+{
+    struct gatt_server_read_req server_read_req;
+    struct gatt_server_write_req server_write_req;
+    struct gatt_server_notify_indicate_done server_notify_indicate_done;
+    struct gatt_client_recv_notify_indicate client_recv_notify_indicate;
+
+};
 
 void ble_init(void);
 
@@ -392,7 +436,11 @@ void gap_manager_slave_security_req(uint8_t con_idx, uint8_t auth);
 
 void gap_manager_slave_pair_response_send(uint8_t con_idx,uint8_t accept,struct pair_feature *feat);
 
-void gap_manager_passkey_input(uint8_t con_idx,struct gap_passkey *passkey);
+void gap_manager_passkey_input(uint8_t con_idx,struct gap_pin_str *passkey);
+
+void gap_manager_numeric_compare_set(uint8_t con_idx,bool equal);
+
+void gap_manager_sc_oob_set(uint8_t con_idx,struct gap_sc_oob *sc_oob);
 
 void gap_manager_tk_set(uint8_t con_idx,uint8_t key[BLE_KEY_LEN]);
 
@@ -402,7 +450,17 @@ uint8_t gap_manager_get_sec_lvl(uint8_t con_idx);
 
 void gatt_manager_init(void (*evt_cb)(enum gatt_evt_type,union gatt_evt_u *,uint8_t));
 
-void gatt_manager_svc_callback_register(uint16_t start_hdl,uint8_t att_num,struct gatt_svc_env *svc_cb);
+void gatt_manager_svc_register(uint16_t start_hdl,uint8_t att_num,struct gatt_svc_env *svc);
+
+void gatt_manager_server_read_req_reply(uint8_t con_idx,uint16_t handle,uint8_t status,uint8_t *data,uint16_t length);
+
+void gatt_manager_server_write_confirm(uint8_t con_idx,uint16_t handle,uint8_t status);
+
+void gatt_manager_server_send_indication(uint8_t con_idx,uint16_t handle,uint8_t *data,uint16_t length);
+
+void gatt_manager_server_send_notification(uint8_t con_idx,uint16_t handle,uint8_t *data,uint16_t length);
+
+void gatt_manager_client_indication_confirm(uint8_t con_idx,uint16_t handle);
 
 #endif
 
