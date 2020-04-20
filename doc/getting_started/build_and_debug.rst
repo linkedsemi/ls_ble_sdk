@@ -14,6 +14,8 @@
 调试
 -------------
 
+.. note:: 在调试前，请将JLink安装路径（JLinkGDBServerCL.exe 所在目录）添加到系统环境变量。
+
 打开VS Code调试视图（快捷键 ``Ctrl + Shift + D`` ），可以选择需要调试的程序。
 
 **Debug {example 1}**
