@@ -14,6 +14,7 @@
 #include "lscache.h"
 #include "reg_rcc.h"
 #include "modem_rf_le501x.h"
+#include "calc_acc.h"
 #define IRQ_NVIC_PRIO(IRQn,priority) (((priority << (8U - __NVIC_PRIO_BITS)) & (uint32_t)0xFFUL) << _BIT_SHIFT(IRQn))
 
 RESET_RETAIN uint32_t reset_reason;
@@ -82,7 +83,7 @@ static void module_init()
     LOG_INIT();
     LOG_I("sys init");
     irq_init();
-
+    calc_acc_init();
     cpu_sleep_recover_init();
     uint32_t base_offset = flash_data_storage_base_offset();
     tinyfs_init(base_offset);
@@ -173,7 +174,7 @@ uint64_t idiv_acc(uint32_t dividend,uint32_t divisor,bool signed_int)
 
 void SystemInit()
 {
-
+    dcdc_on();
 }
 
 uint32_t plf_get_reset_error()

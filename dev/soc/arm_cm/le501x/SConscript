@@ -8,6 +8,7 @@ src = [
     'compiler/$COMPILER/svcall_asm.s',
     'integration/lsqspi_param.c',
     'integration/modem_rf_le501x.c',
+    'integration/calc_acc.c',
     'sleep.c',
 ]
 inc = [

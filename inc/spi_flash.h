@@ -53,5 +53,7 @@ void spi_flash_prog_erase_resume(void);
 
 bool spi_flash_writing_busy(void);
 
+bool spi_flash_xip_status_get(void);
+
 #endif
 

@@ -359,14 +359,14 @@ struct gatt_svc_env
 
 struct gatt_server_read_req
 {
-    struct gatt_svc_env *svc;
+    struct gatt_svc_env const *svc;
     uint8_t att_idx;
 };
 
 struct gatt_server_write_req
 {
     struct gatt_svc_env const *svc;
-    uint8_t *value;
+    uint8_t const *value;
     uint16_t offset;
     uint16_t length;
     uint8_t att_idx;
@@ -382,7 +382,7 @@ struct gatt_client_recv_notify_indicate
 {
     uint16_t handle;
     uint16_t length;
-    uint8_t *value;
+    uint8_t const *value;
 };
 
 union gatt_evt_u
@@ -456,9 +456,9 @@ void gatt_manager_server_read_req_reply(uint8_t con_idx,uint16_t handle,uint8_t 
 
 void gatt_manager_server_write_confirm(uint8_t con_idx,uint16_t handle,uint8_t status);
 
-void gatt_manager_server_send_indication(uint8_t con_idx,uint16_t handle,uint8_t *data,uint16_t length);
+void gatt_manager_server_send_indication(uint8_t con_idx,uint16_t handle,uint8_t *data,uint16_t length,uint16_t *transaction_id);
 
-void gatt_manager_server_send_notification(uint8_t con_idx,uint16_t handle,uint8_t *data,uint16_t length);
+void gatt_manager_server_send_notification(uint8_t con_idx,uint16_t handle,uint8_t *data,uint16_t length,uint16_t *transaction_id);
 
 void gatt_manager_client_indication_confirm(uint8_t con_idx,uint16_t handle);
 

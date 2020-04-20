@@ -11,6 +11,7 @@ SVCALL(SVCALL_FLASH_CHIP_ERASE,void,do_spi_flash_chip_erase_svcall());
 SVCALL(SVCALL_FLASH_WRITE_STATUS_REG,void,do_spi_flash_write_status_reg_svcall(uint16_t status));
 SVCALL(SVCALL_FLASH_ERASE_SECURITY,void,do_spi_flash_erase_security_area_svcall(uint8_t idx, uint16_t addr));
 SVCALL(SVCALL_FLASH_PROGRAM_SECURITY,void,do_spi_flash_program_security_area_svcall(uint8_t idx, uint16_t addr, uint8_t * data, uint16_t length));
+SVCALL(SVCALL_FLASH_READ_SECURITY,void,do_spi_flash_read_security_area_svcall(uint8_t idx, uint16_t addr, uint8_t * data, uint16_t length));
 
 #define FLASH_EXECUTE_WITH_RETVAL(return_val,op,...) \
     do{\
@@ -72,5 +73,10 @@ void spi_flash_erase_security_area_operation(uint8_t idx,uint16_t addr)
 void spi_flash_program_security_area_operation(uint8_t idx, uint16_t addr, uint8_t * data, uint16_t length)
 {
     FLASH_EXECUTE_NO_RETVAL(do_spi_flash_program_security_area, idx,addr,data,length);
+}
+
+void spi_flash_read_security_area_operation(uint8_t idx, uint16_t addr, uint8_t * data, uint16_t length)
+{
+    FLASH_EXECUTE_NO_RETVAL(do_spi_flash_read_security_area, idx,addr,data,length);
 }
 

@@ -1,6 +1,8 @@
 #include <stdint.h>
 #include "sdk_config.h"
 #include "platform.h"
+#include "cpu.h"
+
 #define ENV_BUF_SIZE 2048
 #define DB_BUF_SIZE 4096
 #define MSG_BUF_SIZE 4096
@@ -13,7 +15,8 @@ extern void (*rand_init_fn) (unsigned int seed);
 extern int (*rand_fn) (void);
 extern uint64_t (*idiv_acc_fn)(uint32_t,uint32_t,bool);
 extern void (*ecc_calc_fn)(const uint8_t*,const uint8_t*,const uint8_t*,uint8_t*,uint8_t*,void (*)(void *),void *);
-
+extern void (*exit_critical_fn)(void);
+extern void (*enter_critical_fn)(void);
 
 extern uint8_t main_task;
 extern uint8_t max_activity_num;
@@ -110,6 +113,8 @@ void stack_var_ptr_init()
     rand_init_fn = true_rand_init;
     rand_fn = true_rand_gen;
     idiv_acc_fn = idiv_acc;
+    enter_critical_fn = enter_critical;
+    exit_critical_fn = exit_critical;
 
     max_activity_num = SDK_MAX_ACT_NUM;
     max_profile_num = SDK_MAX_PROFILE_NUM;

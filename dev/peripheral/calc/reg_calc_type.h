@@ -6,6 +6,7 @@ typedef struct{
     volatile uint32_t SQRTSR;
     volatile uint32_t RDCND;
     volatile uint32_t SQRTRES;
+    volatile uint32_t RESERVED0[5];
     volatile uint32_t DIVD;
     volatile uint32_t DIVS;
     volatile uint32_t DIVQ;

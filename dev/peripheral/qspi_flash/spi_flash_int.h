@@ -18,5 +18,8 @@ void do_spi_flash_write_status_reg(uint16_t status);
 void do_spi_flash_erase_security_area(uint8_t idx,uint16_t addr);
 
 void do_spi_flash_program_security_area(uint8_t idx, uint16_t addr, uint8_t * data, uint16_t length);
+
+void do_spi_flash_read_security_area(uint8_t idx,uint16_t addr,uint8_t *data,uint16_t length);
+
 #endif
 

@@ -11,6 +11,16 @@ void cpu_sleep_asm(void);
 
 void cpu_recover_asm(void);
 
+XIP_BANNED void dcdc_off()
+{
+
+}
+
+XIP_BANNED void dcdc_on()
+{
+
+}
+
 void cpu_sleep_recover_init()
 {
     ISR_VECTOR_ADDR[1] = (uint32_t)cpu_recover_asm;
