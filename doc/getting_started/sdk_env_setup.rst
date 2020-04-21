@@ -1,10 +1,9 @@
 软件开发环搭建
 ================= 
 
-我们支持两类开发环境：
+我们支持如下开发环境：
 
 #. Python 3 + VS Code + GCC(ARM)
-#. Python 3 + Keil(MDK)
 
 下载地址： 
 
@@ -19,13 +18,17 @@ Python 3 + VS Code + GCC(ARM)
 
 * 安装Python 3(勾选安装pip模块、添加Python到PATH)、VS Code
 
-* 设置后缀名为.py的文件默认打开方式为Python
-
-* 解压GCC，将 ``{GCC_ROOT}/bin`` 路径添加到系统环境变量PATH中
+* 解压GCC，将 ``{GCC_SETUP_DIR}/bin`` 路径添加到系统环境变量PATH中
 
 * 进入SDK根目录，打开命令行，执行下述命令，安装Python依赖库::
 
     pip install -r requirements.txt
+
+* 设置后缀名为.py的文件默认打开方式为Python，设置完成后，在命令行中执行::
+
+    hexmerge.py -h
+
+  若得到hexmerge帮助信息，则设置成功
 
 * 打开VS Code，点击左侧Extensions（快捷键 ``Ctrl + Shift + X`` ），安装所有Workspace Recommendations插件
 

@@ -2,7 +2,8 @@
 #define TINYFS_CONFIG_H_
 #include "sdk_config.h"
 
-#define TINYFS_NODE_MAX ((SDK_BLE_STORAGE_PEER_MAX)*3 + 1 + SDK_USER_TINYFS_NODE_MAX)
+#define TINYFS_NODE_MAX ((SDK_BLE_STORAGE_PEER_MAX)*3 + 4 + SDK_USER_TINYFS_NODE_MAX)
+// 4 : ecc_priv_key + static_rand_addr + local_irk + folder
 #define TINYFS_SECTION_NUM 3
 
 #if (TINYFS_SECTION_NUM<3)

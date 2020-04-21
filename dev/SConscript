@@ -9,12 +9,10 @@ sdk_inc = module_inc + peripheral_inc + soc_inc
 sdk_inc += Dir(['.'])
 dev_env.Append(CPPPATH = list(map(lambda x:'#/'+x.srcnode().path,sdk_inc)))
 dev_env.Append(LINKFLAGS = ' $GC_OPTION ')
-dev_env.Append(LIBS = [target_lib])
     
 def image_build(name,src,inc,linkscript = '',objprefix = ''):
     global dev_env
     global sdk_src
-    global target_fw
     img_env = dev_env.Clone()
     src_files = File(src)
     inc_dirs = Dir(inc)
@@ -24,14 +22,17 @@ def image_build(name,src,inc,linkscript = '',objprefix = ''):
     target_name = '#build/examples/'+name
     img_target = img_env.Program(target_name, sdk_src + src_files,OBJPREFIX = objprefix)
     img_env.AddPostAction(img_target,Action('$OBJDUMP -d -z -x $TARGET > ${TARGET.base}.asm'))
-    img_env.Depends(img_target,[target_fw,img_env['LINKSCRIPT']])
+    img_env.Depends(img_target,[img_env['LINKSCRIPT']])
     img_env.Clean(img_target,[target_name+'.asm',target_name+'.hex'])
     return img_env,img_target
   
 def app_build(app_name,src,inc,linkscript = ''):
+    global target_lib
+    global target_fw
     app_env,app_target = image_build(app_name,src,inc,linkscript)
+    app_env.Append(LIBS = [target_lib])
     app_env.AddPostAction(app_target,Action('$OBJCOPY -O ihex $TARGET ${TARGET.base}.hex'))
-    app_env.Depends(app_target,'#build/examples/info_sbl.hex')
+    app_env.Depends(app_target,[target_fw,'#build/examples/info_sbl.hex'])
     return app_env,app_target
 
 

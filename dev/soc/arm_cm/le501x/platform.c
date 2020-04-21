@@ -15,6 +15,7 @@
 #include "reg_rcc.h"
 #include "modem_rf_le501x.h"
 #include "calc_acc.h"
+#include "builtin_timer.h"
 #define IRQ_NVIC_PRIO(IRQn,priority) (((priority << (8U - __NVIC_PRIO_BITS)) & (uint32_t)0xFFUL) << _BIT_SHIFT(IRQn))
 
 RESET_RETAIN uint32_t reset_reason;

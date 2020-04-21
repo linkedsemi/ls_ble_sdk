@@ -1,6 +1,6 @@
 
 
-Import('app_build')
+Import('image_build')
 
 src = [
     'main.c'
@@ -9,4 +9,4 @@ inc = [
     '.'
 ]
 
-app_env,app_target = app_build('ram_test',src,inc,'ram_link.txt')
+app_env,app_target = image_build('ram_test',src,inc,'ram_link.txt')

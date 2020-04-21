@@ -1,6 +1,10 @@
 #ifndef SDK_DEFAULT_CONFIG_H_
 #define SDK_DEFAULT_CONFIG_H_
 
+#ifndef SDK_DCDC_BYPASS
+#define SDK_DCDC_BYPASS 1
+#endif
+
 #ifndef SDK_BLE_STORAGE_PEER_MAX
 #define SDK_BLE_STORAGE_PEER_MAX 3
 #endif

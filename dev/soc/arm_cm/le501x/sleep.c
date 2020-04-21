@@ -1,3 +1,4 @@
+#include "sdk_config.h"
 #include "le501x.h"
 #include "spi_flash.h"
 #include "compile_flag.h"
@@ -11,6 +12,10 @@ void cpu_sleep_asm(void);
 
 void cpu_recover_asm(void);
 
+#if SDK_DCDC_BYPASS
+XIP_BANNED void dcdc_off(){}
+XIP_BANNED void dcdc_on(){}
+#else
 XIP_BANNED void dcdc_off()
 {
 
@@ -20,6 +25,8 @@ XIP_BANNED void dcdc_on()
 {
 
 }
+
+#endif
 
 void cpu_sleep_recover_init()
 {

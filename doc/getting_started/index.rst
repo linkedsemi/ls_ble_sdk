@@ -6,6 +6,6 @@
    :maxdepth: 1
    
    sdk_env_setup
-   memory
    build_and_debug
+   memory
    ble_flow
