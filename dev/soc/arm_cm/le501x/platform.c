@@ -1,5 +1,6 @@
 #define LOG_TAG "PLF"
 #include <string.h>
+#include <stdlib.h>
 #include "platform.h"
 #include "calc_div.h"
 #include "cpu.h"
@@ -159,8 +160,7 @@ void true_rand_init(unsigned int seed)
 
 int true_rand_gen(void)
 {
-
-    return 0;
+    return rand();
 }
 
 uint64_t idiv_acc(uint32_t dividend,uint32_t divisor,bool signed_int)
