@@ -20,6 +20,8 @@
 
 RESET_RETAIN uint32_t reset_reason;
 
+DEF_BUILTIN_TIMER_ENV(SDK_SW_TIMER_MAX);
+
 void stack_var_ptr_init(void);
 
 void main_task_app_init(void);
@@ -84,6 +86,7 @@ static void module_init()
     LOG_INIT();
     LOG_I("sys init");
     irq_init();
+    INIT_BUILTIN_TIMER_ENV();
     calc_acc_init();
     cpu_sleep_recover_init();
     uint32_t base_offset = flash_data_storage_base_offset();

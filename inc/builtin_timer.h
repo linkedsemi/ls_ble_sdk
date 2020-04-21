@@ -2,10 +2,11 @@
 #define BUILTIN_TIMER_H_
 #include <stdint.h>
 #include "linked_buffer.h"
+#include "co_list.h"
 
 struct builtin_timer
 {
-    void *hdr;
+    struct co_list_hdr hdr;
     void (*timer_cb)(void *);
     void *param;
 };
@@ -20,5 +21,14 @@ struct builtin_timer
     }while(0)
 
 void builtin_timer_env_register(linked_buffer_t *env);
+
+void *builtin_timer_create(void (*cb)(void *));
+
+void builtin_timer_delete(void *timer);
+
+void builtin_timer_stop(void *timer);
+
+void builtin_timer_start(void *timer,uint32_t timeout,void *param);
+
 #endif
 

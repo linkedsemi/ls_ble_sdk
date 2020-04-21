@@ -1,6 +1,10 @@
 #ifndef SDK_DEFAULT_CONFIG_H_
 #define SDK_DEFAULT_CONFIG_H_
 
+#ifndef SDK_SW_TIMER_MAX
+#define SDK_SW_TIMER_MAX 5
+#endif
+
 #ifndef SDK_DCDC_BYPASS
 #define SDK_DCDC_BYPASS 1
 #endif
