@@ -105,6 +105,7 @@ static void var_init()
 
 void sys_init_itf()
 {
+    dcdc_on();
     var_init();
     main_task_itf_init();
     module_init();
@@ -112,32 +113,10 @@ void sys_init_itf()
 
 void sys_init_app()
 {
+    dcdc_on();
     var_init();
     main_task_app_init();
     module_init();
-}
-
-
-void uart_eif_read(uint8_t *bufptr, uint32_t size, void (*callback)(void *,uint8_t), void* dummy)
-{
-
-
-}
-
-void uart_eif_write(uint8_t *bufptr, uint32_t size, void (*callback)(void *,uint8_t), void* dummy)
-{
-
-
-}
-
-void uart_eif_flow_on(void)
-{
-
-}
-
-bool uart_eif_flow_off(void)
-{
-    return true;
 }
 
 void platform_reset(uint32_t error)
@@ -176,10 +155,7 @@ uint64_t idiv_acc(uint32_t dividend,uint32_t divisor,bool signed_int)
     return retval;
 }
 
-void SystemInit()
-{
-    dcdc_on();
-}
+void SystemInit(){}
 
 uint32_t plf_get_reset_error()
 {

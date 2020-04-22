@@ -11,7 +11,7 @@ XIP_BANNED void enter_critical()
 
 XIP_BANNED void exit_critical()
 {
-    if(--critical_nested_cnt)
+    if(--critical_nested_cnt==0)
     {
         __enable_irq();
     }

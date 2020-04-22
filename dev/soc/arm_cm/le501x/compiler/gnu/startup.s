@@ -126,6 +126,8 @@ __isr_vector:
 	.type	Reset_Handler, %function
 Reset_Handler:
 
+	bl	SystemInit
+
 /*  Single section scheme.
  *
  *  The ranges of copy from/to are specified by following symbols
@@ -150,7 +152,6 @@ Reset_Handler:
 
 .L_loop1_done:
 
-	bl	SystemInit
 	bl	_start
 
 	.pool

@@ -1,10 +1,10 @@
-编译构建、调试简介
+构建、烧录、调试
 ===================
 
-编译构建
+构建
 -------------
 
-通过VS Code打开SDK **根目录** ，通过快捷键 ``Ctrl + ``` 打开Terminal，执行::
+完成 :ref:`env_setup` 操作后，在VS Code中打开SDK **根目录** ，通过快捷键 ``Ctrl + ``` 打开Terminal，执行::
 
     $ scons
     
@@ -25,17 +25,43 @@
 
 **.hex**
     由.elf文件导出的Intel Hex格式程序镜像，用于烧录
+    
+JLINK烧录、调试的准备工作
+-------------------------
 
+#. 将JLink安装路径（JFlash.exe 、JLinkGDBServerCL.exe 所在目录） ``{JLINK_SETUP_DIR}`` 添加到系统环境变量PATH。
+
+#. 将SDK ``tools/prog/`` 目录下所有内容拷贝到JLink安装路径``{JLINK_SETUP_DIR}`` 覆盖原有文件。
+
+烧录
+--------------
+
+根据 :ref:`memory` 一节的介绍，Flash被划分为Info、Second Boot、Image and OTA Image、Persistent Data、Protocol Stack五个区域。
+除了Persistent Data区域是运行时写入的数据，其他四个区域都需要预先写入Flash，程序才能正确运行。
+
+**Info + Second Boot**
+    build/examples/info_sbl.hex
+    
+**Protocol Stack**
+    dev/soc/bin/arm_cm/le501x/bin/fw.hex
+
+*开发调试* 阶段，需要预先将上述两个hex文件烧录Flash。
+
+*量产* 前，用hexmerge.py将上述两个hex和应用镜像hex合并::
+
+    hexmerge.py build/examples/info_sbl.hex dev/soc/bin/arm_cm/le501x/bin/fw.hex build/examples/myapp.hex > mayapp_production.hex
+
+JFlash使用
+~~~~~~~~~~~~~
+.. image:: jflash_start.png
 
 调试
 -------------
 
-.. note:: 在调试前，请将JLink安装路径（JLinkGDBServerCL.exe 所在目录） ``{JLINK_SETUP_DIR}`` 添加到系统环境变量PATH。并将SDK ``tools/prog/`` 目录下所有内容拷贝到 ``{JLINK_SETUP_DIR}`` 覆盖原有文件。
-
 打开VS Code调试视图（快捷键 ``Ctrl + Shift + D`` ），可以选择需要调试的程序。
 
 **Debug {example 1}**
-    表示复位系统，下载 ``{example 1}`` 程序到Flash中，并从头运行
+    表示复位系统，自动烧录 ``{example 1}`` 应用镜像到Flash中，并从头运行
 
 
 **Attach {example 1}**

@@ -1,3 +1,5 @@
+.. _memory:
+
 存储系统
 ============
 
@@ -21,10 +23,10 @@ Flash
 +=====================+===========================+================================+===============================+
 | BLE PROTOCOL STACK  | __stack_lma__             | 0x80000                        | About 205KB                   |
 +---------------------+---------------------------+--------------------------------+-------------------------------+
-| DATA STORAGE        | DATA_STORAGE_BASE         | __stack_lma__ & ~0xfff         | SECTION_NUM * SECTION_SIZE    |
+| PERSISTENT DATA     | PERSISTENT_DATA_BASE      | __stack_lma__ & ~0xfff         | SECTION_NUM * SECTION_SIZE    |
 |                     | (Aligned to 4KB Boundary) |                                | ( Default 12KB)               |
 +---------------------+---------------------------+--------------------------------+-------------------------------+
-| IMAGE and OTA IMAGE | IMAGE_START               | DATA_STORAGE_BASE              |                               |
+| IMAGE and OTA IMAGE | IMAGE_START               | PERSISTENT_DATA_BASE           |                               |
 |                     | (Aligned to 4KB Boundary) |                                |                               |
 +---------------------+---------------------------+--------------------------------+-------------------------------+
 | SECOND BOOTLOADER   | 0x1000                    | SECOND_BOOTLOADER_END          |                               |
