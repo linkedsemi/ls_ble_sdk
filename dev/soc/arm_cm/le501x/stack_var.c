@@ -1,4 +1,5 @@
 #include <stdint.h>
+#include <stdlib.h>
 #include "sdk_config.h"
 #include "platform.h"
 #include "cpu.h"
@@ -110,8 +111,8 @@ void stack_var_ptr_init()
     stack_assert_asm_fn = stack_assert_asm;
     platform_reset_fn = platform_reset;
     ecc_calc_fn = ecc_calc_start;
-    rand_init_fn = true_rand_init;
-    rand_fn = true_rand_gen;
+    rand_init_fn = srand;
+    rand_fn = rand;
     idiv_acc_fn = idiv_acc;
     enter_critical_fn = enter_critical;
     exit_critical_fn = exit_critical;

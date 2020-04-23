@@ -23,4 +23,7 @@ void *ll_malloc(uint32_t size);
 
 void ll_free(void *data);
 
+void rand_gen_by_word(uint8_t *ptr,uint8_t word_num);
+
+
 #endif

@@ -1,5 +1,6 @@
 Import('dev_env')
 src = [
+    'common/common.c',
     'crc/crc16.c',
     'debug/log.c',
     'debug/ls_dbg.c',

@@ -25,9 +25,5 @@ void platform_reset(uint32_t error);
 
 void ecc_calc_start(const uint8_t* secret_key,const uint8_t* pub_x,const uint8_t* pub_y,uint8_t* result_x,uint8_t* result_y,void (*cb)(void *),void *param);
 
-void true_rand_init(unsigned int seed);
-
-int true_rand_gen(void);
-
 uint64_t idiv_acc(uint32_t,uint32_t,bool);
 #endif

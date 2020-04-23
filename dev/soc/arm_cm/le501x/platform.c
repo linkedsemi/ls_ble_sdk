@@ -130,18 +130,6 @@ void ecc_calc_start(const uint8_t* secret_key,const uint8_t* pub_x,const uint8_t
 
 }
 
-
-void true_rand_init(unsigned int seed)
-{
-
-
-}
-
-int true_rand_gen(void)
-{
-    return rand();
-}
-
 uint64_t idiv_acc(uint32_t dividend,uint32_t divisor,bool signed_int)
 {
     uint64_t retval;

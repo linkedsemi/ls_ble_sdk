@@ -247,6 +247,7 @@ enum gap_evt_type
 {
     CONNECTED,
     DISCONNECTED,
+    CONN_PARAM_REQ,
     CONN_PARAM_UPDATED,
     MASTER_PAIR_REQ,
     SLAVE_SECURITY_REQ,
@@ -258,6 +259,28 @@ enum gap_evt_type
     REQUEST_LEGACY_OOB,
     REQUEST_SC_OOB,
 
+};
+
+struct gap_conn_param_req
+{
+    /// Connection interval minimum
+    uint16_t intv_min;
+    /// Connection interval maximum
+    uint16_t intv_max;
+    /// Latency
+    uint16_t latency;
+    /// Supervision timeout
+    uint16_t time_out;
+};
+
+struct gap_conn_param_updated
+{
+    ///Connection interval value
+    uint16_t            con_interval;
+    ///Connection latency value
+    uint16_t            con_latency;
+    ///Supervision timeout
+    uint16_t            sup_to;
 };
 
 struct gap_sc_oob
@@ -332,12 +355,24 @@ union gap_evt_u
 {
     struct gap_connected connected;
     struct gap_disconnected disconnected;
+    struct gap_conn_param_req conn_param_req;
+    struct gap_conn_param_updated conn_param_updated;
     struct gap_master_pair_req master_pair_req;
     struct gap_slave_security_req slave_security_req;
     struct gap_pair_done pair_done;
     struct gap_encrypt_done encrypt_done;
     struct gap_display_passkey display_passkey;
     struct gap_numeric_compare numeric_compare;
+};
+
+struct gap_update_conn_param
+{
+    uint16_t intv_min;
+    uint16_t intv_max;
+    uint16_t latency;
+    uint16_t sup_timeout;
+    uint16_t ce_len_min;
+    uint16_t ce_len_max;
 };
 
 enum gatt_evt_type
@@ -402,6 +437,8 @@ void dev_manager_init(void (*cb)(enum dev_evt_type,union dev_evt_u *));
 
 void dev_manager_stack_init(struct ble_stack_cfg *cfg);
 
+void dev_manager_get_identity_bdaddr(uint8_t *addr,bool *random);
+
 void dev_manager_add_service(struct svc_decl *svc);
 
 void dev_manager_create_legacy_adv_object(struct legacy_adv_obj_param *p_param);
@@ -447,6 +484,10 @@ void gap_manager_tk_set(uint8_t con_idx,uint8_t key[BLE_KEY_LEN]);
 uint8_t gap_manager_get_role(uint8_t con_idx);
 
 uint8_t gap_manager_get_sec_lvl(uint8_t con_idx);
+
+void gap_manager_update_conn_param(uint8_t con_idx,struct gap_update_conn_param *p_param);
+
+void gap_manager_conn_param_response_send(uint8_t con_idx,bool accept);
 
 void gatt_manager_init(void (*evt_cb)(enum gatt_evt_type,union gatt_evt_u *,uint8_t));
 

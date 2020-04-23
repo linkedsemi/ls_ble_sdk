@@ -31,7 +31,7 @@ JLINK烧录、调试的准备工作
 
 #. 将JLink安装路径（JFlash.exe 、JLinkGDBServerCL.exe 所在目录） ``{JLINK_SETUP_DIR}`` 添加到系统环境变量PATH。
 
-#. 将SDK ``tools/prog/`` 目录下所有内容拷贝到JLink安装路径``{JLINK_SETUP_DIR}`` 覆盖原有文件。
+#. 将SDK ``tools/prog/`` 目录下所有内容拷贝到JLink安装路径 ``{JLINK_SETUP_DIR}`` 覆盖原有文件。
 
 烧录
 --------------

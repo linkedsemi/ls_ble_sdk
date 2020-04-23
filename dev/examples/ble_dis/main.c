@@ -102,8 +102,14 @@ static void dev_manager_callback(enum dev_evt_type type,union dev_evt_u *evt)
     }
     break;
     case STACK_READY:
+    {
+        uint8_t addr[6];
+        bool type;
+        dev_manager_get_identity_bdaddr(addr,&type);
+        LOG_I("type:%d,addr:",type);
+        LOG_HEX(addr,sizeof(addr));
         dev_manager_prf_dis_server_add(NO_SEC,0xffff);
-    break;
+    }break;
     case SERVICE_ADDED:
 
     break;
