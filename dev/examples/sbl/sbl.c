@@ -4,7 +4,7 @@
 #include "compile_flag.h"
 #define APP_IMAGE_BASE (0x18036000)
 
-XIP_BANNED void SystemInit(){
+void SystemInit(){
     
 }
 
