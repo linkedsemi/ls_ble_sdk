@@ -9,7 +9,6 @@ const svcall_fn_t svcall_table[SVCALL_NUM_MAX] = {
     [SVCALL_FLASH_FAST_READ] = (svcall_fn_t)do_spi_flash_fast_read,
     [SVCALL_FLASH_QUAD_READ] = (svcall_fn_t)do_spi_flash_quad_io_read,
     [SVCALL_FLASH_CHIP_ERASE] = (svcall_fn_t)do_spi_flash_chip_erase,
-    [SVCALL_FLASH_WRITE_STATUS_REG] = (svcall_fn_t)do_spi_flash_write_status_reg,
     [SVCALL_FLASH_ERASE_SECURITY] = (svcall_fn_t)do_spi_flash_erase_security_area,
     [SVCALL_FLASH_PROGRAM_SECURITY] = (svcall_fn_t)do_spi_flash_program_security_area,
     [SVCALL_FLASH_READ_SECURITY] = (svcall_fn_t)do_spi_flash_read_security_area,

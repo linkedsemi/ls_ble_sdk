@@ -143,7 +143,7 @@ uint64_t idiv_acc(uint32_t dividend,uint32_t divisor,bool signed_int)
     return retval;
 }
 
-void SystemInit(){}
+__attribute__((weak)) void SystemInit(){}
 
 uint32_t plf_get_reset_error()
 {

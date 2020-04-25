@@ -6,7 +6,7 @@
 
 完成 :ref:`env_setup` 操作后，在VS Code中打开SDK **根目录** ，通过快捷键 ``Ctrl + ``` 打开Terminal，执行::
 
-    $ scons
+    scons
     
 会编译所有示例程序，生成文件保存在SDK ``build/examples/`` 目录下
 

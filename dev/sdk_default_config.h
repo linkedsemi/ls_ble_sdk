@@ -6,7 +6,7 @@
 #endif
 
 #ifndef SDK_DCDC_BYPASS
-#define SDK_DCDC_BYPASS 1
+#define SDK_DCDC_BYPASS 0
 #endif
 
 #ifndef SDK_BLE_STORAGE_PEER_MAX

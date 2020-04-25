@@ -61,7 +61,7 @@
             "name": "Debug RAM_TEST",
             "device": "LE501X",
             "interface": "swd",
-            "runToMain": false,
+            "runToMain": true,
             "preLaunchCommands" :[
                 "monitor reset",
                 "load",

@@ -1,6 +1,8 @@
 #include "modem_rf_le501x.h"
 #include "reg_rcc.h"
 #include "field_manipulate.h"
+#include "reg_rf.h"
+#include "reg_mdm2.h"
 
 #define RF_GAIN_TBL_SIZE           (8)
 #define RF_PWR_TBL_SIZE            (8)
@@ -95,7 +97,9 @@ static void rf_reg_init()
 
 static void modem_reg_init()
 {
-
+    REG_FIELD_WR(MDM2->REG08, MDM2_IF_SHIFT, 0x400);
+    REG_FIELD_WR(MDM2->REG20, MDM2_LR_IF_SHIFT, 0x400);
+    REG_FIELD_WR(MDM2->REG20, MDM2_LR_RX_INVERT, 1);
 }
 
 void modem_rf_init()

@@ -21,7 +21,7 @@ XIP_BANNED uint8_t lsqspi_rd_cap_dly_get(struct lsqspi_instance *inst)
 
 XIP_BANNED uint8_t lsqspi_baudrate_get(struct lsqspi_instance *inst)
 {
-    return 2;
+    return 4;
 }
 
 XIP_BANNED uint32_t lsqspi_dly_get(struct lsqspi_instance *inst)

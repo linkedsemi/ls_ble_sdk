@@ -32,7 +32,7 @@ Python 3 + VS Code + GCC(ARM)
 
   若得到hexmerge帮助信息，则设置成功
 
-* 打开VS Code，点击左侧Extensions（快捷键 ``Ctrl + Shift + X`` ），安装所有Workspace Recommendations插件
+* 用VS Code打开SDK目录，点击左侧Extensions（快捷键 ``Ctrl + Shift + X`` ），在搜索框输入 ``@recommended`` ,安装所有Workspace Recommendations插件
 
 
 
