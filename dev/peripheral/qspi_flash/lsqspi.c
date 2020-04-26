@@ -76,11 +76,6 @@ XIP_BANNED static void stig_rd_wr(struct lsqspi_instance *inst,struct lsqspi_sti
     }else
     {
         start_length = (uint32_t)param->start.data % 4 ? 4 - (uint32_t)param->start.data % 4 : 0;
-        if(start_length >= param->size)
-        {
-            start_length = param->size;
-            start_hold = false;
-        }
     }
     stig_start(inst->reg,&param->start,start_length,start_hold);
     stig_continue(inst->reg, (void *)(param->start.data + start_length), param->size - start_length , param->quad_data);
