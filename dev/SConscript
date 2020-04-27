@@ -14,6 +14,8 @@ def image_build(name,src,inc,linkscript = '',objprefix = ''):
     global dev_env
     global sdk_src
     img_env = dev_env.Clone()
+    img_env['PROJ_DIR'] = Dir('.')
+    print(img_env['PROJ_DIR'].srcnode().path)
     src_files = File(src)
     inc_dirs = Dir(inc)
     if linkscript != '':
@@ -21,9 +23,11 @@ def image_build(name,src,inc,linkscript = '',objprefix = ''):
     img_env.Append(CPPPATH = list(map(lambda x:'#/'+x.srcnode().path,inc_dirs)))
     target_name = '#build/examples/'+name
     img_target = img_env.Program(target_name, sdk_src + src_files,OBJPREFIX = objprefix)
-    img_env.AddPostAction(img_target,Action('$OBJDUMP -d -z -x $TARGET > ${TARGET.base}.asm'))
     img_env.Depends(img_target,[img_env['LINKSCRIPT']])
-    img_env.Clean(img_target,[target_name+'.asm',target_name+'.hex'])
+    if not 'mdk' in img_env['TOOLS']:
+        img_env.AddPostAction(img_target,Action('$OBJDUMP -d -z -x $TARGET > ${TARGET.base}.asm'))
+        img_env.Clean(img_target,[target_name+'.asm',target_name+'.hex'])
+
     return img_env,img_target
   
 def app_build(app_name,src,inc,linkscript = ''):
@@ -31,9 +35,11 @@ def app_build(app_name,src,inc,linkscript = ''):
     global target_fw
     app_env,app_target = image_build(app_name,src,inc,linkscript)
     app_env.Append(LIBS = [target_lib])
-    app_env.AddPostAction(app_target,Action('$OBJCOPY -O ihex $TARGET ${TARGET.base}.hex'))
-    app_env.Depends(app_target,[target_fw,'#build/examples/info_sbl.hex'])
+    if not 'mdk' in app_env['TOOLS']:
+        app_env.AddPostAction(app_target,Action('$OBJCOPY -O ihex $TARGET ${TARGET.base}.hex'))
+        app_env.Depends(app_target,[target_fw,'#build/examples/info_sbl.hex'])
+
     return app_env,app_target
 
 
-SConscript(dirs = 'examples',exports=['app_build','image_build'])
+SConscript(dirs = 'examples',exports=['app_build','image_build','dev_env'])

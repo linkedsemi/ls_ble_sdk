@@ -1,11 +1,11 @@
 import os
 SetOption('warn', ['no-duplicate-environment'] + GetOption('warn'))
-tools = ['arm-gcc']
-#tools.append('armcc')
+tool = ARGUMENTS.get('toolchain','arm-gcc')
 toolpath = ['tools']
 VariantDir('build', '.',duplicate=0)
-env = Environment(ENV = os.environ,tools=tools,toolpath=toolpath)
-if 'armcc' in tools:
+env = Environment(ENV = os.environ,tools=[tool],toolpath=toolpath)
+print(env['TOOLS'])
+if 'mdk' in env['TOOLS']:
     env['COMPILER'] = 'armcc'
     
 else:
@@ -16,7 +16,11 @@ else:
     env['GC_OPTION'] = ' -Wl,--gc-sections '
 env['CPPPATH'] = ['#inc','#inc/cmsis','#inc/prf']
 dev_env = env.Clone()
-stack = SConscript('build/stack/SConscript',exports=['env'],must_exist=False)
+
+if not 'mdk' in env['TOOLS']:
+    stack = SConscript('build/stack/SConscript',exports=['env'],must_exist=False)
+else:
+    stack = None
 
 if stack is None:
     target_fw = File('#dev/soc/arm_cm/le501x/bin/fw.hex')

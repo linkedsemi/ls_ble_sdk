@@ -1,5 +1,5 @@
 
-Import('image_build')
+Import('image_build','dev_env')
 
 src = [
     'FlashPrg.c',
@@ -8,9 +8,9 @@ src = [
 inc = [
     '.'
 ]
-
-flash_prog_env,flash_prog_target = image_build('flash_prog',src,inc,'flash_prog_link.txt','flash_prog-')
-flash_prog_env.Append(CPPDEFINES = '-DGLOBAL_OUTPUT_LVL=0')
-flash_prog_env.Append(CFLAGS = ' -fPIE ')
-flash_prog_env.Append(LINKFLAGS = ' -nostartfiles')
-flash_prog_env.AddPostAction(flash_prog_target,Copy('tools/prog/LinkedSemi/${TARGET.file}','$TARGET'))
+if not 'mdk' in dev_env['TOOLS']:
+    flash_prog_env,flash_prog_target = image_build('flash_prog',src,inc,'flash_prog_link.txt','flash_prog-')
+    flash_prog_env.Append(CPPDEFINES = '-DGLOBAL_OUTPUT_LVL=0')
+    flash_prog_env.Append(CFLAGS = ' -fPIE ')
+    flash_prog_env.Append(LINKFLAGS = ' -nostartfiles')
+    flash_prog_env.AddPostAction(flash_prog_target,Copy('tools/prog/LinkedSemi/${TARGET.file}','$TARGET'))
