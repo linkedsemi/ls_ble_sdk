@@ -7,6 +7,7 @@ src = [
     'compiler/$COMPILER/sleep_asm.s',
     'compiler/$COMPILER/svcall_asm.s',
     'integration/lsqspi_param.c',
+    'integration/uart_param.c',
     'integration/modem_rf_le501x.c',
     'integration/calc_acc.c',
     'sleep.c',

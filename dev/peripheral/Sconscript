@@ -2,11 +2,14 @@ src = [
     'qspi_flash/lsqspi.c',
     'qspi_flash/spi_flash.c',
     'calc/calc_div.c',
+    'uart/uart.c'
 ]
 inc = [
     'qspi_flash',
     'cache',
     'calc',
+    'uart',
+    '.',
 ]
 src_files = File(src)
 inc_dirs = Dir(inc)
