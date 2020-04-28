@@ -5,8 +5,9 @@
 #include "uart_param.h" 
 
 
-static HAL_StatusTypeDef UART_EndTransmit_IT(UART_HandleTypeDef *huart);
-static HAL_StatusTypeDef UART_Transmit_IT(UART_HandleTypeDef *huart);
+static void UART_EndTransmit_IT(UART_HandleTypeDef *huart);
+static void UART_Transmit_IT(UART_HandleTypeDef *huart);
+static void UART_Receive_IT(UART_HandleTypeDef *huart);
 static void UART_SetConfig(UART_HandleTypeDef *huart);
 
 /**
@@ -60,7 +61,7 @@ HAL_StatusTypeDef HAL_UART_DeInit(UART_HandleTypeDef *huart)
     /* Check the parameters */
     //  assert_param(IS_UART_INSTANCE(huart->UARTX));
 
-    huart->gState = HAL_UART_STATE_BUSY;
+    uart_int_op(HAL_UARTx_IRQHandler,huart,0);
     huart->ErrorCode = HAL_UART_ERROR_NONE;
     huart->gState = HAL_UART_STATE_RESET;
     huart->RxState = HAL_UART_STATE_RESET;
@@ -107,7 +108,7 @@ __attribute__((weak)) void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
   * @param  Timeout Timeout duration
   * @retval HAL status
   */
-HAL_StatusTypeDef HAL_UART_Transmit(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size, uint32_t Timeout)
+HAL_StatusTypeDef HAL_UART_Transmit(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size)
 {
     /* Check that a Tx process is not already ongoing */
     if (huart->gState == HAL_UART_STATE_READY)
@@ -155,7 +156,7 @@ HAL_StatusTypeDef HAL_UART_Transmit(UART_HandleTypeDef *huart, uint8_t *pData, u
   * @param  Timeout Timeout duration
   * @retval HAL status
   */
-HAL_StatusTypeDef HAL_UART_Receive(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size, uint32_t Timeout)
+HAL_StatusTypeDef HAL_UART_Receive(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size)
 {
     /* Check that a Rx process is not already ongoing */
     if (huart->RxState == HAL_UART_STATE_READY)
@@ -217,7 +218,7 @@ HAL_StatusTypeDef HAL_UART_Transmit_IT(UART_HandleTypeDef *huart, uint8_t *pData
         huart->pTxBuffPtr = pData;
         huart->TxXferSize = Size;
         huart->TxXferCount = Size;
-
+        huart->tx_arg = tx_arg;
         huart->ErrorCode = HAL_UART_ERROR_NONE;
         huart->gState = HAL_UART_STATE_BUSY_TX;
         REG_FIELD_WR(huart->UARTX->FCR,UART_FCR_FIFOEN,1);
@@ -261,6 +262,7 @@ HAL_StatusTypeDef HAL_UART_Receive_IT(UART_HandleTypeDef *huart, uint8_t *pData,
         huart->RxXferCount = Size;
         huart->ErrorCode = HAL_UART_ERROR_NONE;
         huart->RxState = HAL_UART_STATE_BUSY_RX;
+        huart->rx_arg = rx_arg;
         REG_FIELD_WR(huart->UARTX->LCR,UART_LCR_RXEN,1);
         REG_FIELD_WR(huart->UARTX->FCR,UART_FCR_FIFOEN,1);
         if(huart->RxXferSize<8)
@@ -315,7 +317,7 @@ static void UART_SetConfig(UART_HandleTypeDef *huart)
   *                the configuration information for the specified UART module.
   * @retval HAL status
   */
-static HAL_StatusTypeDef UART_Transmit_IT(UART_HandleTypeDef *huart)
+static void UART_Transmit_IT(UART_HandleTypeDef *huart)
 {
     uint8_t i=0;
     /* Check that a Tx process is ongoing */
@@ -329,18 +331,12 @@ static HAL_StatusTypeDef UART_Transmit_IT(UART_HandleTypeDef *huart)
                 if (--huart->TxXferCount == 0U)
                 {
                     huart->UARTX->IDR = FIELD_BUILD(UART_IDR_TXS,1);
-                    huart->gState = HAL_UART_STATE_READY; 
-                    return HAL_OK;
+                    return;
                 }
             }
-            return HAL_OK;
-        }
-        else
-        {
-            return HAL_BUSY;
+            return;
         }
     }
-    return HAL_STATE_ERROR;
 }
 
 /**
@@ -349,14 +345,13 @@ static HAL_StatusTypeDef UART_Transmit_IT(UART_HandleTypeDef *huart)
   *                the configuration information for the specified UART module.
   * @retval HAL status
   */
-static HAL_StatusTypeDef UART_EndTransmit_IT(UART_HandleTypeDef *huart)
+static void UART_EndTransmit_IT(UART_HandleTypeDef *huart)
 {
     /* Disable the UART Transmit Complete Interrupt */
     REG_FIELD_WR(huart->UARTX->IDR,UART_IDR_TC,1);
+    /* Tx process is ended, restore huart->gState to Ready */
     huart->gState = HAL_UART_STATE_READY;
     HAL_UART_TxCpltCallback(huart);
-    /* Tx process is ended, restore huart->gState to Ready */
-    return HAL_OK;
 }
 
 /**
@@ -365,7 +360,7 @@ static HAL_StatusTypeDef UART_EndTransmit_IT(UART_HandleTypeDef *huart)
   *                the configuration information for the specified UART module.
   * @retval HAL status
   */
-static HAL_StatusTypeDef UART_Receive_IT(UART_HandleTypeDef *huart)
+static void UART_Receive_IT(UART_HandleTypeDef *huart)
 {
     /* Check that a Rx process is ongoing */
     if (huart->RxState == HAL_UART_STATE_BUSY_RX)
@@ -379,7 +374,7 @@ static HAL_StatusTypeDef UART_Receive_IT(UART_HandleTypeDef *huart)
                 REG_FIELD_WR(huart->UARTX->FCR,UART_FCR_RXTL,UART_FIFO_RL_8);
                 huart->RxState = HAL_UART_STATE_READY;
                 HAL_UART_RxCpltCallback(huart);
-                return HAL_OK;
+                return;
             }
             if(huart->RxXferCount<0x08)
             {
@@ -391,7 +386,6 @@ static HAL_StatusTypeDef UART_Receive_IT(UART_HandleTypeDef *huart)
             }
         }
     }
-    return  HAL_STATE_ERROR;
 }
 
 /**
@@ -404,29 +398,30 @@ static HAL_StatusTypeDef UART_Receive_IT(UART_HandleTypeDef *huart)
 void HAL_UARTx_IRQHandler(UART_HandleTypeDef *huart)
 {
     uint32_t isrflags   = huart->UARTX->RIF;  
-    uint32_t ivsits     = huart->UARTX->IVS;  
+    uint32_t ivsits     = huart->UARTX->IVS; 
+
     /* UART in mode Transmitter ------------------------------------------------*/
     if ((( isrflags& UART_IT_TXS) != 0) &&((ivsits & UART_IT_TXS) != 0))
     {
+        REG_FIELD_WR(huart->UARTX->ICR,UART_ICR_TXS,1);
         UART_Transmit_IT(huart);
-        return;
     }
 
     /* UART in mode Transmitter end --------------------------------------------*/
     if (((isrflags & UART_IT_TC) != 0) && ((ivsits & UART_IT_TC) != 0))
     {
-        if (((isrflags & UART_IT_TXS) != 0)) 
+        if((ivsits & UART_IT_TXS) == 0)
         {
+            REG_FIELD_WR(huart->UARTX->ICR,UART_ICR_TC,1);
             UART_EndTransmit_IT(huart);
         }
-        return;
     }
     /* UART in mode Receive ------------------------------------------------*/
     if (((isrflags & UART_IT_RXRD) != 0) && ((ivsits & UART_IT_RXRD) != 0))
     {
         UART_Receive_IT(huart);
-        return;
     }
+
 }
 
 

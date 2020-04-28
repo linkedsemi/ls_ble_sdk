@@ -158,6 +158,9 @@ typedef struct __UART_HandleTypeDef
     HAL_UART_StateTypeDef         RxState;          /*!< UART state information related to Rx operations.*/
         
     uint32_t                 ErrorCode;        /*!< UART Error code                    */
+
+    void *rx_arg;
+    void *tx_arg;
 } UART_HandleTypeDef;
 
 /** @defgroup UART_Interrupt_definition  UART Interrupt Definitions
@@ -228,8 +231,8 @@ typedef struct __UART_HandleTypeDef
 
 
 /* IO operation functions *******************************************************/
-HAL_StatusTypeDef HAL_UART_Transmit(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size, uint32_t Timeout);
-HAL_StatusTypeDef HAL_UART_Receive(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size, uint32_t Timeout);
+HAL_StatusTypeDef HAL_UART_Transmit(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size);
+HAL_StatusTypeDef HAL_UART_Receive(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size);
 HAL_StatusTypeDef HAL_UART_Transmit_IT(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size, void *tx_arg);
 HAL_StatusTypeDef HAL_UART_Receive_IT(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size,  void *rx_arg);
 
