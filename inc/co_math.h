@@ -129,15 +129,6 @@ static inline uint32_t co_mod(uint32_t val, uint32_t div)
  */
 static inline uint32_t co_clz(uint32_t val)
 {
-    #if defined(__arm__)
-    return __builtin_clz(val);
-    #elif defined(__GNUC__)
-    if (val == 0)
-    {
-        return 32;
-    }
-    return __builtin_clz(val);
-    #else
     uint32_t i;
     for (i = 0; i < 32; i++)
     {
@@ -145,7 +136,6 @@ static inline uint32_t co_clz(uint32_t val)
             break;
     }
     return i;
-    #endif // defined(__arm__)
 }
 
 /**
@@ -157,15 +147,6 @@ static inline uint32_t co_clz(uint32_t val)
  */
 static inline uint32_t co_ctz(uint32_t val)
 {
-    #if defined(__arm__)
-    return __builtin_ctz(val);
-    #elif defined(__GNUC__)
-    if (val == 0)
-    {
-        return 32;
-    }
-    return __builtin_ctz(val);
-    #else
     uint32_t i;
     for (i = 0; i < 32; i++)
     {
@@ -173,7 +154,6 @@ static inline uint32_t co_ctz(uint32_t val)
             break;
     }
     return i;
-    #endif // defined(__arm__)
 }
 /**
  ****************************************************************************************
