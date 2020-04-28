@@ -8,7 +8,6 @@
 static UART_HandleTypeDef *UART_inst_env[3];
 void (*uart_isr)(UART_HandleTypeDef *);
 
-
 void uart_sw_reset()
 {
     REG_FIELD_WR(RCC->APB2RST, RCC_UART1, 1);
@@ -26,8 +25,7 @@ void uart_int_op(void (*isr)(UART_HandleTypeDef *),UART_HandleTypeDef *inst,uint
         uart_isr=isr; 
     }
     if (states)
-    {
-        
+    {        
         if (inst->UARTX == UART1)
         {
             NVIC_ClearPendingIRQ(UART1_IRQn);
