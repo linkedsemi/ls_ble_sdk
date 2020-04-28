@@ -416,7 +416,7 @@ void HAL_UARTx_IRQHandler(UART_HandleTypeDef *huart)
     /* UART in mode Transmitter end --------------------------------------------*/
     if (((isrflags & UART_IT_TC) != 0) && ((ivsits & UART_IT_TC) != 0))
     {
-        if (((isrflags & UART_IT_TXS) != 0) 
+        if (((isrflags & UART_IT_TXS) != 0)) 
         {
             UART_EndTransmit_IT(huart);
         }

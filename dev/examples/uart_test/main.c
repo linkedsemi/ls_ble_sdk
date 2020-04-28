@@ -26,7 +26,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 static void App_Init(void)
 {
     uint16_t i ;
-    uart_clock_reset();
+    uart_sw_reset();
     UART_Config.UARTX = UART1;
     UART_Config.Init.BaudRate = UART_BAUDRATE_9600;
     UART_Config.Init.MSBEN = 0;
