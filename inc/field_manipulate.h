@@ -5,15 +5,15 @@
 #define REG_FIELD_WR(reg,field,val)\
         do{                                 \
         uint32_t old_val = (reg);\
-        uint32_t new_val = ((val)<<(field##_POS)&(field##_MASK))|(old_val &~(field##_MASK));\
+        uint32_t new_val = ((unsigned int)(val)<<(field##_POS)&(unsigned int)(field##_MASK))|(old_val &~(unsigned int)(field##_MASK));\
         (reg)= new_val;\
     }while(0)
 
 #define REG_FIELD_RD(reg,field)\
-    (((reg)&(field##_MASK))>>(field##_POS))
+    (((reg)&(unsigned int)(field##_MASK))>>(field##_POS))
 
 #define FIELD_BUILD(field,val) \
-    ((val)<<(field##_POS)&(field##_MASK))
+    ((unsigned int)(val)<<(field##_POS)&(unsigned int)(field##_MASK))
 
 
 #endif

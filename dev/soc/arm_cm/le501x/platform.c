@@ -56,9 +56,9 @@ static void stack_data_bss_init()
 static void ble_irq_enable()
 {
     //clear ble irq
-    NVIC->ICPR[0] = 1<<BLE_IRQn | 1<<BLE_ERR_IRQn | 1<<BLE_WKUP_IRQn | 1<<BLE_FIFO_IRQn | 1<<BLE_CRYPT_IRQn;
+    NVIC->ICPR[0] = 1<<BLE_IRQn | 1<<BLE_ERR_IRQn | 1<<BLE_WKUP_IRQn | 1<<BLE_FIFO_IRQn | (unsigned int)1<<BLE_CRYPT_IRQn;
     //enable ble irq
-    NVIC->ISER[0] = 1<<BLE_IRQn | 1<<BLE_ERR_IRQn | 1<<BLE_WKUP_IRQn | 1<<BLE_FIFO_IRQn | 1<<BLE_CRYPT_IRQn;
+    NVIC->ISER[0] = 1<<BLE_IRQn | 1<<BLE_ERR_IRQn | 1<<BLE_WKUP_IRQn | 1<<BLE_FIFO_IRQn | (unsigned int)1<<BLE_CRYPT_IRQn;
 }
 
 static uint32_t flash_data_storage_base_offset()

@@ -6,8 +6,8 @@
 #include "reg_uart.h"
 #include "field_manipulate.h"
 
-void uart_sw_reset();
-void uart_clock_enable();
+void uart_sw_reset(void);
+void uart_clock_enable(void);
 
 void uart_int_op(void (*isr)(UART_HandleTypeDef *),UART_HandleTypeDef *inst,uint8_t states);
 
