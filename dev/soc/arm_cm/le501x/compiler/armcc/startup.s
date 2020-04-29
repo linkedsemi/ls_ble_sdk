@@ -188,6 +188,11 @@ Default_Handler PROC
                 EXPORT  UART3_Handler             [WEAK]
                 EXPORT  BLE_Handler               [WEAK]
                 EXPORT  BLE_Handler               [WEAK]
+NMI_Handler      
+HardFault_Handler
+SVC_Handler      
+PendSV_Handler   
+SysTick_Handler  
 EXTI_Handler
 WWDT_Handler
 LPWKUP_Handler

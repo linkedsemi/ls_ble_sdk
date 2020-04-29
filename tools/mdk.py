@@ -6,16 +6,36 @@ import SCons.Builder
 import subprocess
 
 def mdk_generator(target,source,env,for_signature):
-#    print(for_signature)
     prj = mdk_xml_schema.Project()
     prj.ToolsetName = 'ARM'
     prj.Device = 'ARMCM0'
     prj.useUlib = 1
+#    target_path = target[0].path[0: target[0].path.rfind("\\")+1]
+#    target_name = target[0].path[target[0].path.rfind("\\")+1: len(target[0].path)]
+    prj_dir = env['PROJ_DIR'].srcnode()
+    inc_path_str = ""
+    for node_path in env.Dir(env['CPPPATH']):
+        inc_path_str = inc_path_str + os.path.relpath(node_path.abspath, prj_dir.abspath) + ";"
+    prj.IncludePath = inc_path_str
+    
+    scat_file_str = os.path.relpath((env['LINKSCRIPT']).srcnode().abspath, prj_dir.abspath)
+    prj.ScatterFile = scat_file_str
+    
+    prj.CDefines = "" 
+    prj.COptions = "--c99 -O2 --wchar32" 
+    beforecompile1 = mdk_xml_schema.UserAction('')
+    beforecompile2 = mdk_xml_schema.UserAction('')
+    beforebuild1 = mdk_xml_schema.UserAction('')
+    beforebuild2 = mdk_xml_schema.UserAction('')
+    afterbuild1 = mdk_xml_schema.UserAction(os.path.relpath(env.Dir("#").abspath, prj_dir.abspath) + '\\tools\\disassemble.bat @L')
+    afterbuild2 = mdk_xml_schema.UserAction('')
+    prj.User = pyxb.BIND(BeforeCompile1=beforecompile1,BeforeCompile2=beforecompile2,BeforeBuild1=beforebuild1,BeforeBuild2=beforebuild2,AfterBuild1=afterbuild1,AfterBuild2=afterbuild2)
+    
     c_list = []
     asm_list = []
     obj_list = []
     lib_list = []
-    prj_dir = env['PROJ_DIR'].srcnode()
+#    prj_dir = env['PROJ_DIR'].srcnode()
     for build_src in source:
         src = build_src.srcnode().path
         filepath,extension = os.path.splitext(src)

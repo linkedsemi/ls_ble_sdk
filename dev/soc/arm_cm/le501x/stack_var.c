@@ -136,23 +136,28 @@ extern void (*eif_write)(uint8_t *bufptr, uint32_t size, void (*callback)(void *
 extern void (*eif_flow_on)(void);
 extern bool (*eif_flow_off)(void);
 
+__attribute__((weak)) void uart_eif_read(uint8_t *bufptr, uint32_t size, void (*callback)(void *,uint8_t), void* dummy){}
+__attribute__((weak)) void uart_eif_write(uint8_t *bufptr, uint32_t size, void (*callback)(void *,uint8_t), void* dummy){}
+__attribute__((weak)) void uart_eif_flow_on(void){}
+__attribute__((weak)) bool uart_eif_flow_off(void){return false;}
+
 void app_init(void);
 
 void main_task_app_init()
 {
     main_task = 3;
     app_init_fn = app_init;
-    eif_read = (void *)dummy;
-    eif_write = (void *)dummy;
-    eif_flow_on = (void *)dummy;
-    eif_flow_off = (void *)dummy;
+    eif_read = (void (*)(uint8_t *, uint32_t, void (*)(void *, uint8_t), void *))dummy;
+    eif_write = (void (*)(uint8_t *, uint32_t, void (*)(void *, uint8_t), void *))dummy;
+    eif_flow_on = (void (*)(void))dummy;
+    eif_flow_off = (bool (*)(void))dummy;
 }
 
 
 void main_task_itf_init()
 {
     main_task = 9;
-    app_init_fn = (void *)dummy;
+    app_init_fn = (void (*)(void))dummy;
     eif_read = uart_eif_read;
     eif_write = uart_eif_write;
     eif_flow_on = uart_eif_flow_on;

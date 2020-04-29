@@ -3,6 +3,7 @@
 #include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
+#include "compile_flag.h"
 #include "tinyfs_config.h"
 #include "tinyfs_write_cache.h"
 #include "tinyfs.h"
