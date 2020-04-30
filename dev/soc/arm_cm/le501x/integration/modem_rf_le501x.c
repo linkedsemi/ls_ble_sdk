@@ -255,18 +255,20 @@ static void rf_reg_init()
                 | FIELD_BUILD(RF_RD_CLK_EN,1)
                 | FIELD_BUILD(RF_PLL_TEST_EN,0)
                 | FIELD_BUILD(RF_CH_SEL,1)
-                | FIELD_BUILD(RF_PA_STEP_SET,3)
+                | FIELD_BUILD(RF_PA_VB_SEL,1)
                 | FIELD_BUILD(RF_PA_VB_TARGET,6)
-                | FIELD_BUILD(RF_LDO_START_CNT,6);
+                | FIELD_BUILD(RF_LDO_START_CNT,6)
+                | FIELD_BUILD(RF_PA_STEP_SET,6);
+
 
 
 }
 
 static void modem_reg_init()
 {
-    REG_FIELD_WR(MDM2->REG08, MDM2_IF_SHIFT, 0x400);
-    REG_FIELD_WR(MDM2->REG20, MDM2_LR_IF_SHIFT, 0x400);
-    REG_FIELD_WR(MDM2->REG20, MDM2_LR_RX_INVERT, 1);
+//    REG_FIELD_WR(MDM2->REG08, MDM2_IF_SHIFT, 0x400);
+//    REG_FIELD_WR(MDM2->REG20, MDM2_LR_IF_SHIFT, 0x400);
+//    REG_FIELD_WR(MDM2->REG20, MDM2_LR_RX_INVERT, 1);
 }
 
 void modem_rf_reinit()

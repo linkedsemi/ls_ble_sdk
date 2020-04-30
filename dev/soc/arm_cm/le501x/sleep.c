@@ -19,12 +19,12 @@ XIP_BANNED void dcdc_on(){}
 #else
 XIP_BANNED void dcdc_off()
 {
-    REG_FIELD_WR(SYSCFG->DCDC, SYSCFG_EN, 0);
+//    REG_FIELD_WR(SYSCFG->DCDC, SYSCFG_EN, 0);
 }
 
 XIP_BANNED void dcdc_on()
 {
-    REG_FIELD_WR(SYSCFG->DCDC, SYSCFG_EN, 1);
+//    REG_FIELD_WR(SYSCFG->DCDC, SYSCFG_EN, 1);
 }
 
 #endif

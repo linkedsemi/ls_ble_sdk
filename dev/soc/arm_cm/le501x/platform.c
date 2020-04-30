@@ -17,6 +17,8 @@
 #include "modem_rf_le501x.h"
 #include "calc_acc.h"
 #include "builtin_timer.h"
+#include "reg_syscfg.h"
+#include "field_manipulate.h"
 #define IRQ_NVIC_PRIO(IRQn,priority) (((priority << (8U - __NVIC_PRIO_BITS)) & (uint32_t)0xFFUL) << _BIT_SHIFT(IRQn))
 
 RESET_RETAIN uint32_t reset_reason;
@@ -98,6 +100,8 @@ static void module_init()
 
 static void var_init()
 {
+//    SYSCFG->ANACFG0 = 0x30100a78;
+    SYSCFG->ANACFG1 = 0xb0a30000;
     stack_data_bss_init();
     stack_var_ptr_init();
     spi_flash_drv_var_init();

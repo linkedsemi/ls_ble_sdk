@@ -1,7 +1,6 @@
 #include "ls_ble.h"
 #include "platform.h"
 #include "uart.h"
-
 UART_HandleTypeDef UART_Config; 
 static void (*eif_read_callback)(void *,uint8_t);
 static void (*eif_write_callback)(void *,uint8_t);
@@ -55,8 +54,37 @@ static void uart_test_init(void)
     HAL_UART_Init(&UART_Config);
 }
 
+#include "reg_rcc.h"
+#include "field_manipulate.h"
+static void switch_to_rc32k()
+{
+    REG_FIELD_WR(RCC->CFG, RCC_SYSCLK_SW, 2);
+    REG_FIELD_WR(RCC->CFG, RCC_CKCFG, 1);
+}
+
+static void switch_to_pll64m()
+{
+    REG_FIELD_WR(RCC->CFG, RCC_SYSCLK_SW, 4);
+    REG_FIELD_WR(RCC->CFG, RCC_CKCFG, 1);
+}
+
+static void switch_to_xo16m()
+{
+    REG_FIELD_WR(RCC->CFG, RCC_SYSCLK_SW, 1);
+    REG_FIELD_WR(RCC->CFG, RCC_CKCFG, 1);
+}
+
+static void rc24m_switch_to_pll64m()
+{
+    switch_to_rc32k();
+    switch_to_pll64m();
+}
+
+
 int main()
 {
+    switch_to_xo16m();
+    //rc24m_switch_to_pll64m();
     sys_init_itf();
     uart_test_init();
     ble_init();

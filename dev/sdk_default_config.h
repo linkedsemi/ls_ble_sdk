@@ -33,6 +33,10 @@
 #define SDK_MAX_RAL_NUM 1
 #endif
 
+#ifndef FPGA
+#define FPGA 0
+#endif
+
 #define SDK_MAX_ACT_NUM    (SDK_MAX_CONN_NUM + 1)
 #define SDK_BUILTIN_TASK_NUM 1
 #define SDK_MAX_USER_TASK_NUM (SDK_BUILTIN_TASK_NUM + SDK_USER_TASK_NUM)

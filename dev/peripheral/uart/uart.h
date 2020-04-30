@@ -3,14 +3,12 @@
 #include <stdbool.h>
 #include "reg_uart.h"
 #include "HAL_def.H"
-
-#define FPGA 1
-
+#include "sdk_config.h"
 
 #if FPGA 
 #define UART_CLOCK   16000000
 #else 
-#define UART_CLOCK   64000000
+#define UART_CLOCK   16000000
 
 #endif 
 

@@ -4,30 +4,30 @@
 
 typedef struct
 {
-    volatile uint32_t REG00;
-    volatile uint32_t REG04;
-    volatile uint32_t REG08;
-    volatile uint32_t REG0C;
-    volatile uint32_t REG10;
-    volatile uint32_t REG14;
-    volatile uint32_t REG18;
-    volatile uint32_t REG1C;
-    volatile uint32_t REG20;
-    volatile uint32_t REG24;
-    volatile uint32_t REG28;
-    volatile uint32_t REG2C;
-    volatile uint32_t REG30;
-    volatile uint32_t REG34;
-    volatile uint32_t REG38;
+    volatile uint32_t REG00; //0x0
+    volatile uint32_t REG04; //0x4
+    volatile uint32_t REG08; //0x8
+    volatile uint32_t REG0C; //0xc
+    volatile uint32_t REG10; //0x10
+    volatile uint32_t REG14; //0x14
+    volatile uint32_t REG18; //0x18
+    volatile uint32_t REG1C; //0x1c
+    volatile uint32_t REG20; //0x20
+    volatile uint32_t REG24; //0x24
+    volatile uint32_t REG28; //0x28
+    volatile uint32_t REG2C; //0x2c
+    volatile uint32_t REG30; //0x30
+    volatile uint32_t REG34; //0x34
+    volatile uint32_t REG38; //0x38
     volatile uint32_t RESERVED0[5];
-    volatile uint32_t REG50;
-    volatile uint32_t REG54;
-    volatile uint32_t REG58;
-    volatile uint32_t REG5C;
-    volatile uint32_t REG60;
-    volatile uint32_t REG64;
-    volatile uint32_t REG68;
-    volatile uint32_t REG6C;
+    volatile uint32_t REG50; //0x50
+    volatile uint32_t REG54; //0x54
+    volatile uint32_t REG58; //0x58
+    volatile uint32_t REG5C; //0x5c
+    volatile uint32_t REG60; //0x60
+    volatile uint32_t REG64; //0x64
+    volatile uint32_t REG68; //0x68
+    volatile uint32_t REG6C; //0x6c
 }reg_rf_t;
 
 enum RF_REG_REG00_FIELD
@@ -444,12 +444,14 @@ enum RF_REG_REG50_FIELD
     RF_PLL_TEST_EN_POS = 6,
     RF_CH_SEL_MASK = (int)0x80,
     RF_CH_SEL_POS = 7,
-    RF_PA_STEP_SET_MASK = (int)0xf00,
-    RF_PA_STEP_SET_POS = 8,
+    RF_PA_VB_SEL_MASK = (int)0x100,
+    RF_PA_VB_SEL_POS = 8,
     RF_PA_VB_TARGET_MASK = (int)0xf000,
     RF_PA_VB_TARGET_POS = 12,
     RF_LDO_START_CNT_MASK = (int)0xff0000,
     RF_LDO_START_CNT_POS = 16,
+    RF_PA_STEP_SET_MASK = (int)0x1f000000,
+    RF_PA_STEP_SET_POS = 24,
 };
 
 enum RF_REG_REG54_FIELD

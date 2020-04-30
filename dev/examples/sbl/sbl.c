@@ -25,7 +25,7 @@ static void rc24m_switch_to_pll64m()
 }
 
 void SystemInit(){
-    rc24m_switch_to_pll64m();
+//    rc24m_switch_to_pll64m();
 }
 
 XIP_BANNED int main()
