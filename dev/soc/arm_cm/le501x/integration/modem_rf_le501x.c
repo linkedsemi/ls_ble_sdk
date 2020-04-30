@@ -269,10 +269,15 @@ static void modem_reg_init()
     REG_FIELD_WR(MDM2->REG20, MDM2_LR_RX_INVERT, 1);
 }
 
+void modem_rf_reinit()
+{
+    rf_reg_init();
+    modem_reg_init();
+}
+
 void modem_rf_init()
 {
     RCC->APB1EN |= 1<<RCC_RF_POS | 1<<RCC_MDM2_POS;
-    rf_reg_init();
-    modem_reg_init();
+    modem_rf_reinit();
 }
 
