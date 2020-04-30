@@ -18,7 +18,8 @@
         "spi_flash_int.h": "c",
         "spi_flash.h": "c",
         "uart.h": "c",
-        "reg_uart.h": "c"
+        "reg_uart.h": "c",
+        "log.h": "c"
     },
     "editor.detectIndentation": false,
     "restructuredtext.confPath": "${workspaceFolder}\\doc",

@@ -73,10 +73,8 @@ HAL_StatusTypeDef HAL_UART_DeInit(UART_HandleTypeDef *huart)
   *                the configuration information for the specified UART module.
   * @retval None
   */
-__attribute__((weak)) void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
+__attribute__((weak)) void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart,void *tx_arg)
 {
-    //todo
-    return ;
   /* NOTE: This function should not be modified, when the callback is needed,
            the HAL_UART_TxCpltCallback could be implemented in the user file
    */
@@ -88,10 +86,8 @@ __attribute__((weak)) void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
   *                the configuration information for the specified UART module.
   * @retval None
   */
-__attribute__((weak)) void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
+__attribute__((weak)) void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart,void *rx_arg)
 {
-    //todo
-    return ;
   /* NOTE: This function should not be modified, when the callback is needed,
            the HAL_UART_TxCpltCallback could be implemented in the user file
    */
@@ -222,12 +218,13 @@ HAL_StatusTypeDef HAL_UART_Transmit_IT(UART_HandleTypeDef *huart, uint8_t *pData
         huart->ErrorCode = HAL_UART_ERROR_NONE;
         huart->gState = HAL_UART_STATE_BUSY_TX;
         REG_FIELD_WR(huart->UARTX->FCR,UART_FCR_FIFOEN,1);
-        REG_FIELD_WR(huart->UARTX->FCR,UART_FCR_RXTL,UART_FIFO_RL_1);
-        
+        REG_FIELD_WR(huart->UARTX->FCR,UART_FCR_TXTL,UART_FIFO_RL_1);
     /* Enable the UART Transmit data register empty Interrupt */
+        REG_FIELD_WR(huart->UARTX->ICR,UART_ICR_TC,1);
+        REG_FIELD_WR(huart->UARTX->ICR,UART_ICR_TXS,1);
         REG_FIELD_WR(huart->UARTX->IER,UART_IER_TC,1);
         REG_FIELD_WR(huart->UARTX->IER,UART_IER_TXS,1);
-        huart->TxXferCount--;
+        huart->TxXferCount--; 
         huart->UARTX->TBR = (*huart->pTxBuffPtr++ & (uint8_t)0xFF);
         return HAL_OK;
     }
@@ -308,7 +305,8 @@ static void UART_SetConfig(UART_HandleTypeDef *huart)
         huart->UARTX->BRR  =  huart->Init.BaudRate;  //todo 
     }
     REG_FIELD_WR(huart->UARTX->LCR,UART_LCR_BRWEN,0);
-    REG_FIELD_WR(huart->UARTX->FCR,UART_FCR_FIFOEN,1);   
+    REG_FIELD_WR(huart->UARTX->FCR,UART_FCR_FIFOEN,1);
+    REG_FIELD_WR(huart->UARTX->FCR,UART_FCR_TFRST,1);
 }
 
 /**
@@ -330,11 +328,10 @@ static void UART_Transmit_IT(UART_HandleTypeDef *huart)
                 huart->UARTX->TBR = (*huart->pTxBuffPtr++ & (uint8_t)0xFF);
                 if (--huart->TxXferCount == 0U)
                 {
-                    huart->UARTX->IDR = FIELD_BUILD(UART_IDR_TXS,1);
-                    return;
+                    REG_FIELD_WR(huart->UARTX->IDR,UART_IDR_TXS,1);
+                    break;
                 }
             }
-            return;
         }
     }
 }
@@ -348,10 +345,15 @@ static void UART_Transmit_IT(UART_HandleTypeDef *huart)
 static void UART_EndTransmit_IT(UART_HandleTypeDef *huart)
 {
     /* Disable the UART Transmit Complete Interrupt */
-    REG_FIELD_WR(huart->UARTX->IDR,UART_IDR_TC,1);
-    /* Tx process is ended, restore huart->gState to Ready */
-    huart->gState = HAL_UART_STATE_READY;
-    HAL_UART_TxCpltCallback(huart);
+    
+    if (!REG_FIELD_RD(huart->UARTX->FCR, UART_FCR_TXFL))
+    {
+        REG_FIELD_WR(huart->UARTX->IDR,UART_IDR_TC,1);
+        /* Tx process is ended, restore huart->gState to Ready */
+        huart->gState = HAL_UART_STATE_READY;
+        HAL_UART_TxCpltCallback(huart,huart->tx_arg);
+    }
+    
 }
 
 /**
@@ -370,10 +372,9 @@ static void UART_Receive_IT(UART_HandleTypeDef *huart)
             *huart->pRxBuffPtr++ = (uint8_t)(huart->UARTX->RBR & (uint8_t)0x00FF);
             if (--huart->RxXferCount == 0U)
             {
-                huart->UARTX->IDR = FIELD_BUILD(UART_IDR_TXS,1)|FIELD_BUILD(UART_IDR_TC,1);
                 REG_FIELD_WR(huart->UARTX->FCR,UART_FCR_RXTL,UART_FIFO_RL_8);
                 huart->RxState = HAL_UART_STATE_READY;
-                HAL_UART_RxCpltCallback(huart);
+                HAL_UART_RxCpltCallback(huart,huart->rx_arg);
                 return;
             }
             if(huart->RxXferCount<0x08)
@@ -398,22 +399,21 @@ static void UART_Receive_IT(UART_HandleTypeDef *huart)
 void HAL_UARTx_IRQHandler(UART_HandleTypeDef *huart)
 {
     uint32_t isrflags   = huart->UARTX->RIF;  
-    uint32_t ivsits     = huart->UARTX->IVS; 
+    uint32_t ivsits     = huart->UARTX->IVS;
 
     /* UART in mode Transmitter ------------------------------------------------*/
     if ((( isrflags& UART_IT_TXS) != 0) &&((ivsits & UART_IT_TXS) != 0))
     {
-        REG_FIELD_WR(huart->UARTX->ICR,UART_ICR_TXS,1);
         UART_Transmit_IT(huart);
+        REG_FIELD_WR(huart->UARTX->ICR,UART_ICR_TXS,1);
     }
-
     /* UART in mode Transmitter end --------------------------------------------*/
     if (((isrflags & UART_IT_TC) != 0) && ((ivsits & UART_IT_TC) != 0))
     {
         if((ivsits & UART_IT_TXS) == 0)
         {
-            REG_FIELD_WR(huart->UARTX->ICR,UART_ICR_TC,1);
             UART_EndTransmit_IT(huart);
+            REG_FIELD_WR(huart->UARTX->ICR,UART_ICR_TC,1);
         }
     }
     /* UART in mode Receive ------------------------------------------------*/

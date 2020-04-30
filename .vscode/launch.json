@@ -47,9 +47,10 @@
             "interface": "swd",
             "runToMain": true,
             "preLaunchCommands" :[
+                "monitor flash breakpoints = 0",
                 "monitor reset",
-                "load",
-                
+                "load", 
+                "add-symbol-file build/fw.elf",               
             ]
         },
         {

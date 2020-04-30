@@ -11,13 +11,13 @@ UART_HandleTypeDef UART_Config;
 uint8_t test_zone_a[TEST_ZONE_SIZE * 2] ;
 uint8_t test_zone_b[TEST_ZONE_SIZE * 2] ;
 
-void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
+void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart,void *tx_arg)
 {
     memset(test_zone_b, 0, TEST_ZONE_SIZE);
     HAL_UART_Receive_IT(&UART_Config,test_zone_b,0x64,NULL);
 }
 
-void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart,void *rx_arg)
 {
     HAL_UART_Transmit_IT(&UART_Config,test_zone_a,0X64,NULL);
 }
