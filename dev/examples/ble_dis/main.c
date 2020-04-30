@@ -146,5 +146,4 @@ int main()
     {
         ble_loop();
     }
-    return 0;
 }

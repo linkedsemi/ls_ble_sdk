@@ -56,6 +56,7 @@ XIP_BANNED static void stig_read_continue(reg_lsqspi_t *reg,uint32_t *data,uint1
     if(size)
     {
         reg->STIG_GO = FIELD_BUILD(LSQSPI_STIG_HOLD_CS, 0) | FIELD_BUILD(LSQSPI_STIG_GO,1);
+        while(REG_FIELD_RD(reg->CFG, LSQSPI_IDLE)==0);
         uint32_t buf[2];
         buf[0] = reg->STIG_RD[0];
         buf[1] = reg->STIG_RD[1];

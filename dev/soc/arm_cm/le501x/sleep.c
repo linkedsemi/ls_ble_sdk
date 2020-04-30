@@ -5,6 +5,7 @@
 #include "lscache.h"
 #include "platform.h"
 #include "modem_rf_le501x.h"
+#include "reg_syscfg.h"
 #define BLE_MAC_REG_BASE 0x50000000
 #define BLE_MAC_REG_OFFSET_WORD_MAX (0x18C/4)
 #define ISR_VECTOR_ADDR ((uint32_t *)(0x0))
@@ -18,12 +19,12 @@ XIP_BANNED void dcdc_on(){}
 #else
 XIP_BANNED void dcdc_off()
 {
-
+    REG_FIELD_WR(SYSCFG->DCDC, SYSCFG_EN, 0);
 }
 
 XIP_BANNED void dcdc_on()
 {
-
+    REG_FIELD_WR(SYSCFG->DCDC, SYSCFG_EN, 1);
 }
 
 #endif
