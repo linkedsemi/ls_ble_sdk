@@ -384,163 +384,157 @@
             <File>
               <FileName>SEGGER_RTT.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\module\debug\RTT\SEGGER_RTT.c</FilePath>
+              <FilePath>..\..\..\module\debug\RTT\SEGGER_RTT.c</FilePath>
             </File>
             <File>
               <FileName>SEGGER_RTT_printf.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\module\debug\RTT\SEGGER_RTT_printf.c</FilePath>
+              <FilePath>..\..\..\module\debug\RTT\SEGGER_RTT_printf.c</FilePath>
             </File>
             <File>
               <FileName>calc_acc.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\soc\arm_cm\le501x\integration\calc_acc.c</FilePath>
+              <FilePath>..\..\..\soc\arm_cm\le501x\integration\calc_acc.c</FilePath>
             </File>
             <File>
               <FileName>calc_div.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\peripheral\calc\calc_div.c</FilePath>
+              <FilePath>..\..\..\peripheral\calc\calc_div.c</FilePath>
             </File>
             <File>
               <FileName>common.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\module\common\common.c</FilePath>
+              <FilePath>..\..\..\module\common\common.c</FilePath>
             </File>
             <File>
               <FileName>cpu.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\soc\arm_cm\le501x\cpu.c</FilePath>
+              <FilePath>..\..\..\soc\arm_cm\le501x\cpu.c</FilePath>
             </File>
             <File>
               <FileName>crc16.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\module\crc\crc16.c</FilePath>
+              <FilePath>..\..\..\module\crc\crc16.c</FilePath>
             </File>
             <File>
               <FileName>flash_svcall.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\soc\arm_cm\flash_svcall.c</FilePath>
+              <FilePath>..\..\..\soc\arm_cm\flash_svcall.c</FilePath>
             </File>
             <File>
               <FileName>libfw.o</FileName>
               <FileType>3</FileType>
-              <FilePath>..\..\soc\arm_cm\le501x\bin\libfw.o</FilePath>
+              <FilePath>..\..\..\soc\arm_cm\le501x\bin\libfw.o</FilePath>
             </File>
             <File>
               <FileName>linked_buffer.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\module\static_buffer\linked_buffer.c</FilePath>
+              <FilePath>..\..\..\module\static_buffer\linked_buffer.c</FilePath>
             </File>
             <File>
               <FileName>log.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\module\debug\log.c</FilePath>
+              <FilePath>..\..\..\module\debug\log.c</FilePath>
             </File>
             <File>
               <FileName>ls_dbg.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\module\debug\ls_dbg.c</FilePath>
+              <FilePath>..\..\..\module\debug\ls_dbg.c</FilePath>
             </File>
             <File>
               <FileName>ls_dbg_asm.s</FileName>
               <FileType>2</FileType>
-              <FilePath>..\..\module\debug\asm\armcc\ls_dbg_asm.s</FilePath>
+              <FilePath>..\..\..\module\debug\asm\armcc\ls_dbg_asm.s</FilePath>
             </File>
             <File>
               <FileName>lsqspi.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\peripheral\qspi_flash\lsqspi.c</FilePath>
+              <FilePath>..\..\..\peripheral\qspi_flash\lsqspi.c</FilePath>
             </File>
             <File>
               <FileName>lsqspi_param.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\soc\arm_cm\le501x\integration\lsqspi_param.c</FilePath>
+              <FilePath>..\..\..\soc\arm_cm\le501x\integration\lsqspi_param.c</FilePath>
             </File>
             <File>
               <FileName>main.c</FileName>
               <FileType>1</FileType>
-              <FilePath>main.c</FilePath>
+              <FilePath>..\main.c</FilePath>
             </File>
             <File>
               <FileName>modem_rf_le501x.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\soc\arm_cm\le501x\integration\modem_rf_le501x.c</FilePath>
+              <FilePath>..\..\..\soc\arm_cm\le501x\integration\modem_rf_le501x.c</FilePath>
             </File>
             <File>
               <FileName>platform.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\soc\arm_cm\le501x\platform.c</FilePath>
+              <FilePath>..\..\..\soc\arm_cm\le501x\platform.c</FilePath>
             </File>
             <File>
               <FileName>sleep.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\soc\arm_cm\le501x\sleep.c</FilePath>
+              <FilePath>..\..\..\soc\arm_cm\le501x\sleep.c</FilePath>
             </File>
             <File>
               <FileName>sleep_asm.s</FileName>
               <FileType>2</FileType>
-              <FilePath>..\..\soc\arm_cm\le501x\compiler\armcc\sleep_asm.s</FilePath>
+              <FilePath>..\..\..\soc\arm_cm\le501x\compiler\armcc\sleep_asm.s</FilePath>
             </File>
             <File>
               <FileName>spi_flash.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\peripheral\qspi_flash\spi_flash.c</FilePath>
+              <FilePath>..\..\..\peripheral\qspi_flash\spi_flash.c</FilePath>
             </File>
             <File>
               <FileName>stack_var.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\soc\arm_cm\le501x\stack_var.c</FilePath>
+              <FilePath>..\..\..\soc\arm_cm\le501x\stack_var.c</FilePath>
             </File>
             <File>
               <FileName>startup.s</FileName>
               <FileType>2</FileType>
-              <FilePath>..\..\soc\arm_cm\le501x\compiler\armcc\startup.s</FilePath>
+              <FilePath>..\..\..\soc\arm_cm\le501x\compiler\armcc\startup.s</FilePath>
             </File>
             <File>
               <FileName>svcall.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\soc\arm_cm\svcall.c</FilePath>
+              <FilePath>..\..\..\soc\arm_cm\svcall.c</FilePath>
             </File>
             <File>
               <FileName>svcall_asm.s</FileName>
               <FileType>2</FileType>
-              <FilePath>..\..\soc\arm_cm\le501x\compiler\armcc\svcall_asm.s</FilePath>
+              <FilePath>..\..\..\soc\arm_cm\le501x\compiler\armcc\svcall_asm.s</FilePath>
             </File>
             <File>
               <FileName>tinyfs.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\module\tinyfs\tinyfs.c</FilePath>
+              <FilePath>..\..\..\module\tinyfs\tinyfs.c</FilePath>
             </File>
             <File>
               <FileName>tinyfs_nvm.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\module\tinyfs\tinyfs_nvm.c</FilePath>
+              <FilePath>..\..\..\module\tinyfs\tinyfs_nvm.c</FilePath>
             </File>
             <File>
               <FileName>tinyfs_write_cache.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\module\tinyfs\tinyfs_write_cache.c</FilePath>
+              <FilePath>..\..\..\module\tinyfs\tinyfs_write_cache.c</FilePath>
             </File>
             <File>
               <FileName>uart.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\peripheral\uart\uart.c</FilePath>
+              <FilePath>..\..\..\peripheral\uart\uart.c</FilePath>
             </File>
             <File>
               <FileName>uart_param.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\soc\arm_cm\le501x\integration\uart_param.c</FilePath>
+              <FilePath>..\..\..\soc\arm_cm\le501x\integration\uart_param.c</FilePath>
             </File>
           </Files>
         </Group>
       </Groups>
     </Target>
   </Targets>
-
-  <RTE>
-    <apis/>
-    <components/>
-    <files/>
-  </RTE>
 
 </Project>

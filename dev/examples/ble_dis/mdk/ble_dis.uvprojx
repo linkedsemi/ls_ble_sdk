@@ -10,7 +10,6 @@
       <TargetName>ARMCM0</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
-      <pCCUsed>5060750::V5.06 update 6 (build 750)::ARMCC</pCCUsed>
       <uAC6>0</uAC6>
       <TargetOption>
         <TargetCommonOption>
@@ -133,7 +132,7 @@
             <UseExternalTool>0</UseExternalTool>
             <RunIndependent>0</RunIndependent>
             <UpdateFlashBeforeDebugging>1</UpdateFlashBeforeDebugging>
-            <Capability>1</Capability>
+            <Capability>0</Capability>
             <DriverSelection>-1</DriverSelection>
           </Flash1>
           <bUseTDR>1</bUseTDR>
@@ -338,7 +337,7 @@
               <MiscControls>--c99 -O2 --wchar32</MiscControls>
               <Define></Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\..\..\inc;..\..\..\..\inc\cmsis;..\..\..\..\inc\prf;..\..\..\module\crc;..\..\..\module\debug;..\..\..\module\debug\RTT;..\..\..\module\static_buffer;..\..\..\module\tinyfs;..\..\..\peripheral\qspi_flash;..\..\..\peripheral\cache;..\..\..\peripheral\calc;..\..\..\peripheral\uart;..\..\..\peripheral;..\..\..\soc\arm_cm;..\..\..\soc\arm_cm\le501x;..\..\..\soc\arm_cm\le501x\integration;..\..\..;..</IncludePath>
+              <IncludePath>..\..\..\..\inc;..\..\..\..\inc\cmsis;..\..\..\..\inc\prf;..\..\..\module\crc;..\..\..\module\debug;..\..\..\module\debug\RTT;..\..\..\module\static_buffer;..\..\..\module\tinyfs;..\..\..\peripheral\qspi_flash;..\..\..\peripheral\cache;..\..\..\peripheral\calc;..\..\..\peripheral\uart;..\..\..\peripheral;..\..\..\soc\arm_cm;..\..\..\soc\arm_cm\le501x;..\..\..\soc\arm_cm\le501x\integration;..\..\..;..;</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -356,7 +355,7 @@
               <MiscControls></MiscControls>
               <Define></Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\..\..\inc;..\..\..\..\inc\cmsis;..\..\..\..\inc\prf;..\..\..\module\crc;..\..\..\module\debug;..\..\..\module\debug\RTT;..\..\..\module\static_buffer;..\..\..\module\tinyfs;..\..\..\peripheral\qspi_flash;..\..\..\peripheral\cache;..\..\..\peripheral\calc;..\..\..\peripheral\uart;..\..\..\peripheral;..\..\..\soc\arm_cm;..\..\..\soc\arm_cm\le501x;..\..\..\soc\arm_cm\le501x\integration;..\..\..;..</IncludePath>
+              <IncludePath>..\..\..\..\inc;..\..\..\..\inc\cmsis;..\..\..\..\inc\prf;..\..\..\module\crc;..\..\..\module\debug;..\..\..\module\debug\RTT;..\..\..\module\static_buffer;..\..\..\module\tinyfs;..\..\..\peripheral\qspi_flash;..\..\..\peripheral\cache;..\..\..\peripheral\calc;..\..\..\peripheral\uart;..\..\..\peripheral;..\..\..\soc\arm_cm;..\..\..\soc\arm_cm\le501x;..\..\..\soc\arm_cm\le501x\integration;..\..\..;..;</IncludePath>
             </VariousControls>
           </Aads>
           <LDads>
@@ -537,11 +536,5 @@
       </Groups>
     </Target>
   </Targets>
-
-  <RTE>
-    <apis/>
-    <components/>
-    <files/>
-  </RTE>
 
 </Project>

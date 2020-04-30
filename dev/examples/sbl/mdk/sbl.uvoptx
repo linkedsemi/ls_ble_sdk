@@ -150,7 +150,7 @@
         <aSer4>0</aSer4>
         <StkLoc>0</StkLoc>
         <TrcWin>0</TrcWin>
-        <newCpu>0</newCpu>
+        <newCpu>3</newCpu>
         <uProt>0</uProt>
       </DebugFlag>
       <LintExecutable></LintExecutable>
@@ -182,7 +182,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\module\debug\RTT\SEGGER_RTT.c</PathWithFileName>
+      <PathWithFileName>..\..\..\module\debug\RTT\SEGGER_RTT.c</PathWithFileName>
       <FilenameWithoutPath>SEGGER_RTT.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -194,7 +194,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\module\debug\RTT\SEGGER_RTT_printf.c</PathWithFileName>
+      <PathWithFileName>..\..\..\module\debug\RTT\SEGGER_RTT_printf.c</PathWithFileName>
       <FilenameWithoutPath>SEGGER_RTT_printf.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -206,7 +206,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\soc\arm_cm\le501x\integration\calc_acc.c</PathWithFileName>
+      <PathWithFileName>..\..\..\soc\arm_cm\le501x\integration\calc_acc.c</PathWithFileName>
       <FilenameWithoutPath>calc_acc.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -218,7 +218,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\peripheral\calc\calc_div.c</PathWithFileName>
+      <PathWithFileName>..\..\..\peripheral\calc\calc_div.c</PathWithFileName>
       <FilenameWithoutPath>calc_div.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -230,7 +230,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\module\common\common.c</PathWithFileName>
+      <PathWithFileName>..\..\..\module\common\common.c</PathWithFileName>
       <FilenameWithoutPath>common.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -242,7 +242,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\soc\arm_cm\le501x\cpu.c</PathWithFileName>
+      <PathWithFileName>..\..\..\soc\arm_cm\le501x\cpu.c</PathWithFileName>
       <FilenameWithoutPath>cpu.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -254,7 +254,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\module\crc\crc16.c</PathWithFileName>
+      <PathWithFileName>..\..\..\module\crc\crc16.c</PathWithFileName>
       <FilenameWithoutPath>crc16.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -266,7 +266,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\soc\arm_cm\flash_svcall.c</PathWithFileName>
+      <PathWithFileName>..\..\..\soc\arm_cm\flash_svcall.c</PathWithFileName>
       <FilenameWithoutPath>flash_svcall.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -274,12 +274,12 @@
     <File>
       <GroupNumber>1</GroupNumber>
       <FileNumber>9</FileNumber>
-      <FileType>1</FileType>
+      <FileType>3</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\module\static_buffer\linked_buffer.c</PathWithFileName>
-      <FilenameWithoutPath>linked_buffer.c</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\soc\arm_cm\le501x\bin\libfw.o</PathWithFileName>
+      <FilenameWithoutPath>libfw.o</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -290,8 +290,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\module\debug\log.c</PathWithFileName>
-      <FilenameWithoutPath>log.c</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\module\static_buffer\linked_buffer.c</PathWithFileName>
+      <FilenameWithoutPath>linked_buffer.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -302,32 +302,32 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\module\debug\ls_dbg.c</PathWithFileName>
-      <FilenameWithoutPath>ls_dbg.c</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\module\debug\log.c</PathWithFileName>
+      <FilenameWithoutPath>log.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>1</GroupNumber>
       <FileNumber>12</FileNumber>
-      <FileType>2</FileType>
+      <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\module\debug\asm\armcc\ls_dbg_asm.s</PathWithFileName>
-      <FilenameWithoutPath>ls_dbg_asm.s</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\module\debug\ls_dbg.c</PathWithFileName>
+      <FilenameWithoutPath>ls_dbg.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>1</GroupNumber>
       <FileNumber>13</FileNumber>
-      <FileType>1</FileType>
+      <FileType>2</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\peripheral\qspi_flash\lsqspi.c</PathWithFileName>
-      <FilenameWithoutPath>lsqspi.c</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\module\debug\asm\armcc\ls_dbg_asm.s</PathWithFileName>
+      <FilenameWithoutPath>ls_dbg_asm.s</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -338,8 +338,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\soc\arm_cm\le501x\integration\lsqspi_param.c</PathWithFileName>
-      <FilenameWithoutPath>lsqspi_param.c</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\peripheral\qspi_flash\lsqspi.c</PathWithFileName>
+      <FilenameWithoutPath>lsqspi.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -350,8 +350,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\soc\arm_cm\le501x\integration\modem_rf_le501x.c</PathWithFileName>
-      <FilenameWithoutPath>modem_rf_le501x.c</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\soc\arm_cm\le501x\integration\lsqspi_param.c</PathWithFileName>
+      <FilenameWithoutPath>lsqspi_param.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -362,8 +362,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\soc\arm_cm\le501x\platform.c</PathWithFileName>
-      <FilenameWithoutPath>platform.c</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\soc\arm_cm\le501x\integration\modem_rf_le501x.c</PathWithFileName>
+      <FilenameWithoutPath>modem_rf_le501x.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -374,8 +374,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>sbl.c</PathWithFileName>
-      <FilenameWithoutPath>sbl.c</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\soc\arm_cm\le501x\platform.c</PathWithFileName>
+      <FilenameWithoutPath>platform.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -386,32 +386,32 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\soc\arm_cm\le501x\sleep.c</PathWithFileName>
-      <FilenameWithoutPath>sleep.c</FilenameWithoutPath>
+      <PathWithFileName>..\sbl.c</PathWithFileName>
+      <FilenameWithoutPath>sbl.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>1</GroupNumber>
       <FileNumber>19</FileNumber>
-      <FileType>2</FileType>
+      <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\soc\arm_cm\le501x\compiler\armcc\sleep_asm.s</PathWithFileName>
-      <FilenameWithoutPath>sleep_asm.s</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\soc\arm_cm\le501x\sleep.c</PathWithFileName>
+      <FilenameWithoutPath>sleep.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>1</GroupNumber>
       <FileNumber>20</FileNumber>
-      <FileType>1</FileType>
+      <FileType>2</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\peripheral\qspi_flash\spi_flash.c</PathWithFileName>
-      <FilenameWithoutPath>spi_flash.c</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\soc\arm_cm\le501x\compiler\armcc\sleep_asm.s</PathWithFileName>
+      <FilenameWithoutPath>sleep_asm.s</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -422,56 +422,56 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\soc\arm_cm\le501x\stack_var.c</PathWithFileName>
-      <FilenameWithoutPath>stack_var.c</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\peripheral\qspi_flash\spi_flash.c</PathWithFileName>
+      <FilenameWithoutPath>spi_flash.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>1</GroupNumber>
       <FileNumber>22</FileNumber>
-      <FileType>2</FileType>
+      <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\soc\arm_cm\le501x\compiler\armcc\startup.s</PathWithFileName>
-      <FilenameWithoutPath>startup.s</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\soc\arm_cm\le501x\stack_var.c</PathWithFileName>
+      <FilenameWithoutPath>stack_var.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>1</GroupNumber>
       <FileNumber>23</FileNumber>
-      <FileType>1</FileType>
+      <FileType>2</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\soc\arm_cm\svcall.c</PathWithFileName>
-      <FilenameWithoutPath>svcall.c</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\soc\arm_cm\le501x\compiler\armcc\startup.s</PathWithFileName>
+      <FilenameWithoutPath>startup.s</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>1</GroupNumber>
       <FileNumber>24</FileNumber>
-      <FileType>2</FileType>
+      <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\soc\arm_cm\le501x\compiler\armcc\svcall_asm.s</PathWithFileName>
-      <FilenameWithoutPath>svcall_asm.s</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\soc\arm_cm\svcall.c</PathWithFileName>
+      <FilenameWithoutPath>svcall.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>1</GroupNumber>
       <FileNumber>25</FileNumber>
-      <FileType>1</FileType>
+      <FileType>2</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\module\tinyfs\tinyfs.c</PathWithFileName>
-      <FilenameWithoutPath>tinyfs.c</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\soc\arm_cm\le501x\compiler\armcc\svcall_asm.s</PathWithFileName>
+      <FilenameWithoutPath>svcall_asm.s</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -482,8 +482,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\module\tinyfs\tinyfs_nvm.c</PathWithFileName>
-      <FilenameWithoutPath>tinyfs_nvm.c</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\module\tinyfs\tinyfs.c</PathWithFileName>
+      <FilenameWithoutPath>tinyfs.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -494,8 +494,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\module\tinyfs\tinyfs_write_cache.c</PathWithFileName>
-      <FilenameWithoutPath>tinyfs_write_cache.c</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\module\tinyfs\tinyfs_nvm.c</PathWithFileName>
+      <FilenameWithoutPath>tinyfs_nvm.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -506,8 +506,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\peripheral\uart\uart.c</PathWithFileName>
-      <FilenameWithoutPath>uart.c</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\module\tinyfs\tinyfs_write_cache.c</PathWithFileName>
+      <FilenameWithoutPath>tinyfs_write_cache.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -518,7 +518,19 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\soc\arm_cm\le501x\integration\uart_param.c</PathWithFileName>
+      <PathWithFileName>..\..\..\peripheral\uart\uart.c</PathWithFileName>
+      <FilenameWithoutPath>uart.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>1</GroupNumber>
+      <FileNumber>30</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\soc\arm_cm\le501x\integration\uart_param.c</PathWithFileName>
       <FilenameWithoutPath>uart_param.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>

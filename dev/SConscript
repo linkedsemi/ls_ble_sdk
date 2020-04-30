@@ -9,6 +9,7 @@ sdk_inc = module_inc + peripheral_inc + soc_inc
 sdk_inc += Dir(['.'])
 dev_env.Append(CPPPATH = list(map(lambda x:'#/'+x.srcnode().path,sdk_inc)))
 dev_env.Append(LINKFLAGS = ' $GC_OPTION ')
+dev_env['TARGET_LIB'] = target_lib
     
 def image_build(name,src,inc,linkscript = '',objprefix = ''):
     global dev_env
