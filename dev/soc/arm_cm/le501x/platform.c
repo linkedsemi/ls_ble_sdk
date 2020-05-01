@@ -102,7 +102,7 @@ static void analog_init()
 {
     dcdc_on();
 //    SYSCFG->ANACFG0 = 0x30100a78;
-    SYSCFG->ANACFG1 = 0xb0a30000;
+//    SYSCFG->ANACFG1 = 0xb0a30000;
 }
 
 static void var_init()
