@@ -13,6 +13,10 @@ int8_t rf_rssi_convert(uint8_t rssi_reg);
 
 uint8_t rf_txpwr_cs_get(int8_t txpwr_dbm, bool high);
 
+uint8_t rx_txpwr_max_get(void);
+
+uint8_t rx_txpwr_min_get(void);
+
 void modem_rf_reinit(void);
 
 void modem_rf_init(void);

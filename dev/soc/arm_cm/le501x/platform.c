@@ -98,10 +98,15 @@ static void module_init()
     modem_rf_init();
 }
 
-static void var_init()
+static void analog_init()
 {
+    dcdc_on();
 //    SYSCFG->ANACFG0 = 0x30100a78;
     SYSCFG->ANACFG1 = 0xb0a30000;
+}
+
+static void var_init()
+{
     stack_data_bss_init();
     stack_var_ptr_init();
     spi_flash_drv_var_init();
@@ -109,7 +114,7 @@ static void var_init()
 
 void sys_init_itf()
 {
-    dcdc_on();
+    analog_init();
     var_init();
     main_task_itf_init();
     module_init();
@@ -117,7 +122,7 @@ void sys_init_itf()
 
 void sys_init_app()
 {
-    dcdc_on();
+    analog_init();
     var_init();
     main_task_app_init();
     module_init();

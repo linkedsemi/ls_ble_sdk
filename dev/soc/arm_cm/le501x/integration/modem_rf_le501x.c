@@ -34,8 +34,8 @@ static const int8_t RF_TX_PW_CONV_TBL[RF_PWR_TBL_SIZE] =
 };
 
 // TX max power
-#define RF_POWER_MAX                6
-#define RF_POWER_MIN                1
+#define RF_POWER_MAX                0xf
+#define RF_POWER_MIN                0
 
 
 uint8_t rf_txpwr_dbm_get(uint8_t txpwr_idx, uint8_t modulation)
@@ -69,25 +69,17 @@ int8_t rf_rssi_convert(uint8_t rssi_reg)
 
 uint8_t rf_txpwr_cs_get(int8_t txpwr_dbm, bool high)
 {
-    uint8_t i;
+    return RF_POWER_MAX;
+}
 
-    for (i = RF_POWER_MIN; i <= RF_POWER_MAX; i++)
-    {
-        // Loop until we find a power just higher or equal to the requested one
-        if (RF_TX_PW_CONV_TBL[i] >= txpwr_dbm)
-        {
-            break;
-        }
-    }
+uint8_t rx_txpwr_max_get()
+{
+    return RF_POWER_MAX;
+}
 
-    // If equal to value requested, do nothing
-    // Else if 'high' is false and index higher than the minimum one, decrement by one
-    if ((RF_TX_PW_CONV_TBL[i] != txpwr_dbm) && (!high) && (i > RF_POWER_MIN))
-    {
-        i--;
-    }
-
-    return (i);
+uint8_t rx_txpwr_min_get()
+{
+    return RF_POWER_MIN;
 }
 
 static void rf_reg_init()
@@ -140,7 +132,7 @@ static void rf_reg_init()
                 | FIELD_BUILD(RF_TX_RATE,0)
                 | FIELD_BUILD(RF_CF_BW08M_ADJ,0)
                 | FIELD_BUILD(RF_TX_DATA_TST_EN,0)
-                | FIELD_BUILD(RF_PA_VCAS_RES_ADJ,0)
+                | FIELD_BUILD(RF_PA_VCAS_RES_ADJ,1)
                 | FIELD_BUILD(RF_PA_GAIN,0xf)
                 | FIELD_BUILD(RF_PA_TANK_Q_ADJ,0)
                 | FIELD_BUILD(RF_EN_PA_IBX2,0);
@@ -266,9 +258,9 @@ static void rf_reg_init()
 
 static void modem_reg_init()
 {
-//    REG_FIELD_WR(MDM2->REG08, MDM2_IF_SHIFT, 0x400);
-//    REG_FIELD_WR(MDM2->REG20, MDM2_LR_IF_SHIFT, 0x400);
-//    REG_FIELD_WR(MDM2->REG20, MDM2_LR_RX_INVERT, 1);
+    REG_FIELD_WR(MDM2->REG08, MDM2_IF_SHIFT, 0x400);
+    REG_FIELD_WR(MDM2->REG20, MDM2_LR_IF_SHIFT, 0x400);
+    REG_FIELD_WR(MDM2->REG20, MDM2_LR_RX_INVERT, 1);
 }
 
 void modem_rf_reinit()
