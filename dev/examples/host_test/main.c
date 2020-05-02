@@ -56,7 +56,6 @@ static void uart_test_init(void)
 
 int main()
 {
-    switch_to_xo16m();
     sys_init_itf();
     uart_test_init();
     ble_init();
