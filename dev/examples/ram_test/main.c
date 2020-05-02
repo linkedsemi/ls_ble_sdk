@@ -5,7 +5,7 @@
 #include <stdlib.h>
 uint8_t test_buf[1024];
 uint8_t dst[1024];
-int main()
+int main_flash()
 {
     __disable_irq();
     spi_flash_drv_var_init();
@@ -25,6 +25,37 @@ int main()
 
 //    memcpy(test_buf,(void *)0x18002000,sizeof(test_buf));
     while(1);
-    return 0;
 }
 
+
+#include "reg_rcc.h"
+#include "field_manipulate.h"
+static void switch_to_rc32k()
+{
+    REG_FIELD_WR(RCC->CFG, RCC_SYSCLK_SW, 2);
+    REG_FIELD_WR(RCC->CFG, RCC_CKCFG, 1);
+}
+
+static void switch_to_pll64m()
+{
+    REG_FIELD_WR(RCC->CFG, RCC_SYSCLK_SW, 4);
+    REG_FIELD_WR(RCC->CFG, RCC_CKCFG, 1);
+}
+
+static void switch_to_xo16m()
+{
+    REG_FIELD_WR(RCC->CFG, RCC_SYSCLK_SW, 1);
+    REG_FIELD_WR(RCC->CFG, RCC_CKCFG, 1);
+}
+
+static void rc24m_switch_to_pll64m()
+{
+    switch_to_rc32k();
+    switch_to_pll64m();
+}
+
+int main()
+{
+    rc24m_switch_to_pll64m();
+    while(1);
+}

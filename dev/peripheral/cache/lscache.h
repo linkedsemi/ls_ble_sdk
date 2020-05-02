@@ -1,12 +1,7 @@
 #ifndef LSCACHE_H_
 #define LSCACHE_H_
+#include <stdint.h>
 
-#include "reg_lscache.h"
-#include "field_manipulate.h"
-#define LSCACHE_PREFETCH_ON() REG_FIELD_WR(LSCACHE->CCR, LSCACHE_SET_PREFETCH, 1)
-#define LSCACHE_PREFETCH_OFF() REG_FIELD_WR(LSCACHE->CCR, LSCACHE_SET_PREFETCH, 0)
-#define LSCACHE_ENABLE() REG_FIELD_WR(LSCACHE->CCR,LSCACHE_EN,1)
-#define LSCACHE_DISABLE() REG_FIELD_WR(LSCACHE->CCR,LSCACHE_EN,0)
-#define LSCACHE_CTRL_SET(prefetch,enable) LSCACHE->CCR = FIELD_BUILD(LSCACHE_SET_PREFETCH, (prefetch)) | FIELD_BUILD(LSCACHE_EN, (enable))
+void lscache_cache_ctrl(uint8_t prefetch,uint8_t enable);
+
 #endif
-

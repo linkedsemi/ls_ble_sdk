@@ -10,6 +10,7 @@ src = [
     'integration/uart_param.c',
     'integration/modem_rf_le501x.c',
     'integration/calc_acc.c',
+    'integration/lscache_param.c',
     'sleep.c',
 ]
 inc = [
