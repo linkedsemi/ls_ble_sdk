@@ -20,8 +20,8 @@ static void gap_manager_callback(enum gap_evt_type type,union gap_evt_u *evt,uin
 
     break;
     case CONN_PARAM_REQ:
-        gap_manager_conn_param_response_send(con_idx, true);
-        break;
+        //LOG_I
+    break;
     case CONN_PARAM_UPDATED:
 
     break;

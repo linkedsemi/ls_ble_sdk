@@ -261,7 +261,7 @@ enum gap_evt_type
 
 };
 
-struct gap_conn_param_req
+struct gap_conn_param
 {
     /// Connection interval minimum
     uint16_t intv_min;
@@ -271,6 +271,12 @@ struct gap_conn_param_req
     uint16_t latency;
     /// Supervision timeout
     uint16_t time_out;
+};
+
+struct gap_conn_param_req
+{
+    struct gap_conn_param const *conn_param;
+    bool *accept;
 };
 
 struct gap_conn_param_updated
@@ -486,8 +492,6 @@ uint8_t gap_manager_get_role(uint8_t con_idx);
 uint8_t gap_manager_get_sec_lvl(uint8_t con_idx);
 
 void gap_manager_update_conn_param(uint8_t con_idx,struct gap_update_conn_param *p_param);
-
-void gap_manager_conn_param_response_send(uint8_t con_idx,bool accept);
 
 void gatt_manager_init(void (*evt_cb)(enum gatt_evt_type,union gatt_evt_u *,uint8_t));
 
