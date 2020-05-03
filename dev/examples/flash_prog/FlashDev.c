@@ -27,7 +27,7 @@
 
 struct FlashDevice const FlashDevice  __attribute__ ((section ("DevDscr")))  =  {
    FLASH_DRV_VERS,             // Driver Version, do not modify!
-   "Puya 512KB SPI NOR Flash",   // Device Name 
+   "LE501X 512KB SPI NOR Flash",   // Device Name 
    EXTSPI,                     // Device Type
    LSQSPI_MEM_MAP_BASE_ADDR,                 // Device Start Address
    0x00080000,                 // Device Size in Bytes (512kB)
