@@ -1,0 +1,4 @@
+int ConfigTargetSettings(void) {
+    JLINK_ExecCommand("SetRTTSearchRanges 0x0 0xc000");
+    return 0;
+}
