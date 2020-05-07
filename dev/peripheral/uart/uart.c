@@ -325,12 +325,13 @@ static void UART_Transmit_IT(UART_HandleTypeDef *huart)
         {
             for(i=0;i<8;i++)
             {
-                huart->UARTX->TBR = (*huart->pTxBuffPtr++ & (uint8_t)0xFF);
-                if (--huart->TxXferCount == 0U)
+                if (huart->TxXferCount == 0U)
                 {
                     REG_FIELD_WR(huart->UARTX->IDR,UART_IDR_TXS,1);
                     break;
                 }
+                huart->TxXferCount--;
+                huart->UARTX->TBR = (*huart->pTxBuffPtr++ & (uint8_t)0xFF);
             }
         }
     }
