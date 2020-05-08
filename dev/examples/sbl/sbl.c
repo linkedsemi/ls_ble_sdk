@@ -4,8 +4,10 @@
 #include "compile_flag.h"
 #include "reg_rcc.h"
 #include "field_manipulate.h"
-#define APP_IMAGE_BASE (0x18036000)
+#include "sdk_config.h"
+#define APP_IMAGE_BASE (0x18008000)
 
+#if (SDK_HCLK==64000000)
 XIP_BANNED static void switch_to_rc32k()
 {
     REG_FIELD_WR(RCC->CFG, RCC_SYSCLK_SW, 2);
@@ -24,16 +26,30 @@ XIP_BANNED void rc24m_switch_to_pll64m()
     switch_to_pll64m();
 }
 
+XIP_BANNED static void clk_switch()
+{
+    rc24m_switch_to_pll64m();
+}
+
+#elif (SDK_HCLK==16000000)
 XIP_BANNED void switch_to_xo16m()
 {
     REG_FIELD_WR(RCC->CFG, RCC_SYSCLK_SW, 1);
     REG_FIELD_WR(RCC->CFG, RCC_CKCFG, 1);
 }
 
+XIP_BANNED static void clk_switch()
+{
+    switch_to_xo16m();
+}
+
+#else
+#error HCLK not supported
+#endif
+
 XIP_BANNED int main()
 {
-    rc24m_switch_to_pll64m();
-    //switch_to_xo16m();
+    clk_switch();
     __disable_irq();
     spi_flash_drv_var_init();
     spi_flash_init();

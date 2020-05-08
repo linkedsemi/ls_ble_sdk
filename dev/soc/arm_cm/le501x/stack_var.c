@@ -12,7 +12,6 @@
 extern void (*stack_assert_asm_fn)(uint32_t,uint32_t,uint32_t);
 extern void (*app_init_fn)(void); 
 extern void (*platform_reset_fn)(uint32_t);
-extern void (*rand_init_fn) (unsigned int seed);
 extern int (*rand_fn) (void);
 extern uint64_t (*idiv_acc_fn)(uint32_t,uint32_t,bool);
 extern void (*ecc_calc_fn)(const uint8_t*,const uint8_t*,const uint8_t*,uint8_t*,uint8_t*,void (*)(void *),void *);
@@ -111,7 +110,6 @@ void stack_var_ptr_init()
     stack_assert_asm_fn = stack_assert_asm;
     platform_reset_fn = platform_reset;
     ecc_calc_fn = ecc_calc_start;
-    rand_init_fn = srand;
     rand_fn = rand;
     idiv_acc_fn = idiv_acc;
     enter_critical_fn = enter_critical;

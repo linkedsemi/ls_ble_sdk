@@ -19,8 +19,6 @@
 #include <stdbool.h>       // boolean definitions
 #include <stdlib.h>        // standard library
 
-extern void (*rand_init_fn) (unsigned int seed);
-
 extern int (*rand_fn) (void);
 
 /*
@@ -154,16 +152,6 @@ static inline uint32_t co_ctz(uint32_t val)
             break;
     }
     return i;
-}
-/**
- ****************************************************************************************
- * @brief Function to initialize the random seed.
- * @param[in] seed The seed number to use to generate the random sequence.
- ****************************************************************************************
- */
-static inline void co_random_init(uint32_t seed)
-{
-    rand_init_fn(seed);
 }
 
 /**

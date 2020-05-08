@@ -33,10 +33,21 @@
 #define SDK_MAX_RAL_NUM 1
 #endif
 
+#define MHZ(x) ((x)*1000000)
+
+#ifndef SDK_HCLK
+#define SDK_HCLK MHZ(16)
+#endif
+
+#ifndef SDK_PCLK_DIV
+#define SDK_PCLK_DIV 1
+#endif
+
 #ifndef FPGA
 #define FPGA 0
 #endif
 
+#define SDK_PCLK (SDK_HCLK/SDK_PCLK_DIV)
 #define SDK_MAX_ACT_NUM    (SDK_MAX_CONN_NUM + 1)
 #define SDK_BUILTIN_TASK_NUM 1
 #define SDK_MAX_USER_TASK_NUM (SDK_BUILTIN_TASK_NUM + SDK_USER_TASK_NUM)

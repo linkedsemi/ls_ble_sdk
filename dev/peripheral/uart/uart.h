@@ -8,7 +8,7 @@
 #if FPGA 
 #define UART_CLOCK   16000000
 #else 
-#define UART_CLOCK   16000000
+#define UART_CLOCK   SDK_PCLK
 
 #endif 
 

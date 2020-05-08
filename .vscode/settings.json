@@ -19,7 +19,8 @@
         "spi_flash.h": "c",
         "uart.h": "c",
         "reg_uart.h": "c",
-        "log.h": "c"
+        "log.h": "c",
+        "ls_ip_config.h": "c"
     },
     "editor.detectIndentation": false,
     "python.pythonPath": "C:\\Program Files\\Python38\\python.exe",
