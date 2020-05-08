@@ -9,6 +9,7 @@ XIP_BANNED void lsqspi_init(struct lsqspi_instance *inst)
 {
     lsqspi_clk_set(inst,true);
     lsqspi_sw_rst(inst);
+    inst->reg->CSTIM = FIELD_BUILD(LSQSPI_AUTO_CS_HOLD,0);
     inst->reg->DLY = lsqspi_dly_get(inst);
     inst->reg->RDCAP = FIELD_BUILD(LSQSPI_DLY_RD_CAP, lsqspi_rd_cap_dly_get(inst));
     inst->reg->CFG = FIELD_BUILD(LSQSPI_BAUDRATE,lsqspi_baudrate_get(inst))|FIELD_BUILD(LSQSPI_DAC_ENABLE,1)
@@ -48,10 +49,10 @@ XIP_BANNED static void stig_read_continue(reg_lsqspi_t *reg,uint32_t *data,uint1
     {
          reg->STIG_GO = FIELD_BUILD(LSQSPI_STIG_HOLD_CS, 1) | FIELD_BUILD(LSQSPI_STIG_GO,1);
          size -= 8;
-         data += 2;
          while(REG_FIELD_RD(reg->CFG, LSQSPI_IDLE)==0);
          data[0] = reg->STIG_RD[0];
          data[1] = reg->STIG_RD[1];
+         data += 2;
     }
     if(size)
     {

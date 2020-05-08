@@ -26,5 +26,5 @@ XIP_BANNED uint8_t lsqspi_baudrate_get(struct lsqspi_instance *inst)
 
 XIP_BANNED uint32_t lsqspi_dly_get(struct lsqspi_instance *inst)
 {
-    return FIELD_BUILD(LSQSPI_DLY_NSS,1) | FIELD_BUILD(LSQSPI_DLY_AFTER,3) | FIELD_BUILD(LSQSPI_DLY_INIT, 5);
+    return FIELD_BUILD(LSQSPI_DLY_NSS,4) | FIELD_BUILD(LSQSPI_DLY_AFTER,2) | FIELD_BUILD(LSQSPI_DLY_INIT, 2);
 }

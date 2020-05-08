@@ -7,9 +7,7 @@ void sys_init_app(void);
 
 void sys_init_itf(void);
 
-void irq_init(void);
-
-void flash_init_xip_start(void);
+void irq_reinit(void);
 
 void uart_eif_read(uint8_t *bufptr, uint32_t size, void (*callback)(void *,uint8_t), void* dummy);
 

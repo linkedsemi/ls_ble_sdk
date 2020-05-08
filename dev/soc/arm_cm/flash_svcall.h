@@ -13,7 +13,7 @@ void spi_flash_quad_io_read_operation(uint32_t offset, uint8_t * data, uint16_t 
 
 void spi_flash_chip_erase_operation(void);
 
-void spi_flash_erase_security_area_operation(uint8_t idx,uint16_t addr);
+void spi_flash_erase_security_area_operation(uint8_t idx);
 
 void spi_flash_program_security_area_operation(uint8_t idx, uint16_t addr, uint8_t * data, uint16_t length);
 

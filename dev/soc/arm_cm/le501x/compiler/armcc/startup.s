@@ -169,13 +169,12 @@ Default_Handler PROC
                 EXPORT  IWDT_Handler              [WEAK]
                 EXPORT  CRYPT_Handler             [WEAK]
                 EXPORT  PDM_Handler               [WEAK]
-                EXPORT  BLE_Handler               [WEAK]
+                EXPORT  BLE_WKUP_Handler          [WEAK]
                 EXPORT  ADC_Handler               [WEAK]
                 EXPORT  ADTIM1_Handler            [WEAK]
                 EXPORT  BSTIM1_Handler            [WEAK]
                 EXPORT  GPTIMA1_Handler           [WEAK]
                 EXPORT  GPTIMB1_Handler           [WEAK]
-                EXPORT  BLE_Handler               [WEAK]
                 EXPORT  LVD33_Handler             [WEAK]
                 EXPORT  GPTIMC1_Handler           [WEAK]
                 EXPORT  LPTIM_Handler             [WEAK]
@@ -186,8 +185,6 @@ Default_Handler PROC
                 EXPORT  UART1_Handler             [WEAK]
                 EXPORT  UART2_Handler             [WEAK]
                 EXPORT  UART3_Handler             [WEAK]
-                EXPORT  BLE_Handler               [WEAK]
-                EXPORT  BLE_Handler               [WEAK]
 NMI_Handler      
 HardFault_Handler
 SVC_Handler      
@@ -196,6 +193,7 @@ SysTick_Handler
 EXTI_Handler
 WWDT_Handler
 LPWKUP_Handler
+BLE_WKUP_Handler
 BLE_Handler
 RTC_Handler
 DMA_Handler

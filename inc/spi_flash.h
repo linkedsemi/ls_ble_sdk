@@ -37,7 +37,7 @@ void spi_flash_read_id(uint8_t *manufacturer_id,uint8_t *mem_type_id,uint8_t *ca
 
 void spi_flash_read_unique_id(uint8_t unique_serial_id[16]);
 
-void spi_flash_erase_security_area(uint8_t idx,uint16_t addr);
+void spi_flash_erase_security_area(uint8_t idx);
 
 void spi_flash_program_security_area(uint8_t idx,uint16_t addr,uint8_t *data,uint16_t length);
 

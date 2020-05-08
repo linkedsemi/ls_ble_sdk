@@ -307,18 +307,18 @@ XIP_BANNED static void do_spi_flash_erase_security_area_func(void *param)
     lsqspi_stig_write_register(&lsqspi_inst,ERASE_SECURITY_AREA_OPCODE,param,3);
 }
 
-void do_spi_flash_erase_security_area(uint8_t idx,uint16_t addr)
+void do_spi_flash_erase_security_area(uint8_t idx)
 {
     uint8_t buf[3];
     buf[0] = 0;
-    buf[1] = idx<<4 | (addr>>8 & 0x1);
-    buf[2] = addr & 0xff;
+    buf[1] = idx<<4;
+    buf[2] = 0;
     flash_writing_critical(do_spi_flash_erase_security_area_func,buf);
 }
 
-void spi_flash_erase_security_area(uint8_t idx,uint16_t addr)
+void spi_flash_erase_security_area(uint8_t idx)
 {
-    spi_flash_erase_security_area_operation(idx, addr);
+    spi_flash_erase_security_area_operation(idx);
 }
 
 XIP_BANNED static void do_spi_flash_program_security_area_func(void *param)

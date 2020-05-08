@@ -22,6 +22,6 @@
         "log.h": "c"
     },
     "editor.detectIndentation": false,
-    "restructuredtext.confPath": "${workspaceFolder}\\doc",
     "python.pythonPath": "C:\\Program Files\\Python38\\python.exe",
+    "restructuredtext.confPath": "${workspaceFolder}\\doc",
 }

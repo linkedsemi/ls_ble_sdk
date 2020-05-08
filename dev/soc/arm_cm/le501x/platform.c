@@ -55,12 +55,12 @@ static void stack_data_bss_init()
     memcpy(&__stack_data_start__,&__stack_data_lma__,(uint32_t)&__stack_data_size__);
 }
 
-static void ble_irq_enable()
+void ble_irq_enable()
 {
     //clear ble irq
-    NVIC->ICPR[0] = 1<<BLE_IRQn | 1<<BLE_ERR_IRQn | 1<<BLE_WKUP_IRQn | 1<<BLE_FIFO_IRQn | (unsigned int)1<<BLE_CRYPT_IRQn;
+    NVIC->ICPR[0] = 1<<BLE_IRQn | 1<<BLE_ERR_IRQn | 1<<BLE_FIFO_IRQn | (unsigned int)1<<BLE_CRYPT_IRQn;
     //enable ble irq
-    NVIC->ISER[0] = 1<<BLE_IRQn | 1<<BLE_ERR_IRQn | 1<<BLE_WKUP_IRQn | 1<<BLE_FIFO_IRQn | (unsigned int)1<<BLE_CRYPT_IRQn;
+    NVIC->ISER[0] |= 1<<BLE_IRQn | 1<<BLE_ERR_IRQn | 1<<BLE_FIFO_IRQn | (unsigned int)1<<BLE_CRYPT_IRQn;
 }
 
 static uint32_t flash_data_storage_base_offset()
@@ -70,15 +70,42 @@ static uint32_t flash_data_storage_base_offset()
         - TINYFS_SECTION_NUM*TINYFS_SECTION_SIZE - LSQSPI_MEM_MAP_BASE_ADDR;
 }
 
-void irq_init()
+static void wkup_irq_enable()
+{
+    NVIC->ICPR[0] = 1<<BLE_WKUP_IRQn | 1<<LPWKUP_IRQn;
+    NVIC->ISER[0] = 1<<BLE_WKUP_IRQn | 1<<LPWKUP_IRQn;
+}
+
+void irq_reinit()
 {
     irq_priority();
+    wkup_irq_enable();
+}
+
+static void irq_init()
+{
+    irq_reinit();
     ble_irq_enable();
 }
 
 static void mac_init()
 {
-    RCC->BLECFG = 1<<RCC_BLE_MRST_POS | 1<<RCC_BLE_CRYPT_RST_POS | 1<<RCC_BLE_LCK_RST_POS | 1<<RCC_BLE_AHB_RST_POS | 1<<RCC_BLE_WKUP_RST_POS
+    uint8_t mac_clk;
+    uint32_t clk_cfg = RCC->CFG;
+    if(REG_FIELD_RD(clk_cfg, RCC_SYSCLK_SW) == 0x4)
+    {
+        if(REG_FIELD_RD(clk_cfg, RCC_HCLK_SCAL) == 0x8 )
+        {
+            mac_clk = 1; //AHB 32M
+        }else
+        {
+            mac_clk = 2; //AHB 64M
+        }
+    }else
+    {
+        mac_clk = 0; //AHB 16M
+    }
+    RCC->BLECFG = mac_clk<<RCC_BLE_CK_SEL_POS| 1<<RCC_BLE_MRST_POS | 1<<RCC_BLE_CRYPT_RST_POS | 1<<RCC_BLE_LCK_RST_POS | 1<<RCC_BLE_AHB_RST_POS | 1<<RCC_BLE_WKUP_RST_POS
         | 1<<RCC_BLE_LPWR_CKEN_POS | 1<<RCC_BLE_AHBEN_POS | 1<<RCC_BLE_MDM_REFCLK_CKEN_POS;
     RCC->BLECFG &= ~(1<<RCC_BLE_MRST_POS | 1<<RCC_BLE_CRYPT_RST_POS | 1<<RCC_BLE_LCK_RST_POS | 1<<RCC_BLE_AHB_RST_POS | 1<<RCC_BLE_WKUP_RST_POS);
 }
@@ -96,6 +123,7 @@ static void module_init()
     tinyfs_init(base_offset);
     mac_init();
     modem_rf_init();
+    low_power_mode_set(0);
 }
 
 static void analog_init()

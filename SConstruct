@@ -10,9 +10,9 @@ if 'mdk' in env['TOOLS']:
     
 else:
     env['COMPILER'] = 'gnu'
-    env['CFLAGS'] = '-O2 -Os -mabi=aapcs -mthumb -mcpu=cortex-m0 -std=c11 -g -ffunction-sections -fdata-sections -fstrict-volatile-bitfields -fno-common -Wall'
+    env['CFLAGS'] = '-O2 -Os -mabi=aapcs -mthumb -mcpu=cortex-m0 -std=c11 -g -g3 -ffunction-sections -fdata-sections -fstrict-volatile-bitfields -fno-common -Wall'
     env['ASFLAGS'] = ' -g'
-    env['LINKFLAGS'] = '-O2 -Os -mabi=aapcs -mthumb -mcpu=cortex-m0 -std=c11 -g -specs=nano.specs -specs=nosys.specs -T ${LINKSCRIPT} -Wl,-Map=${TARGET.base}.map -Wl,--cref'
+    env['LINKFLAGS'] = '-O2 -Os -mabi=aapcs -mthumb -mcpu=cortex-m0 -std=c11 -g -g3 -specs=nano.specs -specs=nosys.specs -T ${LINKSCRIPT} -Wl,-Map=${TARGET.base}.map -Wl,--cref'
     env['GC_OPTION'] = ' -Wl,--gc-sections '
 env['CPPPATH'] = ['#inc','#inc/cmsis','#inc/prf']
 dev_env = env.Clone()

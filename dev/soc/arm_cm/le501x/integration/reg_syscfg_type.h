@@ -19,7 +19,7 @@ typedef struct
     volatile uint32_t CFG; //0x3c
     volatile uint32_t PMU_PWR; //0x40
     volatile uint32_t PMU_TRIM; //0x44
-    volatile uint32_t PMUWKUUP; //0x48
+    volatile uint32_t PMU_WKUP; //0x48
     volatile uint32_t PMU_ANALOG; //0x4c
     volatile uint32_t BKD[8]; //0x50
 }reg_syscfg_t;
@@ -326,10 +326,12 @@ enum SYSCFG_REG_PMU_TRIM_FIELD
     SYSCFG_LKRST_EDGE_POS = 30,
 };
 
-enum SYSCFG_REG_PMUWKUUP_FIELD
+enum SYSCFG_REG_PMU_WKUP_FIELD
 {
     SYSCFG_WKUP_EN_MASK = (int)0xff,
     SYSCFG_WKUP_EN_POS = 0,
+    SYSCFG_WKUP_STAT_MASK = (int)0xff,
+    SYSCFG_WKUP_STAT_POS = 0,
     SYSCFG_WKUP_EDGE_MASK = (int)0xff0000,
     SYSCFG_WKUP_EDGE_POS = 16,
     SYSCFG_SLP_LVL_MASK = (int)0x38000000,

@@ -96,7 +96,7 @@ __isr_vector:
 	.long	IWDT_Handler
 	.long	CRYPT_Handler
 	.long	PDM_Handler
-	.long	BLE_Handler
+	.long	BLE_WKUP_Handler
 	.long	ADC_Handler
 	.long	ADTIM1_Handler
 	.long	BSTIM1_Handler
@@ -191,6 +191,7 @@ Default_Handler:
 	def_irq_handler	IWDT_Handler
 	def_irq_handler	CRYPT_Handler
 	def_irq_handler	PDM_Handler
+	def_irq_handler	BLE_WKUP_Handler
 	def_irq_handler	ADC_Handler
 	def_irq_handler	ADTIM1_Handler
 	def_irq_handler	BSTIM1_Handler
