@@ -56,6 +56,7 @@ static void rc24m_switch_to_pll64m()
 
 int main()
 {
+ 
     rc24m_switch_to_pll64m();
     while(1);
 }

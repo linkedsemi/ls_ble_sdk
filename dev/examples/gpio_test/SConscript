@@ -1,0 +1,12 @@
+
+
+Import('image_build')
+
+src = [
+    'main.c'
+]
+inc = [
+    '.'
+]
+
+app_env,app_target = image_build('gpio_test',src,inc,'ram_link.txt')

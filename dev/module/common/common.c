@@ -12,3 +12,10 @@ void rand_gen_by_word(uint8_t *ptr,uint8_t word_num)
     }
 }
 
+void memcpy32(uint32_t *dest, const uint32_t *src, uint32_t size_word)
+{
+    while(size_word--)
+    {
+        *dest++ = *src++;
+    }
+}

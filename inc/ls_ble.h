@@ -137,6 +137,7 @@ enum dev_evt_type
 enum prf_id
 {
     PRF_DIS_SERVER,
+    PRF_MESH,
 };
 
 struct profile_added_evt
@@ -506,6 +507,5 @@ void gatt_manager_server_send_indication(uint8_t con_idx,uint16_t handle,uint8_t
 void gatt_manager_server_send_notification(uint8_t con_idx,uint16_t handle,uint8_t *data,uint16_t length,uint16_t *transaction_id);
 
 void gatt_manager_client_indication_confirm(uint8_t con_idx,uint16_t handle);
-
 #endif
 

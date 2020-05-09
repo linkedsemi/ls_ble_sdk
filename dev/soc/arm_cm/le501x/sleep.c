@@ -74,14 +74,6 @@ NOINLINE XIP_BANNED static void cpu_flash_deep_sleep_and_recover()
     spi_flash_xip_start();
 }
 
-void memcpy32(uint32_t *dest, const uint32_t *src, uint32_t size_word)
-{
-    while(size_word--)
-    {
-        *dest++ = *src++;
-    }
-}
-
 void low_power_mode_set(uint8_t mode)
 {
     SYSCFG->PMU_WKUP = FIELD_BUILD(SYSCFG_SLP_LVL, mode) 

@@ -3,13 +3,22 @@ src = [
     'qspi_flash/spi_flash.c',
     'calc/calc_div.c',
     'uart/uart.c',
-    'cache/lscache.c'
+    'cache/lscache.c',
+    'trng/lstrng.c',
+    'ecc/lsecc.c',
+    'crypt/lscrypt.c',
+    'gpio/lsgpio.c'
+
 ]
 inc = [
     'qspi_flash',
     'cache',
     'calc',
     'uart',
+    'trng',
+    'ecc',
+    'crypt',
+    'gpio',
     '.',
 ]
 src_files = File(src)

@@ -18,7 +18,10 @@
 #include "calc_acc.h"
 #include "builtin_timer.h"
 #include "reg_syscfg.h"
+#include "lsecc.h"
+#include "lstrng.h"
 #include "field_manipulate.h"
+#define BASEBAND_MEMORY_ADDR   (0x50004000)
 #define IRQ_NVIC_PRIO(IRQn,priority) (((priority << (8U - __NVIC_PRIO_BITS)) & (uint32_t)0xFFUL) << _BIT_SHIFT(IRQn))
 
 RESET_RETAIN uint32_t reset_reason;
@@ -30,6 +33,12 @@ void stack_var_ptr_init(void);
 void main_task_app_init(void);
 
 void main_task_itf_init(void);
+
+
+static void bb_mem_clr(void)
+{
+    memset((void *)BASEBAND_MEMORY_ADDR,0,16384);
+}
 
 static void irq_priority()
 {
@@ -110,6 +119,23 @@ static void mac_init()
     RCC->BLECFG &= ~(1<<RCC_BLE_MRST_POS | 1<<RCC_BLE_CRYPT_RST_POS | 1<<RCC_BLE_LCK_RST_POS | 1<<RCC_BLE_AHB_RST_POS | 1<<RCC_BLE_WKUP_RST_POS);
 }
 
+
+uint32_t get_trng_random(void)
+{
+    uint32_t result_random=0;
+    uint8_t cnt_trng=2;
+    do
+    {
+        lstrng_init();
+        lstrng_start();
+        result_random = lstrng_getdata();
+        lstrng_stop();
+        lstrng_deinit();
+    } while(--cnt_trng);
+
+    return result_random;
+ }
+
 static void module_init()
 {
     //TODO
@@ -118,6 +144,10 @@ static void module_init()
     irq_init();
     srand(0);
     INIT_BUILTIN_TIMER_ENV();
+    lsecc_init();
+    lstrng_init();
+    uint32_t random_val = get_trng_random();
+    srand(random_val);
     calc_acc_init();
     cpu_sleep_recover_init();
     uint32_t base_offset = flash_data_storage_base_offset();
@@ -137,6 +167,7 @@ static void analog_init()
 static void var_init()
 {
     stack_data_bss_init();
+    bb_mem_clr();
     stack_var_ptr_init();
     spi_flash_drv_var_init();
 }
@@ -161,11 +192,6 @@ void platform_reset(uint32_t error)
 {
     reset_reason = error;
     while(1);
-}
-
-void ecc_calc_start(const uint8_t* secret_key,const uint8_t* pub_x,const uint8_t* pub_y,uint8_t* result_x,uint8_t* result_y,void (*cb)(void *),void *param)
-{
-
 }
 
 uint64_t idiv_acc(uint32_t dividend,uint32_t divisor,bool signed_int)

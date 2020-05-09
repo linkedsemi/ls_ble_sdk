@@ -25,10 +25,5 @@ enum CALC_REG_DIVCSR_FIELD
     CALC_DIV_TRM_MASK = 0x200,
     CALC_DIV_TRM_POS = 9,
 };
-
-
-
-
-
 #endif
 
