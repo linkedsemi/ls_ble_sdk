@@ -328,7 +328,6 @@ int main()
     led_gpio_func();
     sys_init_app();
     ble_init();
-    SIGMESH_UnbindAll();
     dev_manager_init(dev_manager_callback);
     gap_manager_init(gap_manager_callback);
     gatt_manager_init(gatt_manager_callback);
