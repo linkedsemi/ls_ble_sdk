@@ -10,8 +10,8 @@
 #define MSG_BUF_SIZE 4096
 #define NON_RET_BUF_SIZE 12
 #else
-#define MSG_BUF_SIZE 6144
-#define NON_RET_BUF_SIZE 380*2
+#define MSG_BUF_SIZE 8192
+#define NON_RET_BUF_SIZE (380*2)
 #endif
 
 
