@@ -28,9 +28,9 @@ XIP_BANNED void lsqspi_mode_bits_set(struct lsqspi_instance *inst,uint8_t mode_b
     inst->reg->MODE_BITS = mode_bits;
 }
 
-XIP_BANNED static void stig_read_start(reg_lsqspi_t *reg,struct stig_start_param *param,uint8_t start_length,bool hold_cs)
+XIP_BANNED static void stig_read_start(reg_lsqspi_t *reg,struct stig_start_param *param,uint8_t start_length,bool hold_cs,bool quad_data)
 {
-    reg->STIG_CMD = FIELD_BUILD(LSQSPI_CMD_OPCODE,param->opcode) | FIELD_BUILD(LSQSPI_OPCODE_EN, 1)
+    reg->STIG_CMD = FIELD_BUILD(LSQSPI_CMD_OPCODE,param->opcode) | FIELD_BUILD(LSQSPI_OPCODE_EN, 1) | FIELD_BUILD(LSQSPI_DATA_XFER_TYPE, quad_data)
         | FIELD_BUILD(LSQSPI_ADDR_EN, param->addr_en) | FIELD_BUILD(LSQSPI_ADDR_XFER_TYPE, param->quad_addr) 
         | FIELD_BUILD(LSQSPI_NUM_DUMMY_BYTES, param->dummy_bytes) | FIELD_BUILD(LSQSPI_DUMMY_EN, param->dummy_bytes_en)
         | FIELD_BUILD(LSQSPI_MODE_EN, param->mode_bits_en) | FIELD_BUILD(LSQSPI_NUM_RDATA_BYTES, start_length - 1)
@@ -66,7 +66,7 @@ XIP_BANNED static void stig_read_continue(reg_lsqspi_t *reg,uint32_t *data,uint1
 }
 
 XIP_BANNED static void stig_rd_wr(struct lsqspi_instance *inst,struct lsqspi_stig_rd_wr_param *param,
-    void (*stig_start)(reg_lsqspi_t *reg,struct stig_start_param *param,uint8_t start_length,bool hold_cs),
+    void (*stig_start)(reg_lsqspi_t *reg,struct stig_start_param *param,uint8_t start_length,bool hold_cs,bool quad_data),
     void (*stig_continue)(reg_lsqspi_t *reg,uint32_t *data,uint16_t size,bool quad_data))
 {
     uint8_t start_length;
@@ -79,7 +79,7 @@ XIP_BANNED static void stig_rd_wr(struct lsqspi_instance *inst,struct lsqspi_sti
     {
         start_length = (uint32_t)param->start.data % 4 ? 4 - (uint32_t)param->start.data % 4 : 0;
     }
-    stig_start(inst->reg,&param->start,start_length,start_hold);
+    stig_start(inst->reg,&param->start,start_length,start_hold,param->quad_data);
     stig_continue(inst->reg, (void *)(param->start.data + start_length), param->size - start_length , param->quad_data);
 }
 
@@ -89,9 +89,9 @@ XIP_BANNED void lsqspi_stig_read_data(struct lsqspi_instance *inst,struct lsqspi
     stig_rd_wr(inst,param,stig_read_start,stig_read_continue);
 }
 
-XIP_BANNED static void stig_write_start(reg_lsqspi_t *reg,struct stig_start_param *param,uint8_t start_length,bool hold_cs)
+XIP_BANNED static void stig_write_start(reg_lsqspi_t *reg,struct stig_start_param *param,uint8_t start_length,bool hold_cs,bool quad_data)
 {
-    reg->STIG_CMD = FIELD_BUILD(LSQSPI_CMD_OPCODE,param->opcode) | FIELD_BUILD(LSQSPI_OPCODE_EN, 1)
+    reg->STIG_CMD = FIELD_BUILD(LSQSPI_CMD_OPCODE,param->opcode) | FIELD_BUILD(LSQSPI_OPCODE_EN, 1) | FIELD_BUILD(LSQSPI_DATA_XFER_TYPE, quad_data)
         | FIELD_BUILD(LSQSPI_ADDR_EN, param->addr_en) | FIELD_BUILD(LSQSPI_ADDR_XFER_TYPE, param->quad_addr) 
         | FIELD_BUILD(LSQSPI_NUM_DUMMY_BYTES, param->dummy_bytes) | FIELD_BUILD(LSQSPI_DUMMY_EN, param->dummy_bytes_en)
         | FIELD_BUILD(LSQSPI_MODE_EN, param->mode_bits_en) | FIELD_BUILD(LSQSPI_NUM_WDATA_BYTES, start_length - 1)
