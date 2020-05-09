@@ -337,7 +337,7 @@
               <MiscControls>--c99 -O2 --wchar32</MiscControls>
               <Define></Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\..\..\inc;..\..\..\..\inc\cmsis;..\..\..\..\inc\prf;..\..\..\module\crc;..\..\..\module\debug;..\..\..\module\debug\RTT;..\..\..\module\static_buffer;..\..\..\module\tinyfs;..\..\..\peripheral\qspi_flash;..\..\..\peripheral\cache;..\..\..\peripheral\calc;..\..\..\peripheral\uart;..\..\..\peripheral;..\..\..\soc\arm_cm;..\..\..\soc\arm_cm\le501x;..\..\..\soc\arm_cm\le501x\integration;..\..\..;..;</IncludePath>
+              <IncludePath>..\..\..\..\inc;..\..\..\..\inc\cmsis;..\..\..\..\inc\prf;..\..\..\module\crc;..\..\..\module\debug;..\..\..\module\debug\RTT;..\..\..\module\static_buffer;..\..\..\module\tinyfs;..\..\..\peripheral\qspi_flash;..\..\..\peripheral\cache;..\..\..\peripheral\calc;..\..\..\peripheral\uart;..\..\..\peripheral\trng;..\..\..\peripheral\ecc;..\..\..\peripheral\crypt;..\..\..\peripheral\gpio;..\..\..\peripheral;..\..\..\soc\arm_cm;..\..\..\soc\arm_cm\le501x;..\..\..\soc\arm_cm\le501x\integration;..\..\..;..;</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -355,7 +355,7 @@
               <MiscControls></MiscControls>
               <Define></Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\..\..\inc;..\..\..\..\inc\cmsis;..\..\..\..\inc\prf;..\..\..\module\crc;..\..\..\module\debug;..\..\..\module\debug\RTT;..\..\..\module\static_buffer;..\..\..\module\tinyfs;..\..\..\peripheral\qspi_flash;..\..\..\peripheral\cache;..\..\..\peripheral\calc;..\..\..\peripheral\uart;..\..\..\peripheral;..\..\..\soc\arm_cm;..\..\..\soc\arm_cm\le501x;..\..\..\soc\arm_cm\le501x\integration;..\..\..;..;</IncludePath>
+              <IncludePath>..\..\..\..\inc;..\..\..\..\inc\cmsis;..\..\..\..\inc\prf;..\..\..\module\crc;..\..\..\module\debug;..\..\..\module\debug\RTT;..\..\..\module\static_buffer;..\..\..\module\tinyfs;..\..\..\peripheral\qspi_flash;..\..\..\peripheral\cache;..\..\..\peripheral\calc;..\..\..\peripheral\uart;..\..\..\peripheral\trng;..\..\..\peripheral\ecc;..\..\..\peripheral\crypt;..\..\..\peripheral\gpio;..\..\..\peripheral;..\..\..\soc\arm_cm;..\..\..\soc\arm_cm\le501x;..\..\..\soc\arm_cm\le501x\integration;..\..\..;..;</IncludePath>
             </VariousControls>
           </Aads>
           <LDads>
@@ -531,10 +531,46 @@
               <FileType>1</FileType>
               <FilePath>..\..\..\soc\arm_cm\le501x\integration\uart_param.c</FilePath>
             </File>
+            <File>
+              <FileName>lscache.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\peripheral\cache\lscache.c</FilePath>
+            </File>
+            <File>
+              <FileName>lscache_param.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\soc\arm_cm\le501x\integration\lscache_param.c</FilePath>
+            </File>
+            <File>
+              <FileName>lscrypt.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\peripheral\crypt\lscrypt.c</FilePath>
+            </File>
+            <File>
+              <FileName>lsecc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\peripheral\ecc\lsecc.c</FilePath>
+            </File>
+            <File>
+              <FileName>lsgpio.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\peripheral\gpio\lsgpio.c</FilePath>
+            </File>
+            <File>
+              <FileName>lstrng.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\peripheral\trng\lstrng.c</FilePath>
+            </File>
           </Files>
         </Group>
       </Groups>
     </Target>
   </Targets>
+
+  <RTE>
+    <apis/>
+    <components/>
+    <files/>
+  </RTE>
 
 </Project>

@@ -48,7 +48,7 @@
             <InvalidFlash>1</InvalidFlash>
           </TargetStatus>
           <OutputDirectory>.\UVBuild\</OutputDirectory>
-          <OutputName>sbl</OutputName>
+          <OutputName>ble_mesh</OutputName>
           <CreateExecutable>1</CreateExecutable>
           <CreateLib>0</CreateLib>
           <CreateHexFile>0</CreateHexFile>
@@ -368,7 +368,7 @@
             <TextAddressRange>0x00000000</TextAddressRange>
             <DataAddressRange>0x20000000</DataAddressRange>
             <pXoBase></pXoBase>
-            <ScatterFile>..\compiler\armcc\sbl_link.txt</ScatterFile>
+            <ScatterFile>..\..\..\soc\arm_cm\le501x\compiler\armcc\link_script.txt</ScatterFile>
             <IncludeLibs></IncludeLibs>
             <IncludeLibsPath></IncludeLibsPath>
             <Misc></Misc>
@@ -447,6 +447,31 @@
               <FilePath>..\..\..\module\debug\asm\armcc\ls_dbg_asm.s</FilePath>
             </File>
             <File>
+              <FileName>lscache.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\peripheral\cache\lscache.c</FilePath>
+            </File>
+            <File>
+              <FileName>lscache_param.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\soc\arm_cm\le501x\integration\lscache_param.c</FilePath>
+            </File>
+            <File>
+              <FileName>lscrypt.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\peripheral\crypt\lscrypt.c</FilePath>
+            </File>
+            <File>
+              <FileName>lsecc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\peripheral\ecc\lsecc.c</FilePath>
+            </File>
+            <File>
+              <FileName>lsgpio.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\peripheral\gpio\lsgpio.c</FilePath>
+            </File>
+            <File>
               <FileName>lsqspi.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\peripheral\qspi_flash\lsqspi.c</FilePath>
@@ -457,6 +482,16 @@
               <FilePath>..\..\..\soc\arm_cm\le501x\integration\lsqspi_param.c</FilePath>
             </File>
             <File>
+              <FileName>lstrng.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\peripheral\trng\lstrng.c</FilePath>
+            </File>
+            <File>
+              <FileName>main.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\main.c</FilePath>
+            </File>
+            <File>
               <FileName>modem_rf_le501x.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\soc\arm_cm\le501x\integration\modem_rf_le501x.c</FilePath>
@@ -465,11 +500,6 @@
               <FileName>platform.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\soc\arm_cm\le501x\platform.c</FilePath>
-            </File>
-            <File>
-              <FileName>sbl.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\sbl.c</FilePath>
             </File>
             <File>
               <FileName>sleep.c</FileName>
@@ -531,46 +561,10 @@
               <FileType>1</FileType>
               <FilePath>..\..\..\soc\arm_cm\le501x\integration\uart_param.c</FilePath>
             </File>
-            <File>
-              <FileName>lscache.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\peripheral\cache\lscache.c</FilePath>
-            </File>
-            <File>
-              <FileName>lscache_param.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\soc\arm_cm\le501x\integration\lscache_param.c</FilePath>
-            </File>
-            <File>
-              <FileName>lscrypt.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\peripheral\crypt\lscrypt.c</FilePath>
-            </File>
-            <File>
-              <FileName>lsecc.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\peripheral\ecc\lsecc.c</FilePath>
-            </File>
-            <File>
-              <FileName>lsgpio.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\peripheral\gpio\lsgpio.c</FilePath>
-            </File>
-            <File>
-              <FileName>lstrng.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\peripheral\trng\lstrng.c</FilePath>
-            </File>
           </Files>
         </Group>
       </Groups>
     </Target>
   </Targets>
-
-  <RTE>
-    <apis/>
-    <components/>
-    <files/>
-  </RTE>
 
 </Project>
