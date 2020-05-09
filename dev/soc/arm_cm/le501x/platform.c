@@ -152,6 +152,7 @@ static void module_init()
     cpu_sleep_recover_init();
     uint32_t base_offset = flash_data_storage_base_offset();
     tinyfs_init(base_offset);
+    tinyfs_print_dir_tree();
     mac_init();
     modem_rf_init();
     low_power_mode_set(0);
@@ -169,7 +170,7 @@ static void var_init()
     stack_data_bss_init();
     bb_mem_clr();
     stack_var_ptr_init();
-    spi_flash_drv_var_init();
+    spi_flash_drv_var_init(true,false);
 }
 
 void sys_init_itf()

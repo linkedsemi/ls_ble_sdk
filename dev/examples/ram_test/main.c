@@ -8,7 +8,7 @@ uint8_t dst[1024];
 int main_flash()
 {
     __disable_irq();
-    spi_flash_drv_var_init();
+    spi_flash_drv_var_init(false,false);
     spi_flash_init();
     spi_flash_software_reset();
  //   spi_flash_write_status_register(0);

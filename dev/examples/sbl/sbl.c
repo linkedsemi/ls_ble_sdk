@@ -59,7 +59,7 @@ XIP_BANNED int main()
 {
     clk_switch();
     __disable_irq();
-    spi_flash_drv_var_init();
+    spi_flash_drv_var_init(false,false);
     spi_flash_init();
     spi_flash_qe_status_read_and_set();
     spi_flash_xip_start();

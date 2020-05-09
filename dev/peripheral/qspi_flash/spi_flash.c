@@ -31,12 +31,21 @@ static struct lsqspi_instance lsqspi_inst;
 static bool flash_writing;
 static bool flash_xip_status;
 
-
-XIP_BANNED void spi_flash_drv_var_init()
+XIP_BANNED void spi_flash_xip_status_set(bool xip)
 {
-    flash_writing = false;
-    flash_xip_status = false;
+    flash_xip_status = xip;
+}
+
+XIP_BANNED void spi_flash_writing_status_set(bool writing)
+{
+    flash_writing = writing;
+}
+
+XIP_BANNED void spi_flash_drv_var_init(bool xip,bool writing)
+{
     lsqspi_inst.reg = LSQSPI;
+    spi_flash_xip_status_set(xip);
+    spi_flash_writing_status_set(writing);
 }
 
 XIP_BANNED void spi_flash_init()

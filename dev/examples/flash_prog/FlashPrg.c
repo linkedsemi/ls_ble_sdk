@@ -62,7 +62,7 @@
 
 int Init (unsigned long adr, unsigned long clk, unsigned long fnc) {
     __disable_irq();
-    spi_flash_drv_var_init();
+    spi_flash_drv_var_init(false,false);
     spi_flash_init();
     spi_flash_software_reset();
     spi_flash_release_from_deep_power_down();

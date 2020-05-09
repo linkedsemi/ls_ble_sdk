@@ -3,7 +3,11 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-void spi_flash_drv_var_init(void);
+void spi_flash_xip_status_set(bool xip);
+
+void spi_flash_writing_status_set(bool writing);
+
+void spi_flash_drv_var_init(bool xip,bool writing);
 
 void spi_flash_init(void);
 
