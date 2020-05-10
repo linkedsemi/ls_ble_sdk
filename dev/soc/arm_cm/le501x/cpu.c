@@ -5,8 +5,8 @@
 static uint32_t critical_nested_cnt;
 XIP_BANNED void enter_critical()
 {
-    ++critical_nested_cnt;
     __disable_irq();
+    ++critical_nested_cnt;
 }
 
 XIP_BANNED void exit_critical()
