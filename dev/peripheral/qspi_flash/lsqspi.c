@@ -4,6 +4,7 @@
 #include "ls_dbg.h"
 #include "lsqspi_param.h"
 #include "compile_flag.h"
+#include "cpu.h"
 
 XIP_BANNED void lsqspi_init(struct lsqspi_instance *inst)
 {
@@ -30,7 +31,7 @@ XIP_BANNED void lsqspi_mode_bits_set(struct lsqspi_instance *inst,uint8_t mode_b
 
 XIP_BANNED static void stig_read_start(reg_lsqspi_t *reg,struct stig_start_param *param,uint8_t start_length,bool hold_cs,bool quad_data)
 {
-    reg->STIG_CMD = FIELD_BUILD(LSQSPI_CMD_OPCODE,param->opcode) | FIELD_BUILD(LSQSPI_OPCODE_EN, 1) | FIELD_BUILD(LSQSPI_DATA_XFER_TYPE, quad_data)
+    reg->STIG_CMD = FIELD_BUILD(LSQSPI_CMD_OPCODE,param->opcode) | FIELD_BUILD(LSQSPI_OPCODE_EN, param->opcode_en) | FIELD_BUILD(LSQSPI_DATA_XFER_TYPE, quad_data)
         | FIELD_BUILD(LSQSPI_ADDR_EN, param->addr_en) | FIELD_BUILD(LSQSPI_ADDR_XFER_TYPE, param->quad_addr) 
         | FIELD_BUILD(LSQSPI_NUM_DUMMY_BYTES, param->dummy_bytes) | FIELD_BUILD(LSQSPI_DUMMY_EN, param->dummy_bytes_en)
         | FIELD_BUILD(LSQSPI_MODE_EN, param->mode_bits_en) | FIELD_BUILD(LSQSPI_NUM_RDATA_BYTES, start_length - 1)
@@ -79,8 +80,10 @@ XIP_BANNED static void stig_rd_wr(struct lsqspi_instance *inst,struct lsqspi_sti
     {
         start_length = (uint32_t)param->start.data % 4 ? 4 - (uint32_t)param->start.data % 4 : 0;
     }
+    enter_critical();
     stig_start(inst->reg,&param->start,start_length,start_hold,param->quad_data);
     stig_continue(inst->reg, (void *)(param->start.data + start_length), param->size - start_length , param->quad_data);
+    exit_critical();
 }
 
 
@@ -91,7 +94,7 @@ XIP_BANNED void lsqspi_stig_read_data(struct lsqspi_instance *inst,struct lsqspi
 
 XIP_BANNED static void stig_write_start(reg_lsqspi_t *reg,struct stig_start_param *param,uint8_t start_length,bool hold_cs,bool quad_data)
 {
-    reg->STIG_CMD = FIELD_BUILD(LSQSPI_CMD_OPCODE,param->opcode) | FIELD_BUILD(LSQSPI_OPCODE_EN, 1) | FIELD_BUILD(LSQSPI_DATA_XFER_TYPE, quad_data)
+    reg->STIG_CMD = FIELD_BUILD(LSQSPI_CMD_OPCODE,param->opcode) | FIELD_BUILD(LSQSPI_OPCODE_EN, param->opcode_en) | FIELD_BUILD(LSQSPI_DATA_XFER_TYPE, quad_data)
         | FIELD_BUILD(LSQSPI_ADDR_EN, param->addr_en) | FIELD_BUILD(LSQSPI_ADDR_XFER_TYPE, param->quad_addr) 
         | FIELD_BUILD(LSQSPI_NUM_DUMMY_BYTES, param->dummy_bytes) | FIELD_BUILD(LSQSPI_DUMMY_EN, param->dummy_bytes_en)
         | FIELD_BUILD(LSQSPI_MODE_EN, param->mode_bits_en) | FIELD_BUILD(LSQSPI_NUM_WDATA_BYTES, start_length - 1)
@@ -139,6 +142,7 @@ XIP_BANNED void lsqspi_stig_write_register(struct lsqspi_instance *inst,uint8_t 
     param.start.dummy_bytes_en = 0;
     param.start.addr_en = 0;
     param.start.mode_bits_en = 0;
+    param.start.opcode_en = 1;
     param.size = length;
     param.quad_data = false;
     lsqspi_stig_write_data(inst,&param);
@@ -160,6 +164,7 @@ XIP_BANNED void lsqspi_stig_read_register(struct lsqspi_instance *inst,uint8_t o
     param.start.dummy_bytes_en = 0;
     param.start.addr_en = 0;
     param.start.mode_bits_en = 0;
+    param.start.opcode_en = 1;
     param.size = length;
     param.quad_data = false;
     lsqspi_stig_read_data(inst,&param);

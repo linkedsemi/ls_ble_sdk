@@ -4,6 +4,7 @@
 #include "flash_svcall.h"
 #include "cpu.h"
 #include "compile_flag.h"
+#include "ls_dbg.h"
 #define WRITE_STATUS_REGISTER_OPCODE 0x01
 #define READ_STATUS_REGISTER_0_OPCODE 0x05
 #define READ_STATUS_REGISTER_1_OPCODE 0x35
@@ -27,6 +28,8 @@
 #define PROG_ERASE_RESUME 0x7a
 
 #define XIP_MODE_BITS 0x20
+
+#define DUMMY_BYTE_VAL 0x3c
 static struct lsqspi_instance lsqspi_inst;
 static bool flash_writing;
 static bool flash_xip_status;
@@ -53,7 +56,7 @@ XIP_BANNED void spi_flash_init()
     lsqspi_init(&lsqspi_inst);
 }
 
-XIP_BANNED static void quad_io_read_dummy()
+XIP_BANNED static void quad_io_read_dummy(uint8_t opcode_en)
 {
     uint8_t dummy;
     struct lsqspi_stig_rd_wr_param param;
@@ -65,8 +68,12 @@ XIP_BANNED static void quad_io_read_dummy()
     param.start.addr_en = 1;
     param.start.quad_addr = 1;
     param.start.mode_bits_en = 1;
+    param.start.opcode_en = opcode_en;
     param.size = sizeof(dummy);
+    param.quad_data = true;
     lsqspi_stig_read_data(&lsqspi_inst,&param);
+    LS_RAM_ASSERT(dummy == DUMMY_BYTE_VAL);
+
 }
 
 XIP_BANNED void spi_flash_xip_start()
@@ -77,7 +84,7 @@ XIP_BANNED void spi_flash_xip_start()
     }
     enter_critical();
     lsqspi_mode_bits_set(&lsqspi_inst,XIP_MODE_BITS);
-    quad_io_read_dummy();
+    quad_io_read_dummy(1);
     struct lsqspi_direct_read_config_param direct_read_param; //do not initialize this variable with a const struct
     direct_read_param.opcode = QUAD_IO_READ_OPCODE;
     direct_read_param.dummy_bytes = 2;
@@ -97,7 +104,7 @@ XIP_BANNED void spi_flash_xip_stop()
     }
     enter_critical();
     lsqspi_mode_bits_set(&lsqspi_inst,0);
-    quad_io_read_dummy();
+    quad_io_read_dummy(0);
     flash_xip_status = false;
     exit_critical();
 }
@@ -174,6 +181,7 @@ void do_spi_flash_program(uint32_t offset,uint8_t *data,uint16_t length,bool qua
     param.start.addr_en = 1;
     param.start.quad_addr = 0;
     param.start.mode_bits_en = 0;
+    param.start.opcode_en = 1;
     param.size = length;
     param.quad_data = quad;
     flash_writing_critical(do_spi_flash_prog_func,&param);
@@ -240,6 +248,7 @@ void do_spi_flash_quad_io_read(uint32_t offset,uint8_t *data,uint16_t length)
     param.start.addr_en = 1;
     param.start.quad_addr = 1;
     param.start.mode_bits_en = 1;
+    param.start.opcode_en = 1;
     param.size = length;
     param.quad_data = 1;
     flash_reading_critical(do_spi_flash_quad_io_read_func,&param);
@@ -266,6 +275,7 @@ void do_spi_flash_fast_read(uint32_t offset,uint8_t *data,uint16_t length)
     param.start.addr_en = 1;
     param.start.quad_addr = 0;
     param.start.mode_bits_en = 0;
+    param.start.opcode_en = 1;
     param.size = length;
     param.quad_data = 0;
     flash_reading_critical(do_spi_flash_fast_read_func,&param);
@@ -306,6 +316,7 @@ void spi_flash_read_unique_id(uint8_t unique_serial_id[16])
     param.start.addr_en = 1;
     param.start.quad_addr = 0;
     param.start.mode_bits_en = 0;
+    param.start.opcode_en = 1;
     param.size = 16;
     param.quad_data = false;
     lsqspi_stig_read_data(&lsqspi_inst, &param);
@@ -345,6 +356,7 @@ void do_spi_flash_program_security_area(uint8_t idx,uint16_t addr,uint8_t *data,
     param.start.addr_en = 1;
     param.start.quad_addr = 0;
     param.start.mode_bits_en = 0;
+    param.start.opcode_en = 1;
     param.size = length;
     param.quad_data = false;
     flash_writing_critical(do_spi_flash_program_security_area_func, &param);
@@ -371,6 +383,7 @@ void do_spi_flash_read_security_area(uint8_t idx,uint16_t addr,uint8_t *data,uin
     param.start.addr_en = 1;
     param.start.quad_addr = 0;
     param.start.mode_bits_en = 0;
+    param.start.opcode_en = 1;
     param.size = length;
     param.quad_data = false;
     flash_reading_critical(do_spi_flash_read_security_area_func,&param);

@@ -26,7 +26,8 @@ struct stig_start_param
             dummy_bytes_en:1,
             addr_en:1,
             quad_addr:1,
-            mode_bits_en:1;
+            mode_bits_en:1,
+            opcode_en:1;
 };
 
 struct lsqspi_stig_rd_wr_param
