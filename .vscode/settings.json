@@ -35,7 +35,8 @@
         "field_manipulate.h": "c",
         "reg_rcc.h": "c",
         "m_tb_mio.h": "c",
-        "m_tb_key.h": "c"
+        "m_tb_key.h": "c",
+        "m_config.h": "c"
     },
     "editor.detectIndentation": false,
     "python.pythonPath": "C:\\Program Files\\Python38\\python.exe",
