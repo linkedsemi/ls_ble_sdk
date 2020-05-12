@@ -91,6 +91,7 @@ XIP_BANNED void spi_flash_xip_start()
     direct_read_param.quad_addr = 1;
     direct_read_param.quad_data = 1;
     direct_read_param.mode_bits_en = 1;
+    direct_read_param.mode_bits = XIP_MODE_BITS;
     lsqspi_direct_read_config(&lsqspi_inst,&direct_read_param);
     flash_xip_status = true;
     exit_critical();
