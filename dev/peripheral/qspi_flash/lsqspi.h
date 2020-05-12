@@ -11,6 +11,7 @@ struct lsqspi_instance
 struct lsqspi_direct_read_config_param
 {
     uint8_t opcode;
+    uint8_t mode_bits;
     uint8_t dummy_bytes:2,
             quad_addr:1,
             quad_data:1,
@@ -34,12 +35,11 @@ struct lsqspi_stig_rd_wr_param
 {
     struct stig_start_param start;
     uint16_t size;
+    uint8_t mode_bits;
     bool quad_data;
 };
 
 void lsqspi_init(struct lsqspi_instance *inst);
-
-void lsqspi_mode_bits_set(struct lsqspi_instance *inst,uint8_t mode_bits);
 
 void lsqspi_direct_read_config(struct lsqspi_instance *inst,struct lsqspi_direct_read_config_param *param);
 

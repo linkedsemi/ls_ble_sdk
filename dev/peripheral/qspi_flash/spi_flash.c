@@ -56,7 +56,7 @@ XIP_BANNED void spi_flash_init()
     lsqspi_init(&lsqspi_inst);
 }
 
-XIP_BANNED static void quad_io_read_dummy(uint8_t opcode_en)
+XIP_BANNED static void quad_io_read_dummy(uint8_t opcode_en,uint8_t mode_bits)
 {
     uint8_t dummy;
     struct lsqspi_stig_rd_wr_param param;
@@ -70,6 +70,7 @@ XIP_BANNED static void quad_io_read_dummy(uint8_t opcode_en)
     param.start.mode_bits_en = 1;
     param.start.opcode_en = opcode_en;
     param.size = sizeof(dummy);
+    param.mode_bits = mode_bits;
     param.quad_data = true;
     lsqspi_stig_read_data(&lsqspi_inst,&param);
     LS_RAM_ASSERT(dummy == DUMMY_BYTE_VAL);
@@ -83,8 +84,7 @@ XIP_BANNED void spi_flash_xip_start()
         return;
     }
     enter_critical();
-    lsqspi_mode_bits_set(&lsqspi_inst,XIP_MODE_BITS);
-    quad_io_read_dummy(1);
+    quad_io_read_dummy(1,XIP_MODE_BITS);
     struct lsqspi_direct_read_config_param direct_read_param; //do not initialize this variable with a const struct
     direct_read_param.opcode = QUAD_IO_READ_OPCODE;
     direct_read_param.dummy_bytes = 2;
@@ -103,8 +103,7 @@ XIP_BANNED void spi_flash_xip_stop()
         return;
     }
     enter_critical();
-    lsqspi_mode_bits_set(&lsqspi_inst,0);
-    quad_io_read_dummy(0);
+    quad_io_read_dummy(0,0);
     flash_xip_status = false;
     exit_critical();
 }
@@ -233,7 +232,6 @@ void spi_flash_chip_erase()
 
 XIP_BANNED static void do_spi_flash_quad_io_read_func(void *param)
 {
-    lsqspi_mode_bits_set(&lsqspi_inst,0);
     lsqspi_stig_read_data(&lsqspi_inst,param);
 }
 
@@ -250,6 +248,7 @@ void do_spi_flash_quad_io_read(uint32_t offset,uint8_t *data,uint16_t length)
     param.start.mode_bits_en = 1;
     param.start.opcode_en = 1;
     param.size = length;
+    param.mode_bits = 0;
     param.quad_data = 1;
     flash_reading_critical(do_spi_flash_quad_io_read_func,&param);
 }
