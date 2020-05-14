@@ -28,6 +28,7 @@ typedef struct
     volatile uint32_t REG64; //0x64
     volatile uint32_t REG68; //0x68
     volatile uint32_t REG6C; //0x6c
+    volatile uint32_t REG70; //0x70
 }reg_rf_t;
 
 enum RF_REG_REG00_FIELD
@@ -530,5 +531,18 @@ enum RF_REG_REG6C_FIELD
     RF_ADC_RSSI_POS = 16,
 };
 
+enum RF_REG_REG70_FIELD
+{
+    RF_INT_VTXD_EXT1_MASK = (int)0x1F,
+    RF_INT_VTXD_EXT1_POS = 0,
+    RF_INT_VTXD_EXT2_MASK = (int)0x1F00,
+    RF_INT_VTXD_EXT2_POS = 8,
+    RF_INT_VTXD_CHN_THR0_MASK = (int)0x3F0000,
+    RF_INT_VTXD_CHN_THR0_POS = 16,
+    RF_INT_VTXD_CHN_THR1_MASK = (int)0x3F000000,
+    RF_INT_VTXD_CHN_THR1_POS = 24,
+    RF_RX2MBW_FORCE_EN_MASK = (int)0x80000000,
+    RF_RX2MBW_FORCE_EN_POS = 31,
+};
 #endif
 
