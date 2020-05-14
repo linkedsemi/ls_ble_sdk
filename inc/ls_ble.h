@@ -468,6 +468,8 @@ void dev_manager_start_init(uint8_t init_handle, struct start_init_param * param
 
 void dev_manager_stop_init(uint8_t init_handle);
 
+void dev_manager_set_random_static_addr(uint8_t *addr);
+
 void gap_manager_init(void (*evt_cb)(enum gap_evt_type,union gap_evt_u *,uint8_t));
 
 void gap_manager_disconnect(uint8_t con_idx,uint8_t reason);

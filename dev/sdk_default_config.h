@@ -9,6 +9,10 @@
 #define SDK_DCDC_BYPASS 0
 #endif
 
+#ifndef SDK_DEEP_SLEEP_ENABLE
+#define SDK_DEEP_SLEEP_ENABLE 1
+#endif
+
 #ifndef SDK_BLE_STORAGE_PEER_MAX
 #define SDK_BLE_STORAGE_PEER_MAX 3
 #endif

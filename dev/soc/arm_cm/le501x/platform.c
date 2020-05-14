@@ -64,12 +64,22 @@ static void stack_data_bss_init()
     memcpy(&__stack_data_start__,&__stack_data_lma__,(uint32_t)&__stack_data_size__);
 }
 
-void ble_irq_enable()
+static void ble_irq_clr()
 {
     //clear ble irq
     NVIC->ICPR[0] = 1<<BLE_IRQn | 1<<BLE_ERR_IRQn | 1<<BLE_FIFO_IRQn | (unsigned int)1<<BLE_CRYPT_IRQn;
+}
+
+static void ble_irq_enable()
+{
     //enable ble irq
     NVIC->ISER[0] |= 1<<BLE_IRQn | 1<<BLE_ERR_IRQn | 1<<BLE_FIFO_IRQn | (unsigned int)1<<BLE_CRYPT_IRQn;
+}
+
+void ble_irq_clr_and_enable()
+{
+    ble_irq_clr();
+    ble_irq_enable();
 }
 
 static uint32_t flash_data_storage_base_offset()
@@ -79,9 +89,13 @@ static uint32_t flash_data_storage_base_offset()
         - TINYFS_SECTION_NUM*TINYFS_SECTION_SIZE - LSQSPI_MEM_MAP_BASE_ADDR;
 }
 
-static void wkup_irq_enable()
+static void wkup_irq_clr()
 {
     NVIC->ICPR[0] = 1<<BLE_WKUP_IRQn | 1<<LPWKUP_IRQn;
+}
+
+static void wkup_irq_enable()
+{
     NVIC->ISER[0] = 1<<BLE_WKUP_IRQn | 1<<LPWKUP_IRQn;
 }
 
@@ -93,8 +107,9 @@ void irq_reinit()
 
 static void irq_init()
 {
+    wkup_irq_clr();
     irq_reinit();
-    ble_irq_enable();
+    ble_irq_clr_and_enable();
 }
 
 static void mac_init()

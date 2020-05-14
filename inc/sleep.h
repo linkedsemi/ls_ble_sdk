@@ -2,7 +2,10 @@
 #define SLEEP_H_
 #include <stdint.h>
 #include <stdbool.h>
-#define XTAL_STARTUP_CYCLES 0x10
+#define XTAL_STB_VAL (0x20)
+#define XTAL_STARTUP_CYCLES (XTAL_STB_VAL + 4)
+
+uint8_t get_deep_sleep_enable(void);
 
 void dcdc_on(void);
 
@@ -20,7 +23,7 @@ bool is_ble_power_on(void);
 
 void ble_wakeup_request(void);
 
-void ble_irq_enable(void);
+void ble_irq_clr_and_enable(void);
 
 #endif
 

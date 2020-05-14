@@ -60,8 +60,8 @@ static void prf_dis_server_callback(enum diss_evt_type type,union diss_evt_u *ev
 static void create_adv_obj()
 {
     struct legacy_adv_obj_param adv_param = {
-        .adv_intv_min = 0x20,
-        .adv_intv_max = 0x20,
+        .adv_intv_min = 1600,
+        .adv_intv_max = 1600,
         .own_addr_type = PUBLIC_OR_RANDOM_STATIC_ADDR,
         .filter_policy = 0,
         .ch_map = 0x7,

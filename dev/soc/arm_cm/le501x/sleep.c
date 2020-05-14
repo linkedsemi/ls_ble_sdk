@@ -11,6 +11,7 @@
 #include "reg_rcc.h"
 
 #define ISR_VECTOR_ADDR ((uint32_t *)(0x0))
+
 void cpu_sleep_asm(void);
 
 void cpu_recover_asm(void);
@@ -30,6 +31,11 @@ XIP_BANNED void dcdc_on()
 }
 
 #endif
+
+uint8_t get_deep_sleep_enable(void)
+{
+    return SDK_DEEP_SLEEP_ENABLE;
+}
 
 XIP_BANNED void before_wfi()
 {
@@ -52,14 +58,10 @@ void cpu_sleep_recover_init()
 XIP_BANNED static void power_up_hardware_modules()
 {
     SYSCFG->PMU_PWR = FIELD_BUILD(SYSCFG_PERI_PWR2_PD, 0) 
-                    | FIELD_BUILD(SYSCFG_SEC_PWR4_PD,0)
-                    | FIELD_BUILD(SYSCFG_PERI_ISO2_EN,1)
-                    | FIELD_BUILD(SYSCFG_SEC_ISO4_EN, 1);
-    while((SYSCFG->PMU_PWR & (SYSCFG_PERI_PWR2_ST_MASK|SYSCFG_SEC_PWR4_ST_MASK)));
+                    | FIELD_BUILD(SYSCFG_PERI_ISO2_EN,1);
+    while((SYSCFG->PMU_PWR & (SYSCFG_PERI_PWR2_ST_MASK)));
     SYSCFG->PMU_PWR = FIELD_BUILD(SYSCFG_PERI_PWR2_PD, 0) 
-                    | FIELD_BUILD(SYSCFG_SEC_PWR4_PD,0)
-                    | FIELD_BUILD(SYSCFG_PERI_ISO2_EN,0)
-                    | FIELD_BUILD(SYSCFG_SEC_ISO4_EN, 0);
+                    | FIELD_BUILD(SYSCFG_PERI_ISO2_EN,0);
 }
 
 NOINLINE XIP_BANNED static void cpu_flash_deep_sleep_and_recover()
@@ -79,16 +81,13 @@ void low_power_mode_set(uint8_t mode)
     SYSCFG->PMU_WKUP = FIELD_BUILD(SYSCFG_SLP_LVL, mode) 
                     | FIELD_BUILD(SYSCFG_WKUP_EDGE,0x8)
                     | FIELD_BUILD(SYSCFG_WKUP_EN, 0x8);
-    REG_FIELD_WR(SYSCFG->PMU_TRIM, SYSCFG_XTAL_STBTIME, XTAL_STARTUP_CYCLES);
+    REG_FIELD_WR(SYSCFG->PMU_TRIM, SYSCFG_XTAL_STBTIME, XTAL_STB_VAL);
 }
 
 static void power_down_hardware_modules()
 {
     SYSCFG->PMU_PWR = FIELD_BUILD(SYSCFG_PERI_PWR2_PD, 1) 
-                    | FIELD_BUILD(SYSCFG_SEC_PWR4_PD,1)
-                    | FIELD_BUILD(SYSCFG_PERI_ISO2_EN,1)
-                    | FIELD_BUILD(SYSCFG_SEC_ISO4_EN, 1);
-
+                    | FIELD_BUILD(SYSCFG_PERI_ISO2_EN,1);
 }
 
 bool is_ble_power_on()
