@@ -1,5 +1,5 @@
 ======================
-硬件开发使用使用手册 
+硬件开发使用手册 
 ======================
 
 --------------
@@ -40,8 +40,8 @@ QFN32管脚定义：
 11        PA15       IO
 12        PB00       IO /UART1_TX
 13        PB01       IO /UART1_RX
-14        PB05       IO /SWCLK
-15        PB06       IO /SWDIO
+14        PB05       IO /SWDIO
+15        PB06       IO /SWCLK
 16        NRST       复位引脚
 17        PB08       IO
 18        PB09       IO
@@ -90,8 +90,8 @@ SOP16管脚定义：
 11        PA09       IO
 12        PB00       IO /UART1_TX
 13        PB01       IO /UART1_RX
-14        PB05       IO /SWCLK
-15        PB06       IO /SWDIO
+14        PB05       IO /SWDIO
+15        PB06       IO /SWCLK
 16        VDD12      1.2V电源
 ========  ========  =======
 
@@ -139,6 +139,6 @@ QFN32_SCH  :download:`CN <./LE5010_QFN32_CN.pdf>`
 
 SOP16_SCH  :download:`CN <./SOP16_CN.pdf>`
 
-AD_LIB  :download:`AD_Lib <./lib.IntLib>` 
+AD_LIB  :download:`LE5010_QFN32_Lib <./LE5010_QFN32.IntLib>` 
 
 
