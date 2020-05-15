@@ -15,31 +15,7 @@
 #include "sdk_config.h"
 #define APP_IMAGE_BASE (0x18008000)
 
-#if (SDK_HCLK==64000000)
-XIP_BANNED static void switch_to_rc32k()
-{
-    REG_FIELD_WR(RCC->CFG, RCC_SYSCLK_SW, 2);
-    REG_FIELD_WR(RCC->CFG, RCC_CKCFG, 1);
-}
-
-XIP_BANNED static void switch_to_pll64m()
-{
-    REG_FIELD_WR(RCC->CFG, RCC_SYSCLK_SW, 4);
-    REG_FIELD_WR(RCC->CFG, RCC_CKCFG, 1);
-}
-
-XIP_BANNED void rc24m_switch_to_pll64m()
-{
-    switch_to_rc32k();
-    switch_to_pll64m();
-}
-
-XIP_BANNED static void clk_switch()
-{
-    rc24m_switch_to_pll64m();
-}
-
-#elif (SDK_HCLK==16000000)
+#if (SDK_HCLK==16000000)
 XIP_BANNED void switch_to_xo16m()
 {
     REG_FIELD_WR(RCC->CFG, RCC_SYSCLK_SW, 1);
@@ -52,7 +28,33 @@ XIP_BANNED static void clk_switch()
 }
 
 #else
+XIP_BANNED static void switch_to_pll()
+{
+    REG_FIELD_WR(RCC->CFG, RCC_SYSCLK_SW, 4);
+    REG_FIELD_WR(RCC->CFG, RCC_CKCFG, 1);
+}
+XIP_BANNED static void switch_to_rc32k()
+{
+    REG_FIELD_WR(RCC->CFG, RCC_SYSCLK_SW, 2);
+    REG_FIELD_WR(RCC->CFG, RCC_CKCFG, 1);
+}
+#if (SDK_HCLK==32000000)
+XIP_BANNED static void clk_switch()
+{
+    switch_to_rc32k();
+    REG_FIELD_WR(RCC->CFG, RCC_HCLK_SCAL,0x8);
+    switch_to_pll();
+}
+#elif(SDK_HCLK==64000000)
+XIP_BANNED static void clk_switch()
+{
+    switch_to_rc32k();
+    switch_to_pll();
+}
+#else
 #error HCLK not supported
+#endif
+
 #endif
 
 XIP_BANNED int main()
