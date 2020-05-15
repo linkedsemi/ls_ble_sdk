@@ -22,10 +22,7 @@
 #define PROV_AUTH_ACCEPT 1
 #define PROV_AUTH_NOACCEPT 0
 #define TMALL_TRITUPLE_FLASH_OFFSET (0x0200)
-static uint8_t ali_pid[TRIPLE_PID_LEN] =  {0x8e,0x29,0x00,0x00};//{0x00, 0x00, 0x29, 0x8e};             //{0};
-static uint8_t ali_mac[TRIPLE_MAC_LEN] = {0x55,0xa7,0x87,0x63,0xa7,0xf8};//{0xf8, 0xa7, 0x63, 0x87, 0xa7, 0x55}; //{0}
-static uint8_t ali_secret[TRIPLE_SECRET_LEN] = {0xdb, 0xa3, 0x32, 0x87, 0xb1, 0x8d, 0x6d, 0x9d, 0x91, 0x32, 0x1f, 0x7f, 0x61, 0x0f, 0x00, 0xee};
-static uint8_t ali_authvalue[ALI_AUTH_VALUE_LEN] = {0x2d,0xdf,0x1f,0x55,0x1d,0x55,0x3c,0x16,0xdb,0x30,0xa0,0xec,0x9e,0x06,0x18,0x33};//{0x2d, 0xdf, 0x1f, 0x55, 0x1d, 0x55, 0x3c, 0x16, 0xdb, 0x30, 0xa0, 0xec, 0x9e, 0x06, 0x18, 0x33}; //{0};
+
 uint8_t vendor_tid = 0;
 static uint16_t CurrentLevel = 65535;
 uint8_t CurrentOnoffState = 0;
@@ -38,7 +35,27 @@ struct mesh_model_info model_env;
 tinyfs_dir_t dir0;
 SIGMESH_ModelHandle_TypeDef ModelHandle_OnOff;
 SIGMESH_ModelHandle_TypeDef ModelHandle_Lightness;
-SIGMESH_NodeInfo_TypeDef Node_Proved_State;
+SIGMESH_NodeInfo_TypeDef Node_Get_Proved_State = 0;
+SIGMESH_NodeInfo_TypeDef Node_Proved_State = 0;
+
+static uint8_t ali_pid[TRIPLE_PID_LEN] = {0};
+static uint32_t ali_pid_u32 = 10638;
+static uint8_t ali_mac[TRIPLE_MAC_LEN] = {0xf8, 0xa7, 0x63, 0x87, 0xa7, 0x54};
+static uint8_t ali_secret[TRIPLE_SECRET_LEN] = {0xf1, 0x7b, 0xc5, 0xe3, 0x11, 0xc0, 0xde, 0xd2, 0x3b, 0xa0, 0x34, 0x4e, 0x8a, 0xe3, 0xb7, 0x4a};
+static uint8_t ali_authvalue[ALI_AUTH_VALUE_LEN] = {0x85, 0x29, 0xec, 0xc7, 0xef, 0x7b, 0x8c, 0x90, 0xda, 0x61, 0xea, 0xba, 0xaa, 0xd6, 0xde, 0xfe};
+
+//static uint8_t ali_pid[TRIPLE_PID_LEN] = {0x8e,0x29,0x00,0x00};
+//static uint32_t ali_pid_u32 = 10638;
+//static uint8_t ali_mac[TRIPLE_MAC_LEN] = {0x70,0xa7,0x87,0x63,0xa7,0xf8};
+//static uint8_t ali_secret[TRIPLE_SECRET_LEN] = {0xf1, 0x7b, 0xc5, 0xe3, 0x11, 0xc0, 0xde, 0xd2, 0x3b, 0xa0, 0x34, 0x4e, 0x8a, 0xe3, 0xb7, 0x4a};
+//static uint8_t ali_authvalue[ALI_AUTH_VALUE_LEN] = {0x11,0x65,0xa3,0x06,0xb3,0x9a,0x3d,0xba,0xbd,0x6c,0x00,0x05,0x5c,0x12,0x8c,0x72};
+
+
+uint8_t rsp_data_info[40] = {0};
+
+uint8_t tmall_app_key_lid = 0;
+uint8_t tmall_ModelHandle = 0;
+uint16_t tmall_source_addr = 0;
 
 void hextostring(const uint8_t *source, char *dest, int len)
 {
@@ -58,31 +75,38 @@ static uint8_t gen_ali_authValue(void)
     char cal_ble_key_input[55] = ""; // pid + ',' + mac + ',' + secret = 8+1+12+1+32+'\0'
     char mac_str[(TRIPLE_MAC_LEN << 1) + 1] = "";
     char secret_str[(TRIPLE_SECRET_LEN << 1) + 1] = "";
+    uint8_t tmp_arry[ALI_AUTH_VALUE_LEN] = {0};
 
     uint8_t ali_trituple[ALI_TRIPLE_SUM_LEN] = {0};
-    //   spi_flash_fast_read(TMALL_TRITUPLE_FLASH_OFFSET, &ali_trituple[0], ALI_TRIPLE_SUM_LEN);
-    memcpy(&ali_trituple[0], &ali_pid[0], TRIPLE_PID_LEN);
-    memcpy(&ali_trituple[TRIPLE_PID_LEN], &ali_mac[0], TRIPLE_MAC_LEN);
-    memcpy(&ali_secret[TRIPLE_MAC_LEN], &ali_secret[0], TRIPLE_SECRET_LEN);
-
-    memcpy(ali_pid, &ali_trituple[0], TRIPLE_PID_LEN);
-    memcpy(ali_mac, &ali_trituple[TRIPLE_PID_LEN], TRIPLE_MAC_LEN);
-    memcpy(ali_secret, &ali_trituple[TRIPLE_PID_LEN + TRIPLE_MAC_LEN], TRIPLE_SECRET_LEN);
+    spi_flash_fast_read(TMALL_TRITUPLE_FLASH_OFFSET, &ali_trituple[0], ALI_TRIPLE_SUM_LEN);
+    if ((ali_trituple[0] != 0xff) && (ali_trituple[1] != 0xff) && (ali_trituple[2] != 0xff))
+    {
+        memcpy((uint8_t *)(&ali_pid_u32), &ali_trituple[0], TRIPLE_PID_LEN);
+        memcpy(&ali_mac[0], &ali_trituple[TRIPLE_PID_LEN], TRIPLE_MAC_LEN);
+        memcpy(&ali_secret[0], &ali_trituple[TRIPLE_MAC_LEN], TRIPLE_SECRET_LEN);
+    }
 
     hextostring(ali_mac, mac_str, TRIPLE_MAC_LEN);
     hextostring(ali_secret, secret_str, TRIPLE_SECRET_LEN);
 
-    sprintf(&cal_ble_key_input[0], "%08x,%s,%s", ali_pid, mac_str, secret_str);
+    sprintf(&cal_ble_key_input[0], "%08x,%s,%s", ali_pid_u32, mac_str, secret_str);
 
     status = sha256_handler(&cal_ble_key_input[0], &ali_authvalue[0]);
 
-    for (uint8_t i = 0; i < TRIPLE_PID_LEN; i++)
-    {
-    }
+    memcpy(&ali_pid[0], ((uint8_t *)&ali_pid_u32), TRIPLE_PID_LEN);
 
+    memcpy(tmp_arry, ali_mac, TRIPLE_MAC_LEN);
     for (uint8_t j = 0; j < TRIPLE_MAC_LEN; j++)
     {
+        ali_mac[j] = tmp_arry[TRIPLE_MAC_LEN - 1 - j];
     }
+
+    memcpy(tmp_arry, ali_authvalue, ALI_AUTH_VALUE_LEN);
+    for (uint8_t j = 0; j < ALI_AUTH_VALUE_LEN; j++)
+    {
+        ali_authvalue[j] = tmp_arry[ALI_AUTH_VALUE_LEN - 1 - j];
+    }
+
     if (status == TC_CRYPTO_FAIL)
     {
         memset(&ali_authvalue[0], 0, ALI_AUTH_VALUE_LEN);
@@ -177,14 +201,6 @@ static void gatt_manager_callback(enum gatt_evt_type type, union gatt_evt_u *evt
 {
 }
 
-uint8_t rsp_data_info[40] = {0x90, 0x07, 0xd8, 0x00, 0x00, 0x00, 0x97, 0x07, 0x9e, 0x00,
-                             0xc3, 0x07, 0xb4, 0x00, 0x00, 0x00, 0xcd, 0x07, 0x6c, 0x00,
-                             0x00, 0x00, 0x07, 0xde, 0x36, 0x00, 0x00, 0xe2, 0xf8, 0x1b,
-                             0x0e, 0x1c, 0x07, 0x3b, 0x1b, 0x07, 0x35, 0x35, 0x9b, 0xc7};
-
-uint8_t tmall_app_key_lid = 0;
-uint8_t tmall_ModelHandle = 0;
-uint16_t tmall_source_addr = 0;
 static void vendor_indication_handler(uint8_t const *info, uint16_t const info_len)
 {
     struct rsp_model_info rsp;
@@ -212,7 +228,7 @@ static void mesh_manager_callback(enum mesh_evt_type type, union mesh_evt_u *evt
     case MESH_ACTIVE_DISABLE:
     {
         SIGMESH_UnbindAll();
-        TIMER_Set(1, 3000);
+        ls_mesh_platform_reset();
     }
     break;
     case MESH_ACTIVE_REGISTER_MODEL:
@@ -499,8 +515,8 @@ int main()
 {
     led_gpio_func();
     sys_init_app();
+    gen_ali_authValue();
     ble_init();
-  //  gen_ali_authValue();
     auto_check_unbind();
     dev_manager_init(dev_manager_callback);
     gap_manager_init(gap_manager_callback);

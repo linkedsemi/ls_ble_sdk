@@ -412,4 +412,9 @@ void HAL_GPIO_TogglePin(reg_lsgpio_t *GPIOx, uint16_t GPIO_Pin);
 HAL_StatusTypeDef HAL_GPIO_LockPin(reg_lsgpio_t *GPIOx, uint16_t GPIO_Pin);
 void HAL_GPIO_EXTI_IRQHandler(uint16_t GPIO_Pin);
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin);
+void HAL_GPIO_SET_INPUT(reg_lsgpio_t *GPIOx, uint16_t GPIO_Pin);
+void HAL_GPIO_SET_INPUT_FILT_EN(reg_lsgpio_t *GPIOx, uint16_t GPIO_Pin);
+void HAL_GPIO_SET_OUTPUT(reg_lsgpio_t *GPIOx, uint16_t GPIO_Pin);
+
+																			
 #endif //(LSGPIO_H_)
