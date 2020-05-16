@@ -15,7 +15,7 @@
 #include "sdk_config.h"
 #define APP_IMAGE_BASE (0x18008000)
 
-#if (SDK_HCLK==16000000)
+#if (SDK_HCLK_MHZ==16)
 XIP_BANNED void switch_to_xo16m()
 {
     REG_FIELD_WR(RCC->CFG, RCC_SYSCLK_SW, 1);
@@ -38,14 +38,14 @@ XIP_BANNED static void switch_to_rc32k()
     REG_FIELD_WR(RCC->CFG, RCC_SYSCLK_SW, 2);
     REG_FIELD_WR(RCC->CFG, RCC_CKCFG, 1);
 }
-#if (SDK_HCLK==32000000)
+#if (SDK_HCLK_MHZ==32)
 XIP_BANNED static void clk_switch()
 {
     switch_to_rc32k();
     REG_FIELD_WR(RCC->CFG, RCC_HCLK_SCAL,0x8);
     switch_to_pll();
 }
-#elif(SDK_HCLK==64000000)
+#elif(SDK_HCLK_MHZ==64)
 XIP_BANNED static void clk_switch()
 {
     switch_to_rc32k();

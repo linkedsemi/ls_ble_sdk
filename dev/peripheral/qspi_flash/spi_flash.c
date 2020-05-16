@@ -73,7 +73,9 @@ XIP_BANNED static void quad_io_read_dummy(uint8_t opcode_en,uint8_t mode_bits)
     param.mode_bits = mode_bits;
     param.quad_data = true;
     lsqspi_stig_read_data(&lsqspi_inst,&param);
+    #ifndef FLASH_PROG_ALGO
     LS_RAM_ASSERT(dummy == DUMMY_BYTE_VAL);
+    #endif
 
 }
 
