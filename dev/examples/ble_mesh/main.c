@@ -50,7 +50,6 @@ static uint8_t ali_authvalue[ALI_AUTH_VALUE_LEN] = {0x85, 0x29, 0xec, 0xc7, 0xef
 //static uint8_t ali_secret[TRIPLE_SECRET_LEN] = {0xf1, 0x7b, 0xc5, 0xe3, 0x11, 0xc0, 0xde, 0xd2, 0x3b, 0xa0, 0x34, 0x4e, 0x8a, 0xe3, 0xb7, 0x4a};
 //static uint8_t ali_authvalue[ALI_AUTH_VALUE_LEN] = {0x11,0x65,0xa3,0x06,0xb3,0x9a,0x3d,0xba,0xbd,0x6c,0x00,0x05,0x5c,0x12,0x8c,0x72};
 
-
 uint8_t rsp_data_info[40] = {0};
 
 uint8_t tmall_app_key_lid = 0;
@@ -133,10 +132,31 @@ void auto_check_unbind(void)
     else
     {
         coutinu_power_up_num++;
+        tinyfs_write(dir0, RECORD_KEY1, &coutinu_power_up_num, sizeof(coutinu_power_up_num));
+        tinyfs_write_through();
     }
+}
 
-    tinyfs_write(dir0, RECORD_KEY1, &coutinu_power_up_num, sizeof(coutinu_power_up_num));
-    tinyfs_write_through();
+void enable_tx_unprov_beacon(void)
+{
+    struct bcn_start_unprov_param info;
+    info.DevUuid[0] = 0xA8;
+    info.DevUuid[1] = 0x01;
+    info.DevUuid[2] = 0x71;
+    memcpy(&info.DevUuid[3], &ali_pid[0], TRIPLE_PID_LEN);
+    memcpy(&info.DevUuid[3 + TRIPLE_PID_LEN], &ali_mac[0], TRIPLE_MAC_LEN);
+    info.DevUuid[13] = 0x02;
+    info.DevUuid[14] = 0x00;
+    info.DevUuid[15] = 0x00;
+    info.UriHash = 0xd97478b3;
+    info.OobInfo = 0x0000;
+    info.UriHash_Present = true;
+    start_tx_unprov_beacon(&info);
+}
+
+void disable_tx_unprov_beacon(void)
+{
+    stop_tx_unprov_beacon();
 }
 
 static void led_gpio_func(void)
@@ -204,7 +224,7 @@ static void gatt_manager_callback(enum gatt_evt_type type, union gatt_evt_u *evt
 static void vendor_indication_handler(uint8_t const *info, uint16_t const info_len)
 {
     struct rsp_model_info rsp;
-    rsp.opcode = APP_MESH_VENDOR_TRANSPARENT_MSG;
+    rsp.opcode = APP_MESH_VENDOR_INDICATION;
     rsp.app_key_lid = tmall_app_key_lid;
     rsp.ModelHandle = tmall_ModelHandle;
     rsp.dest_addr = tmall_source_addr;
@@ -246,7 +266,7 @@ static void mesh_manager_callback(enum mesh_evt_type type, union mesh_evt_u *evt
     case MESH_ACTIVE_MODEL_GROUP_MEMBERS:
     {
         model_subscribe(model_env.info[0].model_lid, 0xC000); //group address 0xc000
-                                                              //        model_subscribe(model_env.info[1].model_lid, 0xC000);   //group address 0xc000
+        model_subscribe(model_env.info[1].model_lid, 0xC000); //group address 0xc000                                                      //        model_subscribe(model_env.info[1].model_lid, 0xC000);   //group address 0xc000
                                                               //        model_subscribe(model_env.info[2].model_lid, 0xC000);   //group address 0xc007
     }
     break;
@@ -272,8 +292,8 @@ static void mesh_manager_callback(enum mesh_evt_type type, union mesh_evt_u *evt
     break;
     case MESH_ACTIVE_STORAGE_LOAD:
     {
-        Node_Proved_State = evt->st_proved.proved_state;
-        if (Node_Proved_State == PROVISIONED_OK)
+        Node_Get_Proved_State = evt->st_proved.proved_state;
+        if (Node_Get_Proved_State == PROVISIONED_OK)
         {
             vendor_indication_handler(&rsp_data_info[0], 40);
             HAL_GPIO_WritePin(LSGPIOB, LED_0 | LED_1, GPIO_PIN_SET);
@@ -358,7 +378,18 @@ static void mesh_manager_callback(enum mesh_evt_type type, union mesh_evt_u *evt
             tmall_ModelHandle = evt->rx_msg.ModelHandle;
             tmall_source_addr = evt->rx_msg.source_addr;
 
-            vendor_indication_handler(&rsp_data_info[0], 40);
+            if (evt->rx_msg.opcode == APP_MESH_VENDOR_SET)
+            {
+                struct rsp_model_info vendor_rsp;
+                vendor_rsp.ModelHandle = model_env.info[0].model_lid;
+                vendor_rsp.app_key_lid = tmall_app_key_lid;
+                vendor_rsp.opcode = APP_MESH_VENDOR_STATUES;
+                vendor_rsp.len = evt->rx_msg.rx_info_len;
+                vendor_rsp.dest_addr = tmall_source_addr;
+                memcpy(&(vendor_rsp.info[0]), &(evt->rx_msg.info[0]), vendor_rsp.len);
+                rsp_model_info_ind(&vendor_rsp);
+            }
+            //      vendor_indication_handler(&rsp_data_info[0], 40);
         }
         break;
         case GENERIC_ONOFF_SET: // On Off
@@ -366,17 +397,17 @@ static void mesh_manager_callback(enum mesh_evt_type type, union mesh_evt_u *evt
             uint8_t *pOnOff = &(evt->rx_msg.info[0]);
             CurrentOnoffState = *pOnOff;
 
-            if (evt->rx_msg.ModelHandle == ModelHandle_OnOff)
+            if (evt->rx_msg.ModelHandle == model_env.info[0].model_lid)
             {
-                LightControl(LED_0, *pOnOff);
-                LightControl(LED_1, *pOnOff);
-                struct rsp_model_info rsp;
-                rsp.ModelHandle = ModelHandle_OnOff;
-                rsp.opcode = GENERIC_ONOFF_STATUS;
-                rsp.len = 1;
-                memcpy(&rsp.info[0], &CurrentOnoffState, rsp.len);
-
-                rsp_model_info_ind(&rsp);
+                struct rsp_model_info onoff_rsp;
+                onoff_rsp.ModelHandle = model_env.info[0].model_lid;
+                onoff_rsp.app_key_lid = evt->rx_msg.app_key_lid;
+                onoff_rsp.opcode = GENERIC_ONOFF_STATUS;
+                //                rsp.len = evt->rx_msg.rx_info_len;
+                onoff_rsp.dest_addr = evt->rx_msg.source_addr;
+                onoff_rsp.len = 1; //evt->rx_msg.rx_info_len;
+                memcpy(&onoff_rsp.info[0], &evt->rx_msg.info[0], onoff_rsp.len);
+                rsp_model_info_ind(&onoff_rsp);
 
                 if (!timer_state_flag)
                 {
@@ -406,13 +437,13 @@ static void mesh_manager_callback(enum mesh_evt_type type, union mesh_evt_u *evt
                 Status[0] = CurrentLevel & 0xFF;
                 Status[1] = CurrentLevel >> 8;
 
-                struct rsp_model_info rsp;
-                rsp.ModelHandle = ModelHandle_Lightness;
-                rsp.opcode = LIGHT_LIGHTNESS_STATUS;
-                rsp.len = 2;
-                memcpy(&(rsp.info[0]), &Status, rsp.len);
+                struct rsp_model_info lightness_rsp;
+                lightness_rsp.ModelHandle = ModelHandle_Lightness;
+                lightness_rsp.opcode = LIGHT_LIGHTNESS_STATUS;
+                lightness_rsp.len = 2;
+                memcpy(&(lightness_rsp.info[0]), &Status, lightness_rsp.len);
 
-                rsp_model_info_ind(&rsp);
+                rsp_model_info_ind(&lightness_rsp);
             }
         }
         break;
@@ -483,13 +514,13 @@ static void dev_manager_callback(enum dev_evt_type type, union dev_evt_u *evt)
         prf_mesh_callback_init(mesh_manager_callback);
 
         //       model_env.nb_model = 3;
-        model_env.nb_model = 1;
-        //       model_env.info[0].model_id = GENERIC_ONOFF_SERVER;
-        //       model_env.info[0].element_id = 0;
+        model_env.nb_model = 2;
+        model_env.info[0].model_id = GENERIC_ONOFF_SERVER;
+        model_env.info[0].element_id = 0;
         //       model_env.info[1].model_id = LIGHTNESS_SERVER;
         //       model_env.info[1].element_id = 0;
-        model_env.info[0].model_id = VENDOR_TMALL_SERVER;
-        model_env.info[0].element_id = 0;
+        model_env.info[1].model_id = VENDOR_TMALL_SERVER;
+        model_env.info[1].element_id = 0;
         ls_mesh_init(&model_env);
     }
     break;

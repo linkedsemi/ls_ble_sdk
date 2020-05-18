@@ -206,6 +206,14 @@ struct mesh_model_info
     struct model_id_info info[MAX_MESH_MODEL_NB];
 };
 
+struct bcn_start_unprov_param
+{
+    uint8_t DevUuid[UUID_MESH_DEV_LEN];
+    uint16_t OobInfo;
+    uint32_t UriHash;
+    bool UriHash_Present;
+};
+
 void prf_mesh_callback_init(void (*evt_cb)(enum mesh_evt_type, union mesh_evt_u *));
 void dev_manager_prf_mesh_add(uint8_t sec_lvl, struct ls_mesh_cfg *cfg);
 void ls_mesh_init(struct mesh_model_info *param);
@@ -217,4 +225,6 @@ void rsp_model_info_ind(struct rsp_model_info *param);
 void TIMER_Set(uint8_t TimerID, uint32_t DelayMS);
 void TIMER_Cancel(uint8_t TimerID);
 void SIGMESH_UnbindAll(void);
+void stop_tx_unprov_beacon(void);
+void start_tx_unprov_beacon(struct bcn_start_unprov_param *param);
 #endif //(_LS_MESH_H_
