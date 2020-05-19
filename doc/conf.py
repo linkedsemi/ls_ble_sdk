@@ -53,7 +53,7 @@ exhale_args = {
     # "treeViewIsBootstrap": True,
     "exhaleExecutesDoxygen": True,
     "exhaleDoxygenStdin":    textwrap.dedent('''
-                                    INPUT = ../inc ../dev
+                                    INPUT = ../inc/le501x.h
                                     EXCLUDE_PATTERNS = */inc/cmsis/* *.c
                                     '''),
     #"exhaleUseDoxyfile":     True,
