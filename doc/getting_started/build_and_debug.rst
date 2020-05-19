@@ -1,5 +1,5 @@
-构建、烧录、调试
-===================
+VS Code 构建、烧录、调试
+========================
 
 构建
 -------------
@@ -49,7 +49,7 @@ JLINK烧录、调试的准备工作
 
 *量产* 前，用hexmerge.py将上述两个hex和应用镜像hex合并::
 
-    hexmerge.py build/examples/info_sbl.hex dev/soc/bin/arm_cm/le501x/bin/fw.hex build/examples/myapp.hex > mayapp_production.hex
+    hexmerge.py build/examples/info_sbl.hex dev/soc/arm_cm/le501x/bin/fw.hex build/examples/myapp.hex > mayapp_production.hex
 
 JFlash使用
 ~~~~~~~~~~~~~

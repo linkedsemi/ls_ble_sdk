@@ -1,11 +1,13 @@
 .. _env_setup:
 
-软件开发环搭建
+软件开发环境搭建
 ================= 
 
 我们支持如下开发环境：
 
 #. Python 3 + VS Code + GCC(ARM)
+
+#. MDK-KEIL
 
 下载地址： 
 
@@ -14,6 +16,8 @@
 `VS Code (64bit) <https://go.microsoft.com/fwlink/?Linkid=852157>`_ 
 
 `Python 3.8.2 (64bit) <https://www.python.org/ftp/python/3.8.2/python-3.8.2-amd64.exe>`_
+
+`MDK_KEIL <http://www.keil.com/fid/1u1q11wb9c9j1w9braw1mmudm139b2p1sd2wd1/files/eval/mdk530.exe>`_
 
 Python 3 + VS Code + GCC(ARM)
 ##############################
@@ -34,5 +38,11 @@ Python 3 + VS Code + GCC(ARM)
 
 * 用VS Code打开SDK目录，点击左侧Extensions（快捷键 ``Ctrl + Shift + X`` ），在搜索框输入 ``@recommended`` ,安装所有Workspace Recommendations插件
 
+MDK-KEIL环境搭建
+##############################
 
+* keil版本需要安装5.25以上
 
+* 打开下载的 `ls_ble_sdk <https://github.com/linkedsemi/ls_ble_sdk>`_ 目录，将当前目录下的 tools\\prog\\LinkedSemi\\flash_prog.elf 文件复制一份并修改文件名为flash_prog.FLM,并将flash_prog.FLM文件拷贝到keil安装目录下的 ARM\\Flash 路径中 
+
+* 仍需要安装 `Python 3.8.2 (64bit) <https://www.python.org/ftp/python/3.8.2/python-3.8.2-amd64.exe>`_
