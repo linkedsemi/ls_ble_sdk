@@ -13,54 +13,20 @@
 #include "reg_rcc.h"
 #include "field_manipulate.h"
 #include "sdk_config.h"
+#include "sleep.h"
+#include "reg_lsgpio.h"
 #define APP_IMAGE_BASE (0x18008000)
 
-#if (SDK_HCLK_MHZ==16)
-XIP_BANNED void switch_to_xo16m()
+XIP_BANNED void swd_pull_down()
 {
-    REG_FIELD_WR(RCC->CFG, RCC_SYSCLK_SW, 1);
-    REG_FIELD_WR(RCC->CFG, RCC_CKCFG, 1);
+    MODIFY_REG(LSGPIOB->PUPD,GPIO_PUPD5_MASK|GPIO_PUPD6_MASK,2<<GPIO_PUPD5_POS | 2<<GPIO_PUPD6_POS);
 }
-
-XIP_BANNED static void clk_switch()
-{
-    switch_to_xo16m();
-}
-
-#else
-XIP_BANNED static void switch_to_pll()
-{
-    REG_FIELD_WR(RCC->CFG, RCC_SYSCLK_SW, 4);
-    REG_FIELD_WR(RCC->CFG, RCC_CKCFG, 1);
-}
-XIP_BANNED static void switch_to_rc32k()
-{
-    REG_FIELD_WR(RCC->CFG, RCC_SYSCLK_SW, 2);
-    REG_FIELD_WR(RCC->CFG, RCC_CKCFG, 1);
-}
-#if (SDK_HCLK_MHZ==32)
-XIP_BANNED static void clk_switch()
-{
-    switch_to_rc32k();
-    REG_FIELD_WR(RCC->CFG, RCC_HCLK_SCAL,0x8);
-    switch_to_pll();
-}
-#elif(SDK_HCLK_MHZ==64)
-XIP_BANNED static void clk_switch()
-{
-    switch_to_rc32k();
-    switch_to_pll();
-}
-#else
-#error HCLK not supported
-#endif
-
-#endif
 
 XIP_BANNED int main()
 {
     clk_switch();
     __disable_irq();
+    swd_pull_down();
     spi_flash_drv_var_init(false,false);
     spi_flash_init();
     spi_flash_qe_status_read_and_set();

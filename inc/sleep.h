@@ -7,6 +7,8 @@
 
 uint8_t get_deep_sleep_enable(void);
 
+void clk_switch(void);
+
 void dcdc_on(void);
 
 void dcdc_off(void);
@@ -19,11 +21,14 @@ void deep_sleep(void);
 
 void ble_sleep(void);
 
-bool is_ble_power_on(void);
-
-void ble_wakeup_request(void);
-
 void ble_irq_clr_and_enable(void);
+
+void ble_wkup_status_set(bool);
+
+bool ble_wkup_status_get(void);
+
+void clr_ble_wkup_req(void);
+
 
 #endif
 
