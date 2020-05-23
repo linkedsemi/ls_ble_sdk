@@ -229,3 +229,9 @@ uint32_t plf_get_reset_error()
 {
     return reset_reason;
 }
+
+void flash_prog_erase_suspend_delay()
+{
+    DELAY_US(20);
+}
+

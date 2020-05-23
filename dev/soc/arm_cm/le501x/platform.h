@@ -2,6 +2,7 @@
 #define PLATFORM_H_
 #include <stdint.h>
 #include <stdbool.h>
+#include "sdk_config.h"
 
 void sys_init_app(void);
 
@@ -24,4 +25,9 @@ void platform_reset(uint32_t error);
 void ecc_calc_start(const uint8_t* secret_key,const uint8_t* pub_x,const uint8_t* pub_y,uint8_t* result_x,uint8_t* result_y,void (*cb)(void *),void *param);
 
 uint64_t idiv_acc(uint32_t,uint32_t,bool);
+
+void arm_cm_delay_asm(uint32_t);
+
+#define DELAY_US(a) arm_cm_delay_asm((a)*(SDK_HCLK_MHZ/4))
+
 #endif

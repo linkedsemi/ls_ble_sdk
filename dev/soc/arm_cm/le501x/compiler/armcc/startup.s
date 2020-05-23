@@ -106,7 +106,7 @@ __Vectors       DCD     __initial_sp              ; Top of Stack
                 DCD    IWDT_Handler
                 DCD    CRYPT_Handler
                 DCD    PDM_Handler
-                DCD    BLE_Handler
+                DCD    BLE_WKUP_Handler
                 DCD    ADC_Handler
                 DCD    ADTIM1_Handler
                 DCD    BSTIM1_Handler
