@@ -45,4 +45,6 @@ MDK-KEIL环境搭建
 
 * 打开下载的 `ls_ble_sdk <https://github.com/linkedsemi/ls_ble_sdk>`_ 目录，将当前目录下的 tools\\prog\\LinkedSemi\\flash_prog.elf 文件复制一份并修改文件名为flash_prog.FLM,并将flash_prog.FLM文件拷贝到keil安装目录下的 ARM\\Flash 路径中 
 
-* 仍需要安装 `Python 3.8.2 (64bit) <https://www.python.org/ftp/python/3.8.2/python-3.8.2-amd64.exe>`_
+* 将fromelf执行文件的所在目录添加系统环境变量中，否则在使用keil编译时会报“fromelf不是内部或外部命令，也不是可运行的程序或批处理文件”的警告
+
+* 仍需要安装 `Python 3.8.2 (64bit) <https://www.python.org/ftp/python/3.8.2/python-3.8.2-amd64.exe>`_ 及Python依赖库

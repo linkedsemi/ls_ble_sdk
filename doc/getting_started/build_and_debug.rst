@@ -43,7 +43,7 @@ JLINK烧录、调试的准备工作
     build/examples/info_sbl.hex
     
 **Protocol Stack**
-    dev/soc/bin/arm_cm/le501x/bin/fw.hex
+    dev/soc/arm_cm/le501x/bin/fw.hex
 
 *开发调试* 阶段，需要预先将上述两个hex文件烧录Flash。
 
