@@ -157,7 +157,6 @@ static void module_init()
     LOG_INIT();
     LOG_I("sys init");
     irq_init();
-    srand(0);
     INIT_BUILTIN_TIMER_ENV();
     lsecc_init();
     lstrng_init();

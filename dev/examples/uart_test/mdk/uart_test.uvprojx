@@ -15,7 +15,7 @@
         <TargetCommonOption>
           <Device>ARMCM0</Device>
           <Vendor>ARM</Vendor>
-          <PackID>ARM.CMSIS.5.3.0</PackID>
+          <PackID>ARM.CMSIS.5.6.0</PackID>
           <PackURL>http://www.keil.com/pack/</PackURL>
           <Cpu>IRAM(0x20000000,0x00020000) IROM(0x00000000,0x00040000) CPUTYPE("Cortex-M0") CLOCK(12000000) ESEL ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
@@ -183,6 +183,7 @@
             <hadXRAM>0</hadXRAM>
             <uocXRam>0</uocXRam>
             <RvdsVP>0</RvdsVP>
+            <RvdsMve>0</RvdsMve>
             <hadIRAM2>0</hadIRAM2>
             <hadIROM2>0</hadIROM2>
             <StupSel>8</StupSel>
@@ -569,6 +570,11 @@
               <FileName>utils.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\module\sha256\utils.c</FilePath>
+            </File>
+            <File>
+              <FileName>delay_asm.s</FileName>
+              <FileType>2</FileType>
+              <FilePath>..\..\..\soc\arm_cm\le501x\compiler\armcc\delay_asm.s</FilePath>
             </File>
           </Files>
         </Group>
