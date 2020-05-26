@@ -33,7 +33,7 @@ extern uint8_t max_profile_num;
 extern uint8_t max_ral_num;
 extern uint8_t max_user_task_num;
 
-uint32_t task_list_buf[9 + SDK_MAX_PROFILE_NUM + SDK_MAX_USER_TASK_NUM];
+uint32_t task_list_buf[10 + SDK_MAX_PROFILE_NUM + SDK_MAX_USER_TASK_NUM];
 
 struct {
     uint32_t env[5];

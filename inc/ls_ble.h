@@ -228,7 +228,8 @@ struct char_permissions
 
 struct att_decl
 {
-    uint8_t *uuid;
+    const uint8_t *uuid;
+    uint16_t max_len;
     struct char_permissions char_perm;
     struct char_properties char_prop; 
     enum uuid_length uuid_len;
@@ -236,7 +237,7 @@ struct att_decl
 
 struct svc_decl
 {
-    uint8_t *uuid;
+    const uint8_t *uuid;
     struct att_decl *att;
     uint8_t nb_att;
     uint8_t    sec_lvl:2,
@@ -388,6 +389,7 @@ enum gatt_evt_type
     SERVER_WRITE_REQ,
     SERVER_NOTIFICATION_DONE,
     SERVER_INDICATION_DONE,
+    SERVER_MTU_CHANGED_INDICATION,
     CLIENT_RECV_NOTIFICATION,
     CLIENT_RECV_INDICATION,
 };
@@ -427,13 +429,18 @@ struct gatt_client_recv_notify_indicate
     uint8_t const *value;
 };
 
+struct gatt_mtu_changed_indicate
+{
+    uint16_t mtu;
+};
+
 union gatt_evt_u
 {
     struct gatt_server_read_req server_read_req;
     struct gatt_server_write_req server_write_req;
     struct gatt_server_notify_indicate_done server_notify_indicate_done;
     struct gatt_client_recv_notify_indicate client_recv_notify_indicate;
-
+    struct gatt_mtu_changed_indicate mtu_changed_ind;
 };
 
 void ble_init(void);
@@ -509,5 +516,7 @@ void gatt_manager_server_send_indication(uint8_t con_idx,uint16_t handle,uint8_t
 void gatt_manager_server_send_notification(uint8_t con_idx,uint16_t handle,uint8_t *data,uint16_t length,uint16_t *transaction_id);
 
 void gatt_manager_client_indication_confirm(uint8_t con_idx,uint16_t handle);
+
+uint16_t gatt_manager_get_svc_att_handle(struct gatt_svc_env *svc,uint8_t att_idx);
 #endif
 
