@@ -231,6 +231,6 @@ uint32_t plf_get_reset_error()
 
 XIP_BANNED void flash_prog_erase_suspend_delay()
 {
-    DELAY_US(20);
+    DELAY_US(5);
 }
 

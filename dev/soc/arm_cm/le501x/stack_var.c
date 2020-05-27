@@ -82,7 +82,7 @@ struct{
 
 struct{
     uint32_t env[2];
-}adv_tx_buf[SDK_MAX_ACT_NUM];
+}adv_tx_buf[4];
 
 struct 
 {
@@ -180,23 +180,3 @@ uint8_t *get_peer_id_buf()
     return peer_id_buf;
 }
 
-#define EM_MACRO_0 (SDK_MAX_ACT_NUM + 2)
-const uint32_t em_end = ((((((((((((((((((((((((((112 * (SDK_MAX_ACT_NUM + 4) + 339) & 0xFFFFFFFC) + 12 * EM_MACRO_0 + 3) & 0xFFFFFFFC)
-                               + 56 * SDK_MAX_RAL_NUM
-                               + 3) & 0xFFFFFFFC)
-                             + 171) & 0xFFFFFFFC)
-                           + 112 * (SDK_MAX_ACT_NUM + 4)
-                           - 445) & 0xFFFFFFFC)
-                         + 70 * SDK_MAX_ACT_NUM
-                         + 3) & 0xFFFFFFFC)
-                       + 63 * SDK_MAX_ACT_NUM
-                       + 3) & 0xFFFFFFFC)
-                     + 1270 * SDK_MAX_ACT_NUM
-                     + 3) & 0xFFFFFFFC)
-                   + 105) & 0xFFFFFFFC)
-                 + 2307) & 0xFFFFFFFC)
-               + (EM_MACRO_0 << 8)
-               + 3) & 0xFFFFFFFC)
-             + 1011) & 0xFFFFFFFC)
-           + 15) & 0xFFFFFFFC)
-         + 12;
