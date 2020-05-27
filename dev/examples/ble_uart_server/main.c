@@ -180,7 +180,7 @@ static void ls_uart_server_send_notification(void)
         uint16_t tx_len = uart_server_rx_index > co_min(UART_SERVER_MAX_DATA_LEN, UART_SVC_TX_MAX_LEN) ? co_min(UART_SERVER_MAX_DATA_LEN, UART_SVC_TX_MAX_LEN) : uart_server_rx_index;
         uart_server_rx_index -= tx_len;
         gatt_manager_server_send_notification(connect_id, handle, uart_server_buf, tx_len, NULL);
-        memmove((void*)&uart_server_buf[0], (void*)&uart_server_buf[tx_len], uart_server_rx_index);
+        memcpy((void*)&uart_server_buf[0], (void*)&uart_server_buf[tx_len], uart_server_rx_index);
     }    
 }
 
