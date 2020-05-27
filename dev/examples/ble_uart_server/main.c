@@ -12,6 +12,7 @@
 
 #define UART_SVC_ADV_NAME "LS UART Server"
 #define UART_SERVER_MAX_MTU  247
+#define UART_SERVER_MTU_DFT  23
 #define UART_SERVER_MAX_DATA_LEN (uart_server_mtu - 3)
 #define UART_SVC_RX_MAX_LEN (UART_SERVER_MAX_MTU - 3)
 #define UART_SVC_TX_MAX_LEN (UART_SERVER_MAX_MTU - 3)
@@ -83,7 +84,7 @@ static uint16_t uart_server_rx_index = 0;
 static UART_HandleTypeDef UART_Server_Config; 
 static bool uart_server_tx_busy;
 static bool uart_server_ntf_done = true;
-static uint16_t uart_server_mtu = UART_SERVER_MAX_MTU;
+static uint16_t uart_server_mtu = UART_SERVER_MTU_DFT;
 static struct builtin_timer *uart_server_timer_inst = NULL;
 
 static uint8_t adv_obj_hdl;
@@ -108,7 +109,7 @@ static void ls_uart_server_timer_cb(void *param)
     if(connect_id != 0xff)
     {
         enter_critical();
-        LOG_I("uart timer out, length=%d", uart_server_rx_index);
+        // LOG_I("uart timer out, length=%d", uart_server_rx_index);
         ls_uart_server_send_notification();
         exit_critical();
     }
@@ -193,6 +194,8 @@ static void gap_manager_callback(enum gap_evt_type type,union gap_evt_u *evt,uin
     break;
     case DISCONNECTED:
         connect_id = 0xff;
+        uart_server_mtu = UART_SERVER_MTU_DFT;
+        dev_manager_start_adv(adv_obj_hdl,advertising_data,sizeof(advertising_data),scan_response_data,sizeof(scan_response_data));
         LOG_I("disconnected!");
     break;
     case CONN_PARAM_REQ:
