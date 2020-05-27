@@ -2,7 +2,7 @@
 #define LOG_DEF_H_
 
 #define JLINK_RTT           1
-#define UART1               2
+#define UART1_LOG           2
 #define RAM_LOG             4
 #define LOG_BACKEND (JLINK_RTT)
 

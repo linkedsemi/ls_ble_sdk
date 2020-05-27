@@ -25,7 +25,7 @@ void log_output(bool linefeed,const char *format,...)
         va_start(args,format);
         rtt_output(linefeed,format,&args);
     }
-    if(LOG_BACKEND&UART1)
+    if(LOG_BACKEND&UART1_LOG)
     {
         va_start(args,format);
 
@@ -44,7 +44,7 @@ void log_init()
     {
         SEGGER_RTT_Init();
     }
-    if(LOG_BACKEND&UART1)
+    if(LOG_BACKEND&UART1_LOG)
     {
 
     }
@@ -88,7 +88,7 @@ void log_hex_output(const void * data_pointer , uint16_t data_length)
     {
         SEGGER_RTT_Write(0,log_format_buff,total_length);
     }
-    if(LOG_BACKEND&UART1)
+    if(LOG_BACKEND&UART1_LOG)
     {
 
     }
