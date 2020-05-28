@@ -29,11 +29,13 @@ Keil+JLink 构建、烧录、调试
 
 烧录
 --------------
-#. 请确保已经完成JLINK烧录、调试的准备工作,如果没有请参考本章节的JLINK烧录、调试的准备工作
+#. 请完成 :ref:`vscode_debug` 中的JLINK烧录、调试的准备工作；
 
-#. 打开ble_sdk_app\\dev\\examples\\sbl\\mdk路径下的工程,编译生成 info_sbl.hex 文件
+#. 打开ble_sdk_app\\dev\\examples\\sbl\\mdk路径下的工程,编译生成 ble_sdk_app\\build\\examples\\info_sbl.hex 文件；
 
-#. 在通过Keil烧录之前,仍然需要先确保芯片内已经烧录了 dev\\soc\\bin\\arm_cm\\le501x\\bin\\fw.hex 和 info_sbl.hex文件。如果已经烧录了这两个文件并且没有执行过flash全部擦除的指令,则可以不用重复烧录 fw.hex 和 info_sbl.hex 
+#. 使用JFlash工具将 build\\examples\\info_sbl.hex 和 dev\\soc\\bin\\arm_cm\\le501x\\bin\\fw.hex 分别烧录到芯片内；
+
+#. 在通过Keil烧录之前,必须要先确保芯片内已经烧录了 dev\\soc\\bin\\arm_cm\\le501x\\bin\\fw.hex 和 info_sbl.hex文件。如果已经烧录了这两个文件并且没有执行过flash全部擦除的指令,则可以不用重复烧录 fw.hex 和 info_sbl.hex； 
 
 #. 使用keil图形界面的DownLoad选项,将编译后的文件下载到flash中
  .. image:: DownLoad.png
