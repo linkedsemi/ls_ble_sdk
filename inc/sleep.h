@@ -29,6 +29,7 @@ bool ble_wkup_status_get(void);
 
 void clr_ble_wkup_req(void);
 
+void irq_disable_before_wfi(void);
 
 #endif
 

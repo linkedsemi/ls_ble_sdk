@@ -167,7 +167,8 @@ void ble_wkup_status_set(bool status)
 void deep_sleep()
 {
     power_down_hardware_modules();
-    SCB->SCR |= (1<<2);
+//    SCB->SCR |= (1<<2);
+    irq_disable_before_wfi();
     cpu_flash_deep_sleep_and_recover();
     irq_reinit();
     ble_wkup_status_set(true);

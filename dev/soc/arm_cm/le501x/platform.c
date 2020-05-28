@@ -82,6 +82,11 @@ void ble_irq_clr_and_enable()
     ble_irq_enable();
 }
 
+void irq_disable_before_wfi()
+{
+    NVIC->ICER[0] = ~(1<<BLE_WKUP_IRQn | 1<<LPWKUP_IRQn);
+}
+
 static uint32_t flash_data_storage_base_offset()
 {
     extern uint32_t __stack_lma__;
@@ -151,6 +156,16 @@ uint32_t get_trng_random(void)
     return result_random;
  }
 
+void rco_calib_mode_set(uint8_t mode)
+{
+    REG_FIELD_WR(SYSCFG->ANACFG1, SYSCFG_RCO_MODE_SEL, mode);
+}
+
+void rco_calibration_start()
+{
+    REG_FIELD_WR(SYSCFG->ANACFG1, SYSCFG_RCO_CAL_START, 1);
+}
+
 static void module_init()
 {
     //TODO
@@ -168,6 +183,8 @@ static void module_init()
     tinyfs_init(base_offset);
     tinyfs_print_dir_tree();
     mac_init();
+    rco_calib_mode_set(1);
+    rco_calibration_start();
     modem_rf_init();
     low_power_mode_set(0);
 }
