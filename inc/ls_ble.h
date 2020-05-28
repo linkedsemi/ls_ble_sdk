@@ -9,6 +9,8 @@
 #define BLE_ADDR_LEN 6
 #define BLE_KEY_LEN 16
 
+#define DEV_NAME_MAX_LEN 0x20
+
 enum gap_own_addr_type
 {
     PUBLIC_OR_RANDOM_STATIC_ADDR,
@@ -260,7 +262,9 @@ enum gap_evt_type
     NUMERIC_COMPARE,
     REQUEST_LEGACY_OOB,
     REQUEST_SC_OOB,
-
+    GET_DEV_INFO_DEV_NAME,
+    GET_DEV_INFO_APPEARANCE,
+    GET_DEV_INFO_SLV_PRE_PARAM,
 };
 
 struct gap_conn_param
@@ -359,6 +363,25 @@ struct gap_numeric_compare
     struct gap_pin_str number;
 };
 
+struct gap_dev_info_dev_name
+{
+    uint16_t length;
+    uint8_t* value;
+};
+
+struct gap_dev_info_appearance
+{
+    uint16_t appearance;
+};
+
+struct gap_dev_info_slave_pref_param
+{
+    uint16_t con_intv_min;
+    uint16_t con_intv_max;
+    uint16_t slave_latency;
+    uint16_t conn_timeout;
+};
+
 union gap_evt_u
 {
     struct gap_connected connected;
@@ -371,6 +394,9 @@ union gap_evt_u
     struct gap_encrypt_done encrypt_done;
     struct gap_display_passkey display_passkey;
     struct gap_numeric_compare numeric_compare;
+    struct gap_dev_info_dev_name get_dev_name;
+    struct gap_dev_info_appearance get_appearance;
+    struct gap_dev_info_slave_pref_param slv_pref_param;
 };
 
 struct gap_update_conn_param

@@ -8,6 +8,21 @@ enum diss_evt_type
     DIS_SERVER_GET_VALUE_IND,
 };
 
+enum diss_char_info
+{
+    DIS_SERVER_MANUFACTURER_NAME_CHAR,
+    DIS_SERVER_MODEL_NB_STR_CHAR,
+    DIS_SERVER_SERIAL_NB_STR_CHAR,
+    DIS_SERVER_HARD_REV_STR_CHAR,
+    DIS_SERVER_FIRM_REV_STR_CHAR,
+    DIS_SERVER_SW_REV_STR_CHAR,
+    DIS_SERVER_SYSTEM_ID_CHAR,
+    DIS_SERVER_IEEE_CHAR,
+    DIS_SERVER_PNP_ID_CHAR,
+
+    DIS_SERVER_CHAR_MAX,
+};
+
 struct diss_set_value_rsp_evt
 {
     uint8_t value;
