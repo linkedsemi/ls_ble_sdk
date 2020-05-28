@@ -13,6 +13,7 @@ LR_FLASH FLASH_BASE_USER FLASH_SIZE{
         *(RESET, +First)
         *(+RW)
         *(.xip_banned)
+		*(:gdef:__aeabi_memcpy)
     }
     
     FLASH_CODE FLASH_BASE_USER+ImageLength(RAM_DATA_CODE) ALIGN 0x4{
