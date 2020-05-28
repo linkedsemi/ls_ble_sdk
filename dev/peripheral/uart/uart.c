@@ -27,8 +27,8 @@ HAL_StatusTypeDef HAL_UART_Init(UART_HandleTypeDef *huart)
 
     /* Check the parameters */
     //TODO
-    uart_sw_reset();
-    uart_clock_enable();
+    uart_sw_reset(huart);
+    uart_clock_enable(huart);
     /* Set the UART Communication parameters */
     UART_SetConfig(huart);
     uart_int_op(HAL_UARTx_IRQHandler,huart,1);
