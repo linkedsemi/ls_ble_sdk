@@ -6,8 +6,5 @@
 
 void lstrng_init(void);
 void lstrng_deinit(void);
-void lstrng_start(void);
-void lstrng_stop(void);
-uint32_t lstrng_getdata(void);
 
 #endif //(__LSTRNG_H__)

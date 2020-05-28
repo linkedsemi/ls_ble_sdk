@@ -6,7 +6,8 @@
 #include "log.h"
 
 #define ENV_BUF_SIZE 2048
-#define DB_BUF_SIZE 4096
+//#define DB_BUF_SIZE 4096
+#define DB_BUF_SIZE 8192
 #if 0
 #define MSG_BUF_SIZE 4096
 #define NON_RET_BUF_SIZE 12
@@ -19,13 +20,15 @@
 extern void (*stack_assert_asm_fn)(uint32_t,uint32_t,uint32_t);
 extern void (*app_init_fn)(void); 
 extern void (*platform_reset_fn)(uint32_t);
-extern int (*rand_fn) (void);
+extern uint32_t (*rand_fn) (void);
 extern uint64_t (*idiv_acc_fn)(uint32_t,uint32_t,bool);
 extern void (*ecc_calc_fn)(const uint8_t*,const uint8_t*,const uint8_t*,uint8_t*,uint8_t*,void (*)(void *),void *);
 extern void (*exit_critical_fn)(void);
 extern void (*enter_critical_fn)(void);
 extern void (*log_output_fn)(bool linefeed,const char *format,...);
 extern void (*log_hex_output_fn)(const void * data_pointer , uint16_t data_length);
+extern void (*aes_encrypt_fn)(void (*)(void),const uint8_t*,const uint8_t*);
+extern void (*aes_encrypt_comp_fn)(void (*)(uint32_t *),uint32_t*);
 
 extern uint8_t main_task;
 extern uint8_t max_activity_num;
@@ -119,13 +122,16 @@ void stack_var_ptr_init()
     stack_assert_asm_fn = stack_assert_asm;
     platform_reset_fn = platform_reset;
     ecc_calc_fn = ecc_calc_start;
-    rand_fn = rand;
+//    rand_fn = rand;
+    rand_fn = lstrng_random;
     idiv_acc_fn = idiv_acc;
     enter_critical_fn = enter_critical;
     exit_critical_fn = exit_critical;
     log_output_fn = log_output;
     log_hex_output_fn = log_hex_output;
-    
+    aes_encrypt_fn = ls_ip_aes_encrypt_start;
+    aes_encrypt_comp_fn = ls_ip_aes_encrypt_complete;
+
     max_activity_num = SDK_MAX_ACT_NUM;
     max_profile_num = SDK_MAX_PROFILE_NUM;
     max_ral_num = SDK_MAX_RAL_NUM;

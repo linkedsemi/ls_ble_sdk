@@ -25,6 +25,9 @@ void platform_reset(uint32_t error);
 void ecc_calc_start(const uint8_t* secret_key,const uint8_t* pub_x,const uint8_t* pub_y,uint8_t* result_x,uint8_t* result_y,void (*cb)(void *),void *param);
 
 uint64_t idiv_acc(uint32_t,uint32_t,bool);
+void ls_ip_aes_encrypt_start(void (*cb)(void),const uint8_t* aes_key,const uint8_t* aes_val);
+void ls_ip_aes_encrypt_complete(void (*cb)(uint32_t *),uint32_t* param);
+uint32_t  lstrng_random(void);
 
 void arm_cm_delay_asm(uint32_t);
 

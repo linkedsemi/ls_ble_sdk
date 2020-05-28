@@ -39,7 +39,7 @@ static const int8_t RF_TX_PW_CONV_TBL[RF_PWR_TBL_SIZE] =
     [7] = -2
 };
 
-// TX max power
+// TX max powerf
 #define RF_POWER_MAX                0xf
 #define RF_POWER_MIN                0
 
@@ -167,11 +167,11 @@ static void rf_reg_init()
                | FIELD_BUILD(RF_PLL_REF_SEL,0)
                | FIELD_BUILD(RF_PLL_VREF_ADJ,0)
                | FIELD_BUILD(RF_PLL_FBDIV_PD_BYPS,0)
-               | FIELD_BUILD(RF_PLL_BW_ADJ,2)
+               | FIELD_BUILD(RF_PLL_BW_ADJ,6)
                | FIELD_BUILD(RF_PLL_LOCK_BYPS,0)
                | FIELD_BUILD(RF_PLL_CP_OS_ADJ,0)
                | FIELD_BUILD(RF_PLL_CP_OS_EN,0)
-               | FIELD_BUILD(RF_PLL_VCO_ADJ,2);
+               | FIELD_BUILD(RF_PLL_VCO_ADJ,2);//2020 5.22CAI 2-6
     RF->REG14 = FIELD_BUILD(RF_PLL_FRAC,0)
                | FIELD_BUILD(RF_DAC_CAL_DATA_EXT,0)
                | FIELD_BUILD(RF_DAC_CAL_EN_EXT,0)
@@ -253,10 +253,19 @@ static void rf_reg_init()
                | FIELD_BUILD(RF_RD_CLK_EN,1)
                | FIELD_BUILD(RF_PLL_TEST_EN,0)
                | FIELD_BUILD(RF_CH_SEL,1)
-               | FIELD_BUILD(RF_PA_VB_SEL,1)
+               | FIELD_BUILD(RF_PA_VB_SEL,0)
                | FIELD_BUILD(RF_PA_VB_TARGET,6)
                | FIELD_BUILD(RF_LDO_START_CNT,6)
-               | FIELD_BUILD(RF_PA_STEP_SET,6);
+               | FIELD_BUILD(RF_PA_STEP_SET,1);
+    RF->REG58 = FIELD_BUILD(RF_EN_DAC_CNT,10)
+               | FIELD_BUILD(RF_PLL_CAL_EN_CNT,0x08)
+               | FIELD_BUILD(RF_PLL_GAIN_CAL_EN_CNT,4)
+               | FIELD_BUILD(RF_EN_PA_CNT,0x58);
+    RF->REG5C = FIELD_BUILD(RF_EN_PA_STG1_CNT,0x5a)
+               | FIELD_BUILD(RF_EN_PA_STG2_CNT,0x5c)
+               | FIELD_BUILD(RF_PLL_LOCK_CNT,0x60)
+               | FIELD_BUILD(RF_EN_RX_CNT,2);
+
 
     RF->REG70 = FIELD_BUILD(RF_RX2MBW_FORCE_EN,0)
                | FIELD_BUILD(RF_INT_VTXD_CHN_THR1,0x19)
@@ -340,7 +349,6 @@ static void pll_gain()
     REG_FIELD_WR(RF->REG50,RF_LDO_TEST_EN,0);
     REG_FIELD_WR(RF->REG50,RF_PLL_TEST_EN,0);
 }
-
 
 static void modem_reg_init()
 {

@@ -139,23 +139,6 @@ static void mac_init()
     RCC->BLECFG &= ~(1<<RCC_BLE_MRST_POS | 1<<RCC_BLE_CRYPT_RST_POS | 1<<RCC_BLE_LCK_RST_POS | 1<<RCC_BLE_AHB_RST_POS | 1<<RCC_BLE_WKUP_RST_POS);
 }
 
-
-uint32_t get_trng_random(void)
-{
-    uint32_t result_random=0;
-    uint8_t cnt_trng=2;
-    do
-    {
-        lstrng_init();
-        lstrng_start();
-        result_random = lstrng_getdata();
-        lstrng_stop();
-        lstrng_deinit();
-    } while(--cnt_trng);
-
-    return result_random;
- }
-
 void rco_calib_mode_set(uint8_t mode)
 {
     REG_FIELD_WR(SYSCFG->ANACFG1, SYSCFG_RCO_MODE_SEL, mode);
@@ -168,15 +151,15 @@ void rco_calibration_start()
 
 static void module_init()
 {
+
     //TODO
     LOG_INIT();
     LOG_I("sys init");
     irq_init();
+    srand(0);
     INIT_BUILTIN_TIMER_ENV();
     lsecc_init();
     lstrng_init();
-    uint32_t random_val = get_trng_random();
-    srand(random_val);
     calc_acc_init();
     cpu_sleep_recover_init();
     uint32_t base_offset = flash_data_storage_base_offset();

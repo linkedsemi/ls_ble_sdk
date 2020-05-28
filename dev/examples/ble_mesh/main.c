@@ -11,6 +11,9 @@
 #include "tinyfs.h"
 #include "sha256.h"
 #include "constants.h"
+#include "lscrypt.h"
+#include "field_manipulate.h"
+#include "reg_lscrypt.h"
 
 #define ALI_COMPANY_ID 0x01a8
 #define COMPA_DATA_PAGES 1
@@ -80,9 +83,9 @@ static uint8_t gen_ali_authValue(void)
     spi_flash_fast_read(TMALL_TRITUPLE_FLASH_OFFSET, &ali_trituple[0], ALI_TRIPLE_SUM_LEN);
     if ((ali_trituple[0] != 0xff) && (ali_trituple[1] != 0xff) && (ali_trituple[2] != 0xff))
     {
-        memcpy((uint8_t *)(&ali_pid_u32), &ali_trituple[0], TRIPLE_PID_LEN);
+        ali_pid_u32 = (((uint32_t)ali_trituple[0])<<24) | (((uint32_t)ali_trituple[1])<< 16) | (((uint32_t)ali_trituple[2])<< 8) | (((uint32_t)ali_trituple[3]));
         memcpy(&ali_mac[0], &ali_trituple[TRIPLE_PID_LEN], TRIPLE_MAC_LEN);
-        memcpy(&ali_secret[0], &ali_trituple[TRIPLE_MAC_LEN], TRIPLE_SECRET_LEN);
+        memcpy(&ali_secret[0], &ali_trituple[TRIPLE_PID_LEN+TRIPLE_MAC_LEN], TRIPLE_SECRET_LEN);
     }
 
     hextostring(ali_mac, mac_str, TRIPLE_MAC_LEN);
@@ -546,6 +549,7 @@ int main()
 {
     led_gpio_func();
     sys_init_app();
+    lscrypt_init();
     gen_ali_authValue();
     ble_init();
     auto_check_unbind();
