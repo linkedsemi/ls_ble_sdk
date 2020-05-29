@@ -5,7 +5,7 @@
 一、 烧录工具获取
 ------------------
 
- :download:`ls_download_tool<./ls_dowloard_tool.7z>`
+ :download:`ls_download_tool<./ls_download_tool.7z>`
 
 ----------------
 二、 操作说明
