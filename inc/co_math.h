@@ -19,7 +19,7 @@
 #include <stdbool.h>       // boolean definitions
 #include <stdlib.h>        // standard library
 
-extern uint32_t (*rand_fn) (void);
+extern int (*rand_fn) (void);
 
 /*
  * MACROS

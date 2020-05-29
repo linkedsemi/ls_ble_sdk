@@ -147,6 +147,13 @@ void rco_calib_mode_set(uint8_t mode)
 void rco_calibration_start()
 {
     REG_FIELD_WR(SYSCFG->ANACFG1, SYSCFG_RCO_CAL_START, 1);
+    uint16_t cal_code;
+    while(REG_FIELD_RD(SYSCFG->ANACFG1, SYSCFG_RCO_CAL_DONE)==0)
+    {
+        cal_code = REG_FIELD_RD(SYSCFG->ANACFG1, SYSCFG_RCO_CAL_CODE);
+        SYSCFG->PMU_ANALOG = cal_code;
+    }
+    REG_FIELD_WR(SYSCFG->ANACFG1, SYSCFG_RCO_CAL_START, 0);
 }
 
 static void module_init()
@@ -156,17 +163,17 @@ static void module_init()
     LOG_INIT();
     LOG_I("sys init");
     irq_init();
-    srand(0);
     INIT_BUILTIN_TIMER_ENV();
     lsecc_init();
     lstrng_init();
+    srand(lstrng_random());
     calc_acc_init();
     cpu_sleep_recover_init();
     uint32_t base_offset = flash_data_storage_base_offset();
     tinyfs_init(base_offset);
     tinyfs_print_dir_tree();
     mac_init();
-    rco_calib_mode_set(1);
+    rco_calib_mode_set(0);
     rco_calibration_start();
     modem_rf_init();
     low_power_mode_set(0);
