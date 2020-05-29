@@ -238,7 +238,7 @@ static void rf_reg_init()
                | FIELD_BUILD(RF_PLL_GAIN_CAL_EN,0)
                | FIELD_BUILD(RF_PLL_GAIN_CAL_DC,1);
     RF->REG30 = FIELD_BUILD(RF_RSV,0x44)
-               | FIELD_BUILD(RF_LDO_PA_TRIM,7)
+               | FIELD_BUILD(RF_LDO_PA_TRIM,6)
                | FIELD_BUILD(RF_EN_LMT_OUTI_EXT,1)
                | FIELD_BUILD(RF_EN_LMT_OUTQ_EXT,1)
                | FIELD_BUILD(RF_PAHP_SEL,0)
@@ -260,10 +260,10 @@ static void rf_reg_init()
     RF->REG58 = FIELD_BUILD(RF_EN_DAC_CNT,10)
                | FIELD_BUILD(RF_PLL_CAL_EN_CNT,0x08)
                | FIELD_BUILD(RF_PLL_GAIN_CAL_EN_CNT,4)
-               | FIELD_BUILD(RF_EN_PA_CNT,0x58);
-    RF->REG5C = FIELD_BUILD(RF_EN_PA_STG1_CNT,0x5a)
-               | FIELD_BUILD(RF_EN_PA_STG2_CNT,0x5c)
-               | FIELD_BUILD(RF_PLL_LOCK_CNT,0x60)
+               | FIELD_BUILD(RF_EN_PA_CNT,0x48);
+    RF->REG5C = FIELD_BUILD(RF_EN_PA_STG1_CNT,0x4a)
+               | FIELD_BUILD(RF_EN_PA_STG2_CNT,0x4c)
+               | FIELD_BUILD(RF_PLL_LOCK_CNT,0x4f)
                | FIELD_BUILD(RF_EN_RX_CNT,2);
 
 
