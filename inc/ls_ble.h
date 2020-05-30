@@ -29,6 +29,12 @@ struct dev_addr
     uint8_t addr[BLE_ADDR_LEN];
 };
 
+struct ble_addr
+{
+    struct dev_addr addr;
+    uint8_t type;
+};
+
 enum sec_lvl_type
 {
     NO_SEC,
@@ -526,6 +532,10 @@ void gap_manager_tk_set(uint8_t con_idx,uint8_t key[BLE_KEY_LEN]);
 uint8_t gap_manager_get_role(uint8_t con_idx);
 
 uint8_t gap_manager_get_sec_lvl(uint8_t con_idx);
+
+void gap_manager_get_peer_addr(uint8_t conidx,struct ble_addr *addr);
+
+void gap_manager_get_identity_addr(uint8_t peer_id,struct ble_addr *addr);
 
 void gap_manager_update_conn_param(uint8_t con_idx,struct gap_update_conn_param *p_param);
 
