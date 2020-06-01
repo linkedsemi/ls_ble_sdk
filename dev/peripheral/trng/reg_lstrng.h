@@ -6,3 +6,4 @@
 
 void lstrng_init(void);
 #endif //(REG_LSTRNG_H_)
+

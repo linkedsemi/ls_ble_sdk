@@ -147,6 +147,13 @@ enum GPIO_AF
     AF_SPI1_NSS1,
     AF_I2S_CLK
 };
+
+enum GPIO_ANA_FUNC
+{
+    ANA_FUNC_DIS = 0,
+    ANA_FUNC1,
+    ANA_FUNC2
+};
 /** @defgroup GPIO_mode define 
   */
 #define SET_GPIO_MODE_GPIO 0x00000000u /*!< gpio Mode    */
@@ -260,7 +267,10 @@ typedef struct  __attribute__((packed))
 
     uint32_t AF_Type; /*!< Specifies GPIO Alternate Function  for the selected pins.
                            This parameter can be a value of @ref GPIO AF define */
-    
+
+    uint32_t ANA_Func; /*!< Specifies GPIO ANA FUNC??for the selected pins.
+                           This parameter can be a value of @ref GPIO ANA FUNC define */
+
     GPIO_EdbcTypeDef Edbc_filter; /*!< Specifies EXTI GPIO EDBC Param for filter.*/
 } GPIO_InitTypeDef;
 
@@ -321,6 +331,10 @@ typedef struct  __attribute__((packed))
                                        REG_FIELD_WR(RCC->AHBEN, RCC_GPIOA, 1);\
                                       } while(0U)
 
+#define __HAL_RCC_GPIOA_CLK_DISABLE()   do { \
+                                       REG_FIELD_WR(RCC->AHBEN, RCC_GPIOA, 0);\
+                                      } while(0U)
+
 #define __HAL_RCC_GPIOA_SLP_ENABLE()   do { \
                                        REG_FIELD_WR(RCC->AHBSL, RCC_GPIOA, 1);\
                                       } while(0U)    
@@ -347,6 +361,10 @@ typedef struct  __attribute__((packed))
                                         REG_FIELD_WR(RCC->AHBRST, RCC_GPIOB, 0);\
                                         REG_FIELD_WR(RCC->AHBEN, RCC_GPIOB, 1);\
                                       } while(0U)
+
+#define __HAL_RCC_GPIOB_CLK_DISABLE()   do { \
+                                        REG_FIELD_WR(RCC->AHBEN, RCC_GPIOB, 0);\
+                                      } while(0U)                                      
 
 #define __HAL_RCC_GPIOB_SLP_ENABLE()   do { \
                                        REG_FIELD_WR(RCC->AHBSL, RCC_GPIOB, 1);\

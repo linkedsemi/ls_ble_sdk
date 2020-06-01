@@ -229,6 +229,19 @@
                 "add-symbol-file build/fw.elf", 
             ]
         },
-
+        {
+            "type": "cortex-debug",
+            "request": "launch",
+            "servertype": "jlink",
+            "cwd": "${workspaceRoot}",
+            "executable": "./build/examples/adc_test.elf",
+            "name": "Debug ADC_TEST",
+            "device": "LE501X",
+            "interface": "swd",
+            "runToMain": false,
+            "preLaunchCommands" :[
+                "monitor flash breakpoints = 0",        
+            ]
+        },
     ]
 }

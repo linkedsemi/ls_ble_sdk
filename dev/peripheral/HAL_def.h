@@ -16,6 +16,33 @@ typedef enum
     HAL_DMAC_NO_AVAILABLE_CHANNEL
 } HAL_StatusTypeDef;
 
+typedef enum
+{
+    DISABLE = 0,
+    ENABLE = !DISABLE
+} FunctionalState;
+
+/**
+  * @brief  HAL Lock structures definition
+  */
+typedef enum
+{
+    HAL_UNLOCKED = 0x00U,
+    HAL_LOCKED = 0x01U
+} HAL_LockTypeDef;
+
+typedef enum
+{
+    RESET = 0,
+    SET = !RESET
+} FlagStatus,
+    ITStatus;
+
+typedef enum
+{
+    ERROR = 0,
+    SUCCESS = !ERROR
+} ErrorStatus;    
 
 #endif    // /* ___LE501X_HAL_DEF */
 

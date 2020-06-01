@@ -14,25 +14,25 @@ typedef struct
 
 enum ECC_REG_ARAM_FIELD
 {
-    ECC_ARAMBIT_MASK = 0xffffffff,
+    ECC_ARAMBIT_MASK = (int)0xffffffff,
     ECC_ARAMBIT_POS = 0,
 };
 
 enum ECC_REG_NRAM_FIELD
 {
-    ECC_NRAMBIT_MASK = 0xffffffff,
+    ECC_NRAMBIT_MASK = (int)0xffffffff,
     ECC_NRAMBIT_POS = 0,
 };
 
 enum ECC_REG_ENG_FIELD
 {
-    ECC_ENGBIT_MASK = 0xffffffff,
+    ECC_ENGBIT_MASK = (int)0xffffffff,
     ECC_ENGBIT_POS = 0,
 };
 
 enum ECC_REG_CON_FIELD
 {
-    ECC_CONBIT_MASK = 0xffffffff,
+    ECC_CONBIT_MASK = (int)0xffffffff,
     ECC_CONBIT_POS = 0,
 };
 
@@ -42,7 +42,7 @@ enum ECC_REG_STAT_FIELD
     ECC_RUNNING_POS = 0,
     ECC_DONE_MASK = 0x2,
     ECC_DONE_POS = 1,
-    ECC_STATBIT_MASK = 0xfffffffc,
+    ECC_STATBIT_MASK = (int)0xfffffffc,
     ECC_STATBIT_POS = 2,
 };
 

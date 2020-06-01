@@ -57,13 +57,13 @@ enum TRNG_REG_SR_FIELD
 
 enum TRNG_REG_DR_FIELD
 {
-    TRNG_DATA_MASK = 0xffffffff,
+    TRNG_DATA_MASK = (int)0xffffffff,
     TRNG_DATA_POS = 0,
 };
 
 enum TRNG_REG_SEED_FIELD
 {
-    TRNG_SEED_MASK = 0xffffffff,
+    TRNG_SEED_MASK = (int)0xffffffff,
     TRNG_SEED_POS = 0,
 };
 

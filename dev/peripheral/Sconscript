@@ -7,7 +7,9 @@ src = [
     'trng/lstrng.c',
     'ecc/lsecc.c',
     'crypt/lscrypt.c',
-    'gpio/lsgpio.c'
+    'gpio/lsgpio.c',
+    'iwdt/lsiwdt.c',
+    'adc/lsadc.c'
 
 ]
 inc = [
@@ -19,6 +21,8 @@ inc = [
     'ecc',
     'crypt',
     'gpio',
+    'iwdt',
+    'adc',
     '.',
 ]
 src_files = File(src)

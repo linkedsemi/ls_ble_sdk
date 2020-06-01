@@ -12,3 +12,5 @@ typedef bool boolean;
 void lsecc_init(void);
 void lsecc_deinit(void);
 #endif //(__LSECC_H__)
+
+

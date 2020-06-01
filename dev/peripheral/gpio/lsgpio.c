@@ -49,7 +49,7 @@ void HAL_GPIO_Init(reg_lsgpio_t *GPIOx, GPIO_InitTypeDef *GPIO_Init)
                 MODIFY_REG(GPIOx->MODE, (GPIO_MODE0_MASK << (position << 1u)), (SET_GPIO_MODE_GPIO << (position << 1u)));
                 MODIFY_REG(GPIOx->OD, (GPIO_OD0_MASK << (position << 1u)), (GPIO_Init->Driver_Pwr << (position << 1u)));
                 MODIFY_REG(GPIOx->OE, (GPIO_OE0_MASK << position), (GPIO_OUTPUT_EN << position));
-								MODIFY_REG(GPIOx->IE, (GPIO_IE0_MASK << position), (0U << position));
+                MODIFY_REG(GPIOx->IE, (GPIO_IE0_MASK << position), (0U << position));
                 break;
             case GPIO_MODE_AF:
                 configregister = (iocurrent < GPIO_PIN_8) ? ((iocurrent < GPIO_PIN_4) ? (&(GPIOx->AF0)) : (&(GPIOx->AF1))) : ((iocurrent < GPIO_PIN_12) ? (&(GPIOx->AF2)) : (&(GPIOx->AF3)));
@@ -87,13 +87,13 @@ void HAL_GPIO_Init(reg_lsgpio_t *GPIOx, GPIO_InitTypeDef *GPIO_Init)
                 MODIFY_REG(GPIOx->MODE, (GPIO_MODE0_MASK << (position << 1u)), (SET_GPIO_MODE_GPIO << (position << 1u)));
                 MODIFY_REG(GPIOx->FLT, (GPIO_FLT0_MASK << position), ((GPIO_Init->Filter) << position));
                 MODIFY_REG(GPIOx->IE, (GPIO_IE0_MASK << position), (GPIO_INPUT_EN << position));
-								MODIFY_REG(GPIOx->OE, (GPIO_OE0_MASK << position), (0U << position));
+                MODIFY_REG(GPIOx->OE, (GPIO_OE0_MASK << position), (0U << position));
                 break;
 
             /* If we are configuring the pin in INPUT analog mode */
             case GPIO_MODE_ANALOG:
                 MODIFY_REG(GPIOx->MODE, (GPIO_MODE0_MASK << (position << 1u)), (SET_GPIO_MODE_ANALOG << (position << 1u)));
-                MODIFY_REG(GPIOx->AE, (GPIO_AE0_MASK << position), (GPIO_ANA_EN << position));
+                MODIFY_REG(GPIOx->AE, (GPIO_AE0_MASK << (position << 1u)), (GPIO_Init->ANA_Func << (position << 1u)));
                 break;
 
                 /* If we are configuring the pin in Test mode */
