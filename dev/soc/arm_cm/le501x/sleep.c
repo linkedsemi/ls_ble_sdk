@@ -35,51 +35,6 @@ XIP_BANNED void dcdc_on()
 
 #endif
 
-
-#if (SDK_HCLK_MHZ==16)
-XIP_BANNED void switch_to_xo16m()
-{
-    REG_FIELD_WR(RCC->CFG, RCC_SYSCLK_SW, 1);
-    REG_FIELD_WR(RCC->CFG, RCC_CKCFG, 1);
-}
-
-XIP_BANNED void clk_switch()
-{
-    switch_to_xo16m();
-}
-
-#else
-XIP_BANNED static void switch_to_pll()
-{
-    REG_FIELD_WR(RCC->CFG, RCC_SYSCLK_SW, 4);
-    REG_FIELD_WR(RCC->CFG, RCC_CKCFG, 1);
-}
-XIP_BANNED static void switch_to_rc32k()
-{
-    REG_FIELD_WR(RCC->CFG, RCC_SYSCLK_SW, 2);
-    REG_FIELD_WR(RCC->CFG, RCC_CKCFG, 1);
-}
-
-#if (SDK_HCLK_MHZ==32)
-XIP_BANNED void clk_switch()
-{
-    switch_to_rc32k();
-    REG_FIELD_WR(RCC->CFG, RCC_HCLK_SCAL,0x8);
-    switch_to_pll();
-}
-#elif(SDK_HCLK_MHZ==64)
-XIP_BANNED void clk_switch()
-{
-    switch_to_rc32k();
-    switch_to_pll();
-}
-#else
-#error HCLK not supported
-#endif
-
-#endif
-
-
 uint8_t get_deep_sleep_enable(void)
 {
     return SDK_DEEP_SLEEP_ENABLE;

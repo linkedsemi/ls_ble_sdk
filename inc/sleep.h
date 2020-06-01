@@ -7,8 +7,6 @@
 
 uint8_t get_deep_sleep_enable(void);
 
-void clk_switch(void);
-
 void dcdc_on(void);
 
 void dcdc_off(void);

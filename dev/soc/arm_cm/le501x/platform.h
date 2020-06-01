@@ -4,6 +4,8 @@
 #include <stdbool.h>
 #include "sdk_config.h"
 
+void clk_switch(void);
+
 void sys_init_app(void);
 
 void sys_init_itf(void);

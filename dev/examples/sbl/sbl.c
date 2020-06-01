@@ -13,7 +13,7 @@
 #include "reg_rcc.h"
 #include "field_manipulate.h"
 #include "sdk_config.h"
-#include "sleep.h"
+#include "platform.h"
 #include "reg_lsgpio.h"
 #define APP_IMAGE_BASE (0x18008000)
 
