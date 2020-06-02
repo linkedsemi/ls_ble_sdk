@@ -20,6 +20,7 @@
 #include "reg_syscfg.h"
 #include "lsecc.h"
 #include "lstrng.h"
+#include "lscrypt.h"
 #include "field_manipulate.h"
 #define BASEBAND_MEMORY_ADDR   (0x50004000)
 #define IRQ_NVIC_PRIO(IRQn,priority) (((priority << (8U - __NVIC_PRIO_BITS)) & (uint32_t)0xFFUL) << _BIT_SHIFT(IRQn))
@@ -166,6 +167,7 @@ static void module_init()
     INIT_BUILTIN_TIMER_ENV();
     lsecc_init();
     lstrng_init();
+    lscrypt_init();
     srand(lstrng_random());
     calc_acc_init();
     cpu_sleep_recover_init();

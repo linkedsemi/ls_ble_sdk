@@ -33,7 +33,6 @@
 #define __HAL_RCC_CRYPT_DSLP_DISABLE()   do { \
                                        REG_FIELD_WR(RCC->APB1DSL, RCC_CRYPT, 0);\
                                       } while(0U)
-void lscrypt_init(void);
 
 #endif //(REG_LSCRYPT_H_)
 																			

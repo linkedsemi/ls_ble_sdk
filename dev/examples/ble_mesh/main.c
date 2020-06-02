@@ -549,7 +549,6 @@ int main()
 {
     led_gpio_func();
     sys_init_app();
-    lscrypt_init();
     gen_ali_authValue();
     ble_init();
     auto_check_unbind();
