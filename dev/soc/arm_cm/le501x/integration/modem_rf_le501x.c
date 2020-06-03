@@ -40,7 +40,7 @@ static const int8_t RF_TX_PW_CONV_TBL[RF_PWR_TBL_SIZE] =
 };
 
 // TX max powerf
-#define RF_POWER_MAX                0xf
+#define RF_POWER_MAX                0x4
 #define RF_POWER_MIN                0
 
 

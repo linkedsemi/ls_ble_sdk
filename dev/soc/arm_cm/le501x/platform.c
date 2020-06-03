@@ -186,6 +186,7 @@ static void analog_init()
     dcdc_on();
 //    SYSCFG->ANACFG0 = 0x30100a78;
 //    SYSCFG->ANACFG1 = 0xb0a30000;
+    REG_FIELD_WR(SYSCFG->CFG, SYSCFG_XO16M_CAP_TRIM, 0x20);
     clk_switch();
 }
 
