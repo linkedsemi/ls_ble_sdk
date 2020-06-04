@@ -147,6 +147,7 @@ void rco_calib_mode_set(uint8_t mode)
 
 void rco_calibration_start()
 {
+    REG_FIELD_WR(SYSCFG->ANACFG1, SYSCFG_EN_RCO_DIG_PWR, 1);
     REG_FIELD_WR(SYSCFG->ANACFG1, SYSCFG_RCO_CAL_START, 1);
     uint16_t cal_code;
     while(REG_FIELD_RD(SYSCFG->ANACFG1, SYSCFG_RCO_CAL_DONE)==0)
@@ -155,6 +156,7 @@ void rco_calibration_start()
         SYSCFG->PMU_ANALOG = cal_code;
     }
     REG_FIELD_WR(SYSCFG->ANACFG1, SYSCFG_RCO_CAL_START, 0);
+    REG_FIELD_WR(SYSCFG->ANACFG1, SYSCFG_EN_RCO_DIG_PWR, 0);
 }
 
 static void module_init()
@@ -186,8 +188,13 @@ static void analog_init()
     dcdc_on();
 //    SYSCFG->ANACFG0 = 0x30100a78;
 //    SYSCFG->ANACFG1 = 0xb0a30000;
+    if(clk_check()==false)
+    {
+        clk_switch();
+    }
+    REG_FIELD_WR(SYSCFG->ANACFG1, SYSCFG_OSCRC_DIG_PWR_EN,0);
+    REG_FIELD_WR(SYSCFG->ANACFG1, SYSCFG_ADC12B_DIG_PWR_EN, 0);
     REG_FIELD_WR(SYSCFG->CFG, SYSCFG_XO16M_CAP_TRIM, 0x20);
-    clk_switch();
 }
 
 static void var_init()
@@ -245,54 +252,58 @@ XIP_BANNED void flash_prog_erase_suspend_delay()
     DELAY_US(5);
 }
 
+XIP_BANNED void switch_to_rc32k()
+{
+    MODIFY_REG(RCC->CFG, RCC_SYSCLK_SW_MASK| RCC_HCLK_SCAL_MASK| RCC_CKCFG_MASK, 2 <<RCC_SYSCLK_SW_POS | 1<<RCC_CKCFG_POS);
+}
 
-#if (SDK_HCLK_MHZ==16)
 XIP_BANNED void switch_to_xo16m()
 {
-    REG_FIELD_WR(RCC->CFG, RCC_SYSCLK_SW, 1);
-    REG_FIELD_WR(RCC->CFG, RCC_CKCFG, 1);
+    MODIFY_REG(RCC->CFG, RCC_HCLK_SCAL_MASK | RCC_CKCFG_MASK | RCC_SYSCLK_SW_MASK, 1<<RCC_CKCFG_POS | 1<<RCC_SYSCLK_SW_POS);
+}
+
+#if (SDK_HCLK_MHZ==16)
+XIP_BANNED bool clk_check()
+{
+    uint32_t rcc_cfg = RCC->CFG;
+    return REG_FIELD_RD(rcc_cfg, RCC_SYSCLK_SW) == 1 && REG_FIELD_RD(rcc_cfg, RCC_HCLK_SCAL) == 0;
 }
 
 XIP_BANNED void clk_switch()
 {
-    if(REG_FIELD_RD(RCC->CFG, RCC_SYSCLK_SW)!=1)
-    {
-        REG_FIELD_WR(RCC->CFG, RCC_HCLK_SCAL, 0);
-        switch_to_xo16m();
-    }
+    switch_to_xo16m();
 }
 
 #else
-XIP_BANNED static void switch_to_pll()
+XIP_BANNED static void switch_to_pll(uint8_t hclk_scal)
 {
-    REG_FIELD_WR(RCC->CFG, RCC_SYSCLK_SW, 4);
-    REG_FIELD_WR(RCC->CFG, RCC_CKCFG, 1);
-}
-XIP_BANNED static void switch_to_rc32k()
-{
-    REG_FIELD_WR(RCC->CFG, RCC_SYSCLK_SW, 2);
-    REG_FIELD_WR(RCC->CFG, RCC_CKCFG, 1);
+    MODIFY_REG(RCC->CFG, RCC_SYSCLK_SW_MASK| RCC_HCLK_SCAL_MASK| RCC_CKCFG_MASK, 4 <<RCC_SYSCLK_SW_POS | 1<<RCC_CKCFG_POS | hclk_scal << RCC_HCLK_SCAL_POS);
 }
 
+
 #if (SDK_HCLK_MHZ==32)
+
+XIP_BANNED bool clk_check()
+{
+    uint32_t rcc_cfg = RCC->CFG;
+    return REG_FIELD_RD(rcc_cfg, RCC_SYSCLK_SW) == 4 && REG_FIELD_RD(rcc_cfg, RCC_HCLK_SCAL) == 0x8;
+}
+
 XIP_BANNED void clk_switch()
 {
-    if(REG_FIELD_RD(RCC->CFG, RCC_SYSCLK_SW)!=4 || REG_FIELD_RD(RCC->CFG, RCC_HCLK_SCAL) != 0x8)
-    {
-        switch_to_rc32k();
-        REG_FIELD_WR(RCC->CFG, RCC_HCLK_SCAL,0x8);
-        switch_to_pll();
-    }
+    switch_to_pll(0x8);
 }
 #elif(SDK_HCLK_MHZ==64)
+
+XIP_BANNED bool clk_check()
+{
+    uint32_t rcc_cfg = RCC->CFG;
+    return REG_FIELD_RD(rcc_cfg, RCC_SYSCLK_SW) == 4 && REG_FIELD_RD(rcc_cfg, RCC_HCLK_SCAL) == 0;
+}
+
 XIP_BANNED void clk_switch()
 {
-    if(REG_FIELD_RD(RCC->CFG, RCC_SYSCLK_SW)!=4 || REG_FIELD_RD(RCC->CFG, RCC_HCLK_SCAL) != 0)
-    {
-        switch_to_rc32k();
-        REG_FIELD_WR(RCC->CFG, RCC_HCLK_SCAL,0);
-        switch_to_pll();
-    }
+    switch_to_pll(0);
 }
 #else
 #error HCLK not supported

@@ -4,6 +4,12 @@
 #include <stdbool.h>
 #include "sdk_config.h"
 
+void switch_to_rc32k(void);
+
+void switch_to_xo16m(void);
+
+bool clk_check(void);
+
 void clk_switch(void);
 
 void sys_init_app(void);

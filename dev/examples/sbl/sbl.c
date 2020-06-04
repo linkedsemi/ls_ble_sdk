@@ -24,6 +24,7 @@ XIP_BANNED void swd_pull_down()
 
 XIP_BANNED int main()
 {
+    switch_to_rc32k();
     clk_switch();
     __disable_irq();
     swd_pull_down();

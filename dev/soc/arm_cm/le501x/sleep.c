@@ -25,12 +25,12 @@ XIP_BANNED void dcdc_on(){}
 #else
 XIP_BANNED void dcdc_off()
 {
-//    REG_FIELD_WR(SYSCFG->DCDC, SYSCFG_EN, 0);
+    REG_FIELD_WR(SYSCFG->DCDC, SYSCFG_EN, 0);
 }
 
 XIP_BANNED void dcdc_on()
 {
-//    REG_FIELD_WR(SYSCFG->DCDC, SYSCFG_EN, 1);
+    REG_FIELD_WR(SYSCFG->DCDC, SYSCFG_EN, 1);
 }
 
 #endif
@@ -42,14 +42,30 @@ uint8_t get_deep_sleep_enable(void)
 
 XIP_BANNED void before_wfi()
 {
-//    switch_to_xo16m();
-//    SYSCFG->ANACFG0 &= ~(SYSCFG_EN_DPLL_MASK | SYSCFG_EN_DPLL_16M_RF_MASK | SYSCFG_EN_DPLL_128M_RF_MASK | SYSCFG_EN_DPLL_128M_EXT_MASK | SYSCFG_EN_QCLK_MASK);
-//    SYSCFG->ANACFG0 = 0xf010000;
-
     while(REG_FIELD_RD(SYSCFG->PMU_PWR, SYSCFG_BLE_PWR3_ST));
+    switch_to_xo16m();
+    SYSCFG->ANACFG0 &= ~(SYSCFG_EN_DPLL_MASK | SYSCFG_EN_DPLL_16M_RF_MASK | SYSCFG_EN_DPLL_128M_RF_MASK | SYSCFG_EN_DPLL_128M_EXT_MASK | SYSCFG_EN_QCLK_MASK);
     MODIFY_REG(SYSCFG->ANACFG1,SYSCFG_XO16M_ADJ_MASK | SYSCFG_XO16M_LP_MASK,
         3<<SYSCFG_XO16M_ADJ_POS | 0<<SYSCFG_XO16M_LP_POS);
     dcdc_off();
+}
+
+XIP_BANNED static void wait_dpll_lock()
+{
+    uint32_t i = 0;
+    while(1)
+    {
+        if(REG_FIELD_RD(SYSCFG->ANACFG0, SYSCFG_DPLL_LOCK))
+        {
+
+            break;
+        }
+        if(i>10)
+        {
+            break;
+        }
+        i += 1;
+    }
 }
 
 XIP_BANNED void after_wfi()
@@ -57,6 +73,10 @@ XIP_BANNED void after_wfi()
     dcdc_on();
     MODIFY_REG(SYSCFG->ANACFG1,SYSCFG_XO16M_ADJ_MASK | SYSCFG_XO16M_LP_MASK,
         0<<SYSCFG_XO16M_ADJ_POS | 1<<SYSCFG_XO16M_LP_POS);
+    SYSCFG->ANACFG0 |= (SYSCFG_EN_DPLL_MASK | SYSCFG_EN_DPLL_16M_RF_MASK | SYSCFG_EN_DPLL_128M_RF_MASK | SYSCFG_EN_DPLL_128M_EXT_MASK | SYSCFG_EN_QCLK_MASK);
+    wait_dpll_lock();
+    clk_switch();
+    LS_RAM_ASSERT(REG_FIELD_RD(SYSCFG->PMU_PWR, SYSCFG_BLE_PWR3_ST)==0);
 }
 
 
@@ -104,10 +124,7 @@ void low_power_mode_set(uint8_t mode)
                     | FIELD_BUILD(SYSCFG_WKUP_EDGE,0x8)
                     | FIELD_BUILD(SYSCFG_WKUP_EN, 0x8);
     REG_FIELD_WR(SYSCFG->PMU_TRIM, SYSCFG_XTAL_STBTIME, XTAL_STB_VAL);
-    REG_FIELD_WR(SYSCFG->ANACFG1, SYSCFG_ADC12B_DIG_PWR_EN,0);
-    REG_FIELD_WR(SYSCFG->ANACFG1, SYSCFG_OSCRC_DIG_PWR_EN,0);
     REG_FIELD_WR(SYSCFG->PMU_TRIM,SYSCFG_LDO_LP_TRIM,5);
-    REG_FIELD_WR(SYSCFG->ANACFG1,SYSCFG_EN_RCO_DIG_PWR,0);
 }
 
 static void power_down_hardware_modules()
