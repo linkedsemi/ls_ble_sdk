@@ -33,9 +33,9 @@ Keil+JLink 构建、烧录、调试
 
 #. 打开ble_sdk_app\\dev\\examples\\sbl\\mdk路径下的工程,编译生成 sbl\\mdk\\UVBuild\\info_sbl.hex 文件；
 
-#. 使用JFlash工具将 info_sbl.hex 和 dev\\soc\\bin\\arm_cm\\le501x\\bin\\fw.hex 分别烧录到芯片内；
+#. 使用JFlash工具将 info_sbl.hex 和 dev\\soc\\arm_cm\\le501x\\bin\\fw.hex 分别烧录到芯片内；
 
-#. 在通过Keil烧录之前,必须要先确保芯片内已经烧录了 dev\\soc\\bin\\arm_cm\\le501x\\bin\\fw.hex 和 info_sbl.hex文件。如果已经烧录了这两个文件并且没有执行过flash全部擦除的指令,则可以不用重复烧录 fw.hex 和 info_sbl.hex； 
+#. 在通过Keil烧录之前,必须要先确保芯片内已经烧录了 dev\\soc\\arm_cm\\le501x\\bin\\fw.hex 和 info_sbl.hex文件。如果已经烧录了这两个文件并且没有执行过flash全部擦除的指令,则可以不用重复烧录 fw.hex 和 info_sbl.hex； 
 
 #. 使用keil图形界面的DownLoad选项,将编译后的文件下载到flash中
  .. image:: DownLoad.png
