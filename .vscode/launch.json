@@ -243,5 +243,19 @@
                 "monitor flash breakpoints = 0",        
             ]
         },
+        {
+            "type": "cortex-debug",
+            "request": "launch",
+            "servertype": "jlink",
+            "cwd": "${workspaceRoot}",
+            "executable": "./build/examples/gpio_test.elf",
+            "name": "Debug GPIO_TEST",
+            "device": "LE501X",
+            "interface": "swd",
+            "runToMain": false,
+            "preLaunchCommands" :[
+                "monitor flash breakpoints = 0",        
+            ]
+        },
     ]
 }

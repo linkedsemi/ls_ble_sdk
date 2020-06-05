@@ -155,18 +155,6 @@ void HAL_GPIO_Init(reg_lsgpio_t *GPIOx, GPIO_InitTypeDef *GPIO_Init)
                     CLEAR_BIT(EXTI->EFTS, iocurrent);
                 }
 
-                /* Enable or disable the Rising/falling trigger */
-                if ((GPIO_Init->Mode & RISING_FALLING_EDGE) == RISING_FALLING_EDGE)
-                {
-                    SET_BIT(EXTI->EFTS, iocurrent);
-                    SET_BIT(EXTI->ERTS, iocurrent);
-                }
-                else
-                {
-                    CLEAR_BIT(EXTI->EFTS, iocurrent);
-                    CLEAR_BIT(EXTI->ERTS, iocurrent);
-                }
-
                 /* Enable or disable the filter function */
                 if ((GPIO_Init->Mode & EXTI_FLT_MODE) == EXTI_FLT_MODE)
                 {

@@ -1,6 +1,4 @@
-
-
-Import('image_build')
+Import('app_build')
 
 src = [
     'main.c'
@@ -8,5 +6,4 @@ src = [
 inc = [
     '.'
 ]
-
-app_env,app_target = image_build('gpio_test',src,inc,'ram_link.txt')
+app_build('gpio_test',src,inc)
