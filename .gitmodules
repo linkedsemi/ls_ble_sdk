@@ -1,3 +1,6 @@
 [submodule "stack"]
 	path = stack
 	url = http://10.10.20.8/diffusion/STACK/ble_sdk_stack.git
+[submodule "dev/examples/mesh_app"]
+	path = dev/examples/mesh_app
+	url = http://10.10.20.8/diffusion/M/mesh_app.git
