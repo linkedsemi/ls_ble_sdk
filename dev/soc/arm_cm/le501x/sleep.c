@@ -20,10 +20,10 @@ void cpu_sleep_asm(void);
 void cpu_recover_asm(void);
 
 #if SDK_DCDC_BYPASS
-XIP_BANNED void dcdc_off(){}
+void dcdc_off(){}
 XIP_BANNED void dcdc_on(){}
 #else
-XIP_BANNED void dcdc_off()
+void dcdc_off()
 {
     REG_FIELD_WR(SYSCFG->DCDC, SYSCFG_EN, 0);
 }
@@ -47,7 +47,6 @@ XIP_BANNED void before_wfi()
     SYSCFG->ANACFG0 &= ~(SYSCFG_EN_DPLL_MASK | SYSCFG_EN_DPLL_16M_RF_MASK | SYSCFG_EN_DPLL_128M_RF_MASK | SYSCFG_EN_DPLL_128M_EXT_MASK | SYSCFG_EN_QCLK_MASK);
     MODIFY_REG(SYSCFG->ANACFG1,SYSCFG_XO16M_ADJ_MASK | SYSCFG_XO16M_LP_MASK,
         3<<SYSCFG_XO16M_ADJ_POS | 0<<SYSCFG_XO16M_LP_POS);
-    dcdc_off();
 }
 
 XIP_BANNED static void wait_dpll_lock()
