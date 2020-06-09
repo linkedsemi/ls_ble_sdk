@@ -1,6 +1,7 @@
 #ifndef _LS_MESH_H_
 #define _LS_MESH_H_
 #include <stdint.h>
+#include "ls_ble.h"
 #define __EMPTY
 typedef uint8_t SIGMESH_ModelHandle_TypeDef;
 typedef uint8_t SIGMESH_NodeInfo_TypeDef;
@@ -58,6 +59,7 @@ enum mesh_evt_type
     MESH_ACCEPT_MODEL_INFO = 17,
     MESH_RSP_MODEL_INFO = 18,
     MESH_REPORT_TIMER_STATE = 19,
+    MESH_ADV_REPORT = 20
 };
 
 /// Mesh Supported Features
@@ -178,6 +180,7 @@ union mesh_evt_u {
     struct report_mesh_prov_result_info prov_rslt_sate;
     struct model_rx_info rx_msg;
     struct report_mesh_timer_state_info mesh_timer_state;
+    struct adv_report_evt adv_report;
 };
 
 struct ls_mesh_cfg
