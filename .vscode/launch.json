@@ -226,7 +226,6 @@
                 "monitor flash breakpoints = 0",        
             ]
         },
-        ,
         {
             "type": "cortex-debug",
             "request": "launch",
