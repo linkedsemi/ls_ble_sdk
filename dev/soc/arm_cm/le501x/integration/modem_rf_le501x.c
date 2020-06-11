@@ -11,7 +11,10 @@
 #define PLL_GAIN_CAL_FRQ_DIS0  20
 
 uint8_t   pll_int_vtxd_ext;
-
+struct {
+    uint8_t ldo_tx_trim:3,
+            ldo_rx_trim:3;
+}rf_ret;
 
 // Gain table
 static const uint8_t RF_RX_GAIN_TBL[RF_GAIN_TBL_SIZE] =
@@ -132,8 +135,8 @@ static void rf_reg_init()
                | FIELD_BUILD(RF_MIXH_GAIN_CTL,0)
                | FIELD_BUILD(RF_BPF_GAIN_ADJ,3)
                | FIELD_BUILD(RF_MIX_ENB_CAP,0);
-    RF->REG08 = FIELD_BUILD(RF_LDO_RX_TRIM,4)
-               | FIELD_BUILD(RF_LDO_TX_TRIM,4)
+    RF->REG08 = FIELD_BUILD(RF_LDO_RX_TRIM,rf_ret.ldo_rx_trim)
+               | FIELD_BUILD(RF_LDO_TX_TRIM,rf_ret.ldo_tx_trim)
                | FIELD_BUILD(RF_CF_BW12M_ADJ,0)
                | FIELD_BUILD(RF_TX_RATE,0)
                | FIELD_BUILD(RF_CF_BW08M_ADJ,0)
@@ -361,6 +364,13 @@ static void modem_reg_init()
                | FIELD_BUILD(MDM2_LR_ACC_INVERT,0);
 }
 
+static void rf_reg_retention()
+{
+    uint32_t rf_reg08 = RF->REG08;
+    rf_ret.ldo_tx_trim = REG_FIELD_RD(rf_reg08,RF_LDO_TX_TRIM);
+    rf_ret.ldo_rx_trim = REG_FIELD_RD(rf_reg08,RF_LDO_RX_TRIM);
+}
+
 void modem_rf_reinit()
 {
     rf_reg_init();
@@ -370,6 +380,7 @@ void modem_rf_reinit()
 void modem_rf_init()
 {
     RCC->APB1EN |= 1<<RCC_RF_POS | 1<<RCC_MDM2_POS;
+    rf_reg_retention();
     modem_rf_reinit();
     pll_gain();
 }

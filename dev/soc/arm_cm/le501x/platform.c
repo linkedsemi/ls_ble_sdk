@@ -186,15 +186,13 @@ static void module_init()
 static void analog_init()
 {
     dcdc_on();
-//    SYSCFG->ANACFG0 = 0x30100a78;
-//    SYSCFG->ANACFG1 = 0xb0a30000;
     if(clk_check()==false)
     {
         clk_switch();
     }
     REG_FIELD_WR(SYSCFG->ANACFG1, SYSCFG_OSCRC_DIG_PWR_EN,0);
-    REG_FIELD_WR(SYSCFG->ANACFG1, SYSCFG_ADC12B_DIG_PWR_EN, 0);
-    REG_FIELD_WR(SYSCFG->CFG, SYSCFG_XO16M_CAP_TRIM, 0x20);
+    //REG_FIELD_WR(SYSCFG->ANACFG1, SYSCFG_ADC12B_DIG_PWR_EN, 0);
+
 }
 
 static void var_init()

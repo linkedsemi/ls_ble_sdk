@@ -40,9 +40,15 @@ uint8_t get_deep_sleep_enable(void)
     return SDK_DEEP_SLEEP_ENABLE;
 }
 
+XIP_BANNED static void ble_hclk_clr()
+{
+    REG_FIELD_WR(RCC->BLECFG, RCC_BLE_AHBEN, 0);
+}
+
 XIP_BANNED void before_wfi()
 {
     while(REG_FIELD_RD(SYSCFG->PMU_PWR, SYSCFG_BLE_PWR3_ST));
+    ble_hclk_clr();
     switch_to_xo16m();
     SYSCFG->ANACFG0 &= ~(SYSCFG_EN_DPLL_MASK | SYSCFG_EN_DPLL_16M_RF_MASK | SYSCFG_EN_DPLL_128M_RF_MASK | SYSCFG_EN_DPLL_128M_EXT_MASK | SYSCFG_EN_QCLK_MASK);
     MODIFY_REG(SYSCFG->ANACFG1,SYSCFG_XO16M_ADJ_MASK | SYSCFG_XO16M_LP_MASK,
@@ -67,9 +73,15 @@ XIP_BANNED static void wait_dpll_lock()
     }
 }
 
+XIP_BANNED static void wkup_ble()
+{
+    RCC->BLECFG |= RCC_BLE_WKUP_RST_MASK;
+}
+
 XIP_BANNED void after_wfi()
 {
     dcdc_on();
+    wkup_ble();
     MODIFY_REG(SYSCFG->ANACFG1,SYSCFG_XO16M_ADJ_MASK | SYSCFG_XO16M_LP_MASK,
         0<<SYSCFG_XO16M_ADJ_POS | 1<<SYSCFG_XO16M_LP_POS);
     SYSCFG->ANACFG0 |= (SYSCFG_EN_DPLL_MASK | SYSCFG_EN_DPLL_16M_RF_MASK | SYSCFG_EN_DPLL_128M_RF_MASK | SYSCFG_EN_DPLL_128M_EXT_MASK | SYSCFG_EN_QCLK_MASK);
@@ -92,11 +104,6 @@ XIP_BANNED static void power_up_hardware_modules()
     while((SYSCFG->PMU_PWR & (SYSCFG_PERI_PWR2_ST_MASK)));
     SYSCFG->PMU_PWR = FIELD_BUILD(SYSCFG_PERI_PWR2_PD, 0) 
                     | FIELD_BUILD(SYSCFG_PERI_ISO2_EN,0);
-}
-
-XIP_BANNED static void wkup_ble()
-{
-    RCC->BLECFG |= RCC_BLE_WKUP_RST_MASK;
 }
 
 void clr_ble_wkup_req()
@@ -123,7 +130,6 @@ void low_power_mode_set(uint8_t mode)
                     | FIELD_BUILD(SYSCFG_WKUP_EDGE,0x8)
                     | FIELD_BUILD(SYSCFG_WKUP_EN, 0x8);
     REG_FIELD_WR(SYSCFG->PMU_TRIM, SYSCFG_XTAL_STBTIME, XTAL_STB_VAL);
-    REG_FIELD_WR(SYSCFG->PMU_TRIM,SYSCFG_LDO_LP_TRIM,5);
 }
 
 static void power_down_hardware_modules()
@@ -137,14 +143,27 @@ void ble_wkup_status_set(bool status)
     waiting_ble_wkup_irq = status;
 }
 
+static void ble_hclk_set()
+{
+    REG_FIELD_WR(RCC->BLECFG, RCC_BLE_AHBEN, 1);
+}
+
+static void ble_hclk_restore()
+{
+    LS_ASSERT(REG_FIELD_RD(SYSCFG->PMU_PWR,SYSCFG_BLE_PWR3_ST)==0);
+    while(REG_FIELD_RD(SYSCFG->PMU_PWR,SYSCFG_BLE_PWR3_ST)==0);
+    ble_hclk_set();
+}
+
 void deep_sleep()
 {
     power_down_hardware_modules();
-//    SCB->SCR |= (1<<2);
+    SCB->SCR |= (1<<2);
     irq_disable_before_wfi();
     cpu_flash_deep_sleep_and_recover();
     irq_reinit();
     ble_wkup_status_set(true);
+    ble_hclk_restore();
 }
 
 bool ble_wkup_status_get(void)
