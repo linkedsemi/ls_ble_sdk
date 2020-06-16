@@ -17,7 +17,7 @@
 
 `Python 3.8.2 (64bit) <https://www.python.org/ftp/python/3.8.2/python-3.8.2-amd64.exe>`_
 
-`MDK_KEIL <http://www.keil.com/fid/1u1q11wb9c9j1w9braw1mmudm139b2p1sd2wd1/files/eval/mdk530.exe>`_
+`MDK_KEIL <http://www.keil.com/fid/qtcbv3wb9c9j1wrdw6w1a24gf9liqqd1ig1yd1/files/umdkarm/MDK525.EXE>`_
 
 Python 3 + VS Code + GCC(ARM)
 ##############################

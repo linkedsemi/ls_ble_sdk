@@ -495,6 +495,8 @@ void dev_manager_create_init_object(enum gap_own_addr_type own_addr_type);
 
 void dev_manager_start_adv(uint8_t adv_handle,uint8_t *adv_data,uint8_t adv_data_length,uint8_t *scan_rsp_data,uint8_t scan_rsp_data_length);
 
+void dev_manager_set_adv_duration(uint16_t duration);
+
 void dev_manager_update_adv_data(uint8_t adv_handle,uint8_t *adv_data,uint8_t adv_data_length,uint8_t *scan_rsp_data,uint8_t scan_rsp_data_length);
 
 void dev_manager_stop_adv(uint8_t adv_handle);
