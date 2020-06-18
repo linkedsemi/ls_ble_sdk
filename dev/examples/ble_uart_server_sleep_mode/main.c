@@ -103,7 +103,7 @@ static void ls_deep_sleep_timer_cb(void *param);
 extern struct sleep_wakeup_type env_sleep_wkup;
 
 static uint8_t adv_obj_hdl;
-static uint8_t advertising_data[1]={};  //LinkedSemi
+static uint8_t advertising_data[28];  //LinkedSemi
 static uint8_t scan_response_data[31];
 
 static void ls_uart_server_init(void);
