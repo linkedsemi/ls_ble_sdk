@@ -213,6 +213,7 @@ void sys_init_itf()
 
 void sys_init_app()
 {
+    check_wkup_state();
     analog_init();
     var_init();
     main_task_app_init();

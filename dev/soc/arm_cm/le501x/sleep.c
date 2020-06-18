@@ -11,9 +11,14 @@
 #include "reg_rcc.h"
 #include "reg_lsgpio.h"
 #include "ls_dbg.h"
+#include "reg_lsqspi.h"
+#include "uart.h"
+#include "lsgpio.h"
+
 #define ISR_VECTOR_ADDR ((uint32_t *)(0x0))
 
 bool waiting_ble_wkup_irq;
+struct sleep_wakeup_type env_sleep_wkup;
 
 void cpu_sleep_asm(void);
 
@@ -123,13 +128,75 @@ NOINLINE XIP_BANNED static void cpu_flash_deep_sleep_and_recover()
     __disable_irq();
     spi_flash_xip_start();
 }
+NOINLINE XIP_BANNED  void set_mode_sleep_lvl1(void)
+{
 
+}
+
+NOINLINE XIP_BANNED  void set_mode_sleep_lvl2(void)
+{
+
+}
+
+NOINLINE XIP_BANNED  void set_mode_deep_sleep_lvl3(struct sleep_wakeup_type *param)
+{
+    enter_critical();
+    NVIC->ICER[0] = 0xffffffff;
+    NVIC->ICPR[0] = 0xffffffff;
+    
+   spi_flash_xip_stop();
+   spi_flash_deep_power_down();
+
+   
+   REG_FIELD_WR(RCC->AHBEN,RCC_GPIOA,1);
+   REG_FIELD_WR(RCC->AHBEN,RCC_GPIOB,1);
+   REG_FIELD_WR(RCC->AHBEN,RCC_GPIOC,1);
+
+   WRITE_REG(LSGPIOA->MODE,0);
+   WRITE_REG(LSGPIOB->MODE,0);
+   WRITE_REG(LSGPIOC->MODE,0);
+
+   WRITE_REG(LSGPIOA->OD,0);
+   WRITE_REG(LSGPIOB->OD,0);
+   WRITE_REG(LSGPIOC->OD,0);
+
+   WRITE_REG(LSGPIOA->OE,0);
+   WRITE_REG(LSGPIOB->OE,0);
+   WRITE_REG(LSGPIOC->OE,0);
+
+   WRITE_REG(LSGPIOA->IE,0);
+   WRITE_REG(LSGPIOB->IE,0);
+   WRITE_REG(LSGPIOC->IE,0);
+
+   WRITE_REG(LSGPIOA->PUPD,0xAAAAAAAA);
+   WRITE_REG(LSGPIOB->PUPD,0xAAAAAAA5);
+   WRITE_REG(LSGPIOC->PUPD,0xAAAA555A);
+
+
+
+   REG_FIELD_WR(SYSCFG->QSPICTL,SYSCFG_QSPI_DQ0_IE,0);
+   REG_FIELD_WR(SYSCFG->QSPICTL,SYSCFG_QSPI_DQ1_IE,0);
+   REG_FIELD_WR(SYSCFG->QSPICTL,SYSCFG_QSPI_DQ2_IE,0);
+   REG_FIELD_WR(SYSCFG->QSPICTL,SYSCFG_QSPI_DQ3_IE,0);
+   REG_FIELD_WR(SYSCFG->QSPICTL,SYSCFG_QSPI_NSS_IE,0);
+   REG_FIELD_WR(SYSCFG->QSPICTL,SYSCFG_QSPI_SCK_IE,0);
+   REG_FIELD_WR(SYSCFG->QSPICTL,SYSCFG_QSPI_CTL_EN,0x5B);
+
+   SYSCFG->PMU_WKUP = FIELD_BUILD(SYSCFG_SLP_LVL, SLEEP_MOED3) 
+                      | FIELD_BUILD(SYSCFG_WKUP_EDGE,param->trig_edge)
+                      | FIELD_BUILD(SYSCFG_WKUP_EN, param->trig_src);  //PA00; 
+
+   SYSCFG->PMU_PWR = 0;                      
+   SCB->SCR |= (1<<2);
+   __WFI();
+   while(1);
+}
 void low_power_mode_set(uint8_t mode)
 {
-    SYSCFG->PMU_WKUP = FIELD_BUILD(SYSCFG_SLP_LVL, mode) 
-                    | FIELD_BUILD(SYSCFG_WKUP_EDGE,0x8)
-                    | FIELD_BUILD(SYSCFG_WKUP_EN, 0x8);
-    REG_FIELD_WR(SYSCFG->PMU_TRIM, SYSCFG_XTAL_STBTIME, XTAL_STB_VAL);
+    REG_FIELD_WR(SYSCFG->PMU_WKUP,SYSCFG_SLP_LVL,SLEEP_MOED0);
+     MODIFY_REG(SYSCFG->PMU_WKUP,(BLE_WKUP<<WKUP_EN_POS),((BLE_WKUP)<<WKUP_EN_POS));
+     MODIFY_REG(SYSCFG->PMU_WKUP,(BLE_WKUP_EDGE_RISING<<WKUP_EDGE_POS),((BLE_WKUP_EDGE_RISING)<<WKUP_EDGE_POS));                        
+     REG_FIELD_WR(SYSCFG->PMU_TRIM, SYSCFG_XTAL_STBTIME, XTAL_STB_VAL);
 }
 
 static void power_down_hardware_modules()
@@ -155,6 +222,22 @@ static void ble_hclk_restore()
     ble_hclk_set();
 }
 
+
+
+
+void enter_deep_sleep_lvl3_mode(struct sleep_wakeup_type *sleep_param)
+{
+   set_mode_deep_sleep_lvl3(sleep_param);
+}
+
+void check_wkup_state(void)
+{
+    if (REG_FIELD_RD(SYSCFG->PMU_WKUP,SYSCFG_WKUP_STAT))
+	 {
+         REG_FIELD_WR(SYSCFG->PMU_WKUP, SYSCFG_LP_WKUP_CLR,1);
+     } 
+}
+
 void deep_sleep()
 {
     power_down_hardware_modules();
@@ -171,8 +254,13 @@ bool ble_wkup_status_get(void)
     return waiting_ble_wkup_irq;
 }
 
-void LPWKUP_Handler()
+void LPWKUP_Handler(void)
 {
-    REG_FIELD_WR(SYSCFG->PMU_WKUP, SYSCFG_LP_WKUP_CLR,1);
+     if (REG_FIELD_RD(SYSCFG->PMU_WKUP,SYSCFG_WKUP_STAT) & (env_sleep_wkup.trig_src<<WKUP_STATE_POS))
+	 {
+         MODIFY_REG(SYSCFG->PMU_WKUP,(env_sleep_wkup.trig_src<<WKUP_EN_POS),((~(env_sleep_wkup.trig_src))<<WKUP_EN_POS));
+         MODIFY_REG(SYSCFG->PMU_WKUP,(env_sleep_wkup.trig_src<<WKUP_EN_POS),((env_sleep_wkup.trig_src)<<WKUP_EN_POS));
+	 }
+	 REG_FIELD_WR(SYSCFG->PMU_WKUP, SYSCFG_LP_WKUP_CLR,1);
 }
 
