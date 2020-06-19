@@ -287,8 +287,8 @@ static void nvm_read_node(uint16_t section,uint16_t offset,uint16_t length,uint8
         tinyfs_nvm_read_with_cache(GET_FLASH_ADDR(section,offset), length, buf); 
     }else
     {
-        uint8_t length0 = TINYFS_SECTION_SIZE-offset;
-        uint8_t length1 = length-length0;
+        uint16_t length0 = TINYFS_SECTION_SIZE-offset;
+        uint16_t length1 = length-length0;
         tinyfs_nvm_read_with_cache(GET_FLASH_ADDR(section,offset),length0,buf);
         tinyfs_nvm_read_with_cache(GET_FLASH_ADDR(get_next_section(section),sizeof(section_head_t)),
             length1,&buf[length0]);
