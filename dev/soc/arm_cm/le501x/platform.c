@@ -165,7 +165,6 @@ static void module_init()
     //TODO
     LOG_INIT();
     LOG_I("sys init");
-    irq_init();
     INIT_BUILTIN_TIMER_ENV();
     lsecc_init();
     lstrng_init();
@@ -180,7 +179,8 @@ static void module_init()
     rco_calib_mode_set(0);
     rco_calibration_start();
     modem_rf_init();
-    low_power_mode_set(0);
+    low_power_mode_init();
+    irq_init();
 }
 
 static void analog_init()
@@ -190,8 +190,10 @@ static void analog_init()
     {
         clk_switch();
     }
+
     REG_FIELD_WR(SYSCFG->ANACFG1, SYSCFG_OSCRC_DIG_PWR_EN,0);
     //REG_FIELD_WR(SYSCFG->ANACFG1, SYSCFG_ADC12B_DIG_PWR_EN, 0);
+    REG_FIELD_WR(SYSCFG->PMU_TRIM, SYSCFG_XTAL_STBTIME, XTAL_STB_VAL);
 
 }
 

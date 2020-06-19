@@ -13,6 +13,7 @@ src = [
     'integration/calc_acc.c',
     'integration/lscache_param.c',
     'sleep.c',
+    'sys_stat.c',
 ]
 inc = [
     '.',

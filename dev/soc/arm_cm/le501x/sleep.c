@@ -14,6 +14,7 @@
 #include "reg_lsqspi.h"
 #include "uart.h"
 #include "lsgpio.h"
+#include "cpu.h"
 
 #define ISR_VECTOR_ADDR ((uint32_t *)(0x0))
 
@@ -78,7 +79,7 @@ XIP_BANNED static void wait_dpll_lock()
     }
 }
 
-XIP_BANNED static void wkup_ble()
+static void wkup_ble()
 {
     RCC->BLECFG |= RCC_BLE_WKUP_RST_MASK;
 }
@@ -86,7 +87,6 @@ XIP_BANNED static void wkup_ble()
 XIP_BANNED void after_wfi()
 {
     dcdc_on();
-    wkup_ble();
     MODIFY_REG(SYSCFG->ANACFG1,SYSCFG_XO16M_ADJ_MASK | SYSCFG_XO16M_LP_MASK,
         0<<SYSCFG_XO16M_ADJ_POS | 1<<SYSCFG_XO16M_LP_POS);
     SYSCFG->ANACFG0 |= (SYSCFG_EN_DPLL_MASK | SYSCFG_EN_DPLL_16M_RF_MASK | SYSCFG_EN_DPLL_128M_RF_MASK | SYSCFG_EN_DPLL_128M_EXT_MASK | SYSCFG_EN_QCLK_MASK);
@@ -121,7 +121,6 @@ NOINLINE XIP_BANNED static void cpu_flash_deep_sleep_and_recover()
     spi_flash_xip_stop();
     spi_flash_deep_power_down();
     cpu_sleep_asm();
-    wkup_ble();
     spi_flash_init();
     spi_flash_release_from_deep_power_down();
     power_up_hardware_modules();
@@ -191,12 +190,12 @@ NOINLINE XIP_BANNED  void set_mode_deep_sleep_lvl3(struct sleep_wakeup_type *par
    __WFI();
    while(1);
 }
-void low_power_mode_set(uint8_t mode)
+
+void low_power_mode_init()
 {
-    REG_FIELD_WR(SYSCFG->PMU_WKUP,SYSCFG_SLP_LVL,SLEEP_MOED0);
-     MODIFY_REG(SYSCFG->PMU_WKUP,(BLE_WKUP<<WKUP_EN_POS),((BLE_WKUP)<<WKUP_EN_POS));
-     MODIFY_REG(SYSCFG->PMU_WKUP,(BLE_WKUP_EDGE_RISING<<WKUP_EDGE_POS),((BLE_WKUP_EDGE_RISING)<<WKUP_EDGE_POS));                        
-     REG_FIELD_WR(SYSCFG->PMU_TRIM, SYSCFG_XTAL_STBTIME, XTAL_STB_VAL);
+    SYSCFG->PMU_WKUP = FIELD_BUILD(SYSCFG_SLP_LVL,SLEEP_MOED0)
+                        | FIELD_BUILD(SYSCFG_WKUP_EN,BLE_WKUP)
+                        | FIELD_BUILD(SYSCFG_WKUP_EDGE,BLE_WKUP_EDGE_RISING);
 }
 
 static void power_down_hardware_modules()
@@ -238,12 +237,18 @@ void check_wkup_state(void)
      } 
 }
 
+static void cpu_deep_sleep_bit_set()
+{
+    SCB->SCR |= (1<<2);
+}
+
 void deep_sleep()
 {
     power_down_hardware_modules();
-    SCB->SCR |= (1<<2);
+    cpu_deep_sleep_bit_set();
     irq_disable_before_wfi();
     cpu_flash_deep_sleep_and_recover();
+    wkup_ble();
     irq_reinit();
     ble_wkup_status_set(true);
     ble_hclk_restore();
