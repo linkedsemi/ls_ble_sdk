@@ -3,7 +3,7 @@
 #include "uart.h"
 #include "field_manipulate.h"
 #include "uart_param.h" 
-
+#include "log.h"
 
 static void UART_EndTransmit_IT(UART_HandleTypeDef *huart);
 static void UART_Transmit_IT(UART_HandleTypeDef *huart);
@@ -60,7 +60,7 @@ HAL_StatusTypeDef HAL_UART_DeInit(UART_HandleTypeDef *huart)
 
     /* Check the parameters */
     //  assert_param(IS_UART_INSTANCE(huart->UARTX));
-
+    uart_sw_reset(huart);
     uart_int_op(HAL_UARTx_IRQHandler,huart,0);
     huart->ErrorCode = HAL_UART_ERROR_NONE;
     huart->gState = HAL_UART_STATE_RESET;
@@ -307,6 +307,7 @@ static void UART_SetConfig(UART_HandleTypeDef *huart)
     REG_FIELD_WR(huart->UARTX->LCR,UART_LCR_BRWEN,0);
     REG_FIELD_WR(huart->UARTX->FCR,UART_FCR_FIFOEN,1);
     REG_FIELD_WR(huart->UARTX->FCR,UART_FCR_TFRST,1);
+    REG_FIELD_WR(huart->UARTX->FCR,UART_FCR_RFRST,1);
 }
 
 /**
@@ -346,7 +347,6 @@ static void UART_Transmit_IT(UART_HandleTypeDef *huart)
 static void UART_EndTransmit_IT(UART_HandleTypeDef *huart)
 {
     /* Disable the UART Transmit Complete Interrupt */
-    
     if (!REG_FIELD_RD(huart->UARTX->FCR, UART_FCR_TXFL))
     {
         REG_FIELD_WR(huart->UARTX->IDR,UART_IDR_TC,1);
@@ -365,16 +365,19 @@ static void UART_EndTransmit_IT(UART_HandleTypeDef *huart)
   */
 static void UART_Receive_IT(UART_HandleTypeDef *huart)
 {
+    uint8_t fifo_level;
     /* Check that a Rx process is ongoing */
     if (huart->RxState == HAL_UART_STATE_BUSY_RX)
     {
-        while(REG_FIELD_RD(huart->UARTX->FCR, UART_FCR_RXFL))
+        fifo_level = REG_FIELD_RD(huart->UARTX->FCR, UART_FCR_RXFL);
+        for (;fifo_level>0;fifo_level--)
         {
             *huart->pRxBuffPtr++ = (uint8_t)(huart->UARTX->RBR & (uint8_t)0x00FF);
             if (--huart->RxXferCount == 0U)
             {
                 REG_FIELD_WR(huart->UARTX->FCR,UART_FCR_RXTL,UART_FIFO_RL_8);
                 huart->RxState = HAL_UART_STATE_READY;
+                REG_FIELD_WR(huart->UARTX->IDR,UART_IDR_RXRD,1);
                 HAL_UART_RxCpltCallback(huart,huart->rx_arg);
                 return;
             }
@@ -401,6 +404,7 @@ void HAL_UARTx_IRQHandler(UART_HandleTypeDef *huart)
 {
     uint32_t isrflags   = huart->UARTX->RIF;  
     uint32_t ivsits     = huart->UARTX->IVS;
+    uint32_t status_reg = huart->UARTX->SR;
 
     /* UART in mode Transmitter ------------------------------------------------*/
     if ((( isrflags& UART_IT_TXS) != 0) &&((ivsits & UART_IT_TXS) != 0))
@@ -411,10 +415,13 @@ void HAL_UARTx_IRQHandler(UART_HandleTypeDef *huart)
     /* UART in mode Transmitter end --------------------------------------------*/
     if (((isrflags & UART_IT_TC) != 0) && ((ivsits & UART_IT_TC) != 0))
     {
+        REG_FIELD_WR(huart->UARTX->ICR,UART_ICR_TC,1);
         if((ivsits & UART_IT_TXS) == 0)
         {
-            UART_EndTransmit_IT(huart);
-            REG_FIELD_WR(huart->UARTX->ICR,UART_ICR_TC,1);
+            if(!(huart->UARTX->SR & UART_SR_BUSY))
+            {
+                UART_EndTransmit_IT(huart);
+            }
         }
     }
     /* UART in mode Receive ------------------------------------------------*/
@@ -422,7 +429,10 @@ void HAL_UARTx_IRQHandler(UART_HandleTypeDef *huart)
     {
         UART_Receive_IT(huart);
     }
-
+    if ((status_reg & 0x02) != 0)
+    {
+        LOG_I("uart_rx overrun!!!");
+    }
 }
 
 

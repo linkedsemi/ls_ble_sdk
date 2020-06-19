@@ -20,7 +20,7 @@ void uart_sw_reset(UART_HandleTypeDef *inst)
         REG_FIELD_WR(RCC->APB1RST, RCC_UART2, 1);
         REG_FIELD_WR(RCC->APB1RST, RCC_UART2, 0);
     }
-    if (inst->UARTX == UART2)
+    if (inst->UARTX == UART3)
     {
         REG_FIELD_WR(RCC->APB1RST, RCC_UART3, 1);
         REG_FIELD_WR(RCC->APB1RST, RCC_UART3, 0);
@@ -85,6 +85,11 @@ void uart_int_op(void (*isr)(UART_HandleTypeDef *),UART_HandleTypeDef *inst,uint
         }
         uart_isr = NULL ;
     }
+}
+
+void uart_status_set(UART_HandleTypeDef *inst,uint8_t status)
+{
+
 }
 
 void UART1_Handler(void)
