@@ -181,7 +181,7 @@ NOINLINE XIP_BANNED  void set_mode_deep_sleep_lvl3(struct sleep_wakeup_type *par
    REG_FIELD_WR(SYSCFG->QSPICTL,SYSCFG_QSPI_SCK_IE,0);
    REG_FIELD_WR(SYSCFG->QSPICTL,SYSCFG_QSPI_CTL_EN,0x5B);
 
-   SYSCFG->PMU_WKUP = FIELD_BUILD(SYSCFG_SLP_LVL, SLEEP_MOED3) 
+   SYSCFG->PMU_WKUP = FIELD_BUILD(SYSCFG_SLP_LVL, SLEEP_MODE3) 
                       | FIELD_BUILD(SYSCFG_WKUP_EDGE,param->trig_edge)
                       | FIELD_BUILD(SYSCFG_WKUP_EN, param->trig_src);  //PA00; 
 
@@ -191,12 +191,31 @@ NOINLINE XIP_BANNED  void set_mode_deep_sleep_lvl3(struct sleep_wakeup_type *par
    while(1);
 }
 
+#if DEBUG_MODE == 0
+
+static void cpu_deep_sleep_bit_set()
+{
+    SCB->SCR |= (1<<2);
+}
+
 void low_power_mode_init()
 {
-    SYSCFG->PMU_WKUP = FIELD_BUILD(SYSCFG_SLP_LVL,SLEEP_MOED0)
+    SYSCFG->PMU_WKUP = FIELD_BUILD(SYSCFG_SLP_LVL,SLEEP_MODE0)
                         | FIELD_BUILD(SYSCFG_WKUP_EN,BLE_WKUP)
                         | FIELD_BUILD(SYSCFG_WKUP_EDGE,BLE_WKUP_EDGE_RISING);
 }
+
+#else
+
+static void cpu_deep_sleep_bit_set(){}
+
+void low_power_mode_init()
+{
+    SYSCFG->PMU_WKUP = FIELD_BUILD(SYSCFG_SLP_LVL,NORMAL_SLEEP)
+                        | FIELD_BUILD(SYSCFG_WKUP_EN,BLE_WKUP)
+                        | FIELD_BUILD(SYSCFG_WKUP_EDGE,BLE_WKUP_EDGE_RISING);
+}
+#endif
 
 static void power_down_hardware_modules()
 {
@@ -237,10 +256,6 @@ void check_wkup_state(void)
      } 
 }
 
-static void cpu_deep_sleep_bit_set()
-{
-    SCB->SCR |= (1<<2);
-}
 
 void deep_sleep()
 {

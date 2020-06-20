@@ -6,10 +6,10 @@
 #define XTAL_STARTUP_CYCLES (XTAL_STB_VAL + 4)
 
 #define NORMAL_SLEEP           0x01
-#define SLEEP_MOED0            0x00
-#define SLEEP_MOED1            0x02
-#define SLEEP_MOED2            0x04
-#define SLEEP_MOED3            0x06
+#define SLEEP_MODE0            0x00
+#define SLEEP_MODE1            0x02
+#define SLEEP_MODE2            0x04
+#define SLEEP_MODE3            0x06
 
 #define PB15_IO_WKUP                  0x00000001
 #define PB15_IO_WKUP_EDGE_FALLING     0x00000000

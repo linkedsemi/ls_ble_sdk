@@ -49,6 +49,10 @@
 #define FPGA 0
 #endif
 
+#ifndef DEBUG_MODE
+#define DEBUG_MODE 1
+#endif
+
 #define SDK_PCLK_MHZ (SDK_HCLK_MHZ/SDK_PCLK_DIV)
 #define SDK_MAX_ACT_NUM    (SDK_MAX_CONN_NUM + 1)
 #define SDK_BUILTIN_TASK_NUM 1
