@@ -25,6 +25,7 @@ def mdk_builder(target,source,env):
     
     prj.CDefines = "" 
     prj.COptions = "--c99 -O2 --wchar32" 
+    prj.LinkOptions = "--datacompressor=off"
     beforecompile1 = mdk_xml_schema.UserAction('')
     beforecompile2 = mdk_xml_schema.UserAction('')
     beforebuild1 = mdk_xml_schema.UserAction('')
