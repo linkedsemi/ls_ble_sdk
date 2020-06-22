@@ -50,7 +50,7 @@ enum uart_svc_att_db_handles
     UART_SVC_ATT_NUM
 };
 
-static struct att_decl ls_uart_server_att_decl[UART_SVC_ATT_NUM] =
+static const struct att_decl ls_uart_server_att_decl[UART_SVC_ATT_NUM] =
 {
     [UART_SVC_IDX_RX_CHAR] = {
         .uuid = att_decl_char_array,
@@ -85,10 +85,10 @@ static struct att_decl ls_uart_server_att_decl[UART_SVC_ATT_NUM] =
         .uuid_len = UUID_LEN_16BIT,
     },
 };
-static struct svc_decl ls_uart_server_svc =
+static const struct svc_decl ls_uart_server_svc =
 {
     .uuid = ls_uart_svc_uuid_128,
-    .att = ls_uart_server_att_decl,
+    .att = (struct att_decl *)ls_uart_server_att_decl,
     .nb_att = UART_SVC_ATT_NUM,
     .uuid_len = UUID_LEN_128BIT,
 };
@@ -423,7 +423,7 @@ static void dev_manager_callback(enum dev_evt_type type,union dev_evt_u *evt)
         dev_manager_get_identity_bdaddr(addr,&type);
         LOG_I("type:%d,addr:",type);
         LOG_HEX(addr,sizeof(addr));
-        dev_manager_add_service(&ls_uart_server_svc);
+        dev_manager_add_service((struct svc_decl *)&ls_uart_server_svc);
         ls_uart_init(); 
         HAL_UART_Receive_IT(&UART_Server_Config, &uart_server_rx_buf[0], UART_SYNC_BYTE_LEN, NULL);
         ls_uart_server_init();      
