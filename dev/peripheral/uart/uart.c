@@ -28,10 +28,12 @@ HAL_StatusTypeDef HAL_UART_Init(UART_HandleTypeDef *huart)
     /* Check the parameters */
     //TODO
     uart_sw_reset(huart);
-    uart_clock_enable(huart);
+    uart_clock_enable(huart,1);
     /* Set the UART Communication parameters */
     UART_SetConfig(huart);
     uart_int_op(HAL_UARTx_IRQHandler,huart,1);
+    uart_status_set(huart, 1);
+
     /* Initialize the UART state */
     huart->ErrorCode = HAL_UART_ERROR_NONE;
     huart->gState = HAL_UART_STATE_READY;
@@ -60,8 +62,10 @@ HAL_StatusTypeDef HAL_UART_DeInit(UART_HandleTypeDef *huart)
 
     /* Check the parameters */
     //  assert_param(IS_UART_INSTANCE(huart->UARTX));
-    uart_sw_reset(huart);
+    uart_clock_enable(huart,0);
     uart_int_op(HAL_UARTx_IRQHandler,huart,0);
+    uart_status_set(huart, 0);
+
     huart->ErrorCode = HAL_UART_ERROR_NONE;
     huart->gState = HAL_UART_STATE_RESET;
     huart->RxState = HAL_UART_STATE_RESET;

@@ -15,7 +15,7 @@
 #include "uart.h"
 #include "lsgpio.h"
 #include "cpu.h"
-
+#include "io_config.h"
 #define ISR_VECTOR_ADDR ((uint32_t *)(0x0))
 
 bool waiting_ble_wkup_irq;
@@ -127,68 +127,53 @@ NOINLINE XIP_BANNED static void cpu_flash_deep_sleep_and_recover()
     __disable_irq();
     spi_flash_xip_start();
 }
-NOINLINE XIP_BANNED  void set_mode_sleep_lvl1(void)
-{
 
-}
 
 NOINLINE XIP_BANNED  void set_mode_sleep_lvl2(void)
 {
 
 }
 
+static void lvl2_lvl3_io_retention(reg_lsgpio_t *gpiox)
+{
+    uint16_t oe = gpiox->OE;
+    uint16_t dout = gpiox->DOUT;
+    uint32_t pull = 0;
+    uint8_t i;
+    for(i=0;i<16;++i)
+    {
+        if(1<<i & oe)
+        {
+            if(1<<i & dout)
+            {
+                pull |= IO_PULL_UP <<(2*i);
+            }else
+            {
+                pull |= IO_PULL_DOWN << (2*i);
+            }
+        }
+    }
+    gpiox->PUPD = pull;
+}
+
 NOINLINE XIP_BANNED  void set_mode_deep_sleep_lvl3(struct sleep_wakeup_type *param)
 {
-    enter_critical();
     NVIC->ICER[0] = 0xffffffff;
     NVIC->ICPR[0] = 0xffffffff;
-    
-   spi_flash_xip_stop();
-   spi_flash_deep_power_down();
+    lvl2_lvl3_io_retention(LSGPIOA);
+    lvl2_lvl3_io_retention(LSGPIOB);
+    LSGPIOC->PUPD = 0xAAAA555A;
+    spi_flash_xip_stop();
+    spi_flash_deep_power_down();
 
-   
-   REG_FIELD_WR(RCC->AHBEN,RCC_GPIOA,1);
-   REG_FIELD_WR(RCC->AHBEN,RCC_GPIOB,1);
-   REG_FIELD_WR(RCC->AHBEN,RCC_GPIOC,1);
-
-   WRITE_REG(LSGPIOA->MODE,0);
-   WRITE_REG(LSGPIOB->MODE,0);
-   WRITE_REG(LSGPIOC->MODE,0);
-
-   WRITE_REG(LSGPIOA->OD,0);
-   WRITE_REG(LSGPIOB->OD,0);
-   WRITE_REG(LSGPIOC->OD,0);
-
-   WRITE_REG(LSGPIOA->OE,0);
-   WRITE_REG(LSGPIOB->OE,0);
-   WRITE_REG(LSGPIOC->OE,0);
-
-   WRITE_REG(LSGPIOA->IE,0);
-   WRITE_REG(LSGPIOB->IE,0);
-   WRITE_REG(LSGPIOC->IE,0);
-
-   WRITE_REG(LSGPIOA->PUPD,0xAAAAAAAA);
-   WRITE_REG(LSGPIOB->PUPD,0xAAAAAAA5);
-   WRITE_REG(LSGPIOC->PUPD,0xAAAA555A);
-
-
-
-   REG_FIELD_WR(SYSCFG->QSPICTL,SYSCFG_QSPI_DQ0_IE,0);
-   REG_FIELD_WR(SYSCFG->QSPICTL,SYSCFG_QSPI_DQ1_IE,0);
-   REG_FIELD_WR(SYSCFG->QSPICTL,SYSCFG_QSPI_DQ2_IE,0);
-   REG_FIELD_WR(SYSCFG->QSPICTL,SYSCFG_QSPI_DQ3_IE,0);
-   REG_FIELD_WR(SYSCFG->QSPICTL,SYSCFG_QSPI_NSS_IE,0);
-   REG_FIELD_WR(SYSCFG->QSPICTL,SYSCFG_QSPI_SCK_IE,0);
-   REG_FIELD_WR(SYSCFG->QSPICTL,SYSCFG_QSPI_CTL_EN,0x5B);
-
-   SYSCFG->PMU_WKUP = FIELD_BUILD(SYSCFG_SLP_LVL, SLEEP_MODE3) 
+    SYSCFG->PMU_WKUP = FIELD_BUILD(SYSCFG_SLP_LVL, SLEEP_MODE3) 
                       | FIELD_BUILD(SYSCFG_WKUP_EDGE,param->trig_edge)
                       | FIELD_BUILD(SYSCFG_WKUP_EN, param->trig_src);  //PA00; 
 
-   SYSCFG->PMU_PWR = 0;                      
-   SCB->SCR |= (1<<2);
-   __WFI();
-   while(1);
+    SYSCFG->PMU_PWR = 0; 
+    SCB->SCR |= (1<<2);
+    __WFI();
+    while(1);
 }
 
 #if DEBUG_MODE == 0
@@ -251,9 +236,9 @@ void enter_deep_sleep_lvl3_mode(struct sleep_wakeup_type *sleep_param)
 void check_wkup_state(void)
 {
     if (REG_FIELD_RD(SYSCFG->PMU_WKUP,SYSCFG_WKUP_STAT))
-	 {
-         REG_FIELD_WR(SYSCFG->PMU_WKUP, SYSCFG_LP_WKUP_CLR,1);
-     } 
+    {
+        REG_FIELD_WR(SYSCFG->PMU_WKUP, SYSCFG_LP_WKUP_CLR,1);
+    }
 }
 
 
@@ -276,11 +261,25 @@ bool ble_wkup_status_get(void)
 
 void LPWKUP_Handler(void)
 {
-     if (REG_FIELD_RD(SYSCFG->PMU_WKUP,SYSCFG_WKUP_STAT) & (env_sleep_wkup.trig_src<<WKUP_STATE_POS))
-	 {
-         MODIFY_REG(SYSCFG->PMU_WKUP,(env_sleep_wkup.trig_src<<WKUP_EN_POS),((~(env_sleep_wkup.trig_src))<<WKUP_EN_POS));
-         MODIFY_REG(SYSCFG->PMU_WKUP,(env_sleep_wkup.trig_src<<WKUP_EN_POS),((env_sleep_wkup.trig_src)<<WKUP_EN_POS));
-	 }
-	 REG_FIELD_WR(SYSCFG->PMU_WKUP, SYSCFG_LP_WKUP_CLR,1);
+    uint8_t wkup_stat = REG_FIELD_RD(SYSCFG->PMU_WKUP,SYSCFG_WKUP_STAT);
+    SYSCFG->PMU_WKUP &= ~(wkup_stat << WKUP_EN_POS);
+    SYSCFG->PMU_WKUP |= wkup_stat << WKUP_EN_POS;
+    REG_FIELD_WR(SYSCFG->PMU_WKUP, SYSCFG_LP_WKUP_CLR,1);
+    if(wkup_stat&PB15_IO_WKUP)
+    {
+        io_exti_callback(PB15);
+    }
+    if(wkup_stat&PA00_IO_WKUP)
+    {
+        io_exti_callback(PA00);
+    }
+    if(wkup_stat&PA07_IO_WKUP)
+    {
+        io_exti_callback(PA07);
+    }
+    if(wkup_stat&PB11_IO_WKUP)
+    {
+        io_exti_callback(PB11);
+    }
 }
 

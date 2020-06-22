@@ -38,7 +38,7 @@ static void gpio_init()
     GPIO_InitStruct.Mode = GPIO_MODE_AF;
     GPIO_InitStruct.AF_Type = AF_UART3_TXD;
     HAL_GPIO_Init(LSGPIOB, &GPIO_InitStruct);
-    uart3_io_init(LSGPIOB_15,LSGPIOB_11);
+    uart3_io_init(PB15,PB11);
 
 }
 

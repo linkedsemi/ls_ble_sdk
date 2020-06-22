@@ -22,6 +22,8 @@
 #include "lstrng.h"
 #include "lscrypt.h"
 #include "field_manipulate.h"
+#include "io_config.h"
+
 #define BASEBAND_MEMORY_ADDR   (0x50004000)
 #define IRQ_NVIC_PRIO(IRQn,priority) (((priority << (8U - __NVIC_PRIO_BITS)) & (uint32_t)0xFFUL) << _BIT_SHIFT(IRQn))
 
@@ -161,8 +163,7 @@ void rco_calibration_start()
 
 static void module_init()
 {
-
-    //TODO
+    io_init();
     LOG_INIT();
     LOG_I("sys init");
     INIT_BUILTIN_TIMER_ENV();

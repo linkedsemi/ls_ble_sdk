@@ -4,6 +4,7 @@
 #include "uart.h"
 #include "le501x.h"
 #include "HAL_def.h"
+#include "sys_stat.h"
 
 static UART_HandleTypeDef *UART_inst_env[3];
 void (*uart_isr)(UART_HandleTypeDef *);
@@ -26,30 +27,28 @@ void uart_sw_reset(UART_HandleTypeDef *inst)
         REG_FIELD_WR(RCC->APB1RST, RCC_UART3, 0);
     }
 }
-void uart_clock_enable(UART_HandleTypeDef *inst)
+
+void uart_clock_enable(UART_HandleTypeDef *inst,uint8_t status)
 {
     if (inst->UARTX == UART1)
     {
-        REG_FIELD_WR(RCC->APB2EN, RCC_UART1, 1);
+        REG_FIELD_WR(RCC->APB2EN, RCC_UART1, status);
     }
     if (inst->UARTX == UART2)
     {
-        REG_FIELD_WR(RCC->APB1EN, RCC_UART2, 1);
+        REG_FIELD_WR(RCC->APB1EN, RCC_UART2, status);
     }
     if (inst->UARTX == UART3)
     {
-        REG_FIELD_WR(RCC->APB1EN, RCC_UART3, 1);
+        REG_FIELD_WR(RCC->APB1EN, RCC_UART3, status);
     }
 }
 
 void uart_int_op(void (*isr)(UART_HandleTypeDef *),UART_HandleTypeDef *inst,uint8_t states)
 {
-    if (uart_isr == NULL)
-    {
-        uart_isr=isr; 
-    }
     if (states)
     {
+        uart_isr=isr; 
         if (inst->UARTX == UART1)
         {
             NVIC_ClearPendingIRQ(UART1_IRQn);
@@ -89,7 +88,18 @@ void uart_int_op(void (*isr)(UART_HandleTypeDef *),UART_HandleTypeDef *inst,uint
 
 void uart_status_set(UART_HandleTypeDef *inst,uint8_t status)
 {
-
+    switch((uint32_t)inst->UARTX)
+    {
+    case (uint32_t)UART1:
+        uart1_status_set(status);
+    break;
+    case (uint32_t)UART2:
+        uart2_status_set(status);
+    break;
+    case (uint32_t)UART3:
+        uart3_status_set(status);
+    break;
+    }
 }
 
 void UART1_Handler(void)

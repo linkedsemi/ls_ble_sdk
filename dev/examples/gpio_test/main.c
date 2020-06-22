@@ -60,13 +60,16 @@ void exti_test(void)
     NVIC_SetPriority(EXTI_IRQn, 1);
     NVIC_EnableIRQ(EXTI_IRQn);
 }
+/*
 void EXTI_Handler(void)
 {
-    /*clear Exti*/
+    //clear Exti
     WRITE_REG(EXTI->EICR, READ_REG(EXTI->ERIF)); 
 
     HAL_GPIO_TogglePin(LSGPIOB, GPIO_PIN_8);
 }
+*/
+
 #endif //(EXTI_TEST)
 int main(void)
 {
