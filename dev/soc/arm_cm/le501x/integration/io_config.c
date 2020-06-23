@@ -51,8 +51,8 @@ static void uart_io_init(gpio_pin_t txd,gpio_pin_t rxd)
     gpiox = GPIO_GetPort(rxd.port);
     MODIFY_REG(gpiox->MODE, (GPIO_MODE0_MASK << (position << 1u)), (SET_GPIO_MODE_AF << (position << 1u)));
     MODIFY_REG(gpiox->OD, (GPIO_OD0_MASK << (position << 1u)), (GPIO_OUTPUT_MAX_DRIVER << (position << 1u)));
-    MODIFY_REG(gpiox->OE, (GPIO_OE0_MASK << position), (GPIO_OUTPUT_EN << position));
-    MODIFY_REG(gpiox->IE, (GPIO_IE0_MASK << position), (0U << position));
+    MODIFY_REG(gpiox->OE, (GPIO_OE0_MASK << position), (0U << position));
+    MODIFY_REG(gpiox->IE, (GPIO_IE0_MASK << position), (GPIO_INPUT_EN << position));
 }
 
 static void uart_io_deinit(gpio_pin_t txd,gpio_pin_t rxd)
@@ -60,13 +60,13 @@ static void uart_io_deinit(gpio_pin_t txd,gpio_pin_t rxd)
     reg_lsgpio_t* gpiox;
     uint8_t position = txd.num;
     gpiox = GPIO_GetPort(txd.port);
-    MODIFY_REG(gpiox->MODE, (GPIO_MODE0_MASK << (position << 1u)), (SET_GPIO_MODE_GPIO << (position << 1u)));
     HAL_GPIO_WritePin(gpiox,0x01<<position,1);
+    MODIFY_REG(gpiox->MODE, (GPIO_MODE0_MASK << (position << 1u)), (SET_GPIO_MODE_GPIO << (position << 1u)));
+
 
     position = rxd.num;
     gpiox = GPIO_GetPort(rxd.port);
     MODIFY_REG(gpiox->MODE, (GPIO_MODE0_MASK << (position << 1u)), (SET_GPIO_MODE_GPIO << (position << 1u)));
-    HAL_GPIO_WritePin(gpiox,0x01<<position,1);
 }
 void uart1_io_init(uint8_t txd,uint8_t rxd)
 {
