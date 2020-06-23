@@ -124,25 +124,6 @@ static void ls_uart_init(void)
     HAL_UART_Init(&UART_Server_Config);
 }
 
-XIP_BANNED void ls_uart_deinit(void)
-{
-    __HAL_RCC_GPIOA_CLK_ENABLE(); 
-//  PB00 UART1_RX
-    GPIO_InitTypeDef GPIO_InitStruct = {0};
-    GPIO_InitStruct.Pin = GPIO_PIN_0;
-    GPIO_InitStruct.Mode= GPIO_MODE_INPUT;
-    GPIO_InitStruct.Pull = GPIO_INPUT_PULLUP;
-    HAL_GPIO_Init(LSGPIOB, &GPIO_InitStruct);
-
-//  PB01  UART1_TX
-    GPIO_InitStruct.Pin = GPIO_PIN_1;
-    GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-    GPIO_InitStruct.Driver_Pwr = GPIO_INPUT_PULLUP;
-    HAL_GPIO_Init(LSGPIOB, &GPIO_InitStruct);
-
-    __HAL_RCC_GPIOA_CLK_DISABLE(); 
-}
-
 static void ls_uart_server_init(void)
 {
     uart_server_timer_inst = builtin_timer_create(ls_uart_server_timer_cb);

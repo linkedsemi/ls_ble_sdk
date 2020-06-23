@@ -203,6 +203,7 @@ struct ls_mesh_cfg
     uint16_t MeshProID;
     uint16_t MeshProVerID;
     uint16_t MeshLocDesc;
+    uint16_t NbAddrReplay;
     uint8_t NbCompDataPage;
     uint8_t FrdRxWindowMS;
     uint8_t FrdQueueSize;

@@ -326,8 +326,6 @@ typedef struct  __attribute__((packed))
   */
 
 #define __HAL_RCC_GPIOA_CLK_ENABLE()   do { \
-                                       REG_FIELD_WR(RCC->AHBRST, RCC_GPIOA, 1);\
-                                       REG_FIELD_WR(RCC->AHBRST, RCC_GPIOA, 0);\
                                        REG_FIELD_WR(RCC->AHBEN, RCC_GPIOA, 1);\
                                       } while(0U)
 
@@ -357,8 +355,6 @@ typedef struct  __attribute__((packed))
   * @retval None
   */
 #define __HAL_RCC_GPIOB_CLK_ENABLE()   do { \
-                                        REG_FIELD_WR(RCC->AHBRST, RCC_GPIOB, 1);\
-                                        REG_FIELD_WR(RCC->AHBRST, RCC_GPIOB, 0);\
                                         REG_FIELD_WR(RCC->AHBEN, RCC_GPIOB, 1);\
                                       } while(0U)
 
@@ -389,8 +385,6 @@ typedef struct  __attribute__((packed))
   * @retval None
   */                                     
 #define __HAL_RCC_GPIOC_CLK_ENABLE()   do { \
-                                        REG_FIELD_WR(RCC->AHBRST, RCC_GPIOC, 1);\
-                                        REG_FIELD_WR(RCC->AHBRST, RCC_GPIOC, 0);\
                                         REG_FIELD_WR(RCC->AHBEN, RCC_GPIOC, 1);\
                                       } while(0U)
 
