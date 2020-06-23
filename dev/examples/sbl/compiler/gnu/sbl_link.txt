@@ -12,7 +12,7 @@ SECTIONS
 	{
 		. = ALIGN(4);
 		__data_start__ = .;
-        KEEP(*(.isr_vector))
+		KEEP(*(.isr_vector))
 		*(.data*)
 		*(.xip_banned)
 		*(.text.memcpy)
@@ -25,7 +25,6 @@ SECTIONS
 		KEEP(*(.init))
 		KEEP(*(.fini))
 
-/* 
 		*crtbegin.o(.ctors)
 		*crtbegin?.o(.ctors)
 		*(EXCLUDE_FILE(*crtend?.o *crtend.o) .ctors)
@@ -33,26 +32,27 @@ SECTIONS
 		*(.ctors)
 
 
- 		*crtbegin.o(.dtors)
- 		*crtbegin?.o(.dtors)
- 		*(EXCLUDE_FILE(*crtend?.o *crtend.o) .dtors)
- 		*(SORT(.dtors.*))
- 		*(.dtors)
-*/
+		*crtbegin.o(.dtors)
+		*crtbegin?.o(.dtors)
+		*(EXCLUDE_FILE(*crtend?.o *crtend.o) .dtors)
+		*(SORT(.dtors.*))
+		*(.dtors)
+
 		*(.eh_frame*)
 		*(.text* .rodata*)
 	}>FLASH
 	
-    .bss (NOLOAD):
-    {
-    	__bss_start__ = .;
+	.bss (NOLOAD):
+	{
+		__bss_start__ = .;
 		*(.bss*)
 		*(COMMON)
 		*(SECTION_RTT)
 		__bss_end__ = ALIGN(4);
-    }>RAM
-		
-	.heap (COPY):
+	}>RAM
+
+
+	.heap (NOLOAD):
 	{
 		__end__ = .;
 		PROVIDE(end = .);
@@ -63,14 +63,21 @@ SECTIONS
 	/* .stack_dummy section doesn't contains any symbols. It is only
 	 * used for linker to calculate size of stack sections, and assign
 	 * values to stack symbols later */
-	.stack_dummy (COPY):
+	.stack_dummy (NOLOAD):
 	{
 		*(.stack*)
 	} > RAM
 
+	.reset_retain reset_retain_start (NOLOAD) :
+	{
+		*(.reset_retain)
+	}
+
+	reset_retain_size = SIZEOF(.reset_retain);
+	reset_retain_start = __stack_data_start__ - reset_retain_size;
 	/* Set stack top to end of RAM, and stack limit move down by
 	 * size of stack_dummy section */
-	__StackTop = ORIGIN(RAM) + LENGTH(RAM);
+	__StackTop = reset_retain_start;
 	__StackLimit = __StackTop - SIZEOF(.stack_dummy);
 	PROVIDE(__stack = __StackTop);
 	

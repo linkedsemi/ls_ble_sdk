@@ -137,6 +137,7 @@ NOINLINE XIP_BANNED  void set_mode_sleep_lvl2(void)
 static void lvl2_lvl3_io_retention(reg_lsgpio_t *gpiox)
 {
     uint16_t oe = gpiox->OE;
+    uint16_t ie = gpiox->IE;
     uint16_t dout = gpiox->DOUT;
     uint32_t pull = 0;
     uint8_t i;
@@ -151,6 +152,9 @@ static void lvl2_lvl3_io_retention(reg_lsgpio_t *gpiox)
             {
                 pull |= IO_PULL_DOWN << (2*i);
             }
+        }else if((1<<i & ie)==0)
+        {
+            pull |= IO_PULL_DOWN << (2*i);
         }
     }
     gpiox->PUPD = pull;
@@ -162,9 +166,9 @@ NOINLINE XIP_BANNED  void set_mode_deep_sleep_lvl3(struct sleep_wakeup_type *par
     NVIC->ICPR[0] = 0xffffffff;
     lvl2_lvl3_io_retention(LSGPIOA);
     lvl2_lvl3_io_retention(LSGPIOB);
-    LSGPIOC->PUPD = 0xAAAA555A;
     spi_flash_xip_stop();
     spi_flash_deep_power_down();
+    LSGPIOC->PUPD = 0xAAAA555A;
 
     SYSCFG->PMU_WKUP = FIELD_BUILD(SYSCFG_SLP_LVL, SLEEP_MODE3) 
                       | FIELD_BUILD(SYSCFG_WKUP_EDGE,param->trig_edge)
