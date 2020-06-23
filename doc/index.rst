@@ -12,6 +12,7 @@ Welcome to ls_sdk's documentation!
    
    getting_started/index
    api/api_root
+   demos/demo_list
    hardware/Development_manual
    Download_Tool_Usage/download_tool_introduce
    
