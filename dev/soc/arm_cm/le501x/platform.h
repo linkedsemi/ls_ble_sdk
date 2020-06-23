@@ -12,6 +12,8 @@ bool clk_check(void);
 
 void clk_switch(void);
 
+uint8_t get_wakeup_source(void);
+
 void sys_init_app(void);
 
 void sys_init_itf(void);

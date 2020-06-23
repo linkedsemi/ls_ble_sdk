@@ -28,6 +28,7 @@
 #define IRQ_NVIC_PRIO(IRQn,priority) (((priority << (8U - __NVIC_PRIO_BITS)) & (uint32_t)0xFFUL) << _BIT_SHIFT(IRQn))
 
 RESET_RETAIN uint32_t reset_reason;
+RESET_RETAIN uint8_t wakeup_source;
 
 DEF_BUILTIN_TIMER_ENV(SDK_SW_TIMER_MAX);
 
@@ -161,8 +162,25 @@ void rco_calibration_start()
     REG_FIELD_WR(SYSCFG->ANACFG1, SYSCFG_EN_RCO_DIG_PWR, 0);
 }
 
+static void check_wkup_state(void)
+{
+    uint8_t wkup_stat = REG_FIELD_RD(SYSCFG->PMU_WKUP,SYSCFG_WKUP_STAT);
+    if (wkup_stat)
+    {
+        REG_FIELD_WR(SYSCFG->PMU_WKUP, SYSCFG_LP_WKUP_CLR,1);
+        wakeup_source = wkup_stat;
+    }
+}
+
+uint8_t get_wakeup_source()
+{
+    return wakeup_source;
+}
+
+
 static void module_init()
 {
+    check_wkup_state();
     io_init();
     LOG_INIT();
     LOG_I("sys init");

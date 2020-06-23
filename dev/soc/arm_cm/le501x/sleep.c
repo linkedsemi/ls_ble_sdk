@@ -237,15 +237,6 @@ void enter_deep_sleep_lvl3_mode(struct sleep_wakeup_type *sleep_param)
    set_mode_deep_sleep_lvl3(sleep_param);
 }
 
-void check_wkup_state(void)
-{
-    if (REG_FIELD_RD(SYSCFG->PMU_WKUP,SYSCFG_WKUP_STAT))
-    {
-        REG_FIELD_WR(SYSCFG->PMU_WKUP, SYSCFG_LP_WKUP_CLR,1);
-    }
-}
-
-
 void deep_sleep()
 {
     power_down_hardware_modules();

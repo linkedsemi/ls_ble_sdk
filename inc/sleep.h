@@ -62,8 +62,6 @@ void ble_sleep(void);
 
 void enter_deep_sleep_lvl3_mode(struct sleep_wakeup_type *sleep_param);
 
-void check_wkup_state(void);
-
 void ble_irq_clr_and_enable(void);
 
 void ble_wkup_status_set(bool);
