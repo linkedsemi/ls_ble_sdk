@@ -3,7 +3,7 @@
 #include <stdbool.h>
 #include "reg_rcc.h"
 #include "reg_lsgpio.h"
-#include "hal_def.h"
+#include "HAL_def.h"
 #include "field_manipulate.h"
 
 #define GPIO_GET_INDEX(__GPIOx__) (((__GPIOx__) == (LSGPIOA))? 0uL :\

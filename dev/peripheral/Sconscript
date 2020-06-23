@@ -9,7 +9,8 @@ src = [
     'crypt/lscrypt.c',
     'gpio/lsgpio.c',
     'iwdt/lsiwdt.c',
-    'adc/lsadc.c'
+    'adc/lsadc.c',
+    'timer/lstimer.c'
 
 ]
 inc = [
@@ -23,6 +24,7 @@ inc = [
     'gpio',
     'iwdt',
     'adc',
+    'timer',
     '.',
 ]
 src_files = File(src)

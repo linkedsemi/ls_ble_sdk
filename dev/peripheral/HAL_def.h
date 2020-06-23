@@ -44,6 +44,38 @@ typedef enum
     SUCCESS = !ERROR
 } ErrorStatus;    
 
+
+/* Exported macro ------------------------------------------------------------*/
+#define HAL_MAX_DELAY      0xFFFFFFFFU
+
+#define __HAL_LOCK(__HANDLE__)                                           \
+                                do{                                        \
+                                    if((__HANDLE__)->Lock == HAL_LOCKED)   \
+                                    {                                      \
+                                       return HAL_BUSY;                    \
+                                    }                                      \
+                                    else                                   \
+                                    {                                      \
+                                       (__HANDLE__)->Lock = HAL_LOCKED;    \
+                                    }                                      \
+                                  }while (0U)
+
+#define __HAL_UNLOCK(__HANDLE__)                                          \
+                                  do{                                       \
+                                      (__HANDLE__)->Lock = HAL_UNLOCKED;    \
+                                    }while (0U)
+
+#if defined ( __GNUC__ ) && !defined (__CC_ARM) /* GNU Compiler */
+#ifndef __weak
+#define __weak   __attribute__((weak))
+#endif /* __weak */
+#ifndef __packed
+#define __packed __attribute__((__packed__))
+#endif /* __packed */
+#endif /* __GNUC__ */
+
+#define UNUSED(X) (void)X      /* To avoid gcc/g++ warnings */
+
 #endif    // /* ___LE501X_HAL_DEF */
 
 /****END OF FILE****/

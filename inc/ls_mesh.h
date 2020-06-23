@@ -13,27 +13,40 @@ typedef uint8_t SIGMESH_NodeInfo_TypeDef;
 #define MAX_MESH_MODEL_MSG_BUFFER (60)
 
 //mesh server model index
-#define GENERIC_ONOFF_SERVER (0x1000)
-#define LIGHTNESS_SERVER (0x1300)
-#define VENDOR_TMALL_SERVER (0x01A80000)
+#define GENERIC_ONOFF_SERVER             (0x1000)
+#define LIGHTNESS_SERVER                 (0x1300)
+#define LIGHTS_CTL_SERVER                (0x1303)
+#define LIGHTS_HSL_SERVER                (0x1307)
+#define VENDOR_TMALL_SERVER              (0x01A80000)
+        
+//Generic OnOff        
+#define GENERIC_ONOFF_GET                (0x0182)
+#define GENERIC_ONOFF_SET                (0x0282)
+#define GENERIC_ONOFF_SET_UNAK           (0x0382)
+#define GENERIC_ONOFF_STATUS             (0x0482)
 
-//Generic OnOff
-#define GENERIC_ONOFF_GET (0x0182)
-#define GENERIC_ONOFF_SET (0x0282)
-#define GENERIC_ONOFF_SET_UNAK (0x0382)
-#define GENERIC_ONOFF_STATUS (0x0482)
-//Light Lightness
-#define LIGHT_LIGHTNESS_SET (0x4c82)
-#define LIGHT_LIGHTNESS_SET_UNAK (0x4d82)
-#define LIGHT_LIGHTNESS_STATUS (0x4e82)
+//Light Lightness        
+#define LIGHT_LIGHTNESS_SET              (0x4c82)
+#define LIGHT_LIGHTNESS_SET_UNAK         (0x4d82)
+#define LIGHT_LIGHTNESS_STATUS           (0x4e82)
 
-// Vendor
-#define APP_MESH_VENDOR_SET (0x0001A8d1)
-#define APP_MESH_VENDOR_SET_UNAK (0x0001A8d2)
-#define APP_MESH_VENDOR_STATUES (0x0001A8d3)
-#define APP_MESH_VENDOR_INDICATION (0x0001A8d4)
-#define APP_MESH_VENDOR_CONFIRMATION (0x0001A8d5)
-#define APP_MESH_VENDOR_TRANSPARENT_MSG (0x0001A8cf)
+//Light HSL
+#define LIGHT_HSL_SET                    (0x7682)
+#define LIGHT_HSL_SET_UNACK              (0x7782)
+#define LIGHT_HSL_STATUS                 (0x7882)
+
+//Light CTL
+#define LIGHT_CTL_SET                    (0x5E82)
+#define LIGHT_CTL_SET_UNACK              (0x5F82)
+#define LIGHT_CTL_STATUS                 (0x6082)
+
+// Vendor        
+#define APP_MESH_VENDOR_SET              (0x0001A8d1)
+#define APP_MESH_VENDOR_SET_UNAK         (0x0001A8d2)
+#define APP_MESH_VENDOR_STATUES          (0x0001A8d3)
+#define APP_MESH_VENDOR_INDICATION       (0x0001A8d4)
+#define APP_MESH_VENDOR_CONFIRMATION     (0x0001A8d5)
+#define APP_MESH_VENDOR_TRANSPARENT_MSG  (0x0001A8cf)
 
 #define VENDOR_OPCODE_LEN (3)
 
