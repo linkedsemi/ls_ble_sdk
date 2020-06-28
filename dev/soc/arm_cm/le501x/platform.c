@@ -23,6 +23,7 @@
 #include "lscrypt.h"
 #include "field_manipulate.h"
 #include "io_config.h"
+#include "ls_dbg.h"
 
 #define BASEBAND_MEMORY_ADDR   (0x50004000)
 #define IRQ_NVIC_PRIO(IRQn,priority) (((priority << (8U - __NVIC_PRIO_BITS)) & (uint32_t)0xFFUL) << _BIT_SHIFT(IRQn))
@@ -89,6 +90,7 @@ void ble_irq_clr_and_enable()
 void irq_disable_before_wfi()
 {
     NVIC->ICER[0] = ~(1<<BLE_WKUP_IRQn | 1<<LPWKUP_IRQn);
+    LS_ASSERT(NVIC->ISPR[0]==0);
 }
 
 static uint32_t flash_data_storage_base_offset()

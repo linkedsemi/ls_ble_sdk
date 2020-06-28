@@ -11,8 +11,10 @@ src = [
     'tinyfs/tinyfs_nvm.c',
     'tinyfs/tinyfs_write_cache.c',
     'tinyfs/tinyfs.c',
-    'sha256/sha256.c',
-    'sha256/utils.c'
+    'tinycrypt/lib/source/sha256.c',
+    'tinycrypt/lib/source/utils.c',
+    'tinycrypt/lib/source/ecc.c',
+    'tinycrypt/lib/source/ecc_dsa.c',
 ]
 inc = [
     'crc',
@@ -20,7 +22,7 @@ inc = [
     'debug/RTT',
     'static_buffer',
     'tinyfs',
-    'sha256'
+    'tinycrypt/lib/include',
 ]
 src_files = File(dev_env.subst(src))
 inc_dirs = Dir(inc)

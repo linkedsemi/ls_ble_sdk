@@ -172,7 +172,7 @@ NOINLINE XIP_BANNED  void set_mode_deep_sleep_lvl3(struct sleep_wakeup_type *par
 
     SYSCFG->PMU_WKUP = FIELD_BUILD(SYSCFG_SLP_LVL, SLEEP_MODE3) 
                       | FIELD_BUILD(SYSCFG_WKUP_EDGE,param->trig_edge)
-                      | FIELD_BUILD(SYSCFG_WKUP_EN, param->trig_src);  //PA00; 
+                      | FIELD_BUILD(SYSCFG_WKUP_EN, param->trig_src);
 
     SYSCFG->PMU_PWR = 0; 
     SCB->SCR |= (1<<2);
