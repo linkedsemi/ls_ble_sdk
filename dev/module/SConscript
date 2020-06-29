@@ -15,6 +15,7 @@ src = [
     'tinycrypt/lib/source/utils.c',
     'tinycrypt/lib/source/ecc.c',
     'tinycrypt/lib/source/ecc_dsa.c',
+    'tinycrypt/lib/source/ecc_platform_specific.c',
 ]
 inc = [
     'crc',

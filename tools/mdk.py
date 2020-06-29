@@ -62,6 +62,12 @@ def mdk_builder(target,source,env):
     with open(filename,'wb') as file_obj:
         file_obj.write(prj.toxml("utf-8"))
 
+    #print(os.path.isfile(os.path.join(prj_dir,os.path.basename(target[0].path)+'.uvprojx')))
+    if os.path.isfile(os.path.join(prj_dir,os.path.basename(target[0].path)+'.uvprojx'))==True:
+        os.remove(os.path.join(prj_dir,os.path.basename(target[0].path)+'.uvprojx'))
+    if os.path.isfile(os.path.join(prj_dir,os.path.basename(target[0].path)+'.uvoptx'))==True:
+        os.remove(os.path.join(prj_dir,os.path.basename(target[0].path)+'.uvoptx'))    
+    
     proj_path = os.path.join(prj_dir,os.path.basename(target[0].path)+'.uvprojx')
     proj_gen = env['UV'] + ' ' + proj_path + ' -i ' + filename
     proj_build = env['UV'] + ' -b ' + proj_path

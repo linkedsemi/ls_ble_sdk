@@ -432,6 +432,11 @@
               <FilePath>..\..\..\module\tinycrypt\lib\source\ecc_dsa.c</FilePath>
             </File>
             <File>
+              <FileName>ecc_platform_specific.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\module\tinycrypt\lib\source\ecc_platform_specific.c</FilePath>
+            </File>
+            <File>
               <FileName>flash_svcall.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\soc\arm_cm\flash_svcall.c</FilePath>

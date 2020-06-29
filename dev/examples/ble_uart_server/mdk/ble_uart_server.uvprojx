@@ -32,7 +32,7 @@
           <SLE66CMisc></SLE66CMisc>
           <SLE66AMisc></SLE66AMisc>
           <SLE66LinkerMisc></SLE66LinkerMisc>
-          <SFDFile>$$Device:ARMCM0$Device\ARM\SVD\ARMCM0.svd</SFDFile>
+          <SFDFile></SFDFile>
           <bCustSvd>0</bCustSvd>
           <UseEnv>0</UseEnv>
           <BinPath></BinPath>
@@ -422,6 +422,21 @@
               <FilePath>..\..\..\soc\arm_cm\le501x\compiler\armcc\delay_asm.s</FilePath>
             </File>
             <File>
+              <FileName>ecc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\module\tinycrypt\lib\source\ecc.c</FilePath>
+            </File>
+            <File>
+              <FileName>ecc_dsa.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\module\tinycrypt\lib\source\ecc_dsa.c</FilePath>
+            </File>
+            <File>
+              <FileName>ecc_platform_specific.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\module\tinycrypt\lib\source\ecc_platform_specific.c</FilePath>
+            </File>
+            <File>
               <FileName>flash_svcall.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\soc\arm_cm\flash_svcall.c</FilePath>
@@ -502,6 +517,11 @@
               <FilePath>..\..\..\soc\arm_cm\le501x\integration\lsqspi_param.c</FilePath>
             </File>
             <File>
+              <FileName>lstimer.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\peripheral\timer\lstimer.c</FilePath>
+            </File>
+            <File>
               <FileName>lstrng.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\peripheral\trng\lstrng.c</FilePath>
@@ -524,7 +544,7 @@
             <File>
               <FileName>sha256.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\module\sha256\sha256.c</FilePath>
+              <FilePath>..\..\..\module\tinycrypt\lib\source\sha256.c</FilePath>
             </File>
             <File>
               <FileName>sleep.c</FileName>
@@ -594,33 +614,12 @@
             <File>
               <FileName>utils.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\module\sha256\utils.c</FilePath>
-            </File>
-            <File>
-              <FileName>lstimer.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\peripheral\timer\lstimer.c</FilePath>
-            </File>
-            <File>
-              <FileName>ecc.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\module\tinycrypt\lib\source\ecc.c</FilePath>
-            </File>
-            <File>
-              <FileName>ecc_dsa.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\module\tinycrypt\lib\source\ecc_dsa.c</FilePath>
+              <FilePath>..\..\..\module\tinycrypt\lib\source\utils.c</FilePath>
             </File>
           </Files>
         </Group>
       </Groups>
     </Target>
   </Targets>
-
-  <RTE>
-    <apis/>
-    <components/>
-    <files/>
-  </RTE>
 
 </Project>

@@ -101,5 +101,21 @@ int default_CSPRNG(uint8_t *dest, unsigned int size) {
   return 1;
 }
 
+#else
+#include <stdlib.h>
+#include <stdint.h>
+int default_CSPRNG(uint8_t *dest, unsigned int size) 
+{
+    /* input sanity check: */
+    if (dest == (uint8_t *) 0 || (size <= 0))
+        return 0;
+    
+    for (unsigned int i = 0; i < size; i++)
+    {
+        dest[i++] = rand() & 0xff;
+    }
+    return 1;    
+}
+
 #endif /* platform */
 
