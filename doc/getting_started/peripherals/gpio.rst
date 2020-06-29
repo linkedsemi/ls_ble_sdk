@@ -12,7 +12,7 @@ GPIO
 
 .. code ::
     
-    io_set_output(PB00); //设置PB00为输出模式
+    io_cfg_output(PB00); //设置PB00为输出模式
     io_write_pin(PB00,1); //设置PB00输出高电平
     io_write_pin(PB00,0); //设置PB00输出低电平
     io_set_pin(PB00); //设置PB00输出高电平
@@ -23,17 +23,17 @@ GPIO
 
 .. code ::
 
-    io_set_input(PB01); //设置PB01为输入模式
+    io_cfg_input(PB01); //设置PB01为输入模式
     uint8_t val = io_read_pin(PB01); //读取PB01电平，保存到val变量
 
 配置上升、下降沿中断
 
 .. code ::
     
-    io_set_input(PA00); //设置PA00为输入模式
+    io_cfg_input(PA00); //设置PA00为输入模式
     io_exti_config(PA00,INT_EDGE_RISING); //配置PA00中断，上升沿触发
     io_exti_enable(PA00,true); //使能PA00中断
-    io_set_input(PB11); //设置PB11为输入模式
+    io_cfg_input(PB11); //设置PB11为输入模式
     io_exti_config(PB11,INT_EDGE_FALLING); //配置PB11中断，下降沿触发
     io_exti_enable(PB11,true); //使能PB11中断
 
@@ -71,15 +71,10 @@ GPIO
 外设功能模式
 -------------
 
-UART：
+具体配置参考各外设文档
+
+:ref:`uart_ref` 
 
 
-TIMER:
-
-
-SPI:
-
-
-IIC:
 
 
