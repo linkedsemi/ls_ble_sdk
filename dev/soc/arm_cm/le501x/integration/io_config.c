@@ -37,22 +37,54 @@ reg_lsgpio_t* GPIO_GetPort(uint8_t Pin_port)
     return Port;
 }
 
-static void uart_io_init(gpio_pin_t txd,gpio_pin_t rxd)
+static void uart_io_init(gpio_pin_t txd,gpio_pin_t rxd ,uint8_t uart_num)
 {
     reg_lsgpio_t* gpiox;
     uint8_t position = txd.num;
+    uint32_t iocurrent;
+    volatile uint32_t *configregister; /* Store the address of GPIO register based on pin number */
+    uint32_t registeroffset; 
+    iocurrent = 1u<< position;
     gpiox = GPIO_GetPort(txd.port);
     MODIFY_REG(gpiox->MODE, (GPIO_MODE0_MASK << (position << 1u)), (SET_GPIO_MODE_AF << (position << 1u)));
-    MODIFY_REG(gpiox->OD, (GPIO_OD0_MASK << (position << 1u)), (GPIO_OUTPUT_MAX_DRIVER << (position << 1u)));
     MODIFY_REG(gpiox->OE, (GPIO_OE0_MASK << position), (GPIO_OUTPUT_EN << position));
     MODIFY_REG(gpiox->IE, (GPIO_IE0_MASK << position), (0U << position));
-
+    configregister = (iocurrent < GPIO_PIN_8) ? ((iocurrent < GPIO_PIN_4) ? (&(gpiox->AF0)) : (&(gpiox->AF1))) : ((iocurrent < GPIO_PIN_12) ? (&(gpiox->AF2)) : (&(gpiox->AF3)));
+    registeroffset = (iocurrent < GPIO_PIN_8) ? ((iocurrent < GPIO_PIN_4) ? (position) : (position - 4u)) : ((iocurrent < GPIO_PIN_12) ? (position - 8u) : (position - 12u));
+    registeroffset <<= 3u;
+    if (uart_num == 1)
+    {
+        MODIFY_REG((*configregister), (GPIO_IO0_AF_MASK << (registeroffset)), (AF_UART1_TXD << (registeroffset)));
+    }
+    if (uart_num == 2)
+    {
+        MODIFY_REG((*configregister), (GPIO_IO0_AF_MASK << (registeroffset)), (AF_UART2_TXD << (registeroffset)));
+    }
+    if (uart_num == 3)
+    {
+        MODIFY_REG((*configregister), (GPIO_IO0_AF_MASK << (registeroffset)), (AF_UART3_TXD << (registeroffset)));
+    }
     position = rxd.num;
+    iocurrent = 1u<< position;
     gpiox = GPIO_GetPort(rxd.port);
     MODIFY_REG(gpiox->MODE, (GPIO_MODE0_MASK << (position << 1u)), (SET_GPIO_MODE_AF << (position << 1u)));
-    MODIFY_REG(gpiox->OD, (GPIO_OD0_MASK << (position << 1u)), (GPIO_OUTPUT_MAX_DRIVER << (position << 1u)));
     MODIFY_REG(gpiox->OE, (GPIO_OE0_MASK << position), (0U << position));
     MODIFY_REG(gpiox->IE, (GPIO_IE0_MASK << position), (GPIO_INPUT_EN << position));
+    configregister = (iocurrent < GPIO_PIN_8) ? ((iocurrent < GPIO_PIN_4) ? (&(gpiox->AF0)) : (&(gpiox->AF1))) : ((iocurrent < GPIO_PIN_12) ? (&(gpiox->AF2)) : (&(gpiox->AF3)));
+    registeroffset = (iocurrent < GPIO_PIN_8) ? ((iocurrent < GPIO_PIN_4) ? (position) : (position - 4u)) : ((iocurrent < GPIO_PIN_12) ? (position - 8u) : (position - 12u));
+    registeroffset <<= 3u;
+    if (uart_num == 1)
+    {
+        MODIFY_REG((*configregister), (GPIO_IO0_AF_MASK << (registeroffset)), (AF_UART1_RXD << (registeroffset)));
+    }
+    if (uart_num == 2)
+    {
+        MODIFY_REG((*configregister), (GPIO_IO0_AF_MASK << (registeroffset)), (AF_UART2_RXD << (registeroffset)));
+    }
+    if (uart_num == 3)
+    {
+        MODIFY_REG((*configregister), (GPIO_IO0_AF_MASK << (registeroffset)), (AF_UART3_RXD << (registeroffset)));
+    }
 }
 
 static void uart_io_deinit(gpio_pin_t txd,gpio_pin_t rxd)
@@ -74,12 +106,14 @@ void uart1_io_init(uint8_t txd,uint8_t rxd)
     uart1_rxd.num = rxd;
     uart1_txd.port = txd>>4;
     uart1_txd.num = txd;
-    uart_io_init(uart1_rxd,uart1_txd);
+    uart_io_init(uart1_txd,uart1_rxd,1);
+    io_write_pin(txd,1);
+    io_write_pin(rxd,1);
 }
 
 void uart1_io_deinit()
 {
-    uart_io_deinit(uart1_rxd,uart1_txd);
+    uart_io_deinit(uart1_txd,uart1_rxd);
 }
 
 void uart2_io_init(uint8_t txd,uint8_t rxd)
@@ -88,12 +122,14 @@ void uart2_io_init(uint8_t txd,uint8_t rxd)
     uart2_rxd.num = rxd;
     uart2_txd.port = txd>>4;
     uart2_txd.num = txd;
-    uart_io_init(uart2_rxd,uart2_txd);
+    uart_io_init(uart2_txd,uart2_rxd,2);
+    io_write_pin(txd,1);
+    io_write_pin(rxd,1);
 }
 
 void uart2_io_deinit()
 {
-    uart_io_deinit(uart2_rxd,uart2_txd);
+    uart_io_deinit(uart2_txd,uart2_rxd);
 }
 
 void uart3_io_init(uint8_t txd,uint8_t rxd)
@@ -102,7 +138,9 @@ void uart3_io_init(uint8_t txd,uint8_t rxd)
     uart3_rxd.num = rxd;
     uart3_txd.port = txd>>4;
     uart3_txd.num = txd;
-    uart_io_init(uart3_rxd,uart3_txd);
+    uart_io_init(uart3_txd,uart3_rxd,3);
+    io_write_pin(txd,1);
+    io_write_pin(rxd,1);
 }
 
 void uart3_io_deinit()

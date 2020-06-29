@@ -26,25 +26,12 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart,void *rx_arg)
 
 static void gpio_init()
 {
-    __HAL_RCC_GPIOB_CLK_ENABLE();
-//  PB11 UART3_RX
-    GPIO_InitTypeDef GPIO_InitStruct = {0};
-    GPIO_InitStruct.Pin = GPIO_PIN_11;
-    GPIO_InitStruct.Mode = GPIO_MODE_AF;
-    GPIO_InitStruct.AF_Type = AF_UART3_RXD;
-    HAL_GPIO_Init(LSGPIOB, &GPIO_InitStruct);
-//  PB15  UART3_TX
-    GPIO_InitStruct.Pin = GPIO_PIN_15;
-    GPIO_InitStruct.Mode = GPIO_MODE_AF;
-    GPIO_InitStruct.AF_Type = AF_UART3_TXD;
-    HAL_GPIO_Init(LSGPIOB, &GPIO_InitStruct);
-    uart3_io_init(PB15,PB11);
-
+    uart1_io_init(PB00,PB01);
 }
 
 static void uart_test_init(void)
 {
-    UART_Config.UARTX = UART3;
+    UART_Config.UARTX = UART1;
     UART_Config.Init.BaudRate = UART_BAUDRATE_115200;
     UART_Config.Init.MSBEN = 0;
     UART_Config.Init.Parity = UART_NOPARITY;
