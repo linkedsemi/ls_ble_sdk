@@ -5,8 +5,8 @@
 #include "sleep.h"
 typedef struct
 {
-    uint8_t port:4,
-            num:4;
+    uint8_t num:4,
+            port:4;
 }gpio_pin_t;
 
 gpio_pin_t uart1_txd;

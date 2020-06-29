@@ -105,15 +105,15 @@ static void wkup_irq_clr()
     NVIC->ICPR[0] = 1<<BLE_WKUP_IRQn | 1<<LPWKUP_IRQn;
 }
 
-static void wkup_irq_enable()
+static void wkup_exti_irq_enable()
 {
-    NVIC->ISER[0] = 1<<BLE_WKUP_IRQn | 1<<LPWKUP_IRQn;
+    NVIC->ISER[0] = 1<<BLE_WKUP_IRQn | 1<<LPWKUP_IRQn | 1<<EXTI_IRQn;
 }
 
 void irq_reinit()
 {
     irq_priority();
-    wkup_irq_enable();
+    wkup_exti_irq_enable();
 }
 
 static void irq_init()
