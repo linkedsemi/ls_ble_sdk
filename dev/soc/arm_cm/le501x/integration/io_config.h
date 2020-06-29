@@ -57,9 +57,9 @@ typedef enum
 
 void io_init(void);
 
-void io_set_output(uint8_t pin);
+void io_cfg_output(uint8_t pin);
 
-void io_set_input(uint8_t pin);
+void io_cfg_input(uint8_t pin);
 
 void io_write_pin(uint8_t pin,uint8_t val);
 

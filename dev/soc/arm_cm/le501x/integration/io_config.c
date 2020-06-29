@@ -15,6 +15,7 @@ gpio_pin_t uart2_txd;
 gpio_pin_t uart2_rxd;
 gpio_pin_t uart3_txd;
 gpio_pin_t uart3_rxd;
+
 reg_lsgpio_t* GPIO_GetPort(uint8_t Pin_port)
 {
     uint8_t       PortID = Pin_port;
@@ -37,115 +38,77 @@ reg_lsgpio_t* GPIO_GetPort(uint8_t Pin_port)
     return Port;
 }
 
-static void uart_io_init(gpio_pin_t txd,gpio_pin_t rxd ,uint8_t uart_num)
+static void uart_gpio_init(uint8_t txd,uint8_t rxd)
 {
-    reg_lsgpio_t* gpiox;
-    uint8_t position = txd.num;
-    uint32_t iocurrent;
-    volatile uint32_t *configregister; /* Store the address of GPIO register based on pin number */
-    uint32_t registeroffset; 
-    iocurrent = 1u<< position;
-    gpiox = GPIO_GetPort(txd.port);
-    MODIFY_REG(gpiox->MODE, (GPIO_MODE0_MASK << (position << 1u)), (SET_GPIO_MODE_AF << (position << 1u)));
-    MODIFY_REG(gpiox->OE, (GPIO_OE0_MASK << position), (GPIO_OUTPUT_EN << position));
-    MODIFY_REG(gpiox->IE, (GPIO_IE0_MASK << position), (0U << position));
-    configregister = (iocurrent < GPIO_PIN_8) ? ((iocurrent < GPIO_PIN_4) ? (&(gpiox->AF0)) : (&(gpiox->AF1))) : ((iocurrent < GPIO_PIN_12) ? (&(gpiox->AF2)) : (&(gpiox->AF3)));
-    registeroffset = (iocurrent < GPIO_PIN_8) ? ((iocurrent < GPIO_PIN_4) ? (position) : (position - 4u)) : ((iocurrent < GPIO_PIN_12) ? (position - 8u) : (position - 12u));
-    registeroffset <<= 3u;
-    if (uart_num == 1)
-    {
-        MODIFY_REG((*configregister), (GPIO_IO0_AF_MASK << (registeroffset)), (AF_UART1_TXD << (registeroffset)));
-    }
-    if (uart_num == 2)
-    {
-        MODIFY_REG((*configregister), (GPIO_IO0_AF_MASK << (registeroffset)), (AF_UART2_TXD << (registeroffset)));
-    }
-    if (uart_num == 3)
-    {
-        MODIFY_REG((*configregister), (GPIO_IO0_AF_MASK << (registeroffset)), (AF_UART3_TXD << (registeroffset)));
-    }
-    position = rxd.num;
-    iocurrent = 1u<< position;
-    gpiox = GPIO_GetPort(rxd.port);
-    MODIFY_REG(gpiox->MODE, (GPIO_MODE0_MASK << (position << 1u)), (SET_GPIO_MODE_AF << (position << 1u)));
-    MODIFY_REG(gpiox->OE, (GPIO_OE0_MASK << position), (0U << position));
-    MODIFY_REG(gpiox->IE, (GPIO_IE0_MASK << position), (GPIO_INPUT_EN << position));
-    configregister = (iocurrent < GPIO_PIN_8) ? ((iocurrent < GPIO_PIN_4) ? (&(gpiox->AF0)) : (&(gpiox->AF1))) : ((iocurrent < GPIO_PIN_12) ? (&(gpiox->AF2)) : (&(gpiox->AF3)));
-    registeroffset = (iocurrent < GPIO_PIN_8) ? ((iocurrent < GPIO_PIN_4) ? (position) : (position - 4u)) : ((iocurrent < GPIO_PIN_12) ? (position - 8u) : (position - 12u));
-    registeroffset <<= 3u;
-    if (uart_num == 1)
-    {
-        MODIFY_REG((*configregister), (GPIO_IO0_AF_MASK << (registeroffset)), (AF_UART1_RXD << (registeroffset)));
-    }
-    if (uart_num == 2)
-    {
-        MODIFY_REG((*configregister), (GPIO_IO0_AF_MASK << (registeroffset)), (AF_UART2_RXD << (registeroffset)));
-    }
-    if (uart_num == 3)
-    {
-        MODIFY_REG((*configregister), (GPIO_IO0_AF_MASK << (registeroffset)), (AF_UART3_RXD << (registeroffset)));
-    }
+    io_set_pin(txd);
+    io_cfg_output(txd);
+    io_cfg_input(rxd);
 }
 
-static void uart_io_deinit(gpio_pin_t txd,gpio_pin_t rxd)
+static void af_io_init(gpio_pin_t *pin,enum GPIO_AF af)
 {
-    reg_lsgpio_t* gpiox;
-    uint8_t position = txd.num;
-    gpiox = GPIO_GetPort(txd.port);
-    HAL_GPIO_WritePin(gpiox,0x01<<position,1);
-    MODIFY_REG(gpiox->MODE, (GPIO_MODE0_MASK << (position << 1u)), (SET_GPIO_MODE_GPIO << (position << 1u)));
-
-
-    position = rxd.num;
-    gpiox = GPIO_GetPort(rxd.port);
-    MODIFY_REG(gpiox->MODE, (GPIO_MODE0_MASK << (position << 1u)), (SET_GPIO_MODE_GPIO << (position << 1u)));
+    reg_lsgpio_t *port = GPIO_GetPort(pin->port);
+    switch(pin->num)
+    {
+    case 0: case 1: case 2: case 3:
+        MODIFY_REG(port->AF0, GPIO_IO0_AF_MASK << pin->num * 8, af << pin->num * 8);
+    break;
+    case 4: case 5: case 6: case 7:
+        MODIFY_REG(port->AF1, GPIO_IO4_AF_MASK << (pin->num - 4) * 8, af << (pin->num - 4) * 8);
+    break;
+    case 8: case 9: case 10: case 11:
+        MODIFY_REG(port->AF2, GPIO_IO8_AF_MASK << (pin->num - 8) * 8, af << (pin->num - 8) * 8);
+    break;
+    case 12: case 13: case 14: case 15:
+        MODIFY_REG(port->AF3, GPIO_IO12_AF_MASK << (pin->num - 12) * 8, af << (pin->num - 12) * 8);
+    break;
+    }
+    MODIFY_REG(port->MODE, GPIO_MODE0_MASK << (pin->num << 1u), SET_GPIO_MODE_AF << (pin->num << 1u));
 }
+
+static void set_gpio_mode(gpio_pin_t *pin)
+{
+    reg_lsgpio_t *gpiox = GPIO_GetPort(pin->port);
+    MODIFY_REG(gpiox->MODE, GPIO_MODE0_MASK << (pin->num << 1u), SET_GPIO_MODE_GPIO << (pin->num << 1u));
+}
+
 void uart1_io_init(uint8_t txd,uint8_t rxd)
 {
-    uart1_rxd.port = rxd>>4;
-    uart1_rxd.num = rxd;
-    uart1_txd.port = txd>>4;
-    uart1_txd.num = txd;
-    uart_io_init(uart1_txd,uart1_rxd,1);
-    io_write_pin(txd,1);
-    io_write_pin(rxd,1);
+    uart_gpio_init(txd,rxd);
+    af_io_init((gpio_pin_t *)&txd,AF_UART1_TXD);
+    af_io_init((gpio_pin_t *)&rxd,AF_UART1_RXD);
 }
 
 void uart1_io_deinit()
 {
-    uart_io_deinit(uart1_txd,uart1_rxd);
+    set_gpio_mode((gpio_pin_t *)&uart1_txd);
+    set_gpio_mode((gpio_pin_t *)&uart1_rxd);
 }
 
 void uart2_io_init(uint8_t txd,uint8_t rxd)
 {
-    uart2_rxd.port = rxd>>4;
-    uart2_rxd.num = rxd;
-    uart2_txd.port = txd>>4;
-    uart2_txd.num = txd;
-    uart_io_init(uart2_txd,uart2_rxd,2);
-    io_write_pin(txd,1);
-    io_write_pin(rxd,1);
+    uart_gpio_init(txd,rxd);
+    af_io_init((gpio_pin_t *)&txd,AF_UART2_TXD);
+    af_io_init((gpio_pin_t *)&rxd,AF_UART2_RXD);
 }
 
 void uart2_io_deinit()
 {
-    uart_io_deinit(uart2_txd,uart2_rxd);
+    set_gpio_mode((gpio_pin_t *)&uart2_txd);
+    set_gpio_mode((gpio_pin_t *)&uart2_rxd);
 }
 
 void uart3_io_init(uint8_t txd,uint8_t rxd)
 {
-    uart3_rxd.port = rxd>>4;
-    uart3_rxd.num = rxd;
-    uart3_txd.port = txd>>4;
-    uart3_txd.num = txd;
-    uart_io_init(uart3_txd,uart3_rxd,3);
-    io_write_pin(txd,1);
-    io_write_pin(rxd,1);
+    uart_gpio_init(txd,rxd);
+    af_io_init((gpio_pin_t *)&txd,AF_UART3_TXD);
+    af_io_init((gpio_pin_t *)&rxd,AF_UART3_RXD);
 }
 
 void uart3_io_deinit()
 {
-    uart_io_deinit(uart3_rxd,uart3_txd);
+    set_gpio_mode((gpio_pin_t *)&uart3_txd);
+    set_gpio_mode((gpio_pin_t *)&uart3_rxd);
 }
 
 
@@ -162,7 +125,7 @@ void io_init(void)
     LSGPIOB->PUPD = 0x2800;
 }
 
-void io_set_output(uint8_t pin)
+void io_cfg_output(uint8_t pin)
 {
     gpio_pin_t *x = (gpio_pin_t *)&pin;
     switch(x->port)
@@ -174,10 +137,9 @@ void io_set_output(uint8_t pin)
         LSGPIOB->OE |= 1<< x->num;
     break;
     }
-
 }
 
-void io_set_input(uint8_t pin)
+void io_cfg_input(uint8_t pin)
 {
     gpio_pin_t *x = (gpio_pin_t *)&pin;
     switch(x->port)

@@ -209,7 +209,9 @@ void low_power_mode_init()
 static void power_down_hardware_modules()
 {
     SYSCFG->PMU_PWR = FIELD_BUILD(SYSCFG_PERI_PWR2_PD, 1) 
-                    | FIELD_BUILD(SYSCFG_PERI_ISO2_EN,1);
+                    | FIELD_BUILD(SYSCFG_PERI_ISO2_EN,1)
+                    | FIELD_BUILD(SYSCFG_ERAM_ISO7_EN,2)
+                    | FIELD_BUILD(SYSCFG_ERAM_PWR7_PD,2);
 }
 
 void ble_wkup_status_set(bool status)
