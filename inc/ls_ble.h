@@ -272,7 +272,11 @@ enum gap_evt_type
     GET_DEV_INFO_APPEARANCE,
     GET_DEV_INFO_SLV_PRE_PARAM,
 };
-
+enum
+{
+    LS_BLE_ROLE_MASTER,
+    LS_BLE_ROLE_SLAVE,
+};
 struct gap_conn_param
 {
     /// Connection interval minimum
@@ -417,13 +421,23 @@ struct gap_update_conn_param
 
 enum gatt_evt_type
 {
-    SERVER_READ_REQ,
+    SERVER_READ_REQ = 0,
     SERVER_WRITE_REQ,
     SERVER_NOTIFICATION_DONE,
     SERVER_INDICATION_DONE,
     SERVER_MTU_CHANGED_INDICATION,
+
     CLIENT_RECV_NOTIFICATION,
     CLIENT_RECV_INDICATION,
+    CLIENT_PRIMARY_SVC_DIS_IND,       // Primary service discovery indication
+    CLIENT_SVC_DIS_INCL_IND,          // Included service discovery indication
+    CLIENT_CHAR_DIS_BY_UUID_IND,      // Characteristic discovery by UUID indication 
+    CLIENT_CHAR_DIS_DESC_IND, // Characteristic descriptor discovery by UUID indication
+    // CLIENT_CCCD_DIS_IND,              // CCCD discovery indication
+    CLIENT_RD_CHAR_VAL_BY_UUID_IND,   // Read characteristic value by UUID indication
+    CLIENT_WRITE_RSP_IND,             // Write response indication
+    CLIENT_WRITE_NO_RSP_IND,          // Write with no response indication
+    CLIENT_EVT_MAX
 };
 
 struct gatt_svc_env
@@ -466,6 +480,63 @@ struct gatt_mtu_changed_indicate
     uint16_t mtu;
 };
 
+struct gatt_handle_range
+{
+    uint16_t begin_handle;
+    uint16_t end_handle;
+};
+
+struct gatt_client_svc_disc_indicate
+{
+    const uint8_t *uuid;
+    struct gatt_handle_range handle_range;  
+    enum uuid_length uuid_len;
+};
+
+struct gatt_client_svc_disc_include_indicate
+{
+    const uint8_t *uuid;
+    struct gatt_handle_range handle_range;
+    uint16_t attr_handle;
+    enum uuid_length uuid_len;
+};
+
+struct gatt_client_disc_char_indicate
+{
+    const uint8_t *uuid;
+    uint16_t attr_handle;
+    uint16_t pointer_handle;
+    uint8_t properties;
+    enum uuid_length uuid_len;
+};
+
+struct gatt_client_disc_char_desc_indicate
+{
+    const uint8_t *uuid;
+    uint16_t attr_handle;
+    enum uuid_length uuid_len;
+};
+
+struct gatt_read_indicate
+{
+    uint8_t const *value;
+    uint16_t handle;
+    uint16_t offset;
+    uint16_t length;
+};
+
+struct gatt_write_rsp
+{
+    uint16_t transaction_id;
+    uint8_t status;
+};
+
+struct gatt_write_no_rsp
+{
+    uint16_t transaction_id;
+    uint8_t status;
+};
+
 union gatt_evt_u
 {
     struct gatt_server_read_req server_read_req;
@@ -473,6 +544,13 @@ union gatt_evt_u
     struct gatt_server_notify_indicate_done server_notify_indicate_done;
     struct gatt_client_recv_notify_indicate client_recv_notify_indicate;
     struct gatt_mtu_changed_indicate mtu_changed_ind;
+    struct gatt_client_svc_disc_indicate client_svc_disc_indicate;
+    struct gatt_client_svc_disc_include_indicate client_svc_disc_include_indicate;
+    struct gatt_client_disc_char_indicate client_disc_char_indicate;
+    struct gatt_client_disc_char_desc_indicate client_disc_char_desc_indicate;
+    struct gatt_read_indicate client_read_indicate;
+    struct gatt_write_rsp client_write_rsp;
+    struct gatt_write_no_rsp client_write_no_rsp;
 };
 
 void ble_init(void);
@@ -556,5 +634,21 @@ void gatt_manager_server_send_notification(uint8_t con_idx,uint16_t handle,uint8
 void gatt_manager_client_indication_confirm(uint8_t con_idx,uint16_t handle);
 
 uint16_t gatt_manager_get_svc_att_handle(struct gatt_svc_env *svc,uint8_t att_idx);
+
+void gatt_manager_client_write_no_rsp(uint8_t con_idx,uint16_t handle,uint8_t *data,uint16_t length);
+
+void gatt_manager_client_write_with_rsp(uint8_t con_idx,uint16_t handle,uint8_t *data,uint16_t length);
+
+void gatt_manager_client_cccd_enable(uint8_t con_idx,uint16_t handle,bool notification_en, bool indication_en);
+
+void gatt_manager_client_svc_discover_by_uuid(uint8_t con_idx,uint8_t *uuid,enum uuid_length uuid_len,uint16_t start_hdl,uint16_t end_hdl);
+
+void gatt_manager_client_char_discover_by_uuid(uint8_t con_idx,uint8_t *uuid,enum uuid_length uuid_len,uint16_t start_hdl,uint16_t end_hdl);
+
+void gatt_manager_client_desc_char_discover(uint8_t con_idx,uint16_t start_hdl,uint16_t end_hdl);
+
+void gatt_manager_client_mtu_exch_send(uint8_t con_idx);
+
+void gatt_manager_client_read(uint8_t con_idx,uint16_t handle);
 #endif
 

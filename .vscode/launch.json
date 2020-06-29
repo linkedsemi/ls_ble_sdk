@@ -172,6 +172,37 @@
             "request": "launch",
             "servertype": "jlink",
             "cwd": "${workspaceRoot}",
+            "executable": "./build/examples/ble_master_slave_combine.elf",
+            "name": "Debug BLE_MASTER_SLAVE_COMBINE",
+            "device": "LE501X",
+            "interface": "swd",
+            "runToMain": true,
+            "preLaunchCommands":[
+                "monitor flash breakpoints = 0",
+                "monitor reset",
+                "load", 
+                "add-symbol-file build/fw.elf", 
+            ]
+        },
+        {
+            "type": "cortex-debug",
+            "request": "attach",
+            "servertype": "jlink",
+            "cwd": "${workspaceRoot}",
+            "executable": "./build/examples/ble_master_slave_combine.elf",
+            "name": "Attach BLE_MASTER_SLAVE_COMBINE",
+            "device": "LE501X",
+            "interface": "swd",
+            "preAttachCommands":[
+                "monitor flash breakpoints = 0",
+                "add-symbol-file build/fw.elf", 
+            ]
+        },
+        {
+            "type": "cortex-debug",
+            "request": "launch",
+            "servertype": "jlink",
+            "cwd": "${workspaceRoot}",
             "executable": "./build/examples/uart_test.elf",
             "name": "Debug UART_TEST",
             "device": "LE501X",
