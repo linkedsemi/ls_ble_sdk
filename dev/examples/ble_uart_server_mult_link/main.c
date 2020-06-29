@@ -9,6 +9,7 @@
 #include "builtin_timer.h"
 #include <string.h>
 #include "co_math.h"
+#include "io_config.h"
 
 #define UART_SVC_ADV_NAME "LS UART Server Mult Link"
 #define UART_SERVER_MAX_MTU  517
@@ -220,6 +221,7 @@ static void ls_uart_init(void)
     UART_Server_Config.Init.StopBits = UART_STOPBITS1;
     UART_Server_Config.Init.WordLength = UART_BYTESIZE8;
     HAL_UART_Init(&UART_Server_Config);
+    uart1_io_init(PB00, PB01);
 }
 static void ls_uart_server_read_req_ind(uint8_t att_idx, uint8_t con_idx)
 {

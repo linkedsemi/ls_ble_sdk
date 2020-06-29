@@ -32,7 +32,7 @@
           <SLE66CMisc></SLE66CMisc>
           <SLE66AMisc></SLE66AMisc>
           <SLE66LinkerMisc></SLE66LinkerMisc>
-          <SFDFile>$$Device:ARMCM0$Device\ARM\SVD\ARMCM0.svd</SFDFile>
+          <SFDFile></SFDFile>
           <bCustSvd>0</bCustSvd>
           <UseEnv>0</UseEnv>
           <BinPath></BinPath>
@@ -48,7 +48,7 @@
             <InvalidFlash>1</InvalidFlash>
           </TargetStatus>
           <OutputDirectory>.\UVBuild\</OutputDirectory>
-          <OutputName>uart_test</OutputName>
+          <OutputName>ble_master_slave_combine</OutputName>
           <CreateExecutable>1</CreateExecutable>
           <CreateLib>0</CreateLib>
           <CreateHexFile>0</CreateHexFile>
@@ -417,9 +417,29 @@
               <FilePath>..\..\..\module\crc\crc16.c</FilePath>
             </File>
             <File>
+              <FileName>delay_asm.s</FileName>
+              <FileType>2</FileType>
+              <FilePath>..\..\..\soc\arm_cm\le501x\compiler\armcc\delay_asm.s</FilePath>
+            </File>
+            <File>
+              <FileName>ecc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\module\tinycrypt\lib\source\ecc.c</FilePath>
+            </File>
+            <File>
+              <FileName>ecc_dsa.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\module\tinycrypt\lib\source\ecc_dsa.c</FilePath>
+            </File>
+            <File>
               <FileName>flash_svcall.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\soc\arm_cm\flash_svcall.c</FilePath>
+            </File>
+            <File>
+              <FileName>io_config.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\soc\arm_cm\le501x\integration\io_config.c</FilePath>
             </File>
             <File>
               <FileName>libfw.o</FileName>
@@ -447,6 +467,41 @@
               <FilePath>..\..\..\module\debug\asm\armcc\ls_dbg_asm.s</FilePath>
             </File>
             <File>
+              <FileName>lsadc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\peripheral\adc\lsadc.c</FilePath>
+            </File>
+            <File>
+              <FileName>lscache.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\peripheral\cache\lscache.c</FilePath>
+            </File>
+            <File>
+              <FileName>lscache_param.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\soc\arm_cm\le501x\integration\lscache_param.c</FilePath>
+            </File>
+            <File>
+              <FileName>lscrypt.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\peripheral\crypt\lscrypt.c</FilePath>
+            </File>
+            <File>
+              <FileName>lsecc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\peripheral\ecc\lsecc.c</FilePath>
+            </File>
+            <File>
+              <FileName>lsgpio.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\peripheral\gpio\lsgpio.c</FilePath>
+            </File>
+            <File>
+              <FileName>lsiwdt.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\peripheral\iwdt\lsiwdt.c</FilePath>
+            </File>
+            <File>
               <FileName>lsqspi.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\peripheral\qspi_flash\lsqspi.c</FilePath>
@@ -455,6 +510,16 @@
               <FileName>lsqspi_param.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\soc\arm_cm\le501x\integration\lsqspi_param.c</FilePath>
+            </File>
+            <File>
+              <FileName>lstimer.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\peripheral\timer\lstimer.c</FilePath>
+            </File>
+            <File>
+              <FileName>lstrng.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\peripheral\trng\lstrng.c</FilePath>
             </File>
             <File>
               <FileName>main.c</FileName>
@@ -470,6 +535,11 @@
               <FileName>platform.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\soc\arm_cm\le501x\platform.c</FilePath>
+            </File>
+            <File>
+              <FileName>sha256.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\module\tinycrypt\lib\source\sha256.c</FilePath>
             </File>
             <File>
               <FileName>sleep.c</FileName>
@@ -507,6 +577,11 @@
               <FilePath>..\..\..\soc\arm_cm\le501x\compiler\armcc\svcall_asm.s</FilePath>
             </File>
             <File>
+              <FileName>sys_stat.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\soc\arm_cm\le501x\sys_stat.c</FilePath>
+            </File>
+            <File>
               <FileName>tinyfs.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\module\tinyfs\tinyfs.c</FilePath>
@@ -532,95 +607,14 @@
               <FilePath>..\..\..\soc\arm_cm\le501x\integration\uart_param.c</FilePath>
             </File>
             <File>
-              <FileName>lscache.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\peripheral\cache\lscache.c</FilePath>
-            </File>
-            <File>
-              <FileName>lscache_param.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\soc\arm_cm\le501x\integration\lscache_param.c</FilePath>
-            </File>
-            <File>
-              <FileName>lscrypt.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\peripheral\crypt\lscrypt.c</FilePath>
-            </File>
-            <File>
-              <FileName>lsecc.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\peripheral\ecc\lsecc.c</FilePath>
-            </File>
-            <File>
-              <FileName>lsgpio.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\peripheral\gpio\lsgpio.c</FilePath>
-            </File>
-            <File>
-              <FileName>lstrng.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\peripheral\trng\lstrng.c</FilePath>
-            </File>
-            <File>
-              <FileName>sha256.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\module\sha256\sha256.c</FilePath>
-            </File>
-            <File>
               <FileName>utils.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\module\sha256\utils.c</FilePath>
-            </File>
-            <File>
-              <FileName>delay_asm.s</FileName>
-              <FileType>2</FileType>
-              <FilePath>..\..\..\soc\arm_cm\le501x\compiler\armcc\delay_asm.s</FilePath>
-            </File>
-            <File>
-              <FileName>io_config.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\soc\arm_cm\le501x\integration\io_config.c</FilePath>
-            </File>
-            <File>
-              <FileName>lsadc.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\peripheral\adc\lsadc.c</FilePath>
-            </File>
-            <File>
-              <FileName>lsiwdt.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\peripheral\iwdt\lsiwdt.c</FilePath>
-            </File>
-            <File>
-              <FileName>sys_stat.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\soc\arm_cm\le501x\sys_stat.c</FilePath>
-            </File>
-            <File>
-              <FileName>lstimer.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\peripheral\timer\lstimer.c</FilePath>
-            </File>
-            <File>
-              <FileName>ecc.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\module\tinycrypt\lib\source\ecc.c</FilePath>
-            </File>
-            <File>
-              <FileName>ecc_dsa.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\module\tinycrypt\lib\source\ecc_dsa.c</FilePath>
+              <FilePath>..\..\..\module\tinycrypt\lib\source\utils.c</FilePath>
             </File>
           </Files>
         </Group>
       </Groups>
     </Target>
   </Targets>
-
-  <RTE>
-    <apis/>
-    <components/>
-    <files/>
-  </RTE>
 
 </Project>

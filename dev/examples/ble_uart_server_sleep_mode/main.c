@@ -18,6 +18,7 @@
 #include "spi_flash.h"
 #include "sleep.h"
 #include "field_manipulate.h"
+#include "io_config.h"
 #define UART_SVC_ADV_NAME "LS UART Server"
 #define UART_SERVER_MAX_MTU  247
 #define UART_SERVER_MTU_DFT  23
@@ -122,6 +123,7 @@ static void ls_uart_init(void)
     UART_Server_Config.Init.StopBits = UART_STOPBITS1;
     UART_Server_Config.Init.WordLength = UART_BYTESIZE8;
     HAL_UART_Init(&UART_Server_Config);
+    uart1_io_init(PB00, PB01);
 }
 
 static void ls_uart_server_init(void)
