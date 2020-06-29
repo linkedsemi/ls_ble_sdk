@@ -156,7 +156,7 @@ void io_set_input(uint8_t pin)
 
 }
 
-void io_write_pin(uint8_t pin,uint8_t val)
+void io_set_pin(uint8_t pin)
 {
     gpio_pin_t *x = (gpio_pin_t *)&pin;
     switch(x->port)
@@ -168,7 +168,31 @@ void io_write_pin(uint8_t pin,uint8_t val)
         LSGPIOB->DOUT |= 1<< x->num;
     break;
     }
+}
 
+void io_clr_pin(uint8_t pin)
+{
+    gpio_pin_t *x = (gpio_pin_t *)&pin;
+    switch(x->port)
+    {
+    case 0:
+        LSGPIOA->DOUT &= ~(1<< x->num);
+    break;
+    case 1:
+        LSGPIOB->DOUT &= ~(1<< x->num);
+    break;
+    }
+}
+
+void io_write_pin(uint8_t pin, uint8_t val)
+{
+    if(val)
+    {
+        io_set_pin(pin);
+    }else
+    {
+        io_clr_pin(pin);
+    }
 }
 
 uint8_t io_read_pin(uint8_t pin)

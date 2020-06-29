@@ -63,9 +63,13 @@ void io_set_input(uint8_t pin);
 
 void io_write_pin(uint8_t pin,uint8_t val);
 
-uint8_t io_read_pin(uint8_t pin);
+void io_set_pin(uint8_t pin);
+
+void io_clr_pin(uint8_t pin);
 
 void io_toggle_pin(uint8_t pin);
+
+uint8_t io_read_pin(uint8_t pin);
 
 void io_pull_write(uint8_t pin,io_pull_type_t pull);
 
