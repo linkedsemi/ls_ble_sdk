@@ -10,3 +10,4 @@
    keil_debug
    memory
    ble_flow
+   peripherals/index
