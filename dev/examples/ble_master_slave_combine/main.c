@@ -629,9 +629,9 @@ static void gatt_manager_callback(enum gatt_evt_type type,union gatt_evt_u *evt,
         else
         {
             uart_client_mtu_array[array_idx] = evt->mtu_changed_ind.mtu;
+            ls_uart_client_service_dis(con_idx);
         }       
         
-        ls_uart_client_service_dis(con_idx);
         LOG_I("mtu exch ind, mtu = %d", evt->mtu_changed_ind.mtu);
     break;
     case CLIENT_RECV_NOTIFICATION:
