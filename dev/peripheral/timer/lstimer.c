@@ -8491,6 +8491,168 @@ static void TIM_CCxNChannelCmd(reg_timer_t *TIMx, uint32_t Channel, uint32_t Cha
   /* Set or reset the CCxNE Bit */
   TIMx->CCER |= (uint32_t)(ChannelNState << (Channel & 0x1FU)); /* 0x1FU = 31 bits max shift */
 }
+
+/**
+  * @brief  Sets the TIMx Counter Register value
+  * @param  TIMx: select the TIM peripheral.
+  * @param  Counter: specifies the Counter register new value.
+  * @retval None
+  */
+void TIM_SetCounter(reg_timer_t* TIMx, uint16_t Counter)
+{
+  /* Check the parameters */
+  LS_ASSERT(IS_TIM_INSTANCE(TIMx));
+  /* Set the Counter Register value */
+  TIMx->CNT = Counter;
+}
+
+/**
+  * @brief  Sets the TIMx Autoreload Register value
+  * @param  TIMx: select the TIM peripheral.
+  * @param  Autoreload: specifies the Autoreload register new value.
+  * @retval None
+  */
+void TIM_SetAutoreload(reg_timer_t* TIMx, uint16_t Autoreload)
+{
+  /* Check the parameters */
+  LS_ASSERT(IS_TIM_INSTANCE(TIMx));
+  /* Set the Autoreload Register value */
+  TIMx->ARR = Autoreload;
+}
+
+/**
+  * @brief  Sets the TIMx Capture Compare1 Register value
+  * @param  TIMx: select the TIM peripheral.
+  * @param  Compare1: specifies the Capture Compare1 register new value.
+  * @retval None
+  */
+void TIM_SetCompare1(reg_timer_t* TIMx, uint16_t Compare1)
+{
+  /* Check the parameters */
+  LS_ASSERT(IS_TIM_INSTANCE(TIMx));
+  /* Set the Capture Compare1 Register value */
+  TIMx->CCR1 = Compare1;
+}
+
+/**
+  * @brief  Sets the TIMx Capture Compare2 Register value
+  * @param  TIMx: select the TIM peripheral.
+  * @param  Compare2: specifies the Capture Compare2 register new value.
+  * @retval None
+  */
+void TIM_SetCompare2(reg_timer_t* TIMx, uint16_t Compare2)
+{
+  /* Check the parameters */
+  LS_ASSERT(IS_TIM_INSTANCE(TIMx));
+  /* Set the Capture Compare2 Register value */
+  TIMx->CCR2 = Compare2;
+}
+
+/**
+  * @brief  Sets the TIMx Capture Compare3 Register value
+  * @param  TIMx: select the TIM peripheral.
+  * @param  Compare3: specifies the Capture Compare3 register new value.
+  * @retval None
+  */
+void TIM_SetCompare3(reg_timer_t* TIMx, uint16_t Compare3)
+{
+  /* Check the parameters */
+  LS_ASSERT(IS_TIM_INSTANCE(TIMx));
+  /* Set the Capture Compare3 Register value */
+  TIMx->CCR3 = Compare3;
+}
+
+/**
+  * @brief  Sets the TIMx Capture Compare4 Register value
+  * @param  TIMx: select the TIM peripheral.
+  * @param  Compare4: specifies the Capture Compare4 register new value.
+  * @retval None
+  */
+void TIM_SetCompare4(reg_timer_t* TIMx, uint16_t Compare4)
+{
+  /* Check the parameters */
+  LS_ASSERT(IS_TIM_INSTANCE(TIMx));
+  /* Set the Capture Compare4 Register value */
+  TIMx->CCR4 = Compare4;
+}
+
+/**
+  * @brief  Gets the TIMx Input Capture 1 value.
+  * @param  TIMx: select the TIM peripheral.
+  * @retval Capture Compare 1 Register value.
+  */
+uint16_t TIM_GetCapture1(reg_timer_t* TIMx)
+{
+  /* Check the parameters */
+  LS_ASSERT(IS_TIM_INSTANCE(TIMx));
+  /* Get the Capture 1 Register value */
+  return TIMx->CCR1;
+}
+
+/**
+  * @brief  Gets the TIMx Input Capture 2 value.
+  * @param  TIMx: select the TIM peripheral.
+  * @retval Capture Compare 2 Register value.
+  */
+uint16_t TIM_GetCapture2(reg_timer_t* TIMx)
+{
+  /* Check the parameters */
+  LS_ASSERT(IS_TIM_INSTANCE(TIMx));
+  /* Get the Capture 2 Register value */
+  return TIMx->CCR2;
+}
+
+/**
+  * @brief  Gets the TIMx Input Capture 3 value.
+  * @param  TIMx: select the TIM peripheral.
+  * @retval Capture Compare 3 Register value.
+  */
+uint16_t TIM_GetCapture3(reg_timer_t* TIMx)
+{
+  /* Check the parameters */
+  LS_ASSERT(IS_TIM_INSTANCE(TIMx));
+  /* Get the Capture 3 Register value */
+  return TIMx->CCR3;
+}
+
+/**
+  * @brief  Gets the TIMx Input Capture 4 value.
+  * @param  TIMx: select the TIM peripheral.
+  * @retval Capture Compare 4 Register value.
+  */
+uint16_t TIM_GetCapture4(reg_timer_t* TIMx)
+{
+  /* Check the parameters */
+  LS_ASSERT(IS_TIM_INSTANCE(TIMx));
+  /* Get the Capture 4 Register value */
+  return TIMx->CCR4;
+}
+
+/**
+  * @brief  Gets the TIMx Counter value.
+  * @param  TIMx: select the TIM peripheral.
+  * @retval Counter Register value.
+  */
+uint16_t TIM_GetCounter(reg_timer_t* TIMx)
+{
+  /* Check the parameters */
+  LS_ASSERT(IS_TIM_INSTANCE(TIMx));
+  /* Get the Counter Register value */
+  return TIMx->CNT;
+}
+
+/**
+  * @brief  Gets the TIMx Prescaler value.
+  * @param  TIMx: select the TIM peripheral.
+  * @retval Prescaler Register value.
+  */
+uint16_t TIM_GetPrescaler(reg_timer_t* TIMx)
+{
+  /* Check the parameters */
+  LS_ASSERT(IS_TIM_INSTANCE(TIMx));
+  /* Get the Prescaler Register value */
+  return TIMx->PSC;
+}
 /**
   * @}
   */

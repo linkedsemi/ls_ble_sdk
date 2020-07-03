@@ -1183,7 +1183,7 @@ typedef struct
   *            @arg TIM_FLAG_CC4OF: Capture/Compare 4 overcapture flag
   * @retval The new state of __FLAG__ (TRUE or FALSE).
   */
-#define __HAL_TIM_CLEAR_FLAG(__HANDLE__, __FLAG__)        ((__HANDLE__)->Instance->ICR = ~(__FLAG__))
+#define __HAL_TIM_CLEAR_FLAG(__HANDLE__, __FLAG__)        ((__HANDLE__)->Instance->ICR |= (__FLAG__))
 
 /**
   * @brief  Check whether the specified TIM interrupt source is enabled or not.
@@ -1217,7 +1217,7 @@ typedef struct
   *            @arg TIM_IT_BREAK: Break interrupt
   * @retval None
   */
-#define __HAL_TIM_CLEAR_IT(__HANDLE__, __INTERRUPT__)      ((__HANDLE__)->Instance->ICR = ~(__INTERRUPT__))
+#define __HAL_TIM_CLEAR_IT(__HANDLE__, __INTERRUPT__)      ((__HANDLE__)->Instance->ICR |= (__INTERRUPT__))
 
 /**
   * @brief  Indicates whether or not the TIM Counter is used as downcounter.
@@ -1948,6 +1948,41 @@ mode.
    ((__CHANNEL__) == TIM_CHANNEL_3) ? ((__HANDLE__)->Instance->CCER &= ~(TIMER_CCER_CC3P)) :\
    ((__HANDLE__)->Instance->CCER &= ~(TIM_CCER_CC4P)))
 
+
+#define __HAL_RCC_ADTIM_CLK_ENABLE()   do { \
+                                        REG_FIELD_WR(RCC->APB2EN, RCC_ADTIM1, 1);\
+                                      } while(0U)
+#define __HAL_RCC_ADTIM_CLK_DISABLE()   do { \
+                                        REG_FIELD_WR(RCC->APB2EN, RCC_ADTIM1, 0);\
+                                      } while(0U)                                      
+
+#define __HAL_RCC_TIM1_CLK_ENABLE()   do { \
+                                        REG_FIELD_WR(RCC->APB2EN, RCC_GPTIMC1, 1);\
+                                      } while(0U)
+#define __HAL_RCC_TIM1_CLK_DISABLE()   do { \
+                                        REG_FIELD_WR(RCC->APB2EN, RCC_GPTIMC1, 0);\
+                                      } while(0U)
+
+#define __HAL_RCC_TIM2_CLK_ENABLE()   do { \
+                                        REG_FIELD_WR(RCC->APB1EN, RCC_GPTIMA1, 1);\
+                                      } while(0U)   
+#define __HAL_RCC_TIM2_CLK_DISABLE()   do { \
+                                        REG_FIELD_WR(RCC->APB1EN, RCC_GPTIMA1, 0);\
+                                      } while(0U) 
+
+#define __HAL_RCC_TIM3_CLK_ENABLE()   do { \
+                                        REG_FIELD_WR(RCC->APB1EN, RCC_GPTIMB1, 1);\
+                                      } while(0U)
+#define __HAL_RCC_TIM3_CLK_DISABLE()   do { \
+                                        REG_FIELD_WR(RCC->APB1EN, RCC_GPTIMB1, 0);\
+                                      } while(0U)
+
+#define __HAL_RCC_BTIM_CLK_ENABLE()   do { \
+                                        REG_FIELD_WR(RCC->APB1EN, RCC_BSTIM1, 1);\
+                                      } while(0U)
+#define __HAL_RCC_BTIM_CLK_DISABLE()   do { \
+                                        REG_FIELD_WR(RCC->APB1EN, RCC_BSTIM1, 0);\
+                                      } while(0U)                                                                            
 /**
   * @}
   */
@@ -2316,7 +2351,18 @@ HAL_TIM_StateTypeDef HAL_TIMEx_HallSensor_GetState(TIM_HandleTypeDef *htim);
 /**
   * @}
   */
-
+void HAL_TIM_SetCounter(reg_timer_t* TIMx, uint16_t Counter);
+void HAL_TIM_SetAutoreload(reg_timer_t* TIMx, uint16_t Autoreload);
+void HAL_TIM_SetCompare1(reg_timer_t* TIMx, uint16_t Compare1);
+void HAL_TIM_SetCompare2(reg_timer_t* TIMx, uint16_t Compare2);
+void HAL_TIM_SetCompare3(reg_timer_t* TIMx, uint16_t Compare3);
+void HAL_TIM_SetCompare4(reg_timer_t* TIMx, uint16_t Compare4);
+uint16_t TIM_GetCapture1(reg_timer_t* TIMx);
+uint16_t TIM_GetCapture2(reg_timer_t* TIMx);
+uint16_t TIM_GetCapture3(reg_timer_t* TIMx);
+uint16_t TIM_GetCapture4(reg_timer_t* TIMx);
+uint16_t TIM_GetCounter(reg_timer_t* TIMx);
+uint16_t TIM_GetPrescaler(reg_timer_t* TIMx);
 /**
   * @}
   */
