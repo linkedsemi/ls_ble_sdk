@@ -1,8 +1,11 @@
+#include <stddef.h>
 #include "lsgpio.h"
 #include "reg_lsgpio.h"
 #include "io_config.h"
 #include "reg_syscfg.h"
 #include "sleep.h"
+#include "ls_dbg.h"
+
 typedef struct
 {
     uint8_t num:4,
@@ -15,13 +18,38 @@ gpio_pin_t uart2_txd;
 gpio_pin_t uart2_rxd;
 gpio_pin_t uart3_txd;
 gpio_pin_t uart3_rxd;
+gpio_pin_t adtim1_ch1;
+gpio_pin_t adtim1_ch1n;
+gpio_pin_t adtim1_ch2;
+gpio_pin_t adtim1_ch2n;
+gpio_pin_t adtim1_ch3;
+gpio_pin_t adtim1_ch3n;
+gpio_pin_t adtim1_ch4;
+gpio_pin_t adtim1_etr;
+gpio_pin_t adtim1_bk;
+gpio_pin_t gptima1_ch1;
+gpio_pin_t gptima1_ch2;
+gpio_pin_t gptima1_ch3;
+gpio_pin_t gptima1_ch4;
+gpio_pin_t gptima1_etr;
+gpio_pin_t gptimb1_ch1;
+gpio_pin_t gptimb1_ch2;
+gpio_pin_t gptimb1_ch3;
+gpio_pin_t gptimb1_ch4;
+gpio_pin_t gptimb1_etr;
+gpio_pin_t gptimc1_ch1;
+gpio_pin_t gptimc1_ch1n;
+gpio_pin_t gptimc1_ch2;
+gpio_pin_t gptimc1_bk;
+
+
 
 reg_lsgpio_t* GPIO_GetPort(uint8_t Pin_port)
 {
     uint8_t       PortID = Pin_port;
-    reg_lsgpio_t* Port = {0};
+    reg_lsgpio_t* Port = NULL;
 
-   switch (PortID)
+    switch (PortID)
     {
     case 0:
         Port = LSGPIOA;
@@ -33,12 +61,13 @@ reg_lsgpio_t* GPIO_GetPort(uint8_t Pin_port)
         Port = LSGPIOC;
         break;
     default:
+        LS_ASSERT(0);
         break;
     }
     return Port;
 }
 
-static void uart_gpio_init(uint8_t txd,uint8_t rxd)
+static void uart_io_cfg(uint8_t txd,uint8_t rxd)
 {
     io_set_pin(txd);
     io_cfg_output(txd);
@@ -74,7 +103,9 @@ static void set_gpio_mode(gpio_pin_t *pin)
 
 void uart1_io_init(uint8_t txd,uint8_t rxd)
 {
-    uart_gpio_init(txd,rxd);
+    *(uint8_t *)&uart1_txd = txd;
+    *(uint8_t *)&uart1_rxd = rxd;
+    uart_io_cfg(txd,rxd);
     af_io_init((gpio_pin_t *)&txd,AF_UART1_TXD);
     af_io_init((gpio_pin_t *)&rxd,AF_UART1_RXD);
 }
@@ -87,7 +118,9 @@ void uart1_io_deinit()
 
 void uart2_io_init(uint8_t txd,uint8_t rxd)
 {
-    uart_gpio_init(txd,rxd);
+    *(uint8_t *)&uart2_txd = txd;
+    *(uint8_t *)&uart2_rxd = rxd;
+    uart_io_cfg(txd,rxd);
     af_io_init((gpio_pin_t *)&txd,AF_UART2_TXD);
     af_io_init((gpio_pin_t *)&rxd,AF_UART2_RXD);
 }
@@ -100,7 +133,9 @@ void uart2_io_deinit()
 
 void uart3_io_init(uint8_t txd,uint8_t rxd)
 {
-    uart_gpio_init(txd,rxd);
+    *(uint8_t *)&uart3_txd = txd;
+    *(uint8_t *)&uart3_rxd = rxd;
+    uart_io_cfg(txd,rxd);
     af_io_init((gpio_pin_t *)&txd,AF_UART3_TXD);
     af_io_init((gpio_pin_t *)&rxd,AF_UART3_RXD);
 }
@@ -109,6 +144,300 @@ void uart3_io_deinit()
 {
     set_gpio_mode((gpio_pin_t *)&uart3_txd);
     set_gpio_mode((gpio_pin_t *)&uart3_rxd);
+}
+
+static void timer_ch_io_output_cfg(uint8_t pin,uint8_t default_val)
+{
+    io_write_pin(pin, default_val);
+    io_cfg_output(pin);
+}
+
+static void timer_ch_io_cfg(uint8_t pin,bool output,uint8_t default_val)
+{
+    if(output)
+    {
+        timer_ch_io_output_cfg(pin,default_val);
+    }else
+    {
+        io_cfg_input(pin);
+    }
+}
+
+void adtim1_ch1_io_init(uint8_t pin,bool output,uint8_t default_val)
+{
+    *(uint8_t *)&adtim1_ch1 = pin;
+    timer_ch_io_cfg(pin,output,default_val);
+    af_io_init((gpio_pin_t *)&pin,AF_ADTIM1_CH1);
+}
+
+void adtim1_ch1_io_deinit(void)
+{
+    set_gpio_mode((gpio_pin_t *)&adtim1_ch1);
+}
+
+void adtim1_ch2_io_init(uint8_t pin,bool output,uint8_t default_val)
+{
+    *(uint8_t *)&adtim1_ch2 = pin;
+    timer_ch_io_cfg(pin,output,default_val);
+    af_io_init((gpio_pin_t *)&pin,AF_ADTIM1_CH2);
+}
+
+void adtim1_ch2_io_deinit(void)
+{
+    set_gpio_mode((gpio_pin_t *)&adtim1_ch2);
+}
+
+void adtim1_ch3_io_init(uint8_t pin,bool output,uint8_t default_val)
+{
+    *(uint8_t *)&adtim1_ch3 = pin;
+    timer_ch_io_cfg(pin,output,default_val);
+    af_io_init((gpio_pin_t *)&pin,AF_ADTIM1_CH3);
+}
+
+void adtim1_ch3_io_deinit(void)
+{
+    set_gpio_mode((gpio_pin_t *)&adtim1_ch3);
+}
+
+void adtim1_ch4_io_init(uint8_t pin,bool output,uint8_t default_val)
+{
+    *(uint8_t *)&adtim1_ch4 = pin;
+    timer_ch_io_cfg(pin,output,default_val);
+    af_io_init((gpio_pin_t *)&pin,AF_ADTIM1_CH4);
+}
+
+void adtim1_ch4_io_deinit(void)
+{
+    set_gpio_mode((gpio_pin_t *)&adtim1_ch4);
+}
+
+void adtim1_ch1n_io_init(uint8_t pin)
+{
+    *(uint8_t *)&adtim1_ch1n = pin;
+    timer_ch_io_output_cfg(pin,!io_get_output_val(*(uint8_t *)&adtim1_ch1));
+    af_io_init((gpio_pin_t *)&pin,AF_ADTIM1_CH1N);
+}
+
+void adtim1_ch1n_io_deinit(void)
+{
+    set_gpio_mode((gpio_pin_t *)&adtim1_ch1n);
+}
+
+void adtim1_ch2n_io_init(uint8_t pin)
+{
+    *(uint8_t *)&adtim1_ch2n = pin;
+    timer_ch_io_output_cfg(pin,!io_get_output_val(*(uint8_t *)&adtim1_ch2));
+    af_io_init((gpio_pin_t *)&pin,AF_ADTIM1_CH2N);
+}
+
+void adtim1_ch2n_io_deinit(void)
+{
+    set_gpio_mode((gpio_pin_t *)&adtim1_ch2n);
+}
+
+void adtim1_ch3n_io_init(uint8_t pin)
+{
+    *(uint8_t *)&adtim1_ch3n = pin;
+    timer_ch_io_output_cfg(pin,!io_get_output_val(*(uint8_t *)&adtim1_ch3));
+    af_io_init((gpio_pin_t *)&pin,AF_ADTIM1_CH3N);
+}
+
+void adtim1_ch3n_io_deinit(void)
+{
+    set_gpio_mode((gpio_pin_t *)&adtim1_ch3n);
+}
+
+void adtim1_etr_io_init(uint8_t pin)
+{
+    *(uint8_t *)&adtim1_etr = pin;
+    io_cfg_input(pin);
+    af_io_init((gpio_pin_t *)&pin,AF_ADTIM1_ETR);
+}
+
+void adtim1_etr_io_deinit(void)
+{
+    set_gpio_mode((gpio_pin_t *)&adtim1_etr);
+}
+
+void adtim1_bk_io_init(uint8_t pin)
+{
+    *(uint8_t *)&adtim1_bk = pin;
+    io_cfg_input(pin);
+    af_io_init((gpio_pin_t *)&pin,AF_ADTIM1_BK);
+}
+
+void adtim1_bk_io_deinit(void)
+{
+    set_gpio_mode((gpio_pin_t *)&adtim1_bk);
+}
+
+void gptima1_ch1_io_init(uint8_t pin,bool output,uint8_t default_val)
+{
+    *(uint8_t *)&gptima1_ch1 = pin;
+    timer_ch_io_cfg(pin,output,default_val);
+    af_io_init((gpio_pin_t *)&pin,AF_GPTIMA1_CH1);
+}
+
+void gptima1_ch1_io_deinit(void)
+{
+    set_gpio_mode((gpio_pin_t *)&gptima1_ch1);
+}
+
+void gptima1_ch2_io_init(uint8_t pin,bool output,uint8_t default_val)
+{
+    *(uint8_t *)&gptima1_ch2 = pin;
+    timer_ch_io_cfg(pin,output,default_val);
+    af_io_init((gpio_pin_t *)&pin,AF_GPTIMA1_CH2);
+}
+
+void gptima1_ch2_io_deinit(void)
+{
+    set_gpio_mode((gpio_pin_t *)&gptima1_ch2);
+}
+
+void gptima1_ch3_io_init(uint8_t pin,bool output,uint8_t default_val)
+{
+    *(uint8_t *)&gptima1_ch3 = pin;
+    timer_ch_io_cfg(pin,output,default_val);
+    af_io_init((gpio_pin_t *)&pin,AF_GPTIMA1_CH3);
+}
+
+void gptima1_ch3_io_deinit(void)
+{
+    set_gpio_mode((gpio_pin_t *)&gptima1_ch3);
+}
+
+void gptima1_ch4_io_init(uint8_t pin,bool output,uint8_t default_val)
+{
+    *(uint8_t *)&gptima1_ch4 = pin;
+    timer_ch_io_cfg(pin,output,default_val);
+    af_io_init((gpio_pin_t *)&pin,AF_GPTIMA1_CH4);
+}
+
+void gptima1_ch4_io_deinit(void)
+{
+    set_gpio_mode((gpio_pin_t *)&gptima1_ch4);
+}
+
+void gptima1_etr_io_init(uint8_t pin)
+{
+    *(uint8_t *)&gptima1_etr = pin;
+    io_cfg_input(pin);
+    af_io_init((gpio_pin_t *)&pin,AF_GPTIMA1_ETR);
+}
+
+void gptima1_etr_io_deinit(void)
+{
+    set_gpio_mode((gpio_pin_t *)&gptima1_etr);
+}
+
+void gptimb1_ch1_io_init(uint8_t pin,bool output,uint8_t default_val)
+{
+    *(uint8_t *)&gptimb1_ch1 = pin;
+    timer_ch_io_cfg(pin,output,default_val);
+    af_io_init((gpio_pin_t *)&pin,AF_GPTIMB1_CH1);
+}
+
+void gptimb1_ch1_io_deinit(void)
+{
+    set_gpio_mode((gpio_pin_t *)&gptimb1_ch1);
+}
+
+void gptimb1_ch2_io_init(uint8_t pin,bool output,uint8_t default_val)
+{
+    *(uint8_t *)&gptimb1_ch2 = pin;
+    timer_ch_io_cfg(pin,output,default_val);
+    af_io_init((gpio_pin_t *)&pin,AF_GPTIMB1_CH2);
+}
+
+void gptimb1_ch2_io_deinit(void)
+
+{
+    set_gpio_mode((gpio_pin_t *)&gptimb1_ch2);
+}
+
+void gptimb1_ch3_io_init(uint8_t pin,bool output,uint8_t default_val)
+{
+    *(uint8_t *)&gptimb1_ch3 = pin;
+    timer_ch_io_cfg(pin,output,default_val);
+    af_io_init((gpio_pin_t *)&pin,AF_GPTIMB1_CH3);
+}
+
+void gptimb1_ch3_io_deinit(void)
+{
+    set_gpio_mode((gpio_pin_t *)&gptimb1_ch3);
+}
+
+void gptimb1_ch4_io_init(uint8_t pin,bool output,uint8_t default_val)
+{
+    *(uint8_t *)&gptimb1_ch4 = pin;
+    timer_ch_io_cfg(pin,output,default_val);
+    af_io_init((gpio_pin_t *)&pin,AF_GPTIMB1_CH4);
+}
+
+void gptimb1_ch4_io_deinit(void)
+{
+    set_gpio_mode((gpio_pin_t *)&gptimb1_ch4);
+}
+
+void gptimb1_etr_io_init(uint8_t pin)
+{
+    *(uint8_t *)&gptimb1_etr = pin;
+    io_cfg_input(pin);
+    af_io_init((gpio_pin_t *)&pin,AF_GPTIMB1_ETR);
+}
+
+void gptimb1_etr_io_deinit(void)
+{
+    set_gpio_mode((gpio_pin_t *)&gptimb1_etr);
+}
+
+void gptimc1_ch1_io_init(uint8_t pin,bool output,uint8_t default_val)
+{
+    *(uint8_t *)&gptimc1_ch1 = pin;
+    timer_ch_io_cfg(pin,output,default_val);
+    af_io_init((gpio_pin_t *)&pin,AF_GPTIMC1_CH1);
+}
+
+void gptimc1_ch1_io_deinit(void)
+{
+    set_gpio_mode((gpio_pin_t *)&gptimc1_ch1);
+}
+
+void gptimc1_ch1n_io_init(uint8_t pin)
+{
+    *(uint8_t *)&gptimc1_ch1n = pin;
+    timer_ch_io_output_cfg(pin,!io_get_output_val(*(uint8_t *)&gptimc1_ch1));
+    af_io_init((gpio_pin_t *)&pin,AF_GPTIMC1_CH1N);
+}
+
+void gptimc1_ch1n_io_deinit(void)
+{
+    set_gpio_mode((gpio_pin_t *)&gptimc1_ch1n);
+}
+
+void gptimc1_ch2_io_init(uint8_t pin,bool output,uint8_t default_val)
+{
+    *(uint8_t *)&gptimc1_ch2 = pin;
+    timer_ch_io_cfg(pin,output,default_val);
+    af_io_init((gpio_pin_t *)&pin,AF_GPTIMC1_CH2);
+}
+
+void gptimc1_ch2_io_deinit(void)
+{
+    set_gpio_mode((gpio_pin_t *)&gptimc1_ch2);
+}
+
+void gptimc1_bk_io_init(uint8_t pin)
+{
+    *(uint8_t *)&gptimc1_bk = pin;
+    io_cfg_input(pin);
+    af_io_init((gpio_pin_t *)&pin,AF_GPTIMC1_BK);
+}
+
+void gptimc1_bk_io_deinit(void)
+{
+    set_gpio_mode((gpio_pin_t *)&gptimc1_bk);
 }
 
 
@@ -128,60 +457,30 @@ void io_init(void)
 void io_cfg_output(uint8_t pin)
 {
     gpio_pin_t *x = (gpio_pin_t *)&pin;
-    switch(x->port)
-    {
-    case 0:
-        LSGPIOA->OE |= 1<< x->num;
-    break;
-    case 1:
-        LSGPIOB->OE |= 1<< x->num;
-    break;
-    }
+    reg_lsgpio_t *gpiox = GPIO_GetPort(x->port);
+    gpiox->OE |= 1<< x->num;
 }
 
 void io_cfg_input(uint8_t pin)
 {
     gpio_pin_t *x = (gpio_pin_t *)&pin;
-    switch(x->port)
-    {
-    case 0:
-        LSGPIOA->OE &= ~(1<< x->num);
-        LSGPIOA->IE |= 1<< x->num;
-    break;
-    case 1:
-        LSGPIOB->OE &= ~(1<< x->num);
-        LSGPIOB->IE |= 1<< x->num;
-    break;
-    }
-
+    reg_lsgpio_t *gpiox = GPIO_GetPort(x->port);
+    gpiox->OE &= ~(1<< x->num);
+    gpiox->IE |= 1<< x->num;
 }
 
 void io_set_pin(uint8_t pin)
 {
     gpio_pin_t *x = (gpio_pin_t *)&pin;
-    switch(x->port)
-    {
-    case 0:
-        LSGPIOA->DOUT |= 1<< x->num;
-    break;
-    case 1:
-        LSGPIOB->DOUT |= 1<< x->num;
-    break;
-    }
+    reg_lsgpio_t *gpiox = GPIO_GetPort(x->port);
+    gpiox->DOUT |= 1<< x->num;
 }
 
 void io_clr_pin(uint8_t pin)
 {
     gpio_pin_t *x = (gpio_pin_t *)&pin;
-    switch(x->port)
-    {
-    case 0:
-        LSGPIOA->DOUT &= ~(1<< x->num);
-    break;
-    case 1:
-        LSGPIOB->DOUT &= ~(1<< x->num);
-    break;
-    }
+    reg_lsgpio_t *gpiox = GPIO_GetPort(x->port);
+    gpiox->DOUT &= ~(1<< x->num);
 }
 
 void io_write_pin(uint8_t pin, uint8_t val)
@@ -195,63 +494,42 @@ void io_write_pin(uint8_t pin, uint8_t val)
     }
 }
 
+uint8_t io_get_output_val(uint8_t pin)
+{
+    gpio_pin_t *x = (gpio_pin_t *)&pin;
+    reg_lsgpio_t *gpiox = GPIO_GetPort(x->port);
+    uint8_t val = (gpiox->DOUT >> x->num) & 0x1;
+    return val;
+}
+
 uint8_t io_read_pin(uint8_t pin)
 {
     gpio_pin_t *x = (gpio_pin_t *)&pin;
-    uint8_t val = 0;
-    switch(x->port)
-    {
-    case 0:
-        val = (LSGPIOA->DIN >> x->num) & 0x1;
-    break;
-    case 1:
-        val = (LSGPIOB->DIN >> x->num) & 0x1;
-    break;
-    }
+    reg_lsgpio_t *gpiox = GPIO_GetPort(x->port);
+    uint8_t val = (gpiox->DIN >> x->num) & 0x1;
     return val;
+
 }
 
 void io_toggle_pin(uint8_t pin)
 {
     gpio_pin_t *x = (gpio_pin_t *)&pin;
-    switch(x->port)
-    {
-    case 0:
-        LSGPIOA->DOUT ^= 1<< x->num;
-    break;
-    case 1:
-        LSGPIOB->DOUT ^= 1<< x->num;
-    break;
-    }
+    reg_lsgpio_t *gpiox = GPIO_GetPort(x->port);
+    gpiox->DOUT ^= 1<< x->num;
 }
 
 void io_pull_write(uint8_t pin,io_pull_type_t pull)
 {
     gpio_pin_t *x = (gpio_pin_t *)&pin;
-    switch(x->port)
-    {
-    case 0:
-        LSGPIOA->PUPD = pull << 2 * x->num;
-    break;
-    case 1:
-        LSGPIOB->PUPD = pull << 2 * x->num;
-    break;
-    }
+    reg_lsgpio_t *gpiox = GPIO_GetPort(x->port);
+    gpiox->PUPD = pull << 2 * x->num;
 }
 
 io_pull_type_t io_pull_read(uint8_t pin)
 {
     gpio_pin_t *x = (gpio_pin_t *)&pin;
-    io_pull_type_t pull = IO_PULL_DISABLE;
-    switch(x->port)
-    {
-    case 0:
-        pull = (LSGPIOA->PUPD >> 2 * x->num ) & 0x3;
-    break;
-    case 1:
-        pull = (LSGPIOB->PUPD >> 2 * x->num ) & 0x3;
-    break;
-    }
+    reg_lsgpio_t *gpiox = GPIO_GetPort(x->port);
+    io_pull_type_t pull = (gpiox->PUPD >> 2 * x->num ) & 0x3;
     return pull;
 }
 

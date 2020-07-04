@@ -146,6 +146,7 @@ enum prf_id
 {
     PRF_DIS_SERVER,
     PRF_MESH,
+    PRF_FOTA_SERVER,
 };
 
 struct profile_added_evt
