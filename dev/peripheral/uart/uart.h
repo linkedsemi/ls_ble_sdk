@@ -225,6 +225,8 @@ typedef struct __UART_HandleTypeDef
 #define UART_FIFO_RL_1      0x0     // FIFO trigger level   
 #define UART_FIFO_RL_8      0x2
 #define UART_FIFO_TL_1      0x0     // FIFO trigger level 
+#define UART_FIFO_TL_2      0x1     // FIFO trigger level 
+#define UART_FIFO_TL_4      0x2     // FIFO trigger level 
 #define UART_FIFO_TL_8      0x3
 
 
