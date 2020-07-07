@@ -469,7 +469,6 @@ void  ecc_calc_start(const u_int8* secret_key, const u_int8* public_key_x, const
 				i-=4;
 				j++;
 		 }  
-
     cb(param);
 }    
 
