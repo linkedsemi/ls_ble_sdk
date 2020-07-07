@@ -246,7 +246,7 @@ void sys_init_app()
 void platform_reset(uint32_t error)
 {
     reset_reason = error;
-    while(1);
+    __NVIC_SystemReset();
 }
 
 uint64_t idiv_acc(uint32_t dividend,uint32_t divisor,bool signed_int)
