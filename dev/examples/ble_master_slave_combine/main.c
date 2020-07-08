@@ -575,6 +575,7 @@ static void gap_manager_callback(enum gap_evt_type type,union gap_evt_u *evt,uin
             {
                 start_scan();
                 scan_status = SCAN_BUSY;
+                init_status = INIT_IDLE;
             }         
         }
         else

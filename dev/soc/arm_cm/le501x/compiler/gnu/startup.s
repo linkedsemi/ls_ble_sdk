@@ -61,7 +61,7 @@ __HeapBase:
 __HeapLimit:
 	.size	__HeapLimit, . - __HeapLimit
 
-	.section .isr_vector
+	.section .isr_vector, "ax"
 	.align 2
 	.globl	__isr_vector
 __isr_vector:
@@ -137,9 +137,9 @@ Reset_Handler:
  *
  *  All addresses must be aligned to 4 bytes boundary.
  */
-	ldr	r1, =__data_lma__
-	ldr	r2, =__data_start__
-	ldr	r3, =__data_end__
+    ldr	r1, =__vector_lma__
+	ldr	r2, =__vector__start__
+	ldr	r3, =__vector__end__
 
 	subs	r3, r2
 	ble	.L_loop1_done
@@ -151,6 +151,20 @@ Reset_Handler:
 	bgt	.L_loop1
 
 .L_loop1_done:
+	ldr	r1, =__data_lma__
+	ldr	r2, =__data_start__
+	ldr	r3, =__data_end__
+
+	subs	r3, r2
+	ble	.L_loop2_done
+
+.L_loop2:
+	subs	r3, #4
+	ldr	r0, [r1,r3]
+	str	r0, [r2,r3]
+	bgt	.L_loop2
+
+.L_loop2_done:
 
 	bl	_start
 

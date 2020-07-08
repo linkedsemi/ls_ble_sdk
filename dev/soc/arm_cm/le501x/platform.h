@@ -3,6 +3,13 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include "sdk_config.h"
+#include "compile_flag.h"
+
+struct reset_retain_struct
+{
+    uint32_t reset_reason;
+    uint8_t wakeup_source;
+};
 
 void switch_to_rc32k(void);
 
@@ -38,6 +45,8 @@ uint64_t idiv_acc(uint32_t,uint32_t,bool);
 void ls_ip_aes_encrypt_start(void (*cb)(void),const uint8_t* aes_key,const uint8_t* aes_val);
 void ls_ip_aes_encrypt_complete(void (*cb)(uint32_t *),uint32_t* param);
 uint32_t  lstrng_random(void);
+
+void switch_to_hse(void);
 
 void arm_cm_delay_asm(uint32_t);
 

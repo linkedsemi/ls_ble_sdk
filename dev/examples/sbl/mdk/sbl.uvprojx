@@ -537,6 +537,11 @@
               <FilePath>..\..\..\soc\arm_cm\le501x\platform.c</FilePath>
             </File>
             <File>
+              <FileName>pub_key.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\pub_key.c</FilePath>
+            </File>
+            <File>
               <FileName>sbl.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\sbl.c</FilePath>

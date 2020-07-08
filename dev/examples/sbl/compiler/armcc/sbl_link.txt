@@ -9,14 +9,20 @@
 #define RAM_END (RAM_BASE + RAM_SIZE)
 
 LR_FLASH FLASH_BASE_USER FLASH_SIZE{
-    RAM_DATA_CODE RAM_BASE RAM_SIZE{
+    VECTOR_CODE RAM_BASE{
         *(RESET, +First)
+    }
+    RESET_RETAIN_DATA +0 UNINIT EMPTY 0x8
+    {
+        
+    }
+    RAM_DATA_CODE +0 RAM_SIZE{
         *(+RW)
         *(.xip_banned)
         *(:gdef:__aeabi_memcpy)
     }
     
-    FLASH_CODE FLASH_BASE_USER+ImageLength(RAM_DATA_CODE) ALIGN 0x4{
+    FLASH_CODE FLASH_BASE_USER+ImageLength(RAM_DATA_CODE)+ImageLength(VECTOR_CODE) ALIGN 0x4{
         *(InRoot$$Sections)
         *(+RO)
     }
@@ -29,7 +35,6 @@ LR_FLASH FLASH_BASE_USER FLASH_SIZE{
     }
     HEAP_STACK +0 UNINIT
     {
-        *(.reset_retain)
         *(HEAP)
         *(STACK)
     } 

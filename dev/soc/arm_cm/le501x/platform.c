@@ -28,9 +28,6 @@
 #define BASEBAND_MEMORY_ADDR   (0x50004000)
 #define IRQ_NVIC_PRIO(IRQn,priority) (((priority << (8U - __NVIC_PRIO_BITS)) & (uint32_t)0xFFUL) << _BIT_SHIFT(IRQn))
 
-RESET_RETAIN uint32_t reset_reason;
-RESET_RETAIN uint8_t wakeup_source;
-
 DEF_BUILTIN_TIMER_ENV(SDK_SW_TIMER_MAX);
 
 void stack_var_ptr_init(void);
@@ -166,16 +163,18 @@ void rco_calibration_start()
 static void check_wkup_state(void)
 {
     uint8_t wkup_stat = REG_FIELD_RD(SYSCFG->PMU_WKUP,SYSCFG_WKUP_STAT);
+    struct reset_retain_struct *reset_retain_ptr = (struct reset_retain_struct*)RESET_RETAIN_BASE;
     if (wkup_stat)
     {
         REG_FIELD_WR(SYSCFG->PMU_WKUP, SYSCFG_LP_WKUP_CLR,1);
-        wakeup_source = wkup_stat;
+        reset_retain_ptr->wakeup_source = wkup_stat;
     }
 }
 
 uint8_t get_wakeup_source()
 {
-    return wakeup_source;
+    struct reset_retain_struct *reset_retain_ptr = (struct reset_retain_struct*)RESET_RETAIN_BASE;
+    return reset_retain_ptr->wakeup_source;
 }
 
 
@@ -244,7 +243,9 @@ void sys_init_app()
 
 void platform_reset(uint32_t error)
 {
-    reset_reason = error;
+    struct reset_retain_struct *reset_retain_ptr = (struct reset_retain_struct*)RESET_RETAIN_BASE;
+    reset_retain_ptr->reset_reason = error;
+    switch_to_hse();
     __NVIC_SystemReset();
 }
 
@@ -265,7 +266,8 @@ __attribute__((weak)) void SystemInit(){}
 
 uint32_t plf_get_reset_error()
 {
-    return reset_reason;
+    struct reset_retain_struct *reset_retain_ptr = (struct reset_retain_struct*)RESET_RETAIN_BASE;
+    return reset_retain_ptr->reset_reason;
 }
 
 XIP_BANNED void flash_prog_erase_suspend_delay()
@@ -281,6 +283,11 @@ XIP_BANNED void switch_to_rc32k()
 XIP_BANNED void switch_to_xo16m()
 {
     MODIFY_REG(RCC->CFG, RCC_HCLK_SCAL_MASK | RCC_CKCFG_MASK | RCC_SYSCLK_SW_MASK, 1<<RCC_CKCFG_POS | 1<<RCC_SYSCLK_SW_POS);
+}
+
+XIP_BANNED void switch_to_hse(void)
+{
+    MODIFY_REG(RCC->CFG, RCC_SYSCLK_SW_MASK| RCC_HCLK_SCAL_MASK| RCC_CKCFG_MASK, 1 <<RCC_SYSCLK_SW_POS | 1<<RCC_CKCFG_POS | 0 << RCC_HCLK_SCAL_POS);
 }
 
 #if (SDK_HCLK_MHZ==16)
@@ -300,7 +307,6 @@ XIP_BANNED static void switch_to_pll(uint8_t hclk_scal)
 {
     MODIFY_REG(RCC->CFG, RCC_SYSCLK_SW_MASK| RCC_HCLK_SCAL_MASK| RCC_CKCFG_MASK, 4 <<RCC_SYSCLK_SW_POS | 1<<RCC_CKCFG_POS | hclk_scal << RCC_HCLK_SCAL_POS);
 }
-
 
 #if (SDK_HCLK_MHZ==32)
 
