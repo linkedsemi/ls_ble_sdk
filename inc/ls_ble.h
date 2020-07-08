@@ -139,6 +139,7 @@ enum dev_evt_type
     ADV_STOPPED,
     SCAN_STOPPED,
     INIT_STOPPED,
+    OBJ_DELETED,
     ADV_REPORT,
 };
 
@@ -174,6 +175,12 @@ struct stopped_evt
     uint8_t reason;
 };
 
+struct obj_deleted_evt
+{
+    uint8_t handle;
+    uint8_t status;
+};
+
 struct adv_report_info
 {
     uint8_t evt_type:3,
@@ -199,6 +206,7 @@ union dev_evt_u
     struct service_added_evt service_added;
     struct obj_created_evt obj_created;
     struct stopped_evt stopped;
+    struct obj_deleted_evt deleted;
     struct adv_report_evt adv_report;
 };
 
@@ -587,6 +595,8 @@ void dev_manager_stop_scan(uint8_t scan_handle);
 void dev_manager_start_init(uint8_t init_handle, struct start_init_param * param);
 
 void dev_manager_stop_init(uint8_t init_handle);
+
+void dev_manager_delete_activity(uint8_t obj_hdl);
 
 void dev_manager_set_random_static_addr(uint8_t *addr);
 
