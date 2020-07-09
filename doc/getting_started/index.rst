@@ -11,3 +11,4 @@
    memory
    ble_flow
    peripherals/index
+   fota

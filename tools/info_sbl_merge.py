@@ -17,7 +17,7 @@ image_crypt = 0xffffffff
 sbl_code_start = flash_base+0x1000
 sbl_code_length = len(sbl_data)
 
-public_addr = bytes([0xff,0xff,0xff,0x27,0x50,0x10])
+public_addr = bytes([0xff,0xff,0xff,0xff,0xff,0xff]) # ff:ff:ff:ff:ff:ff is not a valid address
 
 info_head = struct.pack('LLHHLLLL',test_word0,test_word1,cap_delay,spi_clk,cfg_info,image_crypt,sbl_code_start,sbl_code_length)
 

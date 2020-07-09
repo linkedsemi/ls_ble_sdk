@@ -338,3 +338,10 @@ XIP_BANNED void clk_switch()
 
 #endif
 
+void request_ota_reboot()
+{
+    uint32_t ota_req = 0;
+    spi_flash_quad_page_program(OTA_INFO_OFFSET,(uint8_t *)&ota_req, sizeof(ota_req));
+    platform_reset(RESET_OTA_REQ);
+}
+

@@ -14,22 +14,19 @@
 #include "ls_ble.h"
 #include "ls_dbg.h"
 #include "log.h"
+#include "common.h"
 #define APP_IMAGE_BASE (0x1800D000)
-#define OTA_INFO_OFFSET (0x7f000)
-
-#define RESET_OTA_SUCCEED      0xDBDBDBDB
-#define RESET_OTA_FAILED       0xBDBDBDBD
-
+#define OTA_COPY_STATUS_OFFSET (OTA_INFO_OFFSET + FLASH_PAGE_SIZE)
 #define FW_ECC_VERIFY (0)
+
 static uint8_t adv_obj_hdl;
 static uint8_t advertising_data[28] = {5,8,'F','O','T','A'};
 static uint8_t scan_response_data[31];
 
-XIP_BANNED void swd_pull_down()
+static void swd_pull_down()
 {
     MODIFY_REG(LSGPIOB->PUPD,GPIO_PUPD5_MASK|GPIO_PUPD6_MASK,2<<GPIO_PUPD5_POS | 2<<GPIO_PUPD6_POS);
 }
-
 
 uint16_t trim_head_load()
 {
@@ -129,10 +126,33 @@ bool fw_signature_check(struct fw_digest *digest,struct fota_signature *signatur
 }
 #endif
 
+
+static void ota_copy_info_set(struct fota_image_info *ptr)
+{
+    spi_flash_quad_page_program(OTA_COPY_STATUS_OFFSET, (uint8_t *)ptr, sizeof(struct fota_image_info));
+}
+
+static bool ota_copy_info_get(struct fota_image_info *ptr)
+{
+    spi_flash_quad_io_read(OTA_COPY_STATUS_OFFSET,(uint8_t *)ptr, sizeof(struct fota_image_info));
+    if(ptr->base==0xffffffff && ptr->size ==0xffffffff)
+    {
+        return false;
+    }else
+    {
+        return true;
+    }
+}
+
 static void fw_copy(struct fota_image_info *ptr)
 {
-
-
+    static uint8_t fw_buf[FLASH_PAGE_SIZE];
+    uint16_t i;
+    for(i=0;i<CEILING(ptr->size, FLASH_PAGE_SIZE);++i)
+    {
+        spi_flash_quad_io_read(ptr->base - FLASH_BASE_ADDR + i*FLASH_PAGE_SIZE, fw_buf, FLASH_PAGE_SIZE);
+        spi_flash_quad_page_program(APP_IMAGE_BASE - FLASH_BASE_ADDR + i*FLASH_PAGE_SIZE,fw_buf, FLASH_PAGE_SIZE);
+    }
 }
 
 static void ota_settings_erase()
@@ -161,6 +181,7 @@ static void prf_fota_server_callback(enum fotas_evt_type type,union fotas_evt_u 
         {
             if(evt->fotas_finish.new_image->base != APP_IMAGE_BASE)
             {
+                ota_copy_info_set(evt->fotas_finish.new_image);
                 fw_copy(evt->fotas_finish.new_image);
             }
             ota_settings_erase();
@@ -280,35 +301,47 @@ static bool need_ota()
 {
     uint32_t ota_status;
     spi_flash_quad_io_read(OTA_INFO_OFFSET,(uint8_t *)&ota_status, sizeof(ota_status));
-    if(ota_status==0xffffffff)
-    {
-        return false;
-    }
+    return ota_status!=0xffffffff;
+}
 
-    //TODO
-    return true;
+
+static void fota_service_start()
+{
+    sys_init_app();
+    ble_init();
+    dev_manager_init(dev_manager_callback);
+    gap_manager_init(gap_manager_callback);
+    gatt_manager_init(gatt_manager_callback);
+    while(1)
+    {
+        ble_loop();
+    }
+}
+
+static void boot_app()
+{
+    uint32_t *msp = (void *)APP_IMAGE_BASE;
+    void (**reset_handler)(void) = (void *)(APP_IMAGE_BASE + 4);
+    __set_MSP(*msp);
+    (*reset_handler)();
 }
 
 void sbl_start()
 {
+    swd_pull_down();
     trim_val_load();
     if(need_ota())
     {
-        sys_init_app();
-        ble_init();
-        dev_manager_init(dev_manager_callback);
-        gap_manager_init(gap_manager_callback);
-        gatt_manager_init(gatt_manager_callback);
-        while(1)
-        {
-            ble_loop();
-        }
+        fota_service_start();
     }else
     {
-        uint32_t *msp = (void *)APP_IMAGE_BASE;
-        void (**reset_handler)(void) = (void *)(APP_IMAGE_BASE + 4);
-        __set_MSP(*msp);
-        (*reset_handler)();
+        struct fota_image_info image;
+        if(ota_copy_info_get(&image))
+        {
+            fw_copy(&image);
+            ota_settings_erase();
+        }
+        boot_app();
     }
 }
 

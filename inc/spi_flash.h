@@ -2,6 +2,8 @@
 #define SPI_FLASH_H_
 #include <stdint.h>
 #include <stdbool.h>
+#define FLASH_BASE_ADDR (0x18000000)
+#define FLASH_PAGE_SIZE (256)
 
 void spi_flash_xip_status_set(bool xip);
 

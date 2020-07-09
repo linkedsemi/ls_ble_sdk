@@ -5,6 +5,11 @@
 #include "sdk_config.h"
 #include "compile_flag.h"
 
+#define OTA_INFO_OFFSET (0x7f000)
+#define RESET_OTA_SUCCEED      0xDBDBDBDB
+#define RESET_OTA_FAILED       0xBDBDBDBD
+#define RESET_OTA_REQ          0xDDDDDDDD
+
 struct reset_retain_struct
 {
     uint32_t reset_reason;
@@ -49,6 +54,9 @@ uint32_t  lstrng_random(void);
 void switch_to_hse(void);
 
 void arm_cm_delay_asm(uint32_t);
+
+void request_ota_reboot(void);
+
 
 #define DELAY_US(a) arm_cm_delay_asm((a)*(SDK_HCLK_MHZ/4))
 
