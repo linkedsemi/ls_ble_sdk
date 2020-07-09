@@ -598,7 +598,7 @@ void dev_manager_stop_init(uint8_t init_handle);
 
 void dev_manager_delete_activity(uint8_t obj_hdl);
 
-void dev_manager_set_random_static_addr(uint8_t *addr);
+void dev_manager_set_mac_addr(uint8_t *addr);
 
 void gap_manager_init(void (*evt_cb)(enum gap_evt_type,union gap_evt_u *,uint8_t));
 

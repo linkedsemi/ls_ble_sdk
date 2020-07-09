@@ -40,10 +40,21 @@
 #define WKUP_STATE_POS                 8
 #define WKUP_EDGE_POS                  16
 
-struct sleep_wakeup_type
+struct deep_sleep_wakeup
 {
-    uint32_t trig_src;
-    uint32_t trig_edge;
+    uint8_t pb15:1,
+            rtc:1,
+            nrst:1,
+            reserved0:1,
+            pa00:1,
+            pa01:1,
+            pb11:1,
+            wdt:1;
+    uint8_t pb15_rising_edge:1,
+            reserved1:3,
+            pa00_rising_edge:1,
+            pa01_rising_edge:1,
+            pb11_rising_edge:1;
 };
 
 uint8_t get_deep_sleep_enable(void);
@@ -60,7 +71,7 @@ void deep_sleep(void);
 
 void ble_sleep(void);
 
-void enter_deep_sleep_lvl3_mode(struct sleep_wakeup_type *sleep_param);
+void enter_deep_sleep_mode_lvl2_lvl3(struct deep_sleep_wakeup *wakeup);
 
 void ble_irq_clr_and_enable(void);
 

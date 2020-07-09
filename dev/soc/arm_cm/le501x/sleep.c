@@ -19,7 +19,6 @@
 #define ISR_VECTOR_ADDR ((uint32_t *)(0x0))
 
 bool waiting_ble_wkup_irq;
-struct sleep_wakeup_type env_sleep_wkup;
 
 void cpu_sleep_asm(void);
 
@@ -129,12 +128,6 @@ NOINLINE XIP_BANNED static void cpu_flash_deep_sleep_and_recover()
     spi_flash_xip_start();
 }
 
-
-NOINLINE XIP_BANNED  void set_mode_sleep_lvl2(void)
-{
-
-}
-
 static void lvl2_lvl3_io_retention(reg_lsgpio_t *gpiox)
 {
     uint16_t oe = gpiox->OE;
@@ -159,26 +152,6 @@ static void lvl2_lvl3_io_retention(reg_lsgpio_t *gpiox)
         }
     }
     gpiox->PUPD = pull;
-}
-
-NOINLINE XIP_BANNED  void set_mode_deep_sleep_lvl3(struct sleep_wakeup_type *param)
-{
-    NVIC->ICER[0] = 0xffffffff;
-    NVIC->ICPR[0] = 0xffffffff;
-    lvl2_lvl3_io_retention(LSGPIOA);
-    lvl2_lvl3_io_retention(LSGPIOB);
-    spi_flash_xip_stop();
-    spi_flash_deep_power_down();
-    LSGPIOC->PUPD = 0xAAAA555A;
-
-    SYSCFG->PMU_WKUP = FIELD_BUILD(SYSCFG_SLP_LVL, SLEEP_MODE3) 
-                      | FIELD_BUILD(SYSCFG_WKUP_EDGE,param->trig_edge)
-                      | FIELD_BUILD(SYSCFG_WKUP_EN, param->trig_src);
-
-    SYSCFG->PMU_PWR = 0; 
-    SCB->SCR |= (1<<2);
-    __WFI();
-    while(1);
 }
 
 #if DEBUG_MODE == 0
@@ -232,12 +205,39 @@ static void ble_hclk_restore()
     ble_hclk_set();
 }
 
-
-
-
-void enter_deep_sleep_lvl3_mode(struct sleep_wakeup_type *sleep_param)
+static void lvl2_lvl3_mode_prepare(struct deep_sleep_wakeup *wakeup)
 {
-   set_mode_deep_sleep_lvl3(sleep_param);
+    NVIC->ICER[0] = 0xffffffff;
+    lvl2_lvl3_io_retention(LSGPIOA);
+    lvl2_lvl3_io_retention(LSGPIOB);
+    uint8_t mode;
+    if(wakeup->rtc || wakeup->wdt)
+    {
+        mode = SLEEP_MODE2;
+    }else
+    {
+        mode = SLEEP_MODE3;
+    }
+    uint16_t edge_src = *(uint16_t *)wakeup;
+    uint8_t edge = edge_src >> 8;
+    edge |= RTC_WKUP | NRST_IO_WKUP | BLE_WKUP | WDT_WKUP;
+    uint8_t src = edge_src & 0xff;
+    src &= ~BLE_WKUP;
+    SYSCFG->PMU_WKUP = FIELD_BUILD(SYSCFG_SLP_LVL, mode) 
+                      | FIELD_BUILD(SYSCFG_WKUP_EDGE,edge)
+                      | FIELD_BUILD(SYSCFG_WKUP_EN, src);
+    SYSCFG->PMU_PWR = 0; 
+    SCB->SCR |= (1<<2);
+}
+
+XIP_BANNED void enter_deep_sleep_mode_lvl2_lvl3(struct deep_sleep_wakeup *wakeup)
+{
+    lvl2_lvl3_mode_prepare(wakeup);
+    spi_flash_xip_stop();
+    spi_flash_deep_power_down();
+    LSGPIOC->PUPD = 0xAAAA555A;
+    __WFI();
+    while(1);
 }
 
 void deep_sleep()
