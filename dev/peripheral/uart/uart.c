@@ -222,7 +222,7 @@ HAL_StatusTypeDef HAL_UART_Transmit_IT(UART_HandleTypeDef *huart, uint8_t *pData
         huart->ErrorCode = HAL_UART_ERROR_NONE;
         huart->gState = HAL_UART_STATE_BUSY_TX;
         REG_FIELD_WR(huart->UARTX->FCR,UART_FCR_FIFOEN,1);
-        REG_FIELD_WR(huart->UARTX->FCR,UART_FCR_TXTL,UART_FIFO_RL_1);
+        REG_FIELD_WR(huart->UARTX->FCR,UART_FCR_TXTL,UART_FIFO_TL_0);
     /* Enable the UART Transmit data register empty Interrupt */
         REG_FIELD_WR(huart->UARTX->ICR,UART_ICR_TC,1);
         REG_FIELD_WR(huart->UARTX->ICR,UART_ICR_TXS,1);
@@ -278,7 +278,6 @@ HAL_StatusTypeDef HAL_UART_Receive_IT(UART_HandleTypeDef *huart, uint8_t *pData,
         {
             REG_FIELD_WR(huart->UARTX->FCR,UART_FCR_RXTL,UART_FIFO_RL_8);
         } 
-        
         /* Enable the UART Data Register not empty Interrupt */
         REG_FIELD_WR(huart->UARTX->IER,UART_IER_RXRD,1);
         return HAL_OK;
@@ -332,26 +331,22 @@ static void UART_Transmit_IT(UART_HandleTypeDef *huart)
     {
         if(!REG_FIELD_RD(huart->UARTX->FCR, UART_FCR_TXFL))
         {
-            if (huart->TxXferCount == 1U)
+            if (huart->TxXferCount == 0U)
             {
-                huart->TxXferCount--;
-                huart->UARTX->TBR = (*huart->pTxBuffPtr++ & (uint8_t)0xFF);
-                REG_FIELD_WR(huart->UARTX->FCR,UART_FCR_TXTL,UART_FIFO_TL_1);
                 REG_FIELD_WR(huart->UARTX->IDR,UART_IDR_TXS,1);
                 REG_FIELD_WR(huart->UARTX->IER,UART_IER_TC,1);
             }
             else
             {
-                for(i=0;i<14;i++)
+                while(REG_FIELD_RD(huart->UARTX->SR,  UART_SR_TFNF))
                 {
-                    if (huart->TxXferCount == 1U)
+                    if (huart->TxXferCount == 0U)
                     {
                         break;
                     }
                     huart->TxXferCount--;
                     huart->UARTX->TBR = (*huart->pTxBuffPtr++ & (uint8_t)0xFF);
                 }
-                REG_FIELD_WR(huart->UARTX->FCR,UART_FCR_TXTL,UART_FIFO_TL_2);
             }
         }
     }

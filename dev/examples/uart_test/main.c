@@ -15,13 +15,19 @@ uint8_t test_zone_b[TEST_ZONE_SIZE * 2] ;
 
 void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart,void *tx_arg)
 {
-    HAL_UART_DeInit(huart);
-    uart3_io_deinit();
+    //UART disable
+    // HAL_UART_DeInit(huart);
+    // uart1_io_deinit();
+    /*code */
+
+    /* user code end */
+
 }
 
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart,void *rx_arg)
 {
-    HAL_UART_Transmit_IT(&UART_Config,test_zone_b,8,NULL);
+    HAL_UART_Transmit_IT(&UART_Config,test_zone_b,1,NULL);
+    HAL_UART_Receive_IT(&UART_Config,test_zone_b,1,NULL);
 }
 
 static void gpio_init()
@@ -42,7 +48,7 @@ static void uart_test_init(void)
 
 static void uart_test()
 {
-    HAL_UART_Receive_IT(&UART_Config,test_zone_b,8,NULL);
+    HAL_UART_Receive_IT(&UART_Config,test_zone_b,1,NULL);
 }
 
 int main()

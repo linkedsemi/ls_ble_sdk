@@ -55,16 +55,16 @@ typedef struct
                StopBits:1,                  /*!< Specifies the number of stop bits transmitted.
                                            This parameter can be a value of @ref UART_Stop_Bits */
 
-               Parity:1,                    /*!< Specifies the parity mode.
+               Parity:2,                    /*!< Specifies the parity mode.
                                            This parameter can be a value of @ref UART_Parity
                                            @note When parity is enabled, the computed parity is inserted
                                                  at the MSB position of the transmitted data (9th bit when
                                                  the word length is set to 9 data bits; 8th bit when the
                                                  word length is set to 8 data bits). */
                MSBEN:1,
-               HwFlowCtl:1,                 /*!< Specifies whether the hardware flow control mode is enabled or disabled.
+               HwFlowCtl:1;                 /*!< Specifies whether the hardware flow control mode is enabled or disabled.
                                                  This parameter can be a value of @ref UART_Hardware_Flow_Control */
-               Tx_DMA: 1,                   /**< Default DMA Setting for TX. */
+    uint8_t    Tx_DMA: 1,                   /**< Default DMA Setting for TX. */
                Rx_DMA: 1;                   /**< Default DMA Setting for RX . */
 } UART_InitTypeDef;
 
@@ -224,7 +224,7 @@ typedef struct __UART_HandleTypeDef
 #define UART_TXFIFORST      0x4     // Transmit FIFO reset
 #define UART_FIFO_RL_1      0x0     // FIFO trigger level   
 #define UART_FIFO_RL_8      0x2
-#define UART_FIFO_TL_1      0x0     // FIFO trigger level 
+#define UART_FIFO_TL_0      0x0     // FIFO trigger level 
 #define UART_FIFO_TL_2      0x1     // FIFO trigger level 
 #define UART_FIFO_TL_4      0x2     // FIFO trigger level 
 #define UART_FIFO_TL_8      0x3
