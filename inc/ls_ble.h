@@ -600,6 +600,8 @@ void dev_manager_delete_activity(uint8_t obj_hdl);
 
 void dev_manager_set_mac_addr(uint8_t *addr);
 
+uint8_t dev_manager_update_adv_interval(uint8_t adv_handle, uint32_t new_intv_min, uint32_t new_intv_max);
+
 void gap_manager_init(void (*evt_cb)(enum gap_evt_type,union gap_evt_u *,uint8_t));
 
 void gap_manager_disconnect(uint8_t con_idx,uint8_t reason);

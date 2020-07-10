@@ -10,6 +10,7 @@
 #include <string.h>
 #include "co_math.h"
 #include "io_config.h"
+#include "SEGGER_RTT.h"
 
 #define UART_SVC_ADV_NAME "LS UART Server"
 #define UART_SERVER_MAX_MTU  247
@@ -87,6 +88,7 @@ static bool uart_server_tx_busy;
 static bool uart_server_ntf_done = true;
 static uint16_t uart_server_mtu = UART_SERVER_MTU_DFT;
 static struct builtin_timer *uart_server_timer_inst = NULL;
+static bool update_adv_intv_flag = false;
 
 static uint8_t adv_obj_hdl;
 static uint8_t advertising_data[28];
@@ -105,6 +107,16 @@ static void ls_uart_server_init(void)
     uart_server_timer_inst = builtin_timer_create(ls_uart_server_timer_cb);
     builtin_timer_start(uart_server_timer_inst, UART_SERVER_TIMEOUT, NULL);
 }
+
+static void ls_uart_server_update_adv_interval(uint8_t input_intv)
+{
+    LOG_I("input_char: %d",input_intv);
+    uint32_t new_intv = (input_intv - '0')*160;
+    dev_manager_update_adv_interval(adv_obj_hdl, new_intv, new_intv);
+    dev_manager_stop_adv(adv_obj_hdl);
+    update_adv_intv_flag = true;
+}
+
 static void ls_uart_server_timer_cb(void *param)
 {
     if(connect_id != 0xff)
@@ -113,6 +125,11 @@ static void ls_uart_server_timer_cb(void *param)
         // LOG_I("uart timer out, length=%d", uart_server_rx_index);
         ls_uart_server_send_notification();
         exit_critical();
+    }
+    uint8_t input_char = (uint8_t)SEGGER_RTT_GetKey();
+    if(input_char != 0xff && input_char > '0' && input_char <= '9')
+    {
+        ls_uart_server_update_adv_interval(input_char);
     }
     if(uart_server_timer_inst)
     {
@@ -293,7 +310,11 @@ static void dev_manager_callback(enum dev_evt_type type,union dev_evt_u *evt)
         dev_manager_start_adv(adv_obj_hdl,advertising_data,sizeof(advertising_data),scan_response_data,sizeof(scan_response_data));
     break;
     case ADV_STOPPED:
-    
+        if (update_adv_intv_flag)
+        {
+            update_adv_intv_flag = false;
+            dev_manager_start_adv(adv_obj_hdl,advertising_data,sizeof(advertising_data),scan_response_data,sizeof(scan_response_data));
+        }    
     break;
     case SCAN_STOPPED:
     
