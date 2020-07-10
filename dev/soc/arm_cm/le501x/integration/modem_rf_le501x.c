@@ -256,8 +256,8 @@ static void rf_reg_init()
                | FIELD_BUILD(RF_RD_CLK_EN,1)
                | FIELD_BUILD(RF_PLL_TEST_EN,0)
                | FIELD_BUILD(RF_CH_SEL,1)
-               | FIELD_BUILD(RF_PA_VB_SEL,1)  //  0-rf_ctl      1-cs_ctl
-               | FIELD_BUILD(RF_PA_VB_TARGET,6)
+               | FIELD_BUILD(RF_PA_VB_SEL,0)  //  0-rf_ctl      1-cs_ctl
+               | FIELD_BUILD(RF_PA_VB_TARGET,4)
                | FIELD_BUILD(RF_LDO_START_CNT,6)
                | FIELD_BUILD(RF_PA_STEP_SET,1);
     RF->REG58 = FIELD_BUILD(RF_EN_DAC_CNT,10)

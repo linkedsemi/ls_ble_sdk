@@ -325,7 +325,6 @@ static void UART_SetConfig(UART_HandleTypeDef *huart)
   */
 static void UART_Transmit_IT(UART_HandleTypeDef *huart)
 {
-    uint8_t i=0;
     /* Check that a Tx process is ongoing */
     if (huart->gState == HAL_UART_STATE_BUSY_TX)
     {
