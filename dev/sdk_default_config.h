@@ -6,7 +6,7 @@
 #endif
 
 #ifndef SDK_DCDC_BYPASS
-#define SDK_DCDC_BYPASS 0
+#define SDK_DCDC_BYPASS 1
 #endif
 
 #ifndef SDK_DEEP_SLEEP_ENABLE
