@@ -35,6 +35,10 @@
             "name": "Attach SBL",
             "device": "LE501X",
             "interface": "swd",
+            "preAttachCommands":[
+                "monitor flash breakpoints = 0",
+                "add-symbol-file build/fw.elf", 
+            ]
         },
         {
             "type": "cortex-debug",

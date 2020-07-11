@@ -272,7 +272,7 @@ uint32_t plf_get_reset_error()
 
 XIP_BANNED void flash_prog_erase_suspend_delay()
 {
-    DELAY_US(5);
+    DELAY_US(15);
 }
 
 XIP_BANNED void switch_to_rc32k()

@@ -106,6 +106,11 @@ XIP_BANNED static void power_up_hardware_modules()
 {
     SYSCFG->PMU_PWR = FIELD_BUILD(SYSCFG_PERI_PWR2_PD, 0) 
                     | FIELD_BUILD(SYSCFG_PERI_ISO2_EN,1);
+
+}
+
+XIP_BANNED static void remove_hw_isolation()
+{
     while((SYSCFG->PMU_PWR & (SYSCFG_PERI_PWR2_ST_MASK)));
     SYSCFG->PMU_PWR = FIELD_BUILD(SYSCFG_PERI_PWR2_PD, 0) 
                     | FIELD_BUILD(SYSCFG_PERI_ISO2_EN,0);
@@ -121,10 +126,12 @@ NOINLINE XIP_BANNED static void cpu_flash_deep_sleep_and_recover()
     spi_flash_xip_stop();
     spi_flash_deep_power_down();
     cpu_sleep_asm();
+    __disable_irq();
     spi_flash_init();
     spi_flash_release_from_deep_power_down();
     power_up_hardware_modules();
-    __disable_irq();
+    DELAY_US(8);
+    remove_hw_isolation();
     spi_flash_xip_start();
 }
 
