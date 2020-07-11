@@ -14,6 +14,7 @@ struct reset_retain_struct
 {
     uint32_t reset_reason;
     uint8_t wakeup_source;
+    uint8_t reset_source;
 };
 
 void switch_to_rc32k(void);
@@ -23,6 +24,8 @@ void switch_to_xo16m(void);
 bool clk_check(void);
 
 void clk_switch(void);
+
+uint8_t get_reset_source(void);
 
 uint8_t get_wakeup_source(void);
 
@@ -57,6 +60,9 @@ void arm_cm_delay_asm(uint32_t);
 
 void request_ota_reboot(void);
 
+void power_up_hardware_modules(void);
+
+void remove_hw_isolation(void);
 
 #define DELAY_US(a) arm_cm_delay_asm((a)*(SDK_HCLK_MHZ/4))
 

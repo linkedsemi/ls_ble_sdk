@@ -160,15 +160,27 @@ void rco_calibration_start()
     REG_FIELD_WR(SYSCFG->ANACFG1, SYSCFG_EN_RCO_DIG_PWR, 0);
 }
 
-static void check_wkup_state(void)
+static void check_wkup_rst_state(void)
 {
-    uint8_t wkup_stat = REG_FIELD_RD(SYSCFG->PMU_WKUP,SYSCFG_WKUP_STAT);
     struct reset_retain_struct *reset_retain_ptr = (struct reset_retain_struct*)RESET_RETAIN_BASE;
+    uint8_t wkup_stat = REG_FIELD_RD(SYSCFG->PMU_WKUP,SYSCFG_WKUP_STAT);
     if (wkup_stat)
     {
         REG_FIELD_WR(SYSCFG->PMU_WKUP, SYSCFG_LP_WKUP_CLR,1);
         reset_retain_ptr->wakeup_source = wkup_stat;
     }
+    uint8_t rst_stat = SYSCFG->RSTST;
+    if(rst_stat)
+    {
+        SYSCFG->RSTST = 0xff;
+        reset_retain_ptr->reset_source = rst_stat;
+    }
+}
+
+uint8_t get_reset_source()
+{
+    struct reset_retain_struct *reset_retain_ptr = (struct reset_retain_struct*)RESET_RETAIN_BASE;
+    return reset_retain_ptr->reset_source;
 }
 
 uint8_t get_wakeup_source()
@@ -180,7 +192,7 @@ uint8_t get_wakeup_source()
 
 static void module_init()
 {
-    check_wkup_state();
+    check_wkup_rst_state();
     io_init();
     LOG_INIT();
     LOG_I("sys init");
@@ -234,7 +246,6 @@ void sys_init_itf()
 
 void sys_init_app()
 {
-    check_wkup_state();
     analog_init();
     var_init();
     main_task_app_init();
@@ -344,4 +355,23 @@ void request_ota_reboot()
     spi_flash_quad_page_program(OTA_INFO_OFFSET,(uint8_t *)&ota_req, sizeof(ota_req));
     platform_reset(RESET_OTA_REQ);
 }
+
+XIP_BANNED void power_up_hardware_modules()
+{
+    SYSCFG->PMU_PWR = FIELD_BUILD(SYSCFG_PERI_PWR2_PD, 0) 
+                    | FIELD_BUILD(SYSCFG_PERI_ISO2_EN,1)
+                    | FIELD_BUILD(SYSCFG_ERAM_PWR7_PD,0)
+                    | FIELD_BUILD(SYSCFG_ERAM_ISO7_EN,2);
+
+}
+
+XIP_BANNED void remove_hw_isolation()
+{
+    while((SYSCFG->PMU_PWR & (SYSCFG_PERI_PWR2_ST_MASK)) && (SYSCFG->PMU_PWR & (SYSCFG_ERAM_PWR7_ST_MASK)));
+    SYSCFG->PMU_PWR = FIELD_BUILD(SYSCFG_PERI_PWR2_PD, 0) 
+                    | FIELD_BUILD(SYSCFG_PERI_ISO2_EN,0)
+                    | FIELD_BUILD(SYSCFG_ERAM_PWR7_PD,0)
+                    | FIELD_BUILD(SYSCFG_ERAM_ISO7_EN,0);
+}
+
 

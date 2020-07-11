@@ -102,20 +102,6 @@ void cpu_sleep_recover_init()
     ISR_VECTOR_ADDR[1] = (uint32_t)cpu_recover_asm;
 }
 
-XIP_BANNED static void power_up_hardware_modules()
-{
-    SYSCFG->PMU_PWR = FIELD_BUILD(SYSCFG_PERI_PWR2_PD, 0) 
-                    | FIELD_BUILD(SYSCFG_PERI_ISO2_EN,1);
-
-}
-
-XIP_BANNED static void remove_hw_isolation()
-{
-    while((SYSCFG->PMU_PWR & (SYSCFG_PERI_PWR2_ST_MASK)));
-    SYSCFG->PMU_PWR = FIELD_BUILD(SYSCFG_PERI_PWR2_PD, 0) 
-                    | FIELD_BUILD(SYSCFG_PERI_ISO2_EN,0);
-}
-
 void clr_ble_wkup_req()
 {
     RCC->BLECFG &= ~RCC_BLE_WKUP_RST_MASK;

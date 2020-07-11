@@ -349,8 +349,9 @@ XIP_BANNED int main()
 {
     switch_to_rc32k();
     clk_switch();
+    power_up_hardware_modules();
+    remove_hw_isolation();
     __disable_irq();
-    swd_pull_down();
     spi_flash_drv_var_init(false,false);
     spi_flash_init();
     spi_flash_qe_status_read_and_set();
