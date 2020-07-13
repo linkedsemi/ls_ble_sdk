@@ -246,10 +246,15 @@ struct char_permissions
 struct att_decl
 {
     const uint8_t *uuid;
-    uint16_t max_len;
+    union{
+        uint16_t hword;
+        uint16_t max_len:12,
+                eks:1,
+                uuid_len:2,
+                read_indication:1;
+    }u;
     struct char_permissions char_perm;
     struct char_properties char_prop; 
-    enum uuid_length uuid_len;
 };
 
 struct svc_decl
