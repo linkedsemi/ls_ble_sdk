@@ -420,8 +420,8 @@ void HAL_UARTx_IRQHandler(UART_HandleTypeDef *huart)
     /* UART in mode Transmitter ------------------------------------------------*/
     if ((( isrflags& UART_IT_TXS) != 0) &&((ivsits & UART_IT_TXS) != 0))
     {
-        UART_Transmit_IT(huart);
         REG_FIELD_WR(huart->UARTX->ICR,UART_ICR_TXS,1);
+        UART_Transmit_IT(huart);
     }
     /* UART in mode Transmitter end --------------------------------------------*/
     if (((isrflags & UART_IT_TC) != 0) && ((ivsits & UART_IT_TC) != 0))
