@@ -46,45 +46,50 @@ enum uart_svc_att_db_handles
     UART_SVC_ATT_NUM
 };
 
-static struct att_decl ls_uart_server_att_decl[UART_SVC_ATT_NUM] =
+static const struct att_decl ls_uart_server_att_decl[UART_SVC_ATT_NUM] =
 {
     [UART_SVC_IDX_RX_CHAR] = {
         .uuid = att_decl_char_array,
-        .max_len = 0, 
+        .s.max_len = 0,
+        .s.uuid_len = UUID_LEN_16BIT,
+        .s.read_indication = 1,   
         .char_prop.rd_en = 1,
-        .uuid_len = UUID_LEN_16BIT,
     },
     [UART_SVC_IDX_RX_VAL] = {
         .uuid = ls_uart_rx_char_uuid_128,
-        .max_len = UART_SVC_RX_MAX_LEN,
+        .s.max_len = UART_SVC_RX_MAX_LEN,
+        .s.uuid_len = UUID_LEN_128BIT,
+        .s.read_indication = 1,
         .char_prop.wr_cmd = 1,
         .char_prop.wr_req = 1,
-        .uuid_len = UUID_LEN_128BIT,
     },
     [UART_SVC_IDX_TX_CHAR] = {
         .uuid = att_decl_char_array,
-        .max_len = 0,
-        .char_prop.rd_en = 1,
-        .uuid_len = UUID_LEN_16BIT,
+        .s.max_len = 0,
+        .s.uuid_len = UUID_LEN_16BIT,
+        .s.read_indication = 1,
+        .char_prop.rd_en = 1, 
     },
     [UART_SVC_IDX_TX_VAL] = {
         .uuid = ls_uart_tx_char_uuid_128,
-        .max_len = UART_SVC_TX_MAX_LEN,
+        .s.max_len = UART_SVC_TX_MAX_LEN,
+        .s.uuid_len = UUID_LEN_128BIT,
+        .s.read_indication = 1,
         .char_prop.ntf_en = 1,
-        .uuid_len = UUID_LEN_128BIT,
     },
     [UART_SVC_IDX_TX_NTF_CFG] = {
         .uuid = att_desc_client_char_cfg_array,
-        .max_len = 0,
+        .s.max_len = 0,
+        .s.uuid_len = UUID_LEN_16BIT,
+        .s.read_indication = 1,
         .char_prop.rd_en = 1,
         .char_prop.wr_req = 1,
-        .uuid_len = UUID_LEN_16BIT,
     },
 };
-static struct svc_decl ls_uart_server_svc =
+static const struct svc_decl ls_uart_server_svc =
 {
     .uuid = ls_uart_svc_uuid_128,
-    .att = ls_uart_server_att_decl,
+    .att = (struct att_decl*)ls_uart_server_att_decl,
     .nb_att = UART_SVC_ATT_NUM,
     .uuid_len = UUID_LEN_128BIT,
 };
