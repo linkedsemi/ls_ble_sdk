@@ -1,7 +1,6 @@
 
 #include <stdio.h>
 #include "uart.h"
-#include "field_manipulate.h"
 #include "uart_param.h" 
 #include "log.h"
 
@@ -108,8 +107,10 @@ __attribute__((weak)) void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart,voi
   * @param  Timeout Timeout duration
   * @retval HAL status
   */
-HAL_StatusTypeDef HAL_UART_Transmit(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size)
+HAL_StatusTypeDef HAL_UART_Transmit(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size, uint32_t Timeout)
 {
+    //   uint32_t tickstart = 0U;
+    //   uint32_t timeout = (Timeout*UART_CLOCK)/1000;
     /* Check that a Tx process is not already ongoing */
     if (huart->gState == HAL_UART_STATE_READY)
     {
@@ -125,15 +126,22 @@ HAL_StatusTypeDef HAL_UART_Transmit(UART_HandleTypeDef *huart, uint8_t *pData, u
         huart->TxXferSize = Size;
         huart->TxXferCount = Size;
         
-        while (huart->TxXferCount > 0U)
+        while (huart->TxXferCount > 0U )
         {
-            huart->TxXferCount--;
-            huart->UARTX->TBR = (*pData++ & (uint8_t)0xFF);
-            // Wait until TX Buffer Empty
-            while (!(huart->UARTX->SR & UART_SR_TBEM))
-            ;
+            if (huart->UARTX->SR & UART_SR_TFNF)
+            {
+                //Transmit FIFO Not Full
+                huart->TxXferCount--;
+                huart->UARTX->TBR = (*pData++ & (uint8_t)0xFF);
+                if (huart->TxXferCount == 0)
+                {
+                    break;
+                }
+            }
         }
-        
+        // Wait until TX Finish
+        while (!(huart->UARTX->SR & UART_SR_TEMT))
+        ;
         // tx_fifo reset.
         REG_FIELD_WR(huart->UARTX->FCR,UART_FCR_TFRST,1);
         /* At end of Tx process, restore huart->gState to Ready */
@@ -156,8 +164,10 @@ HAL_StatusTypeDef HAL_UART_Transmit(UART_HandleTypeDef *huart, uint8_t *pData, u
   * @param  Timeout Timeout duration
   * @retval HAL status
   */
-HAL_StatusTypeDef HAL_UART_Receive(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size)
+HAL_StatusTypeDef HAL_UART_Receive(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size, uint32_t Timeout)
 {
+    // uint32_t tickstart = 0U;
+    // uint32_t Timeout_ms = Timeout*UART_CLOCK/1000;
     /* Check that a Rx process is not already ongoing */
     if (huart->RxState == HAL_UART_STATE_READY)
     {
@@ -169,7 +179,7 @@ HAL_StatusTypeDef HAL_UART_Receive(UART_HandleTypeDef *huart, uint8_t *pData, ui
         huart->RxState = HAL_UART_STATE_BUSY_RX;
 
         /* Init tickstart for timeout managment */
-
+        //todo
         REG_FIELD_WR(huart->UARTX->LCR,UART_LCR_RXEN,1);
     
         huart->RxXferSize = Size;
@@ -179,7 +189,7 @@ HAL_StatusTypeDef HAL_UART_Receive(UART_HandleTypeDef *huart, uint8_t *pData, ui
         while (huart->RxXferCount > 0U)
         {
             while((huart->UARTX->SR & UART_SR_DR)==0)
-                ;
+            ;
             huart->RxXferCount--;
             *pData++ = (uint8_t)(huart->UARTX->RBR & (uint8_t)0x00FF);
         }
