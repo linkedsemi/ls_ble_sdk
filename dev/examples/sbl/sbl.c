@@ -51,7 +51,7 @@ void trim_version_4100_load()
     uint8_t i;
     for(i=0;i<10;i+=2)
     {
-        if(buf[i]!=~buf[i+1])
+        if(buf[i]!=(uint16_t)~buf[i+1])
         {
             while(1);
         }
