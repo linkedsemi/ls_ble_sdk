@@ -33,7 +33,7 @@ uint16_t trim_head_load()
     uint16_t head[8];
     uint16_t version;
     spi_flash_read_security_area(1, 0,(void *)head, sizeof(head));
-    if(head[0]==~head[1] && head[2]==~head[3])
+    if(head[0]== (uint16_t)~head[1] && head[2]==(uint16_t)~head[3])
     {
         version = head[0];
         return version;
