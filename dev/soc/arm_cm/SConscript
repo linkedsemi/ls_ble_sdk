@@ -5,6 +5,7 @@ le501x_src,le501x_inc = SConscript(dirs='le501x',exports = ['dev_env'])
 src = [
     'flash_svcall.c',
     'svcall.c',
+    'systick.c',
 ]
 inc = [
     '.',

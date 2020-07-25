@@ -16,6 +16,7 @@
 #include "lsgpio.h"
 #include "cpu.h"
 #include "io_config.h"
+#include "systick.h"
 #define ISR_VECTOR_ADDR ((uint32_t *)(0x0))
 
 bool waiting_ble_wkup_irq;
@@ -105,6 +106,25 @@ void cpu_sleep_recover_init()
 void clr_ble_wkup_req()
 {
     RCC->BLECFG &= ~RCC_BLE_WKUP_RST_MASK;
+}
+
+
+XIP_BANNED void power_up_hardware_modules()
+{
+    SYSCFG->PMU_PWR = FIELD_BUILD(SYSCFG_PERI_PWR2_PD, 0) 
+                    | FIELD_BUILD(SYSCFG_PERI_ISO2_EN,1)
+                    | FIELD_BUILD(SYSCFG_ERAM_PWR7_PD,0)
+                    | FIELD_BUILD(SYSCFG_ERAM_ISO7_EN,2);
+
+}
+
+XIP_BANNED void remove_hw_isolation()
+{
+    while((SYSCFG->PMU_PWR & (SYSCFG_PERI_PWR2_ST_MASK)) && (SYSCFG->PMU_PWR & (SYSCFG_ERAM_PWR7_ST_MASK)));
+    SYSCFG->PMU_PWR = FIELD_BUILD(SYSCFG_PERI_PWR2_PD, 0) 
+                    | FIELD_BUILD(SYSCFG_PERI_ISO2_EN,0)
+                    | FIELD_BUILD(SYSCFG_ERAM_PWR7_PD,0)
+                    | FIELD_BUILD(SYSCFG_ERAM_ISO7_EN,0);
 }
 
 NOINLINE XIP_BANNED static void cpu_flash_deep_sleep_and_recover()
@@ -243,6 +263,7 @@ void deep_sleep()
     irq_reinit();
     ble_wkup_status_set(true);
     ble_hclk_restore();
+    systick_start();
 }
 
 bool ble_wkup_status_get(void)

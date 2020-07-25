@@ -24,6 +24,7 @@
 #include "field_manipulate.h"
 #include "io_config.h"
 #include "ls_dbg.h"
+#include "systick.h"
 
 #define BASEBAND_MEMORY_ADDR   (0x50004000)
 #define IRQ_NVIC_PRIO(IRQn,priority) (((priority << (8U - __NVIC_PRIO_BITS)) & (uint32_t)0xFFUL) << _BIT_SHIFT(IRQn))
@@ -189,7 +190,6 @@ uint8_t get_wakeup_source()
     return reset_retain_ptr->wakeup_source;
 }
 
-
 static void module_init()
 {
     check_wkup_rst_state();
@@ -212,6 +212,7 @@ static void module_init()
     modem_rf_init();
     low_power_mode_init();
     irq_init();
+    systick_start();
 }
 
 static void analog_init()
@@ -283,7 +284,34 @@ uint32_t plf_get_reset_error()
 
 XIP_BANNED void flash_prog_erase_suspend_delay()
 {
-    DELAY_US(15);
+    DELAY_US(30);
+}
+
+__attribute__((weak)) void ble_isr(){}
+
+XIP_BANNED void BLE_Handler()
+{
+    bool flash_writing_status = spi_flash_writing_busy();
+    bool xip = spi_flash_xip_status_get();
+    if(flash_writing_status)
+    {
+        LS_RAM_ASSERT(xip == false);
+        spi_flash_prog_erase_suspend();
+        flash_prog_erase_suspend_delay();
+    }
+    if(xip == false)
+    {
+        spi_flash_xip_start();
+    }
+    ble_isr();
+    if(xip == false)
+    {
+        spi_flash_xip_stop();
+    }
+    if(flash_writing_status)
+    {
+        spi_flash_prog_erase_resume();
+    }
 }
 
 XIP_BANNED void switch_to_rc32k()
@@ -356,22 +384,5 @@ void request_ota_reboot()
     platform_reset(RESET_OTA_REQ);
 }
 
-XIP_BANNED void power_up_hardware_modules()
-{
-    SYSCFG->PMU_PWR = FIELD_BUILD(SYSCFG_PERI_PWR2_PD, 0) 
-                    | FIELD_BUILD(SYSCFG_PERI_ISO2_EN,1)
-                    | FIELD_BUILD(SYSCFG_ERAM_PWR7_PD,0)
-                    | FIELD_BUILD(SYSCFG_ERAM_ISO7_EN,2);
-
-}
-
-XIP_BANNED void remove_hw_isolation()
-{
-    while((SYSCFG->PMU_PWR & (SYSCFG_PERI_PWR2_ST_MASK)) && (SYSCFG->PMU_PWR & (SYSCFG_ERAM_PWR7_ST_MASK)));
-    SYSCFG->PMU_PWR = FIELD_BUILD(SYSCFG_PERI_PWR2_PD, 0) 
-                    | FIELD_BUILD(SYSCFG_PERI_ISO2_EN,0)
-                    | FIELD_BUILD(SYSCFG_ERAM_PWR7_PD,0)
-                    | FIELD_BUILD(SYSCFG_ERAM_ISO7_EN,0);
-}
 
 

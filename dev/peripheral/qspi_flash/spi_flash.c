@@ -1,10 +1,16 @@
 #include <stddef.h>
+#include "sdk_config.h"
 #include "spi_flash.h"
 #include "lsqspi.h"
 #include "flash_svcall.h"
 #include "cpu.h"
 #include "compile_flag.h"
 #include "ls_dbg.h"
+#include "platform.h"
+#define PUYA_SUSPEND_WORKAROUND 1
+#if PUYA_SUSPEND_WORKAROUND
+#include "systick.h"
+#endif
 #define WRITE_STATUS_REGISTER_OPCODE 0x01
 #define READ_STATUS_REGISTER_0_OPCODE 0x05
 #define READ_STATUS_REGISTER_1_OPCODE 0x35
@@ -145,6 +151,37 @@ NOINLINE XIP_BANNED static void flash_reading_critical(void (*func)(void *),void
     spi_flash_xip_start();
 }
 
+#if PUYA_SUSPEND_WORKAROUND
+static void do_spi_flash_prog_func(void *param);
+XIP_BANNED static void flash_writing_critical(void (*func)(void *),void *param)
+{
+    enter_critical();
+    spi_flash_xip_stop();
+    spi_flash_write_enable();
+    func(param);
+    uint32_t writing_end_time = systick_get_value();
+    DELAY_US(500);
+    flash_writing = true;
+    exit_critical();
+    int32_t criterion = func == do_spi_flash_prog_func ? 1000 : 6900;
+    while(1)
+    {   
+        int32_t diff = systick_time_diff(systick_get_value(),writing_end_time);
+        if(diff/SDK_HCLK_MHZ> criterion)
+        {
+            break;
+        }
+    }
+    enter_critical();
+    spi_flash_write_status_check();
+    exit_critical();
+    flash_writing = false;
+    spi_flash_xip_start();
+}
+
+
+#else
+
 XIP_BANNED static void flash_writing_critical(void (*func)(void *),void *param)
 {
     enter_critical();
@@ -157,6 +194,7 @@ XIP_BANNED static void flash_writing_critical(void (*func)(void *),void *param)
     flash_writing = false;
     spi_flash_xip_start();
 }
+#endif
 
 XIP_BANNED static void do_spi_flash_write_status_reg_func(void * param)
 {
