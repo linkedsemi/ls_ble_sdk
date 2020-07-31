@@ -141,7 +141,7 @@ void log_hex_output(const void * data_pointer , uint16_t data_length)
     
     uint8_t *data = (uint8_t*)data_pointer;
     uint8_t  tmp_h,tmp_l;
-    uint32_t total_length = data_length * 2 + 1;
+    uint32_t total_length = data_length * 2 + 2;
     char  log_format_buff[total_length];
     char *bufptr=log_format_buff;
     //content
@@ -153,9 +153,9 @@ void log_hex_output(const void * data_pointer , uint16_t data_length)
         *bufptr = hex_num_tab[tmp_l];  bufptr++;
     }
     *bufptr = '\n'; bufptr ++;
-    backend_write(log_format_buff,total_length);
+    *bufptr = '\0';
+    printf(log_format_buff);
 }
-
 
 
 
