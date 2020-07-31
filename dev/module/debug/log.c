@@ -1,41 +1,107 @@
+#include <stdio.h>
 #include "log.h"
 #include "segger_rtt.h"
-//#include "compiler_flag.h"
-//#include "ram_log.h"
+#include "uart.h"
+#include "io_config.h"
 
+#define JLINK_RTT           1
+#define UART_LOG           2
+#define RAM_LOG             4
+#define LOG_BACKEND (JLINK_RTT | UART_LOG)
+
+#define LOG_UART_TXD (PB00)
+#define LOG_UART_RXD (PB01)
 
 const uint8_t hex_num_tab[] = "0123456789ABCDEF";
 
-int SEGGER_RTT_vprintf(unsigned BufferIndex, const char * sFormat, va_list * pParamList);
+#if (LOG_BACKEND&UART_LOG)
+static UART_HandleTypeDef log_uart;
 
-void rtt_output(bool linefeed,const char *format,va_list *args)
+static void log_uart_tx(char *ptr,int len)
 {
-    SEGGER_RTT_vprintf(0,format,args);
-    if(linefeed)
+    HAL_UART_Transmit(&log_uart,(void *)ptr,(uint16_t)len,0);
+}
+
+static void log_uart_init()
+{
+    uart3_io_init(LOG_UART_TXD, LOG_UART_RXD);
+    HAL_UART_Init(&log_uart);
+}
+
+static void log_uart_deinit()
+{
+    HAL_UART_DeInit(&log_uart);
+    uart3_io_deinit();
+}
+
+void uart_log_pause()
+{
+    log_uart_deinit();
+}
+
+void uart_log_resume()
+{
+    log_uart_init();
+}
+#else
+void uart_log_pause(){}
+void uart_log_resume(){}
+#endif
+
+static void backend_write(char *ptr,int len)
+{
+    if(LOG_BACKEND&JLINK_RTT)
     {
-        SEGGER_RTT_vprintf(0,"\n",NULL);
+        SEGGER_RTT_Write(0, ptr, len);
+    }
+    if(LOG_BACKEND&UART_LOG)
+    {
+        log_uart_tx(ptr,len);
+    }
+    if(LOG_BACKEND&RAM_LOG)
+    {
+//        ram_log_print(linefeed,format,&args);
     }
 }
+
+#if defined(__CC_ARM)
+int fputc(int ch, FILE *f)
+{
+    if(LOG_BACKEND&JLINK_RTT)
+    {
+        SEGGER_RTT_PutCharSkip(0, ch);
+    }
+    if(LOG_BACKEND&UART_LOG)
+    {
+        log_uart_tx((char *)&ch,1);
+    }
+    if(LOG_BACKEND&RAM_LOG)
+    {
+//        ram_log_print(linefeed,format,&args);
+    }
+    return ch;
+}
+
+#elif defined(__GNUC__)
+
+int _write (int fd, char *ptr, int len)
+{
+    backend_write(ptr,len);
+    return len;
+}
+
+#endif
 
 void log_output(bool linefeed,const char *format,...)
 {
     va_list args;
-    if(LOG_BACKEND&JLINK_RTT)
-    {
-        va_start(args,format);
-        rtt_output(linefeed,format,&args);
-    }
-    if(LOG_BACKEND&UART1_LOG)
-    {
-        va_start(args,format);
-
-    }
-    if(LOG_BACKEND&RAM_LOG)
-    {
-        va_start(args,format);
-//        ram_log_print(linefeed,format,&args);
-    }
+    va_start(args,format);
+    vprintf(format,args);
     va_end(args);
+    if(linefeed)
+    {
+        putchar('\n');
+    }
 }
 
 void log_init()
@@ -44,17 +110,22 @@ void log_init()
     {
         SEGGER_RTT_Init();
     }
-    if(LOG_BACKEND&UART1_LOG)
+    if(LOG_BACKEND&UART_LOG)
     {
-
+        log_uart.UARTX = UART3;
+        log_uart.Init.BaudRate = UART_BAUDRATE_921600;
+        log_uart.Init.WordLength = UART_BYTESIZE8;
+        log_uart.Init.StopBits = UART_STOPBITS1;
+        log_uart.Init.Parity = UART_NOPARITY;
+        log_uart.Init.MSBEN = 0;
+        log_uart.Init.HwFlowCtl = 0;
+        log_uart_init();
     }
     if(LOG_BACKEND&RAM_LOG)
     {
 
     }
 }
-
-
 
 /**
  ****************************************************************************************
@@ -71,8 +142,8 @@ void log_hex_output(const void * data_pointer , uint16_t data_length)
     uint8_t *data = (uint8_t*)data_pointer;
     uint8_t  tmp_h,tmp_l;
     uint32_t total_length = data_length * 2 + 1;
-    uint8_t  log_format_buff[total_length];
-    uint8_t *bufptr=log_format_buff;
+    char  log_format_buff[total_length];
+    char *bufptr=log_format_buff;
     //content
     for(uint16_t i=0;i<data_length;i++)
     {
@@ -82,20 +153,7 @@ void log_hex_output(const void * data_pointer , uint16_t data_length)
         *bufptr = hex_num_tab[tmp_l];  bufptr++;
     }
     *bufptr = '\n'; bufptr ++;
-    
-    //print
-    if(LOG_BACKEND&JLINK_RTT)
-    {
-        SEGGER_RTT_Write(0,log_format_buff,total_length);
-    }
-    if(LOG_BACKEND&UART1_LOG)
-    {
-
-    }
-    if(LOG_BACKEND&RAM_LOG)
-    {
-        //ram_log_write_buff(log_format_buff,total_length);
-    }
+    backend_write(log_format_buff,total_length);
 }
 
 

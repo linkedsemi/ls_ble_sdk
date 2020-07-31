@@ -4,8 +4,15 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <stddef.h>
-#include "log_def.h"
 
+#define LVL_ERROR 1
+#define LVL_WARN 2
+#define LVL_INFO 3
+#define LVL_DBG  4
+
+#ifndef GLOBAL_OUTPUT_LVL
+#define GLOBAL_OUTPUT_LVL     LVL_DBG
+#endif
 
 #if !defined(LOG_TAG)
     #define LOG_TAG                "NO_TAG"

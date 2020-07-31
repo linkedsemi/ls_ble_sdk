@@ -26,7 +26,7 @@ Python 3 + VS Code + GCC(ARM)
 
 * 解压GCC，将 ``{GCC_SETUP_DIR}/bin`` 路径添加到系统环境变量PATH中
 
-* 进入SDK根目录，打开命令行，执行下述命令，安装Python依赖库::
+* 进入SDK根目录，以系统管理员身份打开命令行，执行下述命令，安装Python依赖库::
 
     pip install -r requirements.txt
 
