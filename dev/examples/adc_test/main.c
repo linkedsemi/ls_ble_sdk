@@ -2,6 +2,8 @@
 #include "lsadc.h"
 #include "le501x.h"
 #include "reg_lsadc.h"
+#include "reg_syscfg.h"
+#include "field_manipulate.h"
 #include "lsiwdt.h"
 
 #include <string.h>
@@ -51,6 +53,23 @@ void lsadc_init(void)
     {
         Error_Handler();
     }
+}
+
+void usr_adc_vbat_sample_func(void)
+{
+    ADC_ChannelConfTypeDef sConfig = {0};
+		sConfig.Channel  = ADC_CHANNEL_TEMPSENSOR_VBAT;
+    sConfig.SamplingTime = ADC_SAMPLETIME_15CYCLES;//ADC_SAMPLETIME_15CYCLES;
+    if (HAL_ADC_ConfigChannel(&hadc, &sConfig) != HAL_OK)
+    {
+       Error_Handler();
+    }	
+	  else
+	  {
+	    REG_FIELD_WR(hadc.Instance->CR2,ADC_BATADJ, 0x02);  //3/8 VBAT
+		REG_FIELD_WR(SYSCFG->PMU_TRIM,SYSCFG_EN_BAT_DET,1);  //enable VBAT test
+	  }	
+	  HAL_ADC_Start_IT(&hadc);
 }
 
 int main(void)

@@ -5,7 +5,8 @@
 #include <stdint.h>
 #include "HAL_def.h"
 
-
+#define IWDT_SW_FEED_VAL   0xa55a1234
+extern uint32_t iwdt_sw_flag;
 
 #define IS_FUNCTIONAL_STATE(STATE) (((STATE) == DISABLE) || ((STATE) == ENABLE))
 

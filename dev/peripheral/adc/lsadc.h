@@ -404,7 +404,7 @@ typedef void (*pADC_CallbackTypeDef)(ADC_HandleTypeDef *hadc); /*!< pointer to a
 
 //#define ADC_CHANNEL_TEMPSENSOR          ADC_CHANNEL_16  /* ADC internal channel (no connection on device pin) */
 //#define ADC_CHANNEL_VREFINT             ADC_CHANNEL_17  /* ADC internal channel (no connection on device pin) */
-//#define ADC_CHANNEL_TEMPSENSOR_VBAT     ADC_CHANNEL_18  /* ADC internal channel (no connection on device pin) */
+#define ADC_CHANNEL_TEMPSENSOR_VBAT       ADC_CHANNEL_10  /* ADC internal channel (no connection on device pin) */
 /**
   * @}
   */

@@ -1,5 +1,5 @@
-#ifndef _LS_MESH_H_
-#define _LS_MESH_H_
+#ifndef _LS_SIG_MESH_H_
+#define _LS_SIG_MESH_H_
 #include <stdint.h>
 #include "ls_ble.h"
 #define __EMPTY
@@ -185,7 +185,7 @@ struct report_mesh_timer_state_info
     uint8_t status;
 };
 
-union mesh_evt_u {
+union ls_sig_mesh_evt_u {
     struct reqister_model_info register_model_param;
     struct report_model_loc_id_info loc_id_param;
     struct report_dev_provisioned_state_info st_proved;
@@ -196,7 +196,7 @@ union mesh_evt_u {
     struct adv_report_evt adv_report;
 };
 
-struct ls_mesh_cfg
+struct ls_sig_mesh_cfg
 {
     uint32_t MeshFeatures;
     uint16_t MeshCompanyID;
@@ -231,10 +231,10 @@ struct bcn_start_unprov_param
     bool UriHash_Present;
 };
 
-void prf_mesh_callback_init(void (*evt_cb)(enum mesh_evt_type, union mesh_evt_u *));
-void dev_manager_prf_mesh_add(uint8_t sec_lvl, struct ls_mesh_cfg *cfg);
-void ls_mesh_init(struct mesh_model_info *param);
-void ls_mesh_platform_reset(void);
+void prf_ls_sig_mesh_callback_init(void (*evt_cb)(enum mesh_evt_type, union ls_sig_mesh_evt_u *));
+void dev_manager_prf_ls_sig_mesh_add(uint8_t sec_lvl, struct ls_sig_mesh_cfg *cfg);
+void ls_sig_mesh_init(struct mesh_model_info *param);
+void ls_sig_mesh_platform_reset(void);
 void set_prov_param(struct mesh_prov_info *param);
 void set_prov_auth_info(struct mesh_prov_auth_info *param);
 void model_subscribe(uint8_t const ModelHandle, uint16_t const Addr);
@@ -244,4 +244,7 @@ void TIMER_Cancel(uint8_t TimerID);
 void SIGMESH_UnbindAll(void);
 void stop_tx_unprov_beacon(void);
 void start_tx_unprov_beacon(struct bcn_start_unprov_param *param);
-#endif //(_LS_MESH_H_
+void ls_sig_mesh_con_set_scan_rsp_data(uint8_t *scan_rsp_data, uint8_t *scan_rsp_data_len);
+void start_ls_sig_mesh_gatt(void);
+void stop_ls_sig_mesh_gatt(void);
+#endif //(_LS_SIG_MESH_H_

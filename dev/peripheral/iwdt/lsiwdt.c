@@ -13,6 +13,8 @@
 #include "reg_syscfg_type.h"
 #include "reg_syscfg.h"
 #include "log.h"
+
+uint32_t iwdt_sw_flag = 0xa55a1234;
 /** @addtogroup aqua_StdPeriph_Driver
   * @{
   */
@@ -225,8 +227,12 @@ ITStatus IWDG_GetITStatus(void)
   */
 void IWDG_ClearITFlag(void)
 {
+    if(iwdt_sw_flag == IWDT_SW_FEED_VAL)
+    {
+        iwdt_sw_flag=0;
     /* Clear the selected flag */
-    REG_FIELD_WR(LSIWDT->IWDT_INTCLR, IWDT_INTCLR, 1);
+         REG_FIELD_WR(LSIWDT->IWDT_INTCLR, IWDT_INTCLR, 1);
+    }
 
     for (uint8_t i = 0; i < 200; i++)  //200 delay count
     {

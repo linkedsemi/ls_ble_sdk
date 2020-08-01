@@ -297,6 +297,37 @@
             "request": "launch",
             "servertype": "jlink",
             "cwd": "${workspaceRoot}",
+            "executable": "./build/examples/tmall_mesh_gatt.elf",
+            "name": "Debug TMALL_MESH_GATT",
+            "device": "LE501X",
+            "interface": "swd",
+            "runToMain": false,
+            "preLaunchCommands" :[
+                "monitor flash breakpoints = 0",
+                "monitor reset",
+                "load", 
+                "add-symbol-file build/fw.elf",               
+            ]
+        },
+        {
+            "type": "cortex-debug",
+            "request": "attach",
+            "servertype": "jlink",
+            "cwd": "${workspaceRoot}",
+            "executable": "./build/examples/tmall_mesh_gatt.elf",
+            "name": "Attach TMALL_MESH_GATT",
+            "device": "LE501X",
+            "interface": "swd",
+            "preAttachCommands":[
+                "monitor flash breakpoints = 0",
+                "add-symbol-file build/fw.elf", 
+            ]
+        },
+        {
+            "type": "cortex-debug",
+            "request": "launch",
+            "servertype": "jlink",
+            "cwd": "${workspaceRoot}",
             "executable": "./build/examples/ble_uart_server_sleep_mode.elf",
             "name": "Debug BLE_UART_SERVER_SLEEP_MODE",
             "device": "LE501X",

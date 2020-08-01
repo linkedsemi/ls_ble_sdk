@@ -193,9 +193,18 @@ HAL_StatusTypeDef HAL_ADC_ConfigChannel(ADC_HandleTypeDef *hadc, ADC_ChannelConf
     //               ADC_SMPR1(sConfig->SamplingTime, sConfig->Channel) );
     //
     //    MODIFY_REG(hadc->Instance->RSQR1, ADC_RSQ1_MASK,sConfig->Channel);
-
-    REG_FIELD_WR(LSADC->SMPR1, ADC_SMP0, 0); //select adc sample
-    REG_FIELD_WR(LSADC->RSQR1, ADC_RSQ1, 4); //select ADC channel 4
+    if (sConfig->Channel == ADC_CHANNEL_TEMPSENSOR_VBAT)
+		{
+				REG_FIELD_WR(hadc->Instance->SMPR1, ADC_SMP10, sConfig->SamplingTime); //select adc sample
+			  REG_FIELD_WR(hadc->Instance->RSQR1, ADC_RSQ1, sConfig->Channel); //select ADC channel 4
+			  
+		}
+		else
+		{
+			REG_FIELD_WR(hadc->Instance->SMPR1, ADC_SMP4, sConfig->SamplingTime); //select adc sample
+			REG_FIELD_WR(hadc->Instance->RSQR1, ADC_RSQ1, sConfig->Channel); //select ADC channel 4
+		}
+		
     /* Return function status */
     return tmp_hal_status;
 }

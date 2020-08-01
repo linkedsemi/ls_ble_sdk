@@ -12,8 +12,6 @@
   */
 
 #define __HAL_RCC_ADC_CLK_ENABLE()   do { \
-                                       REG_FIELD_WR(RCC->APB2RST, RCC_ADC, 1);\
-                                       REG_FIELD_WR(RCC->APB2RST, RCC_ADC, 0);\
                                        REG_FIELD_WR(RCC->APB2EN,  RCC_ADC, 1);\
                                       } while(0U)
 
