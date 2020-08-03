@@ -14,6 +14,7 @@ typedef uint8_t SIGMESH_NodeInfo_TypeDef;
 
 //mesh server model index
 #define GENERIC_ONOFF_SERVER             (0x1000)
+#define GENERIC_LVL_SERVER               (0x1002)
 #define LIGHTNESS_SERVER                 (0x1300)
 #define LIGHTS_CTL_SERVER                (0x1303)
 #define LIGHTS_HSL_SERVER                (0x1307)
@@ -24,6 +25,12 @@ typedef uint8_t SIGMESH_NodeInfo_TypeDef;
 #define GENERIC_ONOFF_SET                (0x0282)
 #define GENERIC_ONOFF_SET_UNAK           (0x0382)
 #define GENERIC_ONOFF_STATUS             (0x0482)
+
+//Generic OnOff        
+#define GENERIC_LVL_GET                  (0x0582)
+#define GENERIC_LVL_SET                  (0x0682)
+#define GENERIC_LVL_SET_UNAK             (0x0782)
+#define GENERIC_LVL_STATUS               (0x0882)
 
 //Light Lightness        
 #define LIGHT_LIGHTNESS_SET              (0x4c82)
@@ -72,7 +79,8 @@ enum mesh_evt_type
     MESH_ACCEPT_MODEL_INFO = 17,
     MESH_RSP_MODEL_INFO = 18,
     MESH_REPORT_TIMER_STATE = 19,
-    MESH_ADV_REPORT = 20
+    MESH_ADV_REPORT = 20,
+    MESH_STATE_UPD_IND = 21
 };
 
 /// Mesh Supported Features
@@ -105,6 +113,91 @@ enum mesh_timer_state
 {
     MESH_TIMER_DOING = 0x00,
     MESH_TIMER_DONE = 0x01,
+};
+
+/// State identifier values
+enum mesh_state_idx
+{
+    /// Generic OnOff state
+    MESH_STATE_GEN_ONOFF = 0,
+    /// Generic Level state
+    MESH_STATE_GEN_LVL,
+    /// Generic Default Transition Time state
+    MESH_STATE_GEN_DTT,
+    /// Generic Power Actual state
+    MESH_STATE_GEN_POWER_ACTUAL,
+    /// Generic Power Last state
+    MESH_STATE_GEN_POWER_LAST,
+    /// Generic Power Default state
+    MESH_STATE_GEN_POWER_DFLT,
+    /// Generic Power Range state
+    MESH_STATE_GEN_POWER_RANGE,
+    /// Generic OnPowerUp state
+    MESH_STATE_GEN_ONPOWERUP,
+
+    /// Light Lightness
+    MESH_STATE_LIGHT_LN = 50,
+    /// Light Lightness Linear
+    MESH_STATE_LIGHT_LN_LIN,
+    /// Light Lightness Last
+    MESH_STATE_LIGHT_LN_LAST,
+    /// Light Lightness Default
+    MESH_STATE_LIGHT_LN_DFLT,
+    /// Light Lightness Range
+    MESH_STATE_LIGHT_LN_RANGE,
+    /// Light Lightness Range Min
+    MESH_STATE_LIGHT_LN_RANGE_MIN,
+    /// Light Lightness Range Max
+    MESH_STATE_LIGHT_LN_RANGE_MAX,
+
+    /// Light CTL Lightness
+    MESH_STATE_LIGHT_CTL_LN = 100,
+    /// Light CTL Temperature
+    MESH_STATE_LIGHT_CTL_TEMP,
+    /// Light CTL Delta UV
+    MESH_STATE_LIGHT_CTL_DELTA_UV,
+    /// Light CTL Temperature Default
+    MESH_STATE_LIGHT_CTL_TEMP_DFLT,
+    /// Light CTL Temperature Range
+    MESH_STATE_LIGHT_CTL_TEMP_RANGE,
+    /// Light CTL Delta UV Default
+    MESH_STATE_LIGHT_CTL_DELTA_UV_DFLT,
+
+    /// Light HSL Lightness
+    MESH_STATE_LIGHT_HSL_LN = 150,
+    /// Light HSL Hue
+    MESH_STATE_LIGHT_HSL_HUE,
+    /// Light HSL Saturation
+    MESH_STATE_LIGHT_HSL_SAT,
+    /// Light HSL Target
+    MESH_STATE_LIGHT_HSL_TGT,
+    /// Light HSL Default (Lightness + Hue + Saturation)
+    MESH_STATE_LIGHT_HSL_DFLT,
+    /// Light HSL Lightness Default
+    MESH_STATE_LIGHT_HSL_DFLT_LN,
+    /// Light HSL Hue Default
+    MESH_STATE_LIGHT_HSL_DFLT_HUE,
+    /// Light HSL Saturation Default
+    MESH_STATE_LIGHT_HSL_DFLT_SAT,
+    /// Light HSL Hue Range
+    MESH_STATE_LIGHT_HSL_RANGE_HUE,
+    /// Light HSL Saturation Range
+    MESH_STATE_LIGHT_HSL_RANGE_SAT,
+
+    /// Light xyL Lightness
+    MESH_STATE_LIGHT_XYL_LN = 200,
+    /// Light xyL x and y
+    MESH_STATE_LIGHT_XYL_XY,
+    /// Light xyL Lightness Target
+    MESH_STATE_LIGHT_XYL_LN_TGT,
+    /// Light xyL x and y Target
+    MESH_STATE_LIGHT_XYL_XY_TGT,
+    /// Light xyL Lightness Default
+    MESH_STATE_LIGHT_XYL_LN_DFLT,
+    /// Light xyL x and y Default
+    MESH_STATE_LIGHT_XYL_XY_DFLT,
+    /// Light xyL x and y Range
+    MESH_STATE_LIGHT_XYL_XY_RANGE
 };
 
 struct reqister_model_info
@@ -173,6 +266,15 @@ struct model_rx_info
     uint8_t info[__EMPTY];
 };
 
+struct model_state_upd
+{
+    uint32_t state;
+    uint32_t trans_time_ms;
+    /// State identifier 
+    uint16_t state_id;
+    uint8_t elmt_idx;
+};
+
 struct report_mesh_prov_result_info
 {
     uint8_t state;
@@ -185,6 +287,20 @@ struct report_mesh_timer_state_info
     uint8_t status;
 };
 
+struct model_id_info
+{
+    uint8_t sig_model_cfg_idx;
+    uint8_t element_id;
+    uint8_t model_lid;
+    uint32_t model_id;
+};
+
+struct mesh_model_info
+{
+    uint8_t nb_model;
+    struct model_id_info info[MAX_MESH_MODEL_NB];
+};
+
 union ls_sig_mesh_evt_u {
     struct reqister_model_info register_model_param;
     struct report_model_loc_id_info loc_id_param;
@@ -194,6 +310,8 @@ union ls_sig_mesh_evt_u {
     struct model_rx_info rx_msg;
     struct report_mesh_timer_state_info mesh_timer_state;
     struct adv_report_evt adv_report;
+    struct model_state_upd mdl_state_upd_ind;
+    struct mesh_model_info sig_mdl_info;
 };
 
 struct ls_sig_mesh_cfg
@@ -208,19 +326,6 @@ struct ls_sig_mesh_cfg
     uint8_t FrdRxWindowMS;
     uint8_t FrdQueueSize;
     uint8_t FrdSubsListSize;
-};
-
-struct model_id_info
-{
-    uint8_t element_id;
-    uint8_t model_lid;
-    uint32_t model_id;
-};
-
-struct mesh_model_info
-{
-    uint8_t nb_model;
-    struct model_id_info info[MAX_MESH_MODEL_NB];
 };
 
 struct bcn_start_unprov_param
@@ -247,4 +352,5 @@ void start_tx_unprov_beacon(struct bcn_start_unprov_param *param);
 void ls_sig_mesh_con_set_scan_rsp_data(uint8_t *scan_rsp_data, uint8_t *scan_rsp_data_len);
 void start_ls_sig_mesh_gatt(void);
 void stop_ls_sig_mesh_gatt(void);
+void ls_sig_mesh_proxy_adv_ctl(uint8_t enable);
 #endif //(_LS_SIG_MESH_H_
