@@ -50,35 +50,41 @@ void uart_log_resume(){}
 
 static void backend_write(char *ptr,int len)
 {
-    if(LOG_BACKEND&JLINK_RTT)
+    #if(LOG_BACKEND&JLINK_RTT)
     {
         SEGGER_RTT_Write(0, ptr, len);
     }
-    if(LOG_BACKEND&UART_LOG)
+    #endif
+    #if(LOG_BACKEND&UART_LOG)
     {
         log_uart_tx(ptr,len);
     }
-    if(LOG_BACKEND&RAM_LOG)
+    #endif
+    #if(LOG_BACKEND&RAM_LOG)
     {
 //        ram_log_print(linefeed,format,&args);
     }
+    #endif
 }
 
 #if defined(__CC_ARM)
 int fputc(int ch, FILE *f)
 {
-    if(LOG_BACKEND&JLINK_RTT)
+    #if(LOG_BACKEND&JLINK_RTT)
     {
         SEGGER_RTT_PutCharSkip(0, ch);
     }
-    if(LOG_BACKEND&UART_LOG)
+    #endif
+    #if(LOG_BACKEND&UART_LOG)
     {
         log_uart_tx((char *)&ch,1);
     }
-    if(LOG_BACKEND&RAM_LOG)
+    #endif
+    #if(LOG_BACKEND&RAM_LOG)
     {
 //        ram_log_print(linefeed,format,&args);
     }
+    #endif
     return ch;
 }
 
@@ -106,11 +112,12 @@ void log_output(bool linefeed,const char *format,...)
 
 void log_init()
 {
-    if(LOG_BACKEND&JLINK_RTT)
+    #if(LOG_BACKEND&JLINK_RTT)
     {
         SEGGER_RTT_Init();
     }
-    if(LOG_BACKEND&UART_LOG)
+    #endif
+    #if(LOG_BACKEND&UART_LOG)
     {
         log_uart.UARTX = UART3;
         log_uart.Init.BaudRate = UART_BAUDRATE_921600;
@@ -121,10 +128,12 @@ void log_init()
         log_uart.Init.HwFlowCtl = 0;
         log_uart_init();
     }
-    if(LOG_BACKEND&RAM_LOG)
+    #endif
+    #if(LOG_BACKEND&RAM_LOG)
     {
 
     }
+    #endif
 }
 
 /**
