@@ -95,6 +95,7 @@ static bool uart_server_ntf_done = true;
 static uint16_t uart_server_mtu = UART_SERVER_MTU_DFT;
 static struct builtin_timer *uart_server_timer_inst = NULL;
 static bool update_adv_intv_flag = false;
+static uint16_t cccd_config = 0;
 
 static uint8_t adv_obj_hdl;
 static uint8_t advertising_data[28];
@@ -175,7 +176,7 @@ static void ls_uart_server_read_req_ind(uint8_t att_idx, uint8_t con_idx)
     if(att_idx == UART_SVC_IDX_TX_NTF_CFG)
     {
         handle = gatt_manager_get_svc_att_handle(&ls_uart_server_svc_env, att_idx);
-        gatt_manager_server_read_req_reply(con_idx, handle, 0, NULL, 0);
+        gatt_manager_server_read_req_reply(con_idx, handle, 0, (void*)&cccd_config, 2);
     }
 }
 static void ls_uart_server_write_req_ind(uint8_t att_idx, uint8_t con_idx, uint16_t length, uint8_t const *value)
@@ -196,7 +197,13 @@ static void ls_uart_server_write_req_ind(uint8_t att_idx, uint8_t con_idx, uint1
             memcpy(uart_server_tx_buf, (uint8_t*)value, length);
             HAL_UART_Transmit_IT(&UART_Server_Config, (uint8_t*)uart_server_tx_buf, length, NULL);
         } 
-    }    
+    }
+    else if (att_idx == UART_SVC_IDX_TX_NTF_CFG)
+    {
+        LS_ASSERT(length == 2);
+        memcpy(&cccd_config, value, length);
+    }
+    
 }
 static void ls_uart_server_send_notification(void)
 {

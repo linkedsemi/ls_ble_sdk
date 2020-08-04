@@ -129,7 +129,7 @@ static UART_HandleTypeDef UART_Server_Config;
 static bool uart_server_ntf_done_array[UART_SERVER_MASTER_NUM];
 static uint16_t uart_server_mtu_array[UART_SERVER_MASTER_NUM];
 static uint8_t con_idx_array[UART_SERVER_MASTER_NUM];
-
+static uint16_t cccd_config_array[UART_SERVER_MASTER_NUM];
 /************************************************data for client*****************************************************/
 enum initiator_status
 {
@@ -346,10 +346,12 @@ static void ls_uart_init(void)
 static void ls_uart_server_read_req_ind(uint8_t att_idx, uint8_t con_idx)
 {
     uint16_t handle = 0;
+    uint8_t array_idx = search_conidx(con_idx);
+    LS_ASSERT(array_idx != 0xff);
     if(att_idx == UART_SVC_IDX_TX_NTF_CFG)
     {
         handle = gatt_manager_get_svc_att_handle(&ls_uart_server_svc_env, att_idx);
-        gatt_manager_server_read_req_reply(con_idx, handle, 0, NULL, 0);
+        gatt_manager_server_read_req_reply(con_idx, handle, 0, (void*)&cccd_config_array[array_idx], 2);
     }
 }
 static void ls_uart_server_write_req_ind(uint8_t att_idx, uint8_t con_idx, uint16_t length, uint8_t const *value)
@@ -375,7 +377,12 @@ static void ls_uart_server_write_req_ind(uint8_t att_idx, uint8_t con_idx, uint1
             HAL_UART_Transmit_IT(&UART_Server_Config, &uart_server_tx_buf[array_idx][0], length + UART_HEADER_LEN, NULL);
         } 
         exit_critical();
-    }    
+    }
+    else if (att_idx == UART_SVC_IDX_TX_NTF_CFG)
+    {
+        LS_ASSERT(length == 2);
+        memcpy(&cccd_config_array[array_idx], value, length);
+    }
 }
 static void ls_uart_server_send_notification(void)
 {
