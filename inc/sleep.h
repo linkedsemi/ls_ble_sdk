@@ -65,7 +65,7 @@ void dcdc_off(void);
 
 void cpu_sleep_recover_init(void);
 
-void low_power_mode_init();
+void low_power_mode_init(void);
 
 void deep_sleep(void);
 

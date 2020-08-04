@@ -86,7 +86,7 @@ static const struct att_decl ls_uart_server_att_decl[UART_SVC_ATT_NUM] =
         .char_prop.wr_req = 1,
     },
 };
-static const struct svc_decl ls_uart_server_svc =
+static struct svc_decl ls_uart_server_svc =
 {
     .uuid = ls_uart_svc_uuid_128,
     .att = (struct att_decl*)ls_uart_server_att_decl,
@@ -106,7 +106,6 @@ static struct builtin_timer *uart_server_timer_inst = NULL;
 static struct builtin_timer *deep_sleep_timer_inst = NULL;
 
 static void ls_deep_sleep_timer_cb(void *param);
-extern struct sleep_wakeup_type env_sleep_wkup;
 
 static uint8_t adv_obj_hdl;
 static uint8_t advertising_data[28];  //LinkedSemi
@@ -142,10 +141,30 @@ static void ls_deep_sleep_timer_init(void)
     deep_sleep_timer_inst = builtin_timer_create(ls_deep_sleep_timer_cb);
 }
 
+void rtc_test_init(void)
+{
+//    __HAL_RCC_RTC_CLK_ENABLE();
+
+//    REG_FIELD_WR(LSRTC->RTC_CTRL,LSRTC_CKSEL,2);
+//    REG_FIELD_WR(LSRTC->RTC_CTRL,LSRTC_RTCEN,1);
+
+//    REG_FIELD_WR(LSRTC->RTC_WAKEUP,LSRTC_WKCAL,1);
+//    REG_FIELD_WR(LSRTC->RTC_WAKEUP,LSRTC_WKSEL,2);
+}
 
 static void  ls_deep_sleep_timer_cb (void *param)
 {
-    enter_deep_sleep_lvl3_mode(&env_sleep_wkup);
+    struct deep_sleep_wakeup wakeup;
+    memset(&wakeup,0,sizeof(wakeup));
+    #if 1
+    wakeup.pa00 = 1;
+    wakeup.pa00_rising_edge = 1;
+    enter_deep_sleep_mode_lvl2_lvl3(&wakeup);
+    #else
+    wakeup.rtc = 1;
+    rtc_test_init();
+    enter_deep_sleep_mode_lvl2_lvl3(&wakeup);
+    #endif
 }
 
 static void ls_uart_server_timer_cb(void *param)
@@ -318,8 +337,8 @@ static void dev_manager_callback(enum dev_evt_type type,union dev_evt_u *evt)
         LOG_I("type:%d,addr:",type);
         LOG_HEX(addr,sizeof(addr));
         dev_manager_add_service(&ls_uart_server_svc);
-        ls_uart_init(); 
-        HAL_UART_Receive_IT(&UART_Server_Config, &uart_server_rx_byte, 1, NULL); 
+//        ls_uart_init(); 
+//        HAL_UART_Receive_IT(&UART_Server_Config, &uart_server_rx_byte, 1, NULL); 
         ls_uart_server_init();
         ls_deep_sleep_timer_init();      
     }
@@ -345,22 +364,10 @@ static void dev_manager_callback(enum dev_evt_type type,union dev_evt_u *evt)
     break;
     }
 }
-	 
-void gpio_init_wkup_cfg(uint32_t trig_src  ,uint32_t trig_edge)
-{
-     env_sleep_wkup.trig_src = trig_src;
-     env_sleep_wkup.trig_edge = trig_edge;
-     MODIFY_REG(SYSCFG->PMU_WKUP,(env_sleep_wkup.trig_src<<WKUP_EN_POS),((env_sleep_wkup.trig_src)<<WKUP_EN_POS));
-     MODIFY_REG(SYSCFG->PMU_WKUP,(env_sleep_wkup.trig_src<<WKUP_EDGE_POS),((env_sleep_wkup.trig_edge)<<WKUP_EDGE_POS));
-}	
-
 
 int main()
 {
     sys_init_app();
-    gpio_init_wkup_cfg(PA00_IO_WKUP, PA00_IO_WKUP_EDGE_RISING);
-
-
     ble_init();
     dev_manager_init(dev_manager_callback);
     gap_manager_init(gap_manager_callback);
