@@ -816,51 +816,52 @@ static storage_addr_t node_write(uint8_t *buf,uint16_t length,enum node_write_ty
     storage_addr_t addr;
     if(tinyfs_env.tail_available_offset == TINYFS_SECTION_SIZE)
     {
-        tinyfs_env.tail_section=get_next_section(tinyfs_env.tail_section);
-        section_head_write(tinyfs_env.tail_section,++tinyfs_env.tail_count,sizeof(section_head_t));
-        tinyfs_env.tail_available_offset = sizeof(section_head_t);
+        addr.offset = sizeof(section_head_t);
+        addr.section = get_next_section(tinyfs_env.tail_section);
+    }else
+    {
+        addr.offset = tinyfs_env.tail_available_offset;
+        addr.section = tinyfs_env.tail_section;
     }
-    addr.offset = tinyfs_env.tail_available_offset;
-    addr.section = tinyfs_env.tail_section;
-     while(length)
-     {
-         if(tinyfs_env.tail_available_offset == TINYFS_SECTION_SIZE)
-         {
-            uint16_t node_offset;
-            if(type == PROGRAM_START)
-            {
-                type = PROGRAM_CONTINUE;
-                node_offset = length+subsequent_length+sizeof(section_head_t);
-            }else
-            {
-                if(length+subsequent_length+sizeof(section_head_t)>=TINYFS_SECTION_SIZE)
-                {
-                    node_offset = INVALID_NODE_OFFSET;
-                }else
-                {
-                    node_offset = length+subsequent_length+sizeof(section_head_t);
-                }
-            }
-            tinyfs_env.tail_section=get_next_section(tinyfs_env.tail_section);
-            section_head_write(tinyfs_env.tail_section,++tinyfs_env.tail_count,node_offset);
-            tinyfs_env.tail_available_offset = sizeof(section_head_t);
-         }
-         if(length+tinyfs_env.tail_available_offset>TINYFS_SECTION_SIZE)
-         {
-             tinyfs_nvm_program(GET_FLASH_ADDR(tinyfs_env.tail_section,tinyfs_env.tail_available_offset),
-                 TINYFS_SECTION_SIZE-tinyfs_env.tail_available_offset,buf);
-             buf += TINYFS_SECTION_SIZE - tinyfs_env.tail_available_offset;
-             length -= TINYFS_SECTION_SIZE - tinyfs_env.tail_available_offset;
-             tinyfs_env.tail_available_offset = TINYFS_SECTION_SIZE;
-         }else
-         {
-             tinyfs_nvm_program(GET_FLASH_ADDR(tinyfs_env.tail_section,tinyfs_env.tail_available_offset),
-                 length,buf);
-             tinyfs_env.tail_available_offset += length;
-             length = 0;
-         }
-     }
-     return addr;
+    while(length)
+    {
+        if(tinyfs_env.tail_available_offset == TINYFS_SECTION_SIZE)
+        {
+           uint16_t node_offset;
+           if(type == PROGRAM_START)
+           {
+               node_offset = sizeof(section_head_t);
+           }else
+           {
+               if(length+subsequent_length+sizeof(section_head_t)>=TINYFS_SECTION_SIZE)
+               {
+                   node_offset = INVALID_NODE_OFFSET;
+               }else
+               {
+                   node_offset = length+subsequent_length+sizeof(section_head_t);
+               }
+           }
+           tinyfs_env.tail_section=get_next_section(tinyfs_env.tail_section);
+           section_head_write(tinyfs_env.tail_section,++tinyfs_env.tail_count,node_offset);
+           tinyfs_env.tail_available_offset = sizeof(section_head_t);
+        }
+        if(length+tinyfs_env.tail_available_offset>TINYFS_SECTION_SIZE)
+        {
+            tinyfs_nvm_program(GET_FLASH_ADDR(tinyfs_env.tail_section,tinyfs_env.tail_available_offset),
+                TINYFS_SECTION_SIZE-tinyfs_env.tail_available_offset,buf);
+            buf += TINYFS_SECTION_SIZE - tinyfs_env.tail_available_offset;
+            length -= TINYFS_SECTION_SIZE - tinyfs_env.tail_available_offset;
+            tinyfs_env.tail_available_offset = TINYFS_SECTION_SIZE;
+        }else
+        {
+            tinyfs_nvm_program(GET_FLASH_ADDR(tinyfs_env.tail_section,tinyfs_env.tail_available_offset),
+                length,buf);
+            tinyfs_env.tail_available_offset += length;
+            length = 0;
+        }
+        type = PROGRAM_CONTINUE;
+    }
+    return addr;
 }
 
 static storage_addr_t record_add_write(uint16_t name,uint16_t parent_id,uint16_t data_length)
