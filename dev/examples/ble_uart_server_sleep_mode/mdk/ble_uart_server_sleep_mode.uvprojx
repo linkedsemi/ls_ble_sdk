@@ -336,7 +336,7 @@
               <MiscControls>--c99 -O2 --wchar32</MiscControls>
               <Define></Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\..\..\inc;..\..\..\..\inc\cmsis;..\..\..\..\inc\prf;..\..\..\module\crc;..\..\..\module\debug;..\..\..\module\debug\RTT;..\..\..\module\static_buffer;..\..\..\module\tinyfs;..\..\..\module\tinycrypt\lib\include;..\..\..\peripheral\qspi_flash;..\..\..\peripheral\cache;..\..\..\peripheral\calc;..\..\..\peripheral\uart;..\..\..\peripheral\trng;..\..\..\peripheral\ecc;..\..\..\peripheral\crypt;..\..\..\peripheral\gpio;..\..\..\peripheral\iwdt;..\..\..\peripheral\adc;..\..\..\peripheral\timer;..\..\..\peripheral;..\..\..\soc\arm_cm;..\..\..\soc\arm_cm\le501x;..\..\..\soc\arm_cm\le501x\integration;..\..\..;..</IncludePath>
+              <IncludePath>..\..\..\..\inc;..\..\..\..\inc\cmsis;..\..\..\..\inc\prf;..\..\..\module\crc;..\..\..\module\debug;..\..\..\module\debug\RTT;..\..\..\module\static_buffer;..\..\..\module\tinyfs;..\..\..\module\tinycrypt\lib\include;..\..\..\peripheral\qspi_flash;..\..\..\peripheral\cache;..\..\..\peripheral\calc;..\..\..\peripheral\uart;..\..\..\peripheral\trng;..\..\..\peripheral\ecc;..\..\..\peripheral\crypt;..\..\..\peripheral\gpio;..\..\..\peripheral\iwdt;..\..\..\peripheral\adc;..\..\..\peripheral\timer;..\..\..\peripheral;..\..\..\soc\arm_cm;..\..\..\soc\arm_cm\le501x;..\..\..\soc\arm_cm\le501x\integration;..\..\..;..;</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -625,11 +625,5 @@
       </Groups>
     </Target>
   </Targets>
-
-  <RTE>
-    <apis/>
-    <components/>
-    <files/>
-  </RTE>
 
 </Project>
