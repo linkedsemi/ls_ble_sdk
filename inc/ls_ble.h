@@ -438,19 +438,19 @@ enum gatt_evt_type
     SERVER_WRITE_REQ,
     SERVER_NOTIFICATION_DONE,
     SERVER_INDICATION_DONE,
-    SERVER_MTU_CHANGED_INDICATION,
 
     CLIENT_RECV_NOTIFICATION,
     CLIENT_RECV_INDICATION,
     CLIENT_PRIMARY_SVC_DIS_IND,       // Primary service discovery indication
-    CLIENT_SVC_DIS_INCL_IND,          // Included service discovery indication
+    CLIENT_INCL_SVC_DIS_IND,          // Included service discovery indication
     CLIENT_CHAR_DIS_BY_UUID_IND,      // Characteristic discovery by UUID indication 
-    CLIENT_CHAR_DIS_DESC_IND, // Characteristic descriptor discovery by UUID indication
-    // CLIENT_CCCD_DIS_IND,              // CCCD discovery indication
+    CLIENT_CHAR_DESC_DIS_BY_UUID_IND, // Characteristic descriptor discovery by UUID indication
     CLIENT_RD_CHAR_VAL_BY_UUID_IND,   // Read characteristic value by UUID indication
-    CLIENT_WRITE_RSP_IND,             // Write response indication
-    CLIENT_WRITE_NO_RSP_IND,          // Write with no response indication
-    CLIENT_EVT_MAX
+    CLIENT_WRITE_WITH_RSP_DONE,             // Write response indication
+    CLIENT_WRITE_NO_RSP_DONE,          // Write with no response indication
+
+    MTU_CHANGED_INDICATION,
+    GATT_EVT_MAX
 };
 
 struct gatt_svc_env

@@ -9,6 +9,7 @@ Stack-->-App: dev event: STACK_READY
 opt ADD SERVICE
     App->+Stack: dev_manager_add_service
     Stack-->-App: dev event: SERVICE_ADDED
+    App->Stack: gatt_manager_svc_register
 end
 opt ADD PROFILE
     App->+Stack: dev_manager_prf_xxx_add

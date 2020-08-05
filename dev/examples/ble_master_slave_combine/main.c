@@ -634,7 +634,7 @@ static void gatt_manager_callback(enum gatt_evt_type type,union gatt_evt_u *evt,
         uart_server_ntf_done_array[array_idx] = true;
         LOG_I("ntf done");
     break;
-    case SERVER_MTU_CHANGED_INDICATION:
+    case MTU_CHANGED_INDICATION:
         if (gap_manager_get_role(con_idx) == LS_BLE_ROLE_SLAVE)
         {
             uart_server_mtu_array[array_idx] = evt->mtu_changed_ind.mtu;
@@ -684,7 +684,7 @@ static void gatt_manager_callback(enum gatt_evt_type type,union gatt_evt_u *evt,
             LOG_I("unexpected char uuid");
         }   
     break;
-    case CLIENT_CHAR_DIS_DESC_IND:
+    case CLIENT_CHAR_DESC_DIS_BY_UUID_IND:
         if (!memcmp(evt->client_disc_char_desc_indicate.uuid, att_desc_client_char_cfg_array, sizeof(att_desc_client_char_cfg_array)))
         {
             uart_client_cccd_handle[array_idx] = evt->client_disc_char_desc_indicate.attr_handle;
@@ -696,7 +696,7 @@ static void gatt_manager_callback(enum gatt_evt_type type,union gatt_evt_u *evt,
             LOG_I("unexpected desc uuid");
         }      
     break;
-    case CLIENT_WRITE_RSP_IND:
+    case CLIENT_WRITE_WITH_RSP_DONE:
         if(evt->client_write_rsp.status == 0)
         {
             LOG_I("write success");
@@ -706,7 +706,7 @@ static void gatt_manager_callback(enum gatt_evt_type type,union gatt_evt_u *evt,
             LOG_I("write fail, status = %d", evt->client_write_rsp.status);
         }       
     break;
-    case CLIENT_WRITE_NO_RSP_IND:
+    case CLIENT_WRITE_NO_RSP_DONE:
         if(evt->client_write_no_rsp.status == 0)
         {
             LS_ASSERT(gap_manager_get_role(con_idx) == LS_BLE_ROLE_MASTER);

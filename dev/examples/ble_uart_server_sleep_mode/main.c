@@ -287,7 +287,7 @@ static void gatt_manager_callback(enum gatt_evt_type type,union gatt_evt_u *evt,
         uart_server_ntf_done = true;
         LOG_I("ntf done");
     break;
-    case SERVER_MTU_CHANGED_INDICATION:
+    case MTU_CHANGED_INDICATION:
         uart_server_mtu = evt->mtu_changed_ind.mtu;
         LOG_I("mtu: %d", uart_server_mtu);
     break;
