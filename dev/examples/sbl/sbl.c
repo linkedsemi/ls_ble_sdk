@@ -49,50 +49,57 @@ void trim_version_4100_load()
     uint16_t buf[10];
     spi_flash_read_security_area(1, 0x10,(void *)buf, sizeof(buf));
     uint8_t i;
+    bool trim_valid = true;
     for(i=0;i<10;i+=2)
     {
         if(buf[i]!=(uint16_t)~buf[i+1])
         {
-            while(1);
+            trim_valid = false;
+            break;
         }
     }
-    struct {
-        uint16_t bg_vref_fine:2,
-                bg_reg_trim:6,
-                dcdc_vbg_vctl:4,
-                lvd_ref:3;
-    } *cal_0 = (void *)&buf[0];
-    struct {
-        uint16_t hpldo_trim:2,
-                res:6,
-                ldo_tx_trim:3,
-                res2:1,
-                ldo_rx_trim:3;
-    } *cal_1 = (void *)&buf[2];
-    struct {
-        uint16_t xo16m_cap_trim:6,
-                xo16m_adj:2;
-    } *cal_2 = (void *)&buf[4];
-    struct {
-        uint16_t osc_rc24m_cal:15;
-    } *cal_3 = (void *)&buf[6];
-    struct {
-        uint16_t lpldo_trim:3;
-    } *cal_4 = (void *)&buf[8];
-    cal_2->xo16m_cap_trim = 0x20;
-    cal_4->lpldo_trim = 5;
-    REG_FIELD_WR(SYSCFG->DCDC, SYSCFG_VBG_VCTL, cal_0->dcdc_vbg_vctl);
-    MODIFY_REG(SYSCFG->ANACFG0, SYSCFG_BG_RES_TRIM_MASK | SYSCFG_BG_VREF_FINE_MASK | SYSCFG_LDO_DG_TRIM_MASK | SYSCFG_LVD_REF_MASK
-        , cal_0->bg_reg_trim<<SYSCFG_BG_RES_TRIM_POS | cal_0->bg_vref_fine<<SYSCFG_BG_VREF_FINE_POS 
-        | cal_1->hpldo_trim << SYSCFG_LDO_DG_TRIM_POS | cal_0->lvd_ref << SYSCFG_LVD_REF_POS);
-    MODIFY_REG(SYSCFG->ANACFG1, SYSCFG_XO16M_ADJ_MASK | SYSCFG_XO16M_CAP_TRIM_MASK, 
-        cal_2->xo16m_adj << SYSCFG_XO16M_ADJ_POS | cal_2->xo16m_cap_trim << SYSCFG_XO16M_CAP_TRIM_POS);
-    MODIFY_REG(SYSCFG->CFG, SYSCFG_HAI_SEL_MASK | SYSCFG_HAI_IBIAS_SEL_MASK | SYSCFG_HAI_CAL_MASK | SYSCFG_HAI_CAP_MASK,
-        cal_3->osc_rc24m_cal);
-    REG_FIELD_WR(SYSCFG->PMU_TRIM,SYSCFG_LDO_LP_TRIM,cal_4->lpldo_trim);
-
-    MODIFY_REG(RF->REG08,RF_LDO_TX_TRIM_MASK | RF_LDO_RX_TRIM_MASK,
-        cal_1->ldo_tx_trim<<RF_LDO_TX_TRIM_POS | cal_1->ldo_rx_trim<<RF_LDO_RX_TRIM_POS);
+    if(trim_valid)
+    {
+        struct {
+            uint16_t bg_vref_fine:2,
+                    bg_reg_trim:6,
+                    dcdc_vbg_vctl:4,
+                    lvd_ref:3;
+        } *cal_0 = (void *)&buf[0];
+        struct {
+            uint16_t hpldo_trim:2,
+                    res:6,
+                    ldo_tx_trim:3,
+                    res2:1,
+                    ldo_rx_trim:3;
+        } *cal_1 = (void *)&buf[2];
+        struct {
+            uint16_t xo16m_cap_trim:6,
+                    xo16m_adj:2;
+        } *cal_2 = (void *)&buf[4];
+        struct {
+            uint16_t osc_rc24m_cal:15;
+        } *cal_3 = (void *)&buf[6];
+        struct {
+            uint16_t lpldo_trim:3;
+        } *cal_4 = (void *)&buf[8];
+        (void)cal_4;
+        REG_FIELD_WR(SYSCFG->DCDC, SYSCFG_VBG_VCTL, cal_0->dcdc_vbg_vctl);
+        MODIFY_REG(SYSCFG->ANACFG0, SYSCFG_BG_RES_TRIM_MASK | SYSCFG_BG_VREF_FINE_MASK | SYSCFG_LDO_DG_TRIM_MASK | SYSCFG_LVD_REF_MASK
+            , cal_0->bg_reg_trim<<SYSCFG_BG_RES_TRIM_POS | cal_0->bg_vref_fine<<SYSCFG_BG_VREF_FINE_POS 
+            | cal_1->hpldo_trim << SYSCFG_LDO_DG_TRIM_POS | cal_0->lvd_ref << SYSCFG_LVD_REF_POS);
+        REG_FIELD_WR(SYSCFG->ANACFG1,SYSCFG_XO16M_ADJ,cal_2->xo16m_adj);
+        MODIFY_REG(SYSCFG->CFG, SYSCFG_HAI_SEL_MASK | SYSCFG_HAI_IBIAS_SEL_MASK | SYSCFG_HAI_CAL_MASK | SYSCFG_HAI_CAP_MASK,
+            cal_3->osc_rc24m_cal);
+        MODIFY_REG(RF->REG08,RF_LDO_TX_TRIM_MASK | RF_LDO_RX_TRIM_MASK,
+            cal_1->ldo_tx_trim<<RF_LDO_TX_TRIM_POS | cal_1->ldo_rx_trim<<RF_LDO_RX_TRIM_POS);
+    }else
+    {
+        MODIFY_REG(RF->REG08,RF_LDO_TX_TRIM_MASK | RF_LDO_RX_TRIM_MASK,
+            4<<RF_LDO_TX_TRIM_POS | 4<<RF_LDO_RX_TRIM_POS);
+    }
+    REG_FIELD_WR(SYSCFG->ANACFG1,SYSCFG_XO16M_CAP_TRIM,0x20);
+    REG_FIELD_WR(SYSCFG->PMU_TRIM,SYSCFG_LDO_LP_TRIM,5);
 }
 
 void trim_version_4101_load()
