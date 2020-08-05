@@ -7,7 +7,11 @@
 #include "compile_flag.h"
 #include "ls_dbg.h"
 #include "platform.h"
+#ifndef FLASH_PROG_ALGO
 #define PUYA_SUSPEND_WORKAROUND 1
+#else
+#define PUYA_SUSPEND_WORKAROUND 0
+#endif
 #if PUYA_SUSPEND_WORKAROUND
 #include "systick.h"
 #endif
