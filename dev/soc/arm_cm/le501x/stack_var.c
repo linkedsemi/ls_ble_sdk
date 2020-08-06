@@ -117,6 +117,8 @@ void statck_buffer_init(uint32_t,uint32_t,uint32_t,uint32_t);
 
 void prf_fn_init(void);
 
+void ble_storage_max_num_init(uint8_t num);
+
 void stack_var_ptr_init()
 {
     stack_assert_asm_fn = stack_assert_asm;
@@ -138,6 +140,7 @@ void stack_var_ptr_init()
 
     statck_buffer_init(ENV_BUF_SIZE,DB_BUF_SIZE,MSG_BUF_SIZE,NON_RET_BUF_SIZE);
     prf_fn_init();
+    ble_storage_max_num_init(SDK_BLE_STORAGE_PEER_MAX);
 }
 
 static bool dummy()
