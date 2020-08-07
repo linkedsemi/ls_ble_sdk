@@ -2351,12 +2351,12 @@ HAL_TIM_StateTypeDef HAL_TIMEx_HallSensor_GetState(TIM_HandleTypeDef *htim);
 /**
   * @}
   */
-void HAL_TIM_SetCounter(reg_timer_t* TIMx, uint16_t Counter);
-void HAL_TIM_SetAutoreload(reg_timer_t* TIMx, uint16_t Autoreload);
-void HAL_TIM_SetCompare1(reg_timer_t* TIMx, uint16_t Compare1);
-void HAL_TIM_SetCompare2(reg_timer_t* TIMx, uint16_t Compare2);
-void HAL_TIM_SetCompare3(reg_timer_t* TIMx, uint16_t Compare3);
-void HAL_TIM_SetCompare4(reg_timer_t* TIMx, uint16_t Compare4);
+void TIM_SetCounter(reg_timer_t* TIMx, uint16_t Counter);
+void TIM_SetAutoreload(reg_timer_t* TIMx, uint16_t Autoreload);
+void TIM_SetCompare1(reg_timer_t* TIMx, uint16_t Compare1);
+void TIM_SetCompare2(reg_timer_t* TIMx, uint16_t Compare2);
+void TIM_SetCompare3(reg_timer_t* TIMx, uint16_t Compare3);
+void TIM_SetCompare4(reg_timer_t* TIMx, uint16_t Compare4);
 uint16_t TIM_GetCapture1(reg_timer_t* TIMx);
 uint16_t TIM_GetCapture2(reg_timer_t* TIMx);
 uint16_t TIM_GetCapture3(reg_timer_t* TIMx);
