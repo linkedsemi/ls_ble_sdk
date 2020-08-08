@@ -108,7 +108,7 @@ static struct builtin_timer *deep_sleep_timer_inst = NULL;
 static void ls_deep_sleep_timer_cb(void *param);
 
 static uint8_t adv_obj_hdl;
-static uint8_t advertising_data[28];  //LinkedSemi
+static uint8_t advertising_data[28] = {11,0x08,'L','i','n','k','e','d','s','e','m','i'};  //LinkedSemi
 static uint8_t scan_response_data[31];
 
 static void ls_uart_server_init(void);

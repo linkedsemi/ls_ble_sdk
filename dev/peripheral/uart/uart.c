@@ -123,7 +123,6 @@ HAL_StatusTypeDef HAL_UART_Transmit(UART_HandleTypeDef *huart, uint8_t *pData, u
         huart->gState = HAL_UART_STATE_BUSY_TX;
         /* Init tickstart for timeout managment */
         //TODO
-        huart->TxXferSize = Size;
         huart->TxXferCount = Size;
         
         while (huart->TxXferCount > 0U )
@@ -142,7 +141,7 @@ HAL_StatusTypeDef HAL_UART_Transmit(UART_HandleTypeDef *huart, uint8_t *pData, u
         // Wait until TX Finish
         while (!(huart->UARTX->SR & UART_SR_TEMT))
         ;
-        // tx_fifo reset.
+        // tx_fifo reset. need?
         REG_FIELD_WR(huart->UARTX->FCR,UART_FCR_TFRST,1);
         /* At end of Tx process, restore huart->gState to Ready */
         huart->gState = HAL_UART_STATE_READY;
@@ -181,8 +180,6 @@ HAL_StatusTypeDef HAL_UART_Receive(UART_HandleTypeDef *huart, uint8_t *pData, ui
         /* Init tickstart for timeout managment */
         //todo
         REG_FIELD_WR(huart->UARTX->LCR,UART_LCR_RXEN,1);
-    
-        huart->RxXferSize = Size;
         huart->RxXferCount = Size;
 
         /* Check the remain data to be received */
@@ -226,7 +223,6 @@ HAL_StatusTypeDef HAL_UART_Transmit_IT(UART_HandleTypeDef *huart, uint8_t *pData
             return HAL_INVALIAD_PARAM;
         }
         huart->pTxBuffPtr = pData;
-        huart->TxXferSize = Size;
         huart->TxXferCount = Size;
         huart->tx_arg = tx_arg;
         huart->ErrorCode = HAL_UART_ERROR_NONE;
@@ -273,14 +269,13 @@ HAL_StatusTypeDef HAL_UART_Receive_IT(UART_HandleTypeDef *huart, uint8_t *pData,
             return HAL_INVALIAD_PARAM;
         }
         huart->pRxBuffPtr = pData;
-        huart->RxXferSize = Size;
         huart->RxXferCount = Size;
         huart->ErrorCode = HAL_UART_ERROR_NONE;
         huart->RxState = HAL_UART_STATE_BUSY_RX;
         huart->rx_arg = rx_arg;
         REG_FIELD_WR(huart->UARTX->LCR,UART_LCR_RXEN,1);
         REG_FIELD_WR(huart->UARTX->FCR,UART_FCR_FIFOEN,1);
-        if(huart->RxXferSize<8)
+        if(huart->RxXferCount<8)
         {
             REG_FIELD_WR(huart->UARTX->FCR,UART_FCR_RXTL,UART_FIFO_RL_1);
         }
@@ -398,7 +393,7 @@ static void UART_Receive_IT(UART_HandleTypeDef *huart)
             {
                 REG_FIELD_WR(huart->UARTX->FCR,UART_FCR_RXTL,UART_FIFO_RL_8);
                 huart->RxState = HAL_UART_STATE_READY;
-                REG_FIELD_WR(huart->UARTX->IDR,UART_IDR_RXRD,1);
+                REG_FIELD_WR(huart->UARTX->IDR,UART_IDR_RXRD,1);//need?
                 HAL_UART_RxCpltCallback(huart,huart->rx_arg);
                 return;
             }
