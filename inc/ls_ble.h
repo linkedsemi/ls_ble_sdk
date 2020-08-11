@@ -24,6 +24,75 @@ enum gap_peer_addr_type
     RANDOM_ADDR,
 };
 
+enum gap_adv_type
+{
+    /// Flag
+    GAP_ADV_TYPE_FLAGS                      = 0x01,//!< GAP_ADV_TYPE_FLAGS
+    /// Use of more than 16 bits UUID
+    GAP_ADV_TYPE_MORE_16_BIT_UUID           = 0x02,//!< GAP_ADV_TYPE_MORE_16_BIT_UUID
+    /// Complete list of 16 bit UUID
+    GAP_ADV_TYPE_COMPLETE_LIST_16_BIT_UUID  = 0x03,//!< GAP_ADV_TYPE_COMPLETE_LIST_16_BIT_UUID
+    /// Use of more than 32 bit UUD
+    GAP_ADV_TYPE_MORE_32_BIT_UUID           = 0x04,//!< GAP_ADV_TYPE_MORE_32_BIT_UUID
+    /// Complete list of 32 bit UUID
+    GAP_ADV_TYPE_COMPLETE_LIST_32_BIT_UUID  = 0x05,//!< GAP_ADV_TYPE_COMPLETE_LIST_32_BIT_UUID
+    /// Use of more than 128 bit UUID
+    GAP_ADV_TYPE_MORE_128_BIT_UUID          = 0x06,//!< GAP_ADV_TYPE_MORE_128_BIT_UUID
+    /// Complete list of 128 bit UUID
+    GAP_ADV_TYPE_COMPLETE_LIST_128_BIT_UUID = 0x07,//!< GAP_ADV_TYPE_COMPLETE_LIST_128_BIT_UUID
+    /// Shortened device name
+    GAP_ADV_TYPE_SHORTENED_NAME             = 0x08,//!< GAP_ADV_TYPE_SHORTENED_NAME
+    /// Complete device name
+    GAP_ADV_TYPE_COMPLETE_NAME              = 0x09,//!< GAP_ADV_TYPE_COMPLETE_NAME
+    /// Transmit power
+    GAP_ADV_TYPE_TRANSMIT_POWER             = 0x0A,//!< GAP_ADV_TYPE_TRANSMIT_POWER
+    /// Class of device
+    GAP_ADV_TYPE_CLASS_OF_DEVICE            = 0x0D,//!< GAP_ADV_TYPE_CLASS_OF_DEVICE
+    /// Simple Pairing Hash C
+    GAP_ADV_TYPE_SP_HASH_C                  = 0x0E,//!< GAP_ADV_TYPE_SP_HASH_C
+    /// Simple Pairing Randomizer
+    GAP_ADV_TYPE_SP_RANDOMIZER_R            = 0x0F,//!< GAP_ADV_TYPE_SP_RANDOMIZER_R
+    /// Temporary key value
+    GAP_ADV_TYPE_TK_VALUE                   = 0x10,//!< GAP_ADV_TYPE_TK_VALUE
+    /// Out of Band Flag
+    GAP_ADV_TYPE_OOB_FLAGS                  = 0x11,//!< GAP_ADV_TYPE_OOB_FLAGS
+    /// Slave connection interval range
+    GAP_ADV_TYPE_SLAVE_CONN_INT_RANGE       = 0x12,//!< GAP_ADV_TYPE_SLAVE_CONN_INT_RANGE
+    /// Require 16 bit service UUID
+    GAP_ADV_TYPE_RQRD_16_BIT_SVC_UUID       = 0x14,//!< GAP_ADV_TYPE_RQRD_16_BIT_SVC_UUID
+    /// Require 32 bit service UUID
+    GAP_ADV_TYPE_RQRD_32_BIT_SVC_UUID       = 0x1F,//!< GAP_ADV_TYPE_RQRD_32_BIT_SVC_UUID
+    /// Require 128 bit service UUID
+    GAP_ADV_TYPE_RQRD_128_BIT_SVC_UUID      = 0x15,//!< GAP_ADV_TYPE_RQRD_128_BIT_SVC_UUID
+    /// Service data 16-bit UUID
+    GAP_ADV_TYPE_SERVICE_16_BIT_DATA        = 0x16,//!< GAP_ADV_TYPE_SERVICE_16_BIT_DATA
+    /// Service data 32-bit UUID
+    GAP_ADV_TYPE_SERVICE_32_BIT_DATA        = 0x20,//!< GAP_ADV_TYPE_SERVICE_32_BIT_DATA
+    /// Service data 128-bit UUID
+    GAP_ADV_TYPE_SERVICE_128_BIT_DATA       = 0x21,//!< GAP_ADV_TYPE_SERVICE_128_BIT_DATA
+    /// Public Target Address
+    GAP_ADV_TYPE_PUB_TGT_ADDR               = 0x17,//!< GAP_ADV_TYPE_PUB_TGT_ADDR
+    /// Random Target Address
+    GAP_ADV_TYPE_RAND_TGT_ADDR              = 0x18,//!< GAP_ADV_TYPE_RAND_TGT_ADDR
+    /// Appearance
+    GAP_ADV_TYPE_APPEARANCE                 = 0x19,//!< GAP_ADV_TYPE_APPEARANCE
+    /// Advertising Interval
+    GAP_ADV_TYPE_ADV_INTV                   = 0x1A,//!< GAP_ADV_TYPE_ADV_INTV
+    /// LE Bluetooth Device Address
+    GAP_ADV_TYPE_LE_BT_ADDR                 = 0x1B,//!< GAP_ADV_TYPE_LE_BT_ADDR
+    /// LE Role
+    GAP_ADV_TYPE_LE_ROLE                    = 0x1C,//!< GAP_ADV_TYPE_LE_ROLE
+    /// Simple Pairing Hash C-256
+    GAP_ADV_TYPE_SPAIR_HASH                 = 0x1D,//!< GAP_ADV_TYPE_SPAIR_HASH
+    /// Simple Pairing Randomizer R-256
+    GAP_ADV_TYPE_SPAIR_RAND                 = 0x1E,//!< GAP_ADV_TYPE_SPAIR_RAND
+    /// 3D Information Data
+    GAP_ADV_TYPE_3D_INFO                    = 0x3D,//!< GAP_ADV_TYPE_3D_INFO
+
+    /// Manufacturer specific data
+    GAP_ADV_TYPE_MANU_SPECIFIC_DATA         = 0xFF,//!< GAP_ADV_TYPE_MANU_SPECIFIC_DATA
+};
+
 struct dev_addr
 {
     uint8_t addr[BLE_ADDR_LEN];
@@ -89,7 +158,7 @@ enum scan_type
 
 struct start_scan_param
 {
-     uint16_t scan_intv;
+    uint16_t scan_intv;
     uint16_t scan_window;
     uint16_t duration;
     uint16_t period;
@@ -565,6 +634,9 @@ union gatt_evt_u
     struct gatt_write_rsp client_write_rsp;
     struct gatt_write_no_rsp client_write_no_rsp;
 };
+
+uint8_t *adv_data_pack(uint8_t *buf,uint8_t field_nums,...);
+#define ADV_DATA_PACK(buf,field_nums,...) (adv_data_pack((buf),(field_nums),__VA_ARGS__) - (buf))
 
 void ble_init(void);
 
