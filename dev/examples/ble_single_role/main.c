@@ -247,9 +247,6 @@ static void ls_uart_server_read_req_ind(uint8_t att_idx, uint8_t con_idx)
 }
 static void ls_uart_server_write_req_ind(uint8_t att_idx, uint8_t con_idx, uint16_t length, uint8_t const *value)
 {
-    uint16_t handle = 0;
-    handle = gatt_manager_get_svc_att_handle(&ls_uart_server_svc_env, att_idx);
-    gatt_manager_server_write_confirm(con_idx, handle, 0);
     if(att_idx == UART_SVC_IDX_RX_VAL && uart_server_tx_buf[0] != UART_SYNC_BYTE)
     { 
         LS_ASSERT(length <= UART_TX_PAYLOAD_LEN_MAX);

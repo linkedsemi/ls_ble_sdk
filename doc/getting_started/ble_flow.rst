@@ -15,3 +15,4 @@ GAP
 GATT
 -------------
 
+.. image:: ble_gatt_typical_message_flow.png

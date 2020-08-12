@@ -539,6 +539,7 @@ struct gatt_server_write_req
 {
     struct gatt_svc_env const *svc;
     uint8_t const *value;
+    uint8_t *return_status;
     uint16_t offset;
     uint16_t length;
     uint8_t att_idx;
@@ -713,8 +714,6 @@ void gatt_manager_init(void (*evt_cb)(enum gatt_evt_type,union gatt_evt_u *,uint
 void gatt_manager_svc_register(uint16_t start_hdl,uint8_t att_num,struct gatt_svc_env *svc);
 
 void gatt_manager_server_read_req_reply(uint8_t con_idx,uint16_t handle,uint8_t status,uint8_t *data,uint16_t length);
-
-void gatt_manager_server_write_confirm(uint8_t con_idx,uint16_t handle,uint8_t status);
 
 void gatt_manager_server_send_indication(uint8_t con_idx,uint16_t handle,uint8_t *data,uint16_t length,uint16_t *transaction_id);
 
