@@ -346,11 +346,8 @@ static void ls_uart_server_read_req_ind(uint8_t att_idx, uint8_t con_idx)
 }
 static void ls_uart_server_write_req_ind(uint8_t att_idx, uint8_t con_idx, uint16_t length, uint8_t const *value)
 {
-    uint16_t handle = 0;
     uint8_t array_idx = search_conidx(con_idx);
     LS_ASSERT(array_idx != 0xff);
-    handle = gatt_manager_get_svc_att_handle(&ls_uart_server_svc_env, att_idx);
-    gatt_manager_server_write_confirm(con_idx, handle, 0);
     if(att_idx == UART_SVC_IDX_RX_VAL)
     {
         ble_slave_recv_data_ind(con_idx, value, length);
@@ -632,10 +629,7 @@ void create_adv_obj(uint32_t adv_intv)
     };
     dev_manager_create_legacy_adv_object(&adv_param);
 }
-static void create_scan_obj(void)
-{
-    dev_manager_create_scan_object(PUBLIC_OR_RANDOM_STATIC_ADDR);
-}
+
 static void create_init_obj(void)
 {
     dev_manager_create_init_object(PUBLIC_OR_RANDOM_STATIC_ADDR);
