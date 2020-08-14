@@ -285,6 +285,27 @@ static void create_adv_obj()
     };
     dev_manager_create_legacy_adv_object(&adv_param);
 }
+/*
+static void create_highduty_adv_obj(void)
+{
+    struct legacy_adv_obj_param adv_param = {
+        .peer_addr = (struct dev_addr*)peer_addr_1,
+        .peer_addr_type = RANDOM_ADDR,
+        .adv_intv_min = 0x20,
+        .adv_intv_max = 0x20,
+        .own_addr_type = PUBLIC_OR_RANDOM_STATIC_ADDR,
+        .filter_policy = 0,
+        .ch_map = 0x7,
+        .disc_mode = ADV_MODE_NON_DISC,
+        .prop = {
+            .connectable = 1,
+            .scannable = 0,
+            .directed = 1,
+            .high_duty_cycle = 1,
+        },
+    };
+    dev_manager_create_legacy_adv_object(&adv_param);
+}*/
 
 static void dev_manager_callback(enum dev_evt_type type,union dev_evt_u *evt)
 {
