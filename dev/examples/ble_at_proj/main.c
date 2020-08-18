@@ -290,6 +290,16 @@ void dev_connected_fun(uint8_t con_idx)
         uint8_t msg_len = sprintf((char *)at_rsp,"\r\n+CONN:%d\r\nOK\r\n",con_idx);
         uart_write(at_rsp,msg_len);
     }
+
+    if(get_ble_con_num()==1)
+    {
+        trans_mode_enter();
+    }
+    else
+    {
+        trans_mode_exit();
+    }
+    
 }
 void dev_disconnected_fun(uint8_t con_idx,uint8_t reason)
 {

@@ -36,5 +36,7 @@ extern struct at_buff_env ls_at_buff_env;
 extern const uint16_t adv_int_arr[6];
 
 void at_recv_cmd_handler(at_recv_cmd_t *recv_buf);
+void trans_mode_enter(void);
+void trans_mode_exit(void);
 
 #endif

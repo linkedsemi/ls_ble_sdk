@@ -1,5 +1,6 @@
 #include "at_recv_cmd.h"
 #include "at_cmd_parse.h"
+#include "platform.h"
 
 uint8_t *find_int_from_str(uint8_t *buff)
 {
@@ -81,11 +82,30 @@ void str_to_hex_arr(uint8_t hex_arr[], uint8_t *str, uint8_t arr_len)
     }
 }
 
+void trans_mode_enter(void)
+{
+    if(ls_at_buff_env.default_info.auto_trans == true)
+    {
+        at_clr_uart_buff();
+        ls_at_ctl_env.transparent_start = 1;
+    }
+}
+
+void trans_mode_exit(void)
+{
+    if(ls_at_ctl_env.transparent_start)
+    {
+        ls_at_ctl_env.transparent_start = 0;
+        at_clr_uart_buff();
+    }
+}
+
 void at_recv_cmd_handler(at_recv_cmd_t *param)
 {
     uint8_t *buff;
     uint8_t index;
     uint8_t msg_len;
+    uint8_t temp;
     uint8_t msg_rsp[100];
     memset(msg_rsp, 0, sizeof(msg_rsp));
     buff = param->recv_data;
@@ -142,11 +162,22 @@ void at_recv_cmd_handler(at_recv_cmd_t *param)
         switch (*buff++)
         {
         case '?':
-
+            msg_len = sprintf((char *)msg_rsp,"\r\n+ADVINT:%d\r\nOK\r\n",ls_at_buff_env.default_info.advint);
+            uart_write(msg_rsp,msg_len);
             break;
         case '=':
+            temp = ls_at_buff_env.default_info.advint;
             update_adv_intv(adv_int_arr[atoi((const char *)buff)]);
             ls_at_buff_env.default_info.advint = atoi((const char *)buff);
+            if(ls_at_buff_env.default_info.advint>5)
+            {
+                msg_len = sprintf((char *)msg_rsp,"\r\n+ADVINT:%d\r\nERR\r\n",ls_at_buff_env.default_info.advint);
+                ls_at_buff_env.default_info.advint = temp;
+            }
+            else{
+                msg_len = sprintf((char *)msg_rsp,"\r\n+ADVINT:%d\r\nOK\r\n",ls_at_buff_env.default_info.advint);
+            }
+            uart_write(msg_rsp,msg_len);
             break;
         default:
             break;
@@ -186,6 +217,13 @@ void at_recv_cmd_handler(at_recv_cmd_t *param)
         default:
             break;
         }
+    }
+    break;
+    case AT_CMD_IDX_Z:
+    {
+        msg_len = sprintf((char *)at_rsp,"\r\n+Z\r\nOK\r\n");
+        uart_write(msg_rsp,msg_len);
+        platform_reset(0);
     }
     break;
     case AT_CMD_IDX_MAC:
@@ -234,7 +272,7 @@ void at_recv_cmd_handler(at_recv_cmd_t *param)
             break;
         }
         hex_arr_to_str(peer_dev_addr_str,peer_dev_addr,ADDR_LEN);
-        msg_len = sprintf((char *)msg_rsp,"\r\n+CONNADD:%s\r\nOK\r\n",peer_dev_addr_str);
+        msg_len = sprintf((char *)msg_rsp,"\r\n+CONN:%s\r\nOK\r\n",peer_dev_addr_str);
         uart_write(msg_rsp,msg_len);
     }
     break;
@@ -277,11 +315,12 @@ void at_recv_cmd_handler(at_recv_cmd_t *param)
         struct ble_addr tmp_addr;
         uint8_t mac_str[ADDR_LEN*2+1];
         uint8_t link_mode;
+        msg_len = sprintf((char *)msg_rsp,"\r\n+LINK\r\nOK\r\n");
+        uart_write(msg_rsp,msg_len);
         if ( *buff == '?')
         {
             for (uint8_t i=0; i < get_ble_con_num(); i++)
             {
-                link_mode = 'N';
                 if (get_con_status(i)==false)
                 {
                     continue;
@@ -299,7 +338,7 @@ void at_recv_cmd_handler(at_recv_cmd_t *param)
                 
                 hex_arr_to_str(mac_str,(const uint8_t*)&tmp_addr.addr.addr,ADDR_LEN);
                 mac_str[ADDR_LEN*2] = 0;
-                msg_len = sprintf((char *)msg_rsp,"\r\nLink_ID: %d LinkMode:%c PeerAddr:%s\r\n",i,link_mode,mac_str);
+                msg_len = sprintf((char *)msg_rsp,"Link_ID: %d LinkMode:%c PeerAddr:%s\r\n",i,link_mode,mac_str);
                 uart_write(msg_rsp,msg_len);
             }
         }
@@ -360,6 +399,35 @@ void at_recv_cmd_handler(at_recv_cmd_t *param)
                 msg_len = sprintf((char *)msg_rsp, "\r\n+SEND\r\nERR\r\n");
             }
             uart_write(msg_rsp,msg_len);
+        }
+    }
+    break;
+    case AT_CMD_IDX_AUTO_TRANSPARENT:
+    {
+        switch (*buff++)
+        {
+        case '?':
+            if(ls_at_buff_env.default_info.auto_trans == true)
+                msg_len = sprintf((char *)msg_rsp,"\r\n+AUTO+++:Y\r\nOK\r\n");
+            else
+                msg_len = sprintf((char *)msg_rsp,"\r\n+AUTO+++:Y\r\nOK\r\n");
+            uart_write(msg_rsp,msg_len);
+            break;
+        case '=':
+            if(*buff == 'Y')
+            {
+                ls_at_buff_env.default_info.auto_trans = true;
+                msg_len = sprintf((char *)msg_rsp,"\r\n+AUTO+++:Y\r\nOK\r\n");
+            }
+            else if(*buff == 'N')
+            {
+                ls_at_buff_env.default_info.auto_trans = false;
+                msg_len = sprintf((char *)msg_rsp,"\r\n+AUTO+++:N\r\nOK\r\n");
+            }
+            uart_write(msg_rsp,msg_len);
+            break;
+        default:
+            break;
         }
     }
     break;
