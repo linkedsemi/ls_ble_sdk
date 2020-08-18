@@ -161,7 +161,7 @@ void rco_calibration_start()
     REG_FIELD_WR(SYSCFG->ANACFG1, SYSCFG_EN_RCO_DIG_PWR, 0);
 }
 
-static void check_wkup_rst_state(void)
+static void check_wkup_state(void)
 {
     struct reset_retain_struct *reset_retain_ptr = (struct reset_retain_struct*)RESET_RETAIN_BASE;
     uint8_t wkup_stat = REG_FIELD_RD(SYSCFG->PMU_WKUP,SYSCFG_WKUP_STAT);
@@ -170,18 +170,13 @@ static void check_wkup_rst_state(void)
         REG_FIELD_WR(SYSCFG->PMU_WKUP, SYSCFG_LP_WKUP_CLR,1);
         reset_retain_ptr->wakeup_source = wkup_stat;
     }
-    uint8_t rst_stat = SYSCFG->RSTST;
-    if(rst_stat)
-    {
-        SYSCFG->RSTST = 0xff;
-        reset_retain_ptr->reset_source = rst_stat;
-    }
 }
 
 uint8_t get_reset_source()
 {
-    struct reset_retain_struct *reset_retain_ptr = (struct reset_retain_struct*)RESET_RETAIN_BASE;
-    return reset_retain_ptr->reset_source;
+    uint8_t rst_stat = SYSCFG->RSTST;
+    SYSCFG->RSTST = 0xff;
+    return rst_stat;
 }
 
 uint8_t get_wakeup_source()
@@ -192,7 +187,7 @@ uint8_t get_wakeup_source()
 
 static void module_init()
 {
-    check_wkup_rst_state();
+    check_wkup_state();
     io_init();
     LOG_INIT();
     LOG_I("sys init");
@@ -255,6 +250,7 @@ void sys_init_app()
 
 void platform_reset(uint32_t error)
 {
+    __disable_irq();
     struct reset_retain_struct *reset_retain_ptr = (struct reset_retain_struct*)RESET_RETAIN_BASE;
     reset_retain_ptr->reset_reason = error;
     switch_to_hse();

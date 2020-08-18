@@ -14,7 +14,6 @@ struct reset_retain_struct
 {
     uint32_t reset_reason;
     uint8_t wakeup_source;
-    uint8_t reset_source;
 };
 
 void switch_to_rc32k(void);
