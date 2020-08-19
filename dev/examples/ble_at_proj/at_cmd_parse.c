@@ -221,7 +221,7 @@ void at_recv_cmd_handler(at_recv_cmd_t *param)
     break;
     case AT_CMD_IDX_Z:
     {
-        msg_len = sprintf((char *)at_rsp,"\r\n+Z\r\nOK\r\n");
+        msg_len = sprintf((char *)msg_rsp,"\r\n+Z\r\nOK\r\n");
         uart_write(msg_rsp,msg_len);
         platform_reset(0);
     }
