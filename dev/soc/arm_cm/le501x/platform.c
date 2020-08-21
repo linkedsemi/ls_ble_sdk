@@ -76,18 +76,13 @@ static void ble_irq_clr()
 static void ble_irq_enable()
 {
     //enable ble irq
-    NVIC->ISER[0] |= 1<<BLE_IRQn | 1<<BLE_ERR_IRQn | 1<<BLE_FIFO_IRQn | (unsigned int)1<<BLE_CRYPT_IRQn;
+    NVIC->ISER[0] = 1<<BLE_IRQn | 1<<BLE_ERR_IRQn | 1<<BLE_FIFO_IRQn | (unsigned int)1<<BLE_CRYPT_IRQn;
 }
 
 void ble_irq_clr_and_enable()
 {
     ble_irq_clr();
     ble_irq_enable();
-}
-
-void irq_disable_before_wfi()
-{
-    NVIC->ICER[0] = ~(1<<BLE_WKUP_IRQn | 1<<LPWKUP_IRQn);
 }
 
 static uint32_t flash_data_storage_base_offset()
@@ -97,25 +92,14 @@ static uint32_t flash_data_storage_base_offset()
         - TINYFS_SECTION_NUM*TINYFS_SECTION_SIZE - LSQSPI_MEM_MAP_BASE_ADDR;
 }
 
-static void wkup_irq_clr()
-{
-    NVIC->ICPR[0] = 1<<BLE_WKUP_IRQn | 1<<LPWKUP_IRQn;
-}
-
-static void wkup_exti_irq_enable()
-{
-    NVIC->ISER[0] = 1<<BLE_WKUP_IRQn | 1<<LPWKUP_IRQn | 1<<EXTI_IRQn;
-}
-
 void irq_reinit()
 {
     irq_priority();
-    wkup_exti_irq_enable();
+    NVIC->ISER[0] = 1<<EXTI_IRQn;
 }
 
 static void irq_init()
 {
-    wkup_irq_clr();
     irq_reinit();
     ble_irq_clr_and_enable();
 }
@@ -138,7 +122,7 @@ static void mac_init()
         mac_clk = 0; //AHB 16M
     }
     RCC->BLECFG = mac_clk<<RCC_BLE_CK_SEL_POS| 1<<RCC_BLE_MRST_POS | 1<<RCC_BLE_CRYPT_RST_POS | 1<<RCC_BLE_LCK_RST_POS | 1<<RCC_BLE_AHB_RST_POS | 1<<RCC_BLE_WKUP_RST_POS
-        | 1<<RCC_BLE_LPWR_CKEN_POS | 1<<RCC_BLE_AHBEN_POS | 1<<RCC_BLE_MDM_REFCLK_CKEN_POS;
+        | 1<<RCC_BLE_LPWR_CKEN_POS | 1<<RCC_BLE_AHBEN_POS | 1<<RCC_BLE_MDM_REFCLK_CKEN_POS;// | 1<<RCC_BLE_LCK_SEL_POS;
     RCC->BLECFG &= ~(1<<RCC_BLE_MRST_POS | 1<<RCC_BLE_CRYPT_RST_POS | 1<<RCC_BLE_LCK_RST_POS | 1<<RCC_BLE_AHB_RST_POS | 1<<RCC_BLE_WKUP_RST_POS);
 }
 

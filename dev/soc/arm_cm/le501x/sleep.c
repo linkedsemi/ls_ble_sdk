@@ -59,7 +59,6 @@ XIP_BANNED void before_wfi()
     SYSCFG->ANACFG0 &= ~(SYSCFG_EN_DPLL_MASK | SYSCFG_EN_DPLL_16M_RF_MASK | SYSCFG_EN_DPLL_128M_RF_MASK | SYSCFG_EN_DPLL_128M_EXT_MASK | SYSCFG_EN_QCLK_MASK);
     MODIFY_REG(SYSCFG->ANACFG1,SYSCFG_XO16M_ADJ_MASK | SYSCFG_XO16M_LP_MASK,
         3<<SYSCFG_XO16M_ADJ_POS | 0<<SYSCFG_XO16M_LP_POS);
-    LS_RAM_ASSERT(__NVIC_GetPendingIRQ(BLE_WKUP_IRQn)==0);
 }
 
 XIP_BANNED static void wait_dpll_lock()
@@ -85,15 +84,19 @@ static void wkup_ble()
     RCC->BLECFG |= RCC_BLE_WKUP_RST_MASK;
 }
 
+XIP_BANNED uint32_t __NVIC_GetPendingIRQ(IRQn_Type IRQn);
+
 XIP_BANNED void after_wfi()
 {
+    LS_RAM_ASSERT(__NVIC_GetPendingIRQ(LPWKUP_IRQn));
+    REG_FIELD_WR(SYSCFG->PMU_WKUP, SYSCFG_LP_WKUP_CLR,1);
+    DELAY_US(200);
     dcdc_on();
     MODIFY_REG(SYSCFG->ANACFG1,SYSCFG_XO16M_ADJ_MASK | SYSCFG_XO16M_LP_MASK,
         0<<SYSCFG_XO16M_ADJ_POS | 1<<SYSCFG_XO16M_LP_POS);
     SYSCFG->ANACFG0 |= (SYSCFG_EN_DPLL_MASK | SYSCFG_EN_DPLL_16M_RF_MASK | SYSCFG_EN_DPLL_128M_RF_MASK | SYSCFG_EN_DPLL_128M_EXT_MASK | SYSCFG_EN_QCLK_MASK);
     wait_dpll_lock();
     clk_switch();
-    LS_RAM_ASSERT(__NVIC_GetPendingIRQ(BLE_WKUP_IRQn)==0);
 }
 
 
@@ -206,16 +209,23 @@ void ble_wkup_status_set(bool status)
     waiting_ble_wkup_irq = status;
 }
 
-static void ble_hclk_set()
+void ble_hclk_set()
 {
     REG_FIELD_WR(RCC->BLECFG, RCC_BLE_AHBEN, 1);
 }
 
-static void ble_hclk_restore()
+static void ble_radio_en_sync()
 {
     LS_ASSERT(REG_FIELD_RD(SYSCFG->PMU_PWR,SYSCFG_BLE_PWR3_ST)==0);
     while(REG_FIELD_RD(SYSCFG->PMU_PWR,SYSCFG_BLE_PWR3_ST)==0);
-    ble_hclk_set();
+//    io_cfg_output(PB00);
+//    io_toggle_pin(PB00);
+//    static uint8_t i=0;
+//    if(i==1)     while(1);
+//    i+=1;
+//    LS_ASSERT(__NVIC_GetPendingIRQ(BLE_WKUP_IRQn)==0);
+    __NVIC_ClearPendingIRQ(BLE_WKUP_IRQn);
+    __NVIC_EnableIRQ(BLE_WKUP_IRQn);
 }
 
 static void lvl2_lvl3_mode_prepare(struct deep_sleep_wakeup *wakeup)
@@ -257,12 +267,13 @@ void deep_sleep()
 {
     power_down_hardware_modules();
     cpu_deep_sleep_bit_set();
-    irq_disable_before_wfi();
+    NVIC->ICER[0] = ~0;
+    __NVIC_EnableIRQ(LPWKUP_IRQn);
     cpu_flash_deep_sleep_and_recover();
     wkup_ble();
     irq_reinit();
     ble_wkup_status_set(true);
-    ble_hclk_restore();
+    ble_radio_en_sync();
     systick_start();
 }
 
@@ -276,7 +287,6 @@ void LPWKUP_Handler(void)
     uint8_t wkup_stat = REG_FIELD_RD(SYSCFG->PMU_WKUP,SYSCFG_WKUP_STAT);
     SYSCFG->PMU_WKUP &= ~(wkup_stat << WKUP_EN_POS);
     SYSCFG->PMU_WKUP |= wkup_stat << WKUP_EN_POS;
-    REG_FIELD_WR(SYSCFG->PMU_WKUP, SYSCFG_LP_WKUP_CLR,1);
     if(wkup_stat&PB15_IO_WKUP)
     {
         io_exti_callback(PB15);
@@ -295,3 +305,7 @@ void LPWKUP_Handler(void)
     }
 }
 
+void BLE_WKUP_IRQ_DISABLE()
+{
+    __NVIC_DisableIRQ(BLE_WKUP_IRQn);
+}
