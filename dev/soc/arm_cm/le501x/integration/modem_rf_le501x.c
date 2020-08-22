@@ -269,7 +269,12 @@ static void rf_reg_init()
                | FIELD_BUILD(RF_PLL_LOCK_CNT,0x4f)
                | FIELD_BUILD(RF_EN_RX_CNT,2);
 
-
+    RF->REG68 = FIELD_BUILD(RF_AGC_GAIN0, 1)
+               |FIELD_BUILD(RF_AGC_GAIN1, 21)
+               |FIELD_BUILD(RF_AGC_GAIN2, 42)
+               |FIELD_BUILD(RF_AGC_GAIN3, 63);
+    RF->REG64 = FIELD_BUILD(RF_RSSI_OFFSET, 0X80)
+               |FIELD_BUILD(RF_ADC_MDM_EN, 1);      
     RF->REG70 = FIELD_BUILD(RF_RX2MBW_FORCE_EN,0)
                | FIELD_BUILD(RF_INT_VTXD_CHN_THR1,0x19)
                | FIELD_BUILD(RF_INT_VTXD_CHN_THR0,0xc)
@@ -293,9 +298,9 @@ static uint16_t rf_pll_gain_cal(uint8_t tx_channel_dis)
     REG_FIELD_WR(RF->REG10, RF_PLL_CAL_EN, 0);// AFC CAL disable
 	REG_FIELD_WR(RF->REG10, RF_PLL_CAL_EN, 1);// AFC CAL enable
 
-    cnt_timeout=50000;
+    cnt_timeout=500;
     while((!(REG_FIELD_RD(RF->REG38,RF_PLL_BAND_CAL_DONE))) 
-        || (cnt_timeout>0))
+        && (cnt_timeout>0))
         {cnt_timeout--;}
 
     // gain cal 
@@ -304,9 +309,9 @@ static uint16_t rf_pll_gain_cal(uint8_t tx_channel_dis)
     REG_FIELD_WR(RF->REG2C,RF_PLL_GAIN_CAL_EN,0); 
     REG_FIELD_WR(RF->REG2C,RF_PLL_GAIN_CAL_EN,1);  
 
-    cnt_timeout=50000;
+    cnt_timeout=500;
     while((!(REG_FIELD_RD(RF->REG38,RF_PLL_GAIN_CAL_DONE)))
-        || (cnt_timeout>0))
+        && (cnt_timeout>0))
         {cnt_timeout--;}
 
     pll_gain_cal_val =REG_FIELD_RD(RF->REG38, RF_PLL_DAC_ADJ_TEST);

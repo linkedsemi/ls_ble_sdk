@@ -515,8 +515,14 @@ enum RF_REG_REG64_FIELD
 
 enum RF_REG_REG68_FIELD
 {
-    RF_AGC_GAIN_MASK = (int)0xffffffff,
-    RF_AGC_GAIN_POS = 0,
+    RF_AGC_GAIN0_MASK = (int)0xff,
+    RF_AGC_GAIN0_POS = 0,
+    RF_AGC_GAIN1_MASK = (int)0xff00,
+    RF_AGC_GAIN1_POS = 8,
+    RF_AGC_GAIN2_MASK = (int)0xff0000,
+    RF_AGC_GAIN2_POS = 16,
+    RF_AGC_GAIN3_MASK = (int)0xff000000,
+    RF_AGC_GAIN3_POS = 24,
 };
 
 enum RF_REG_REG6C_FIELD
