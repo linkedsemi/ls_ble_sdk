@@ -95,7 +95,7 @@ static uint32_t flash_data_storage_base_offset()
 void irq_reinit()
 {
     irq_priority();
-    NVIC->ISER[0] = 1<<EXTI_IRQn;
+    NVIC->ISER[0] = 1<<LPWKUP_IRQn|1<<EXTI_IRQn;
 }
 
 static void irq_init()

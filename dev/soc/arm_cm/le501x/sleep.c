@@ -267,8 +267,7 @@ void deep_sleep()
 {
     power_down_hardware_modules();
     cpu_deep_sleep_bit_set();
-    NVIC->ICER[0] = ~0;
-    __NVIC_EnableIRQ(LPWKUP_IRQn);
+    NVIC->ICER[0] = ~(1<<LPWKUP_IRQn);
     cpu_flash_deep_sleep_and_recover();
     wkup_ble();
     irq_reinit();
