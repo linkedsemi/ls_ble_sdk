@@ -43,7 +43,7 @@ typedef struct
 #define SysTick_BASE        (SCS_BASE +  0x0010UL)                    /*!< SysTick Base Address */
 #define SysTick             ((SysTick_Type   *)     SysTick_BASE  )   /*!< SysTick configuration struct */
 
-void systick_start()
+XIP_BANNED void systick_start()
 {
     SysTick->CTRL = 0;
     SysTick->LOAD = 0xffffff;

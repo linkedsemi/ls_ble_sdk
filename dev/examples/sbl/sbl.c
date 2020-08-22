@@ -15,6 +15,7 @@
 #include "ls_dbg.h"
 #include "log.h"
 #include "common.h"
+#include "systick.h"
 #define APP_IMAGE_BASE (0x1800D000)
 #define OTA_COPY_STATUS_OFFSET (OTA_INFO_OFFSET + FLASH_PAGE_SIZE)
 #define FW_ECC_VERIFY (0)
@@ -369,6 +370,8 @@ static bool need_ota()
 static void fota_service_start()
 {
     sys_init_app();
+//    MODIFY_REG(LSGPIOA->MODE,GPIO_MODE4_MASK,1<<GPIO_MODE4_POS);
+//    MODIFY_REG(LSGPIOA->AE,GPIO_AE4_MASK,2<<GPIO_AE4_POS);
     ble_init();
     dev_manager_init(dev_manager_callback);
     gap_manager_init(gap_manager_callback);
@@ -413,6 +416,7 @@ XIP_BANNED int main()
     power_up_hardware_modules();
     remove_hw_isolation();
     __disable_irq();
+    systick_start();
     spi_flash_drv_var_init(false,false);
     spi_flash_init();
     spi_flash_qe_status_read_and_set();
