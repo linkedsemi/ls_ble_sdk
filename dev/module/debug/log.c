@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include "log.h"
-#include "segger_rtt.h"
+#include "SEGGER_RTT.h"
 #include "uart.h"
 #include "io_config.h"
 

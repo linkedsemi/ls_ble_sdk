@@ -2,7 +2,7 @@
 #define UART_H_
 #include <stdbool.h>
 #include "reg_uart.h"
-#include "HAL_def.H"
+#include "HAL_def.h"
 #include "sdk_config.h"
 
 #if FPGA 

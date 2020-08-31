@@ -20,7 +20,7 @@
 #define ISR_VECTOR_ADDR ((uint32_t *)(0x0))
 
 bool waiting_ble_wkup_irq;
-
+static uint8_t wkup_stat;
 void cpu_sleep_asm(void);
 
 void cpu_recover_asm(void);
@@ -89,6 +89,7 @@ XIP_BANNED uint32_t __NVIC_GetPendingIRQ(IRQn_Type IRQn);
 XIP_BANNED void after_wfi()
 {
     LS_RAM_ASSERT(__NVIC_GetPendingIRQ(LPWKUP_IRQn));
+    wkup_stat = REG_FIELD_RD(SYSCFG->PMU_WKUP,SYSCFG_WKUP_STAT);
     REG_FIELD_WR(SYSCFG->PMU_WKUP, SYSCFG_LP_WKUP_CLR,1);
     DELAY_US(200);
     dcdc_on();
@@ -283,7 +284,6 @@ bool ble_wkup_status_get(void)
 
 void LPWKUP_Handler(void)
 {
-    uint8_t wkup_stat = REG_FIELD_RD(SYSCFG->PMU_WKUP,SYSCFG_WKUP_STAT);
     SYSCFG->PMU_WKUP &= ~(wkup_stat << WKUP_EN_POS);
     SYSCFG->PMU_WKUP |= wkup_stat << WKUP_EN_POS;
     if(wkup_stat&PB15_IO_WKUP)
