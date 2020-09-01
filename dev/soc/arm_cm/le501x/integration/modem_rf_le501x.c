@@ -67,13 +67,17 @@ void rf_force_agc_enable(bool en)
 int8_t rf_rssi_convert(uint8_t rssi_reg)
 {
     int8_t rssi_dbm;
-    uint16_t power_modem;
-
-    /* Get the RSSI value from the look up table and get its signed value
-     * Get the 2-complements signed value on 8 bits */
-    power_modem = ((rssi_reg & 0xF8) >> 3) * 2;
-    rssi_dbm = power_modem - RF_RX_GAIN_TBL[rssi_reg & 0x07] - 64;
-
+    uint8_t agc_state;
+    agc_state = REG_FIELD_RD(RF->REG6C,RF_AGC_STATE);
+    if(agc_state ==2 ){
+        rssi_dbm = rssi_reg-255 + agc_state*17 ;
+    }
+    else if(agc_state == 1){
+        rssi_dbm = rssi_reg-255 + agc_state*6 ;
+    }
+    else{
+        rssi_dbm = rssi_reg-255-20;
+    }
     return (rssi_dbm);
 }
 
@@ -269,10 +273,6 @@ static void rf_reg_init()
                | FIELD_BUILD(RF_PLL_LOCK_CNT,0x4f)
                | FIELD_BUILD(RF_EN_RX_CNT,2);
 
-    RF->REG68 = FIELD_BUILD(RF_AGC_GAIN0, 1)
-               |FIELD_BUILD(RF_AGC_GAIN1, 21)
-               |FIELD_BUILD(RF_AGC_GAIN2, 42)
-               |FIELD_BUILD(RF_AGC_GAIN3, 63);
     RF->REG64 = FIELD_BUILD(RF_RSSI_OFFSET, 0X80)
                |FIELD_BUILD(RF_ADC_MDM_EN, 1);      
     RF->REG70 = FIELD_BUILD(RF_RX2MBW_FORCE_EN,0)
