@@ -269,6 +269,8 @@ void at_load_info_from_flash(void)
     tinyfs_read(ble_at_dir, RECORD_BLENAME, ble_device_name, &name_len);
     tinyfs_read(ble_at_dir, RECORD_BLEAT, (uint8_t*)&buff, &len);
     memcpy(&ls_at_buff_env, &buff, len);
+
+    rf_set_power(tx_power_arr[ls_at_buff_env.default_info.rfpower]);
 }
 
 void at_store_info_to_flash(void)

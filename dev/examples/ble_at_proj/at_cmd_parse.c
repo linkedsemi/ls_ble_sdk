@@ -1,6 +1,7 @@
 #include "at_recv_cmd.h"
 #include "at_cmd_parse.h"
 #include "platform.h"
+#include "modem_rf_le501x.h"
 
 uint8_t *find_int_from_str(uint8_t *buff)
 {
@@ -53,7 +54,13 @@ const char *cmds[] =
 };
 
 const uint16_t adv_int_arr[6] = {80, 160, 320, 800, 1600, 3200};
-
+//4: 0dbm
+//0: -20dbm
+//2: -8dbm
+//8: 4dbm
+//7: 10dbm
+//b: 12dbm
+const uint16_t tx_power_arr[6] = {4, 0, 2, 8, 7, 0xb};
 void hex_arr_to_str(uint8_t *str, const uint8_t hex_arr[], uint8_t arr_len)
 {
     for (uint8_t i = 0; i < arr_len; i++)
@@ -433,18 +440,26 @@ void at_recv_cmd_handler(at_recv_cmd_t *param)
     break;
     case AT_CMD_IDX_POWER:
     {
-        switch (buff[0])
+        switch(*buff++)
         {
-        case '=':
-            //TODO
-
-            //LOG_I("%s",buff[1]);
-            //set_rf_power(str_to_hex(&buff[1]));
-            break;
-        case '?':
-            break;
-        default:
-            break;
+            case '?':
+                msg_len = sprintf((char *)msg_rsp,"\r\n+POWER:%d\r\nOK\r\n",ls_at_buff_env.default_info.rfpower);
+                uart_write(msg_rsp,msg_len);
+                break;
+            case '=':
+                ls_at_buff_env.default_info.rfpower = atoi((const char *)buff);
+                if(ls_at_buff_env.default_info.rfpower > 5)
+                    msg_len = sprintf((char *)msg_rsp,"\r\n+POWER:%d\r\nERR\r\n",ls_at_buff_env.default_info.rfpower);
+                else
+                {
+                    LOG_I("power:%d",tx_power_arr[ls_at_buff_env.default_info.rfpower]);
+                    rf_set_power(tx_power_arr[ls_at_buff_env.default_info.rfpower]);
+                    msg_len = sprintf((char *)msg_rsp,"\r\n+POWER:%d\r\nOK\r\n",ls_at_buff_env.default_info.rfpower);
+                }
+                uart_write(msg_rsp,msg_len);
+                break;
+            default:
+                break;
         }
     }
     break;

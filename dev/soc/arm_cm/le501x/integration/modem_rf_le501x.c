@@ -376,6 +376,25 @@ static void rf_reg_retention()
     rf_ret.ldo_rx_trim = REG_FIELD_RD(rf_reg08,RF_LDO_RX_TRIM);
 }
 
+void rf_set_power(uint8_t tx_power)
+{
+    if(tx_power==7 || tx_power==0xB )
+    {
+        REG_FIELD_WR(RF->REG00,RF_EN_PAHP,1);
+        REG_FIELD_WR(RF->REG30,RF_PAHP_SEL,1);
+        REG_FIELD_WR(RF->REG30,RF_LDO_PAHP_TRIM,0xf);
+        REG_FIELD_WR(RF->REG30,RF_LDO_PA_TRIM,7);
+    }
+    else{
+        REG_FIELD_WR(RF->REG00,RF_EN_PAHP,0);
+        REG_FIELD_WR(RF->REG30,RF_PAHP_SEL,0);
+        REG_FIELD_WR(RF->REG30,RF_LDO_PAHP_TRIM,0);
+        REG_FIELD_WR(RF->REG30,RF_LDO_PA_TRIM,3);
+    }
+
+    REG_FIELD_WR(RF->REG50,RF_PA_VB_TARGET,tx_power);
+}
+
 void modem_rf_reinit()
 {
     rf_reg_init();

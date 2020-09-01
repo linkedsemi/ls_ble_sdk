@@ -21,5 +21,7 @@ void modem_rf_reinit(void);
 
 void modem_rf_init(void);
 
+void rf_set_power(uint8_t tx_power);
+
 #endif
 
