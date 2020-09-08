@@ -179,7 +179,7 @@ HAL_StatusTypeDef HAL_UART_Receive(UART_HandleTypeDef *huart, uint8_t *pData, ui
 
         /* Init tickstart for timeout managment */
         //todo
-        REG_FIELD_WR(huart->UARTX->LCR,UART_LCR_RXEN,1);
+    
         huart->RxXferCount = Size;
 
         /* Check the remain data to be received */
@@ -227,7 +227,6 @@ HAL_StatusTypeDef HAL_UART_Transmit_IT(UART_HandleTypeDef *huart, uint8_t *pData
         huart->tx_arg = tx_arg;
         huart->ErrorCode = HAL_UART_ERROR_NONE;
         huart->gState = HAL_UART_STATE_BUSY_TX;
-        REG_FIELD_WR(huart->UARTX->FCR,UART_FCR_FIFOEN,1);
         REG_FIELD_WR(huart->UARTX->FCR,UART_FCR_TXTL,UART_FIFO_TL_0);
     /* Enable the UART Transmit data register empty Interrupt */
         REG_FIELD_WR(huart->UARTX->ICR,UART_ICR_TC,1);
@@ -273,8 +272,6 @@ HAL_StatusTypeDef HAL_UART_Receive_IT(UART_HandleTypeDef *huart, uint8_t *pData,
         huart->ErrorCode = HAL_UART_ERROR_NONE;
         huart->RxState = HAL_UART_STATE_BUSY_RX;
         huart->rx_arg = rx_arg;
-        REG_FIELD_WR(huart->UARTX->LCR,UART_LCR_RXEN,1);
-        REG_FIELD_WR(huart->UARTX->FCR,UART_FCR_FIFOEN,1);
         if(huart->RxXferCount<8)
         {
             REG_FIELD_WR(huart->UARTX->FCR,UART_FCR_RXTL,UART_FIFO_RL_1);
@@ -310,16 +307,11 @@ static void UART_SetConfig(UART_HandleTypeDef *huart)
         Set TE and RE bits according to huart->Init.Mode value
         Set OVER8 bit according to huart->Init.OverSampling value*/
     huart->UARTX->LCR = FIELD_BUILD(UART_LCR_DLS,huart->Init.WordLength)|FIELD_BUILD(UART_LCR_STOP,huart->Init.StopBits)
-                                  |FIELD_BUILD(UART_LCR_PS,huart->Init.Parity)|FIELD_BUILD(UART_LCR_MSB,huart->Init.MSBEN);
-    REG_FIELD_WR(huart->UARTX->LCR,UART_LCR_BRWEN,1);
-    if(huart->Init.BaudRate != 0)
-    {
-        huart->UARTX->BRR  =  huart->Init.BaudRate;  //todo 
-    }
+                                  |FIELD_BUILD(UART_LCR_PS,huart->Init.Parity)|FIELD_BUILD(UART_LCR_MSB,huart->Init.MSBEN)
+                                  |FIELD_BUILD(UART_LCR_RXEN,1)|FIELD_BUILD(UART_LCR_BRWEN,1);
+    huart->UARTX->FCR = UART_FCR_TFRST_MASK | UART_FCR_RFRST_MASK | UART_FCR_FIFOEN_MASK;
+    huart->UARTX->BRR  =  huart->Init.BaudRate;
     REG_FIELD_WR(huart->UARTX->LCR,UART_LCR_BRWEN,0);
-    REG_FIELD_WR(huart->UARTX->FCR,UART_FCR_FIFOEN,1);
-    REG_FIELD_WR(huart->UARTX->FCR,UART_FCR_TFRST,1);
-    REG_FIELD_WR(huart->UARTX->FCR,UART_FCR_RFRST,1);
 }
 
 /**
@@ -446,6 +438,19 @@ void HAL_UARTx_IRQHandler(UART_HandleTypeDef *huart)
 }
 
 
+HAL_StatusTypeDef HAL_UART_AutoBaudRate_Detect(UART_HandleTypeDef *huart,uint8_t mode)
+{
+    REG_FIELD_WR(huart->UARTX->LCR,UART_LCR_BRWEN,1);
+    MODIFY_REG(huart->UARTX->MCR, UART_MCR_ABRMOD_MASK | UART_MCR_ABREN_MASK, mode<<UART_MCR_ABRMOD_POS | 1<<UART_MCR_ABREN_POS);
+    while(REG_FIELD_RD(huart->UARTX->RIF, UART_RIF_ABE)==0);
+    huart->UARTX->ICR = UART_ICR_ABE_MASK;
+    while(REG_FIELD_RD(huart->UARTX->SR,UART_SR_BUSY));
+    REG_FIELD_WR(huart->UARTX->MCR,UART_MCR_ABREN,0);
+    REG_FIELD_WR(huart->UARTX->LCR,UART_LCR_BRWEN,0);
+    return HAL_OK;
+}
+
+HAL_StatusTypeDef HAL_UART_AutoBaudRate_Detect_IT(UART_HandleTypeDef * huart,uint8_t mode);
 
 
 

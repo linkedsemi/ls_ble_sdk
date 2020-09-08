@@ -1,5 +1,5 @@
 Import('dev_env')
 
-cm_src,cm_inc = SConscript(dirs='arm_cm',exports = ['dev_env'])
+cm_src,cm_inc,cm_start_src = SConscript(dirs='arm_cm',exports = ['dev_env'])
 
-Return('cm_src','cm_inc')
+Return('cm_src','cm_inc','cm_start_src')

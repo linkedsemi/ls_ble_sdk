@@ -6,12 +6,6 @@
 #include "sleep.h"
 #include "ls_dbg.h"
 
-typedef struct
-{
-    uint8_t num:4,
-            port:4;
-}gpio_pin_t;
-
 gpio_pin_t uart1_txd;
 gpio_pin_t uart1_rxd;
 gpio_pin_t uart2_txd;

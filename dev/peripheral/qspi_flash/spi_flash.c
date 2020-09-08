@@ -148,6 +148,23 @@ XIP_BANNED static void spi_flash_write_status_check()
     while(spi_flash_write_in_process());
 }
 
+#if ROM_CODE == 1
+static void flash_reading_critical(void (*func)(void *),void *param)
+{
+    func(param);
+}
+
+static void flash_writing_critical(void (*func)(void *),void *param)
+{
+    enter_critical();
+    spi_flash_write_enable();
+    func(param);
+    flash_writing = true;
+    exit_critical();
+    spi_flash_write_status_check();
+    flash_writing = false;
+}
+#else
 NOINLINE XIP_BANNED static void flash_reading_critical(void (*func)(void *),void *param)
 {
     spi_flash_xip_stop();
@@ -199,6 +216,10 @@ XIP_BANNED static void flash_writing_critical(void (*func)(void *),void *param)
     spi_flash_xip_start();
 }
 #endif
+
+#endif
+
+
 
 XIP_BANNED static void do_spi_flash_write_status_reg_func(void * param)
 {
@@ -438,7 +459,7 @@ void spi_flash_read_security_area(uint8_t idx,uint16_t addr,uint8_t *data,uint16
     spi_flash_read_security_area_operation(idx, addr,data,length);
 }
 
-void spi_flash_software_reset()
+XIP_BANNED void spi_flash_software_reset()
 {
     lsqspi_stig_send_command(&lsqspi_inst,RESET_EN_OPCODE);
     lsqspi_stig_send_command(&lsqspi_inst,RESET_OPCODE);

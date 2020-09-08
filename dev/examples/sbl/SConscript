@@ -1,12 +1,12 @@
 
-def sbl_build(sbl_name,src,inc,linkscript,flash_base_str):
+def sbl_build(sbl_name,src,inc,linkscript):
     sbl_env,sbl_target = image_build(sbl_name,src,inc,linkscript,)
     sbl_env.Append(LIBS = [dev_env['TARGET_LIB']])
     print(sbl_env['OBJSUFFIX'])
 #    sbl_env.Append(CPPDEFINES = '-DGLOBAL_OUTPUT_LVL=0')
     if not 'mdk' in sbl_env['TOOLS']:
         sbl_bin = sbl_env.Command('#build/examples/sbl.bin',sbl_target,Action('$OBJCOPY -O binary $SOURCE $TARGET'))
-        info_sbl_hex = sbl_env.Command('#build/examples/info_sbl.hex',sbl_bin,'python tools/info_sbl_merge.py $SOURCE ' +flash_base_str + ' $TARGET')
+        info_sbl_hex = sbl_env.Command('#build/examples/info_sbl.hex',sbl_bin,'python tools/info_sbl_merge.py $SOURCE le501x $TARGET')
     else:
         pass
     
@@ -20,5 +20,4 @@ inc = [
     '.'
 ]
 
-sbl_build('sbl',src,inc, dev_env.subst("./compiler/$COMPILER/sbl_link.txt"),'0x18000000')
-#sbl_build('sbl',src,inc, "sbl_link.txt",'0x18000000')
+sbl_build('sbl',src,inc, dev_env.subst("./compiler/$COMPILER/sbl_link.txt"))

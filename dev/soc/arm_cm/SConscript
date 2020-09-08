@@ -1,7 +1,5 @@
 Import('dev_env')
 
-le501x_src,le501x_inc = SConscript(dirs='le501x',exports = ['dev_env'])
-
 src = [
     'flash_svcall.c',
     'svcall.c',
@@ -10,8 +8,15 @@ src = [
 inc = [
     '.',
 ]
+if dev_env['IC']!= 'le501x':
+    sagi_src,sagi_inc,sagi_start_src = SConscript(dirs='sagi',exports = ['dev_env'])
+    src_files = File(src) + sagi_src
+    inc_dirs = Dir(inc) + sagi_inc
+    start_files = sagi_start_src
+else:
+    le501x_src,le501x_inc,le501x_start_src = SConscript(dirs='le501x',exports = ['dev_env'])
+    src_files = File(src) + le501x_src
+    inc_dirs = Dir(inc) + le501x_inc
+    start_files = le501x_start_src
 
-src_files = File(src) + le501x_src
-inc_dirs = Dir(inc) + le501x_inc
-
-Return("src_files","inc_dirs")
+Return("src_files","inc_dirs","start_files")

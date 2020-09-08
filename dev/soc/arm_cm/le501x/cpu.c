@@ -22,3 +22,12 @@ bool in_interrupt()
     return (SCB->ICSR & SCB_ICSR_VECTACTIVE_Msk) != 0;
 }
 
+void disable_global_irq()
+{
+    __disable_irq();
+}
+
+void enable_global_irq()
+{
+    __enable_irq();
+}

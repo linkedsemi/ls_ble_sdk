@@ -19,3 +19,20 @@ void memcpy32(uint32_t *dest, const uint32_t *src, uint32_t size_word)
         *dest++ = *src++;
     }
 }
+
+int32_t time_diff(uint32_t time0,uint32_t time1)
+{
+    int32_t diff = time0 - time1;
+    return diff;
+}
+
+uint8_t count_trailing_zeros(uint32_t x)
+{
+    uint32_t i;
+    for (i = 0; i < 32; i++)
+    {
+        if (x & 1<<i )
+            break;
+    }
+    return i;
+}

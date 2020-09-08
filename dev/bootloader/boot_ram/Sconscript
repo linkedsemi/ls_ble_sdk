@@ -1,0 +1,18 @@
+Import('dev_env')
+
+bram_env = dev_env.Clone()
+
+if dev_env['IC'] != 'le501x':
+    src = [
+        'boot_ram.c',
+    ]
+    bram_env.Append(CPPPATH = ['.'])
+    bram_env.Append(CFLAGS = ' -fPIE ')
+    bram_env['LINKSCRIPT'] = File('bram.ld')
+    bram_target = bram_env.Program('#build/boot_ram/bram',dev_env['SDK_SRC'] + src,OBJPREFIX = 'boot_ram-')
+    bram_env.Append(LINKFLAGS = ' -T ' + File('brom.sym').srcnode().path + ' -static-pie -nostartfiles')
+    bram_env.Depends(bram_target,[bram_env['LINKSCRIPT'],File('brom.sym')])
+    bram_env.AddPostAction(bram_target,Action('$OBJDUMP -d -z -x $TARGET > ${TARGET.base}.asm'))
+    bram_bin = bram_env.Command('#build/boot_ram/bram.bin',bram_target,Action('$OBJCOPY -O binary $SOURCE $TARGET'))
+    info_sbl_hex = bram_env.Command('#build/boot_ram/info_sbl.hex',bram_bin,Action('python tools/info_sbl_merge.py $SOURCE sagi $TARGET'))
+    bram_env.Depends(info_sbl_hex,['#tools/info_sbl_merge.py'])

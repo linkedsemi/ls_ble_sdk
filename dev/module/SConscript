@@ -8,6 +8,7 @@ src = [
     'debug/RTT/SEGGER_RTT_printf.c',
     'debug/RTT/SEGGER_RTT.c',
     'static_buffer/linked_buffer.c',
+    'static_buffer/fifo.c',
     'tinyfs/tinyfs_nvm.c',
     'tinyfs/tinyfs_write_cache.c',
     'tinyfs/tinyfs.c',

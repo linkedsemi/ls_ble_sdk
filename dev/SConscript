@@ -3,17 +3,18 @@ Import('dev_env','target_fw','target_lib')
 
 module_src,module_inc = SConscript(dirs='module',exports = ['dev_env'])
 peripheral_src,peripheral_inc = SConscript(dirs='peripheral',exports = ['dev_env'])
-soc_src,soc_inc = SConscript(dirs='soc',exports = ['dev_env'])
+soc_src,soc_inc,startup_src = SConscript(dirs='soc',exports = ['dev_env'])
 sdk_src = module_src + peripheral_src + soc_src
 sdk_inc = module_inc + peripheral_inc + soc_inc
 sdk_inc += Dir(['.'])
+dev_env['SDK_SRC'] = sdk_src
+dev_env['SDK_STARTUP_SRC'] = startup_src
 dev_env.Append(CPPPATH = list(map(lambda x:'#/'+x.srcnode().path,sdk_inc)))
 dev_env.Append(LINKFLAGS = ' $GC_OPTION ')
 dev_env['TARGET_LIB'] = target_lib
     
 def image_build(name,src,inc,linkscript = ''):
     global dev_env
-    global sdk_src
     img_env = dev_env.Clone()
     img_env['PROJ_DIR'] = Dir('.')
     print(img_env['PROJ_DIR'].srcnode().path)
@@ -23,7 +24,7 @@ def image_build(name,src,inc,linkscript = ''):
         img_env['LINKSCRIPT'] = File(linkscript)
     img_env.Append(CPPPATH = list(map(lambda x:'#/'+x.srcnode().path,inc_dirs)))
     target_name = '#build/examples/'+name
-    img_target = img_env.Program(target_name, sdk_src + src_files,OBJPREFIX = name+'-')
+    img_target = img_env.Program(target_name, dev_env['SDK_SRC'] + dev_env['SDK_STARTUP_SRC'] + src_files,OBJPREFIX = name+'-')
     img_env.Depends(img_target,[img_env['LINKSCRIPT']])
     if not 'mdk' in img_env['TOOLS']:
         img_env.AddPostAction(img_target,Action('$OBJDUMP -d -z -x $TARGET > ${TARGET.base}.asm'))
@@ -38,9 +39,10 @@ def app_build(app_name,src,inc,linkscript = ''):
     app_env.Append(LIBS = [target_lib])
     if not 'mdk' in app_env['TOOLS']:
         app_env.AddPostAction(app_target,Action('$OBJCOPY -O ihex $TARGET ${TARGET.base}.hex'))
-        app_env.Depends(app_target,[target_fw,'#build/examples/info_sbl.hex'])
+        app_env.Depends(app_target,[target_fw])
 
     return app_env,app_target
 
 
 SConscript(dirs = 'examples',exports=['app_build','image_build','dev_env'])
+SConscript(dirs = 'bootloader',exports=['dev_env'])

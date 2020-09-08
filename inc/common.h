@@ -3,6 +3,7 @@
 #include <stdint.h>
 #include <stddef.h>
 
+extern const unsigned char one_bits[];
 /// Number of '1' bits in a byte
 #define NB_ONE_BITS(byte)   (one_bits[byte & 0x0F] + one_bits[byte >> 4])
 
@@ -23,8 +24,15 @@ void *ll_malloc(uint32_t size);
 
 void ll_free(void *data);
 
+void ll_aes_128(uint8_t *key,uint8_t *plaintext,uint8_t *ciphertext,void (*cb)(void *param),void *param);
+
 void rand_gen_by_word(uint8_t *ptr,uint8_t word_num);
 
 void memcpy32(uint32_t *dest, const uint32_t *src, uint32_t size_word);
 
+int32_t time_diff(uint32_t time0,uint32_t time1);
+
+uint8_t count_trailing_zeros(uint32_t x);
+
+uint8_t count_leading_zeros(uint32_t x);
 #endif

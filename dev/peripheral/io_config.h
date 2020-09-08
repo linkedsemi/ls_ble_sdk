@@ -1,7 +1,7 @@
 #ifndef IO_CONFIG_H_
 #define IO_CONFIG_H_
 #include <stdint.h>
-
+#include <stdbool.h>
 /**@brief IO pull type */
 typedef enum 
 {
@@ -15,6 +15,12 @@ typedef enum
     INT_EDGE_FALLING,
     INT_EDGE_RISING,
 }exti_edge_t;
+
+typedef struct
+{
+    uint8_t num:4,
+            port:4;
+}gpio_pin_t;
 
 //lsgpioa
 #define PA00 ((uint8_t)0x00)   /* Pin A0 selected    */
@@ -53,7 +59,15 @@ typedef enum
 //lsgpioc
 #define PC00 ((uint8_t)0X20)   /* Pin C0 selected    */
 #define PC01 ((uint8_t)0X21)   /* Pin C1 selected    */
-
+#define PC02 ((uint8_t)0X22)   /* Pin C2 selected    */
+#define PC03 ((uint8_t)0X23)   /* Pin C3 selected    */
+#define PC04 ((uint8_t)0X24)   /* Pin C4 selected    */
+#define PC05 ((uint8_t)0X25)   /* Pin C5 selected    */
+#define PC06 ((uint8_t)0X26)   /* Pin C6 selected    */
+#define PC07 ((uint8_t)0X27)   /* Pin C7 selected    */
+#define PC08 ((uint8_t)0X28)   /* Pin C8 selected    */
+#define PC09 ((uint8_t)0X29)   /* Pin C9 selected    */
+#define PC10 ((uint8_t)0X2A)  /* Pin C10 selected   */
 
 void io_init(void);
 
@@ -82,6 +96,12 @@ void io_exti_config(uint8_t pin,exti_edge_t edge);
 void io_exti_enable(uint8_t pin,bool enable);
 
 void io_exti_callback(uint8_t pin);
+
+void qspi_flash_io_init(void);
+void qspi_flash_io_deinit(void);
+
+void iic1_io_init(uint8_t scl,uint8_t sda);
+void iic1_io_deinit(void);
 
 void uart1_io_init(uint8_t txd,uint8_t rxd);
 void uart1_io_deinit(void);

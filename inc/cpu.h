@@ -8,5 +8,8 @@ void exit_critical(void);
 
 bool in_interrupt(void);
 
+void disable_global_irq(void);
+
+
 #endif
 

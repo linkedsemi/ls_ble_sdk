@@ -1,0 +1,24 @@
+Import("dev_env")
+src = [
+    'lsqspi_param.c',
+    'uart_param.c',
+    'platform.c',
+    'cpu.c',
+    'modem_rf_sagi.c',
+    'io_config.c',
+    'delay_asm.s',
+    'sleep_asm.s',
+    'sleep.c',
+]
+inc = [
+    '.',
+]
+start_src = [
+    'startup_asm.s',
+    'startup.c',
+]
+src_files = File(src)
+inc_dirs = Dir(inc)
+start_files = File(start_src)
+dev_env['LINKSCRIPT'] = File("link_script.txt")
+Return("src_files","inc_dirs","start_files")

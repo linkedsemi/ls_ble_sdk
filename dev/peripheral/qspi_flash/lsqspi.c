@@ -8,8 +8,8 @@
 
 XIP_BANNED void lsqspi_init(struct lsqspi_instance *inst)
 {
-    lsqspi_clk_set(inst,true);
     lsqspi_sw_rst(inst);
+    lsqspi_clk_set(inst,true);
     inst->reg->CSTIM = FIELD_BUILD(LSQSPI_AUTO_CS_HOLD,0);
     inst->reg->DLY = lsqspi_dly_get(inst);
     inst->reg->RDCAP = FIELD_BUILD(LSQSPI_DLY_RD_CAP, lsqspi_rd_cap_dly_get(inst));
@@ -25,6 +25,26 @@ XIP_BANNED void lsqspi_direct_read_config(struct lsqspi_instance *inst,struct ls
         | FIELD_BUILD(LSQSPI_RD_NUM_DUMMY, param->dummy_bytes);
 }
 
+#if (defined(SAGI_BOOT_ROM))
+XIP_BANNED static void lsqspi_operation_wait(reg_lsqspi_t *reg)
+{
+    reg->CFG;
+    reg->CFG;
+    reg->CFG;
+    reg->CFG;
+    reg->CFG;
+    reg->CFG;
+    reg->CFG;
+    reg->CFG;
+    while(REG_FIELD_RD(reg->CFG, LSQSPI_IDLE)==0);
+}
+#else
+XIP_BANNED static void lsqspi_operation_wait(reg_lsqspi_t *reg)
+{
+    while(REG_FIELD_RD(reg->CFG, LSQSPI_IDLE)==0);
+}
+#endif
+
 XIP_BANNED static void stig_read_start(reg_lsqspi_t *reg,struct stig_start_param *param,uint8_t start_length,bool hold_cs,bool quad_data)
 {
     reg->STIG_CMD = FIELD_BUILD(LSQSPI_CMD_OPCODE,param->opcode) | FIELD_BUILD(LSQSPI_OPCODE_EN, param->opcode_en) | FIELD_BUILD(LSQSPI_DATA_XFER_TYPE, quad_data)
@@ -34,7 +54,7 @@ XIP_BANNED static void stig_read_start(reg_lsqspi_t *reg,struct stig_start_param
         | FIELD_BUILD(LSQSPI_RDATA_EN, start_length ? 1 : 0);
     reg->STIG_ADDR = param->addr;
     reg->STIG_GO = FIELD_BUILD(LSQSPI_STIG_HOLD_CS, hold_cs) | FIELD_BUILD(LSQSPI_STIG_GO,1);
-    while(REG_FIELD_RD(reg->CFG, LSQSPI_IDLE)==0);
+    lsqspi_operation_wait(reg);
     uint32_t data = reg->STIG_RD[0];
     memcpy(param->data,&data,start_length);
 }
@@ -46,7 +66,7 @@ XIP_BANNED static void stig_read_continue(reg_lsqspi_t *reg,uint32_t *data,uint1
     {
          reg->STIG_GO = FIELD_BUILD(LSQSPI_STIG_HOLD_CS, 1) | FIELD_BUILD(LSQSPI_STIG_GO,1);
          size -= 8;
-         while(REG_FIELD_RD(reg->CFG, LSQSPI_IDLE)==0);
+         lsqspi_operation_wait(reg);
          data[0] = reg->STIG_RD[0];
          data[1] = reg->STIG_RD[1];
          data += 2;
@@ -54,7 +74,7 @@ XIP_BANNED static void stig_read_continue(reg_lsqspi_t *reg,uint32_t *data,uint1
     if(size)
     {
         reg->STIG_GO = FIELD_BUILD(LSQSPI_STIG_HOLD_CS, 0) | FIELD_BUILD(LSQSPI_STIG_GO,1);
-        while(REG_FIELD_RD(reg->CFG, LSQSPI_IDLE)==0);
+        lsqspi_operation_wait(reg);
         uint32_t buf[2];
         buf[0] = reg->STIG_RD[0];
         buf[1] = reg->STIG_RD[1];
@@ -101,7 +121,7 @@ XIP_BANNED static void stig_write_start(reg_lsqspi_t *reg,struct stig_start_para
     memcpy(&data,param->data,start_length);
     reg->STIG_WR[0] = data;
     reg->STIG_GO = FIELD_BUILD(LSQSPI_STIG_HOLD_CS, hold_cs) | FIELD_BUILD(LSQSPI_STIG_GO,1);
-    while(REG_FIELD_RD(reg->CFG, LSQSPI_IDLE)==0);
+    lsqspi_operation_wait(reg);
 }
 
 
@@ -114,14 +134,14 @@ XIP_BANNED static void stig_write_continue(reg_lsqspi_t *reg,uint32_t *data,uint
         reg->STIG_GO = FIELD_BUILD(LSQSPI_STIG_HOLD_CS, 1) | FIELD_BUILD(LSQSPI_STIG_GO,1);
         data += 1;
         size -= 4;
-        while(REG_FIELD_RD(reg->CFG, LSQSPI_IDLE)==0);
+        lsqspi_operation_wait(reg);
     }
     if(size)
     {
         reg->STIG_CMD = FIELD_BUILD(LSQSPI_DATA_XFER_TYPE, quad_data) | FIELD_BUILD(LSQSPI_NUM_WDATA_BYTES, size - 1) | FIELD_BUILD( LSQSPI_WDATA_EN , 1);
         reg->STIG_WR[0] = *data;
         reg->STIG_GO = FIELD_BUILD(LSQSPI_STIG_HOLD_CS, 0) | FIELD_BUILD(LSQSPI_STIG_GO,1);
-        while(REG_FIELD_RD(reg->CFG, LSQSPI_IDLE)==0);
+        lsqspi_operation_wait(reg);
     }
 }
 
@@ -149,7 +169,7 @@ XIP_BANNED void lsqspi_stig_send_command(struct lsqspi_instance *inst,uint8_t op
 {
     inst->reg->STIG_CMD = FIELD_BUILD(LSQSPI_CMD_OPCODE, opcode) | FIELD_BUILD(LSQSPI_OPCODE_EN, 1);
     inst->reg->STIG_GO = FIELD_BUILD(LSQSPI_STIG_GO, 1);
-    while(REG_FIELD_RD(inst->reg->CFG, LSQSPI_IDLE)==0);
+    lsqspi_operation_wait(inst->reg);
 }
 
 XIP_BANNED void lsqspi_stig_read_register(struct lsqspi_instance *inst,uint8_t opcode,uint8_t *data,uint8_t length)

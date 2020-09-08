@@ -3,7 +3,6 @@ src = [
     'cpu.c',
     'platform.c',
     'stack_var.c',
-    'compiler/$COMPILER/startup.s',
     'compiler/$COMPILER/sleep_asm.s',
     'compiler/$COMPILER/svcall_asm.s',
     'compiler/$COMPILER/delay_asm.s',
@@ -20,7 +19,11 @@ inc = [
     '.',
     'integration',
 ]
+start_src = [
+    'compiler/$COMPILER/startup.s',
+]
 src_files = File(dev_env.subst(src))
 inc_dirs = Dir(inc)
+start_files = File(dev_env.subst(start_src))
 dev_env['LINKSCRIPT'] = File(dev_env.subst("compiler/$COMPILER/link_script.txt"))
-Return("src_files","inc_dirs")
+Return("src_files","inc_dirs","start_files")
