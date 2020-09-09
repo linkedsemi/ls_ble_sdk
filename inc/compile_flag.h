@@ -1,7 +1,7 @@
 #ifndef COMPILE_FLAG_H_
 #define COMPILE_FLAG_H_
 
-#if ROM_CODE==1
+#if (ROM_CODE==1 || BOOT_RAM==1)
 #define XIP_BANNED 
 #else
 #define XIP_BANNED __attribute__((section(".xip_banned")))

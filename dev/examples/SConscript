@@ -1,5 +1,5 @@
 Import('app_build','image_build','dev_env')
-SConscript(dirs = 'sbl',exports=['image_build','dev_env'])
+SConscript(dirs = 'fota',exports=['app_build','dev_env'])
 SConscript(dirs = 'flash_prog',exports=['image_build','dev_env'])
 SConscript(dirs = 'ram_test',exports=['image_build','dev_env'])
 SConscript(dirs = 'ble_ancs_c',exports=['app_build'])
