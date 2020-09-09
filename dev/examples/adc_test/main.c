@@ -5,7 +5,8 @@
 #include "reg_syscfg.h"
 #include "field_manipulate.h"
 #include "lsiwdt.h"
-
+#include "sys_stat.h"
+#include "io_config.h"
 #include <string.h>
 
 void Error_Handler(void);
@@ -13,20 +14,7 @@ void software_trig(void);
 ADC_HandleTypeDef hadc;
 static void lsgpio_init(void)
 {
-    GPIO_InitTypeDef GPIO_InitStruct = {0};
-
-    __HAL_RCC_GPIOA_CLK_ENABLE();
-
-    /*Configure GPIO pin Output Level */
-    HAL_GPIO_WritePin(LSGPIOA, GPIO_PIN_0, GPIO_PIN_RESET);
-
-    /*Configure GPIO pin : PA00 */
-    GPIO_InitStruct.Pin = GPIO_PIN_0;
-    GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
-    GPIO_InitStruct.ANA_Func = ANA_FUNC1;
-    HAL_GPIO_Init(LSGPIOA, &GPIO_InitStruct);
-
-    __HAL_RCC_GPIOA_CLK_DISABLE();
+   adc12b_in4_io_init();
 }
 
 void lsadc_init(void)

@@ -1,5 +1,5 @@
 #include "main.h"
-
+#include "io_config.h"
 #if 1
 #define  PERIOD_VALUE       (666 - 1)  /* Period Value  */
 #define  PULSE1_VALUE       333        /* Capture Compare 1 Value  */
@@ -25,7 +25,6 @@ static void Error_Handler(void);
 /* Private functions ---------------------------------------------------------*/
 void HAL_TIM_PWM_MspInit(TIM_HandleTypeDef *htim)
 {
-  GPIO_InitTypeDef   GPIO_InitStruct;
   /*##-1- Enable peripherals and GPIO Clocks #################################*/
   /* TIMx Peripheral clock enable */
 //   TIMx_CLK_ENABLE();
@@ -38,25 +37,12 @@ void HAL_TIM_PWM_MspInit(TIM_HandleTypeDef *htim)
     __HAL_RCC_GPIOA_CLK_ENABLE();
   /* Configure PA00, PA01, PA07, PA08 for PWM output 
   */
-  /* Common configuration for all channels */
-  GPIO_InitStruct.Mode = GPIO_MODE_AF;
-  GPIO_InitStruct.AF_Type = AF_GPTIMB1_CH1;
 
-  GPIO_InitStruct.Pin = TIMx_GPIO_PIN_CHANNEL1;
-  HAL_GPIO_Init(TIMx_GPIO_PORT_CHANNEL1, &GPIO_InitStruct);
-
-  GPIO_InitStruct.AF_Type = AF_GPTIMB1_CH2;
-
-  GPIO_InitStruct.Pin = TIMx_GPIO_PIN_CHANNEL2;
-  HAL_GPIO_Init(TIMx_GPIO_PORT_CHANNEL2, &GPIO_InitStruct);
-
-  GPIO_InitStruct.AF_Type = AF_GPTIMB1_CH3;
-  GPIO_InitStruct.Pin = TIMx_GPIO_PIN_CHANNEL3;
-  HAL_GPIO_Init(TIMx_GPIO_PORT_CHANNEL3, &GPIO_InitStruct);
-
-  GPIO_InitStruct.AF_Type = AF_GPTIMB1_CH4;
-  GPIO_InitStruct.Pin = TIMx_GPIO_PIN_CHANNEL4;
-  HAL_GPIO_Init(TIMx_GPIO_PORT_CHANNEL4, &GPIO_InitStruct);
+  /* Enable all GPIO Channels Clock requested */
+	gptimb1_ch1_io_init(PA00,true,0);
+	gptimb1_ch2_io_init(PA01,true,0);
+    gptimb1_ch3_io_init(PA07,true,0);
+    gptimb1_ch4_io_init(PA08,true,0);
 }
 /**
   * @brief  Main program
@@ -242,18 +228,9 @@ void HAL_TIM_PWM_MspInit(TIM_HandleTypeDef *htim)
     /* TIMx Peripheral clock enable */
     __HAL_RCC_ADTIM_CLK_ENABLE();
     /* Enable all GPIO Channels Clock requested */
-    __HAL_RCC_GPIOA_CLK_ENABLE();
     /* Configure PA00, PA01 for PWM output*/
-    GPIO_InitStruct.Mode = GPIO_MODE_AF;
-    GPIO_InitStruct.AF_Type = AF_ADTIM1_CH1;
-
-    GPIO_InitStruct.Pin = TIMx_GPIO_PIN_CHANNEL1;
-    HAL_GPIO_Init(TIMx_GPIO_PORT_CHANNEL1, &GPIO_InitStruct);
-
-    GPIO_InitStruct.AF_Type = AF_ADTIM1_CH1N;
-
-    GPIO_InitStruct.Pin = TIMx_GPIO_PIN_CHANNEL2;
-    HAL_GPIO_Init(TIMx_GPIO_PORT_CHANNEL2, &GPIO_InitStruct);
+    gptimb1_ch1_io_init(PA00,true,0);
+	gptimb1_ch1n_io_init(PA01,true,0);
 }
 
 void main(void)
@@ -299,23 +276,13 @@ TIM_HandleTypeDef light_tim_hdl_t;
 TIM_OC_InitTypeDef light_tim_cfg;
 void HAL_TIM_PWM_MspInit(TIM_HandleTypeDef *htim)
 {
-    GPIO_InitTypeDef   GPIO_InitStruct;
     /*##-1- Enable peripherals and GPIO Clocks #################################*/
     /* TIMx Peripheral clock enable */
     __HAL_RCC_ADTIM_CLK_ENABLE();
     __HAL_RCC_TIM3_CLK_ENABLE();
-    /* Enable all GPIO Channels Clock requested */
-    __HAL_RCC_GPIOA_CLK_ENABLE();
-    /* Configure PA00, PA01 for PWM output*/
-    GPIO_InitStruct.Mode = GPIO_MODE_AF;
-
-    GPIO_InitStruct.AF_Type = AF_ADTIM1_CH1;
-    GPIO_InitStruct.Pin = TIMx_GPIO_PIN_CHANNEL1;
-    HAL_GPIO_Init(TIMx_GPIO_PORT_CHANNEL1, &GPIO_InitStruct);
-
-    GPIO_InitStruct.AF_Type = AF_GPTIMB1_CH1;
-    GPIO_InitStruct.Pin = TIMx_GPIO_PIN_CHANNEL2;
-    HAL_GPIO_Init(TIMx_GPIO_PORT_CHANNEL2, &GPIO_InitStruct);
+    
+    adtim1_ch1_io_init(PA00,true,0);
+    gptimb1_ch1_io_init(PA01,true,0);
 }
 
 void main(void)
@@ -361,12 +328,8 @@ TIM_HandleTypeDef light_tim_hdl;
 TIM_OC_InitTypeDef light_tim_cfg;
 void gpio_test_init(void)
 {
-    GPIO_InitTypeDef GPIO_InitStruct;
-    GPIO_InitStruct.Pin = GPIO_PIN_0;
-    GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT;
-    GPIO_InitStruct.OT = GPIO_OUTPUT_PUSHPLL;
-    GPIO_InitStruct.Driver_Pwr = GPIO_OUTPUT_MAX_DRIVER;
-    HAL_GPIO_Init(LSGPIOA, &GPIO_InitStruct);
+    io_cfg_output(PA00);
+    io_write_pin(PA00,0);
 }
 uint16_t time;
 void main(void)
@@ -397,6 +360,6 @@ void BSTIM1_Handler(void)
 
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
-    HAL_GPIO_TogglePin(LSGPIOA,GPIO_PIN_0);   
+    io_toggle_pin(PA00);
 }
 #endif

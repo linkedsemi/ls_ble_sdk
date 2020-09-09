@@ -6,6 +6,7 @@
 #include "field_manipulate.h"
 #include "reg_lscrypt.h"
 #include "reg_rcc.h"
+#include "sys_stat.h"
 
 #define AES_KEY_LEN    (16)
 #define AES_DATA_LEN   (16)
@@ -94,6 +95,8 @@ void lscrypt_write_data(uint8_t const *data_val)
 void ls_ip_aes_encrypt_start(void (*cb)(void),const uint8_t* aes_key,const uint8_t* aes_val)
 {
     lscrypt_isr_cb = cb;
+	NVIC_EnableIRQ(CRYPT_IRQn);
+    crypt_status_set(true); 
     REG_FIELD_WR(LSCRYPT->CR,CRYPT_ENCS,1); 
     lscrypt_write_key(aes_key);
 	lscrypt_write_data(aes_val);
@@ -105,9 +108,12 @@ void ls_ip_aes_encrypt_complete(void (*cb)(uint32_t *),uint32_t *param)
     param[1] = REG_FIELD_RD(LSCRYPT->RES1,CRYPT_RES1);
     param[2] = REG_FIELD_RD(LSCRYPT->RES2,CRYPT_RES2);
     param[3] = REG_FIELD_RD(LSCRYPT->RES3,CRYPT_RES3);
+    
+    crypt_status_set(false);
 
    cb(param);
 }
+
 
 void CRYPT_Handler(void)
 {

@@ -2,6 +2,7 @@
 #include <stdarg.h>
 #include "log.h"
 #include "compile_flag.h"
+#include "platform.h"
 
 //void iob_output_set(uint8_t i);
 
@@ -27,6 +28,7 @@ void stack_assert_c(uint32_t lvl,uint32_t param0,uint32_t param1,uint32_t lr)
     if(lvl==LVL_ERROR)
     {
         disable_global_irq();
+//        platform_reset(LVL_ERROR);
         while(1);
     }
 }

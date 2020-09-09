@@ -165,7 +165,24 @@ void gptimc1_ch2_io_deinit(void);
 void gptimc1_bk_io_init(uint8_t pin);
 void gptimc1_bk_io_deinit(void);
 
-
+void adc12b_in0_io_init(void);
+void adc12b_in0_io_deinit(void);
+void adc12b_in1_io_init(void);
+void adc12b_in1_io_deinit(void);
+void adc12b_in2_io_init(void);
+void adc12b_in2_io_deinit(void);
+void adc12b_in3_io_init(void);
+void adc12b_in3_io_deinit(void);
+void adc12b_in4_io_init(void);
+void adc12b_in4_io_deinit(void);
+void adc12b_in5_io_init(void);
+void adc12b_in5_io_deinit(void);
+void adc12b_in6_io_init(void);
+void adc12b_in6_io_deinit(void);
+void adc12b_in7_io_init(void);
+void adc12b_in7_io_deinit(void);
+void adc12b_in8_io_init(void);
+void adc12b_in8_io_deinit(void);
 
 #endif
 

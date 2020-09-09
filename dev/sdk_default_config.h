@@ -38,7 +38,7 @@
 #endif
 
 #ifndef SDK_HCLK_MHZ
-#define SDK_HCLK_MHZ (64)
+#define SDK_HCLK_MHZ (16)
 #endif
 
 #ifndef SDK_PCLK_DIV

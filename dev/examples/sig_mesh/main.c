@@ -18,7 +18,7 @@
 #include "sig_mesh_ctl.h"
 #include "sig_light_cfg.h"
 
-#define COMPANY_ID 0xffff
+#define COMPANY_ID 0x093A
 #define COMPA_DATA_PAGES 1
 #define MAX_NB_ADDR_REPLAY 20
 #define PROV_AUTH_ACCEPT 1
@@ -155,7 +155,7 @@ static void mesh_manager_callback(enum mesh_evt_type type, union ls_sig_mesh_evt
     {
     }
     break;
-    case MESH_ACTIVE_MODEL_RSP_SEND:
+    case MESH_ACTIVE_MODEL_RSP_SENT:
     {
     }
     break;

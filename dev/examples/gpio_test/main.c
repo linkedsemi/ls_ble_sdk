@@ -1,5 +1,7 @@
 #include "lsgpio.h"
 #include "le501x.h"
+#include "sys_stat.h"
+#include "io_config.h"
 #include <string.h>
 
 #define GPIO_TEST 0
@@ -8,27 +10,20 @@
 #if (GPIO_TEST)
 void gpio_test(void)
 {
-    GPIO_InitTypeDef GPIO_InitStruct = {0};
-    __HAL_RCC_GPIOA_CLK_ENABLE();
-    __HAL_RCC_GPIOB_CLK_ENABLE();
+    io_cfg_input(PB00);
+    io_pull_write(PB00, IO_PULL_DISABLE);
+    io_cfg_input(PB07);
+    io_pull_write(PB00, IO_PULL_DISABLE);
 
-    /*Configure GPIO pin*/
-    GPIO_InitStruct.Pin = GPIO_PIN_0 | GPIO_PIN_7;
-    GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-    GPIO_InitStruct.Pull = GPIO_INPUT_NOPULL;
-
-    HAL_GPIO_Init(LSGPIOA, &GPIO_InitStruct);
-
-    GPIO_InitStruct.Pin = GPIO_PIN_8 | GPIO_PIN_9;
-    GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT;
-    GPIO_InitStruct.OT = GPIO_OUTPUT_PUSHPLL;
-    GPIO_InitStruct.Driver_Pwr = GPIO_OUTPUT_MAX_DRIVER;
-    HAL_GPIO_Init(LSGPIOB, &GPIO_InitStruct);
+    io_cfg_output(PB08);
+    io_write_pin(PB08,0);
+    io_cfg_output(PB09);
+    io_write_pin(PB09,0);
 
     while (1)
     {
-        HAL_GPIO_WritePin(LSGPIOB, GPIO_PIN_8, HAL_GPIO_ReadPin(LSGPIOA, GPIO_PIN_0));
-        HAL_GPIO_WritePin(LSGPIOB, GPIO_PIN_9, HAL_GPIO_ReadPin(LSGPIOA, GPIO_PIN_7));
+        io_write_pin(PB08,io_read_pin(PB000));
+        io_write_pin(PB09,io_read_pinPB07));
     }
 }
 #endif //(GPIO_TEST)
@@ -36,29 +31,20 @@ void gpio_test(void)
 #if (EXTI_TEST)
 void exti_test(void)
 {
-    GPIO_InitTypeDef GPIO_InitStruct = {0};
-    __HAL_RCC_GPIOA_CLK_ENABLE();
-    __HAL_RCC_GPIOB_CLK_ENABLE();
+    io_cfg_output(PB08);
+    io_write_pin(PB08,0);
 
-    GPIO_InitStruct.Pin = GPIO_PIN_8 | GPIO_PIN_9;
-    GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT;
-    GPIO_InitStruct.OT = GPIO_OUTPUT_PUSHPLL;
-    GPIO_InitStruct.Driver_Pwr = GPIO_OUTPUT_MAX_DRIVER;
-    HAL_GPIO_Init(LSGPIOB, &GPIO_InitStruct);
+    io_cfg_output(PB09);
+    io_write_pin(PB09,0);
 
-    /*Configure GPIO pin*/
-    GPIO_InitStruct.Pin = GPIO_PIN_15;
-    GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING_FLT;
-    GPIO_InitStruct.Pull = GPIO_INPUT_NOPULL;
-    GPIO_InitStruct.Filter = GPIO_INPUT_FLI_20NS_EN;
+    io_cfg_input(PB15);
+    io_pull_write(PB15,IO_PULL_UP);
+    io_exti_config(PB15,INT_EDGE_RISING);
+    io_exti_enable(PB15,true);
 
-    GPIO_InitStruct.Edbc_filter.Cnt = 7;
-    GPIO_InitStruct.Edbc_filter.Pre = 255;
+    NVIC_EnableIRQ(EXTI_IRQn); //exti_IRQHandler
 
-    HAL_GPIO_Init(LSGPIOB, &GPIO_InitStruct);
-
-    NVIC_SetPriority(EXTI_IRQn, 1);
-    NVIC_EnableIRQ(EXTI_IRQn);
+    NVIC_SetPriority(EXTI_IRQn,1);
 }
 /*
 void EXTI_Handler(void)
@@ -73,16 +59,31 @@ void EXTI_Handler(void)
 #endif //(EXTI_TEST)
 int main(void)
 {
-    #if (GPIO_TEST)
+#if (GPIO_TEST)
     gpio_test();
-    #endif
+#endif
 
-    #if (EXTI_TEST)
+#if (EXTI_TEST)
     exti_test();
-    #endif
+#endif
 
     while (1)
     {
         ;
+    }
+}
+
+void io_exti_callback(uint8_t pin) // override io_exti_callback
+{
+    switch (pin)
+    {
+    case PA07:
+        // do something
+        break;
+    case PB15:
+        // do something
+        break;
+    default:
+        break;
     }
 }

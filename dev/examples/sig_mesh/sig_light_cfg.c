@@ -1,5 +1,5 @@
 #include "sig_light_cfg.h"
-
+#include "io_config.h"
 TIM_HandleTypeDef light_tim_hdl;
 TIM_OC_InitTypeDef light_tim_cfg;
 static struct light_state sigmesh_light_state;
@@ -68,18 +68,9 @@ void HAL_TIM_PWM_MspInit(TIM_HandleTypeDef *htim)
     /* TIMx Peripheral clock enable */
     REG_FIELD_WR(RCC->APB1EN, RCC_GPTIMB1, 1);
     /* Enable all GPIO Channels Clock requested */
-    __HAL_RCC_GPIOA_CLK_ENABLE();
     /* Configure PA00, PA01 for PWM output*/
-    GPIO_InitStruct.Mode = GPIO_MODE_AF;
-    GPIO_InitStruct.AF_Type = AF_GPTIMB1_CH1;
-
-    GPIO_InitStruct.Pin = LED_PIN_0;
-    HAL_GPIO_Init(LED_PORT_0, &GPIO_InitStruct);
-
-    GPIO_InitStruct.AF_Type = AF_GPTIMB1_CH2;
-
-    GPIO_InitStruct.Pin = LED_PIN_1;
-    HAL_GPIO_Init(LED_PORT_1, &GPIO_InitStruct);
+    gptimb1_ch1_io_init(PA00,true,0);
+	gptimb1_ch2_io_init(PA01,true,0);
 }
 
 void sigmesh_pwm_init(void)

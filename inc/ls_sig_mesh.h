@@ -64,7 +64,7 @@ enum mesh_evt_type
     MESH_ACTIVE_REGISTER_MODEL = 2,
     MESH_ACTIVE_MODEL_PUBLISH = 3,
     MESH_ACTIVE_MODEL_GROUP_MEMBERS = 4,
-    MESH_ACTIVE_MODEL_RSP_SEND = 5,
+    MESH_ACTIVE_MODEL_RSP_SENT = 5,
     MESH_ACTIVE_LPN_START = 6,
     MESH_ACTIVE_LPN_STOP = 7,
     MESH_ACTIVE_LPN_SELECT_FRIEND = 8,
@@ -79,8 +79,11 @@ enum mesh_evt_type
     MESH_ACCEPT_MODEL_INFO = 17,
     MESH_RSP_MODEL_INFO = 18,
     MESH_REPORT_TIMER_STATE = 19,
-    MESH_ADV_REPORT = 20,
-    MESH_STATE_UPD_IND = 21
+    MESH_GENIE_PROV_COMP = 20,
+    MESH_ADV_REPORT = 21,
+    MESH_STATE_UPD_IND = 22,
+    MESH_ACTIVE_GLP_START = 23,
+    MESH_ACTIVE_GLP_STOP = 24,
 };
 
 /// Mesh Supported Features
@@ -216,6 +219,7 @@ struct report_model_loc_id_info
 struct report_dev_provisioned_state_info
 {
     uint8_t proved_state;
+    uint8_t proving_success_state;
 };
 
 struct mesh_prov_info
@@ -244,6 +248,13 @@ struct report_mesh_attention_info
     uint8_t state;
 };
 
+struct update_state_info
+{
+    uint8_t upd_type;
+    uint8_t len;
+    uint8_t data[__EMPTY];
+};
+
 struct rsp_model_info
 {
     uint8_t ModelHandle;
@@ -252,6 +263,12 @@ struct rsp_model_info
     uint32_t opcode;
     uint16_t len;
     uint8_t info[MAX_MESH_MODEL_MSG_BUFFER];
+};
+
+struct start_glp_info
+{
+    uint8_t RxDelyMs;
+    uint16_t SleepIntvlMs;
 };
 
 struct model_rx_info
@@ -281,6 +298,13 @@ struct report_mesh_prov_result_info
     uint16_t status;
 };
 
+struct model_rsp_sent_info
+{
+    uint8_t state;
+    uint16_t status;
+};
+
+
 struct report_mesh_timer_state_info
 {
     uint8_t timer_id;
@@ -308,6 +332,7 @@ union ls_sig_mesh_evt_u {
     struct report_mesh_attention_info update_attention;
     struct report_mesh_prov_result_info prov_rslt_sate;
     struct model_rx_info rx_msg;
+    struct update_state_info update_state_param;
     struct report_mesh_timer_state_info mesh_timer_state;
     struct adv_report_evt adv_report;
     struct model_state_upd mdl_state_upd_ind;
@@ -353,4 +378,6 @@ void ls_sig_mesh_con_set_scan_rsp_data(uint8_t *scan_rsp_data, uint8_t *scan_rsp
 void start_ls_sig_mesh_gatt(void);
 void stop_ls_sig_mesh_gatt(void);
 void ls_sig_mesh_proxy_adv_ctl(uint8_t enable);
+void start_glp_handler(struct start_glp_info *param);
+void stop_glp_handler(void);
 #endif //(_LS_SIG_MESH_H_

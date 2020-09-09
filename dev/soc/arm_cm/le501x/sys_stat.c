@@ -17,8 +17,16 @@ struct peri_stat_env
     bool gptimerc1;
     bool pdm;
     bool dma;
-    bool adc;
+    bool crypt;
+    bool adc12b;
 }peri_stat;
+
+bool app_event_status;
+
+void app_status_set(bool stat)
+{
+    app_event_status = stat;
+}
 
 void uart1_status_set(bool stat)
 {
@@ -90,10 +98,16 @@ void dma_status_set(bool stat)
     peri_stat.dma = stat;
 }
 
-void adc_status_set(bool stat)
+void crypt_status_set(bool stat)
 {
-    peri_stat.adc = stat;
+     peri_stat.crypt = stat;
 }
+
+void adc12b_status_set(bool stat)
+{
+    peri_stat.adc12b = stat;
+}
+
 
 bool peri_status_busy()
 {
@@ -107,3 +121,7 @@ bool peri_status_busy()
     }
 }
 
+bool app_event_status_busy()
+{
+    return app_event_status;
+}

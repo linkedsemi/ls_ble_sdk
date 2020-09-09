@@ -85,7 +85,7 @@ struct{
 
 struct{
     uint32_t env[2];
-}adv_tx_buf[4];
+}adv_tx_buf[6];
 
 struct 
 {
