@@ -463,6 +463,13 @@ void io_cfg_input(uint8_t pin)
     gpiox->IE |= 1<< x->num;
 }
 
+void io_cfg_disable(uint8_t pin)
+{
+    gpio_pin_t *x = (gpio_pin_t *)&pin;
+    reg_lsgpio_t *gpiox = GPIO_GetPort(x->port);
+    gpiox->IE &= ~(1<< x->num);
+}
+
 void io_set_pin(uint8_t pin)
 {
     gpio_pin_t *x = (gpio_pin_t *)&pin;

@@ -75,6 +75,8 @@ void io_cfg_output(uint8_t pin);
 
 void io_cfg_input(uint8_t pin);
 
+void io_cfg_disable(uint8_t pin);
+
 void io_write_pin(uint8_t pin,uint8_t val);
 
 void io_set_pin(uint8_t pin);
