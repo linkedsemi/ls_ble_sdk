@@ -33,6 +33,8 @@ void crypt_status_set(bool);
 
 void adc12b_status_set(bool);
 
+void app_status_set(bool);
+
 bool peri_status_busy(void);
 
 bool app_event_status_busy(void);
