@@ -648,7 +648,7 @@ void io_pull_write(uint8_t pin,io_pull_type_t pull)
 {
     gpio_pin_t *x = (gpio_pin_t *)&pin;
     reg_lsgpio_t *gpiox = GPIO_GetPort(x->port);
-    gpiox->PUPD = pull << 2 * x->num;
+    MODIFY_REG(gpiox->PUPD, 0x3 << 2*x->num, pull << 2*x->num);
 }
 
 io_pull_type_t io_pull_read(uint8_t pin)
