@@ -4,6 +4,7 @@ import os
 import SCons.Tool
 import SCons.Builder
 import subprocess
+import shutil
 
 def mdk_builder(target,source,env):
     prj = mdk_xml_schema.Project()
@@ -15,6 +16,18 @@ def mdk_builder(target,source,env):
     prj_dir = os.path.join(env['PROJ_DIR'].srcnode().abspath,'mdk')
     if os.path.exists(prj_dir)==False:
         os.mkdir(prj_dir)
+    jlink_script_src_dir = os.path.join(env.Dir('.').abspath,'tools\\prog\\LinkedSemi\\LE501X.jlinkscript')
+    jlink_script_dst_dir = os.path.join(prj_dir, 'JLinkSettings.jlinkscript')
+
+#    print(jlink_script_src_dir)
+#    print(jlink_script_dst_dir)
+    try:
+        shutil.copy(jlink_script_src_dir, jlink_script_dst_dir)
+    except IOError as e:
+        print("Unable to copy jlink script file")
+    except:
+        print("Unexpected error:", sys.exc_info())
+    
     inc_path_str = ""
     for node_path in env.Dir(env['CPPPATH']):
         inc_path_str = inc_path_str + os.path.relpath(node_path.abspath, prj_dir) + ";"
@@ -78,7 +91,7 @@ def generate(env):
     env['BUILDERS']['Program'] = SCons.Builder.Builder(action = mdk_builder)
     env['UV'] = 'C:/Keil_v5/UV4/UV4.exe'
     SCons.Tool.createProgBuilder(env)
-
+    
 def exists(env):
     return True
 
