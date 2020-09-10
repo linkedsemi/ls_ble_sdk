@@ -81,7 +81,7 @@
           <AfterMake>
             <RunUserProg1>1</RunUserProg1>
             <RunUserProg2>0</RunUserProg2>
-            <UserProg1Name>..\..\..\..\tools\disassemble.bat @L</UserProg1Name>
+            <UserProg1Name>..\..\..\..\tools\disassemble.bat @L ..\..\..\..</UserProg1Name>
             <UserProg2Name></UserProg2Name>
             <UserProg1Dos16Mode>0</UserProg1Dos16Mode>
             <UserProg2Dos16Mode>0</UserProg2Dos16Mode>
@@ -336,7 +336,7 @@
               <MiscControls>--c99 -O2 --wchar32</MiscControls>
               <Define></Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\..\..\inc;..\..\..\..\inc\cmsis;..\..\..\..\inc\prf;..\..\..\module\crc;..\..\..\module\debug;..\..\..\module\debug\RTT;..\..\..\module\static_buffer;..\..\..\module\tinyfs;..\..\..\module\tinycrypt\lib\include;..\..\..\peripheral\qspi_flash;..\..\..\peripheral\cache;..\..\..\peripheral\calc;..\..\..\peripheral\uart;..\..\..\peripheral\trng;..\..\..\peripheral\ecc;..\..\..\peripheral\crypt;..\..\..\peripheral\gpio;..\..\..\peripheral\iwdt;..\..\..\peripheral\adc;..\..\..\peripheral\timer;..\..\..\peripheral;..\..\..\soc\arm_cm;..\..\..\soc\arm_cm\le501x;..\..\..\soc\arm_cm\le501x\integration;..\..\..;..;</IncludePath>
+              <IncludePath>..\..\..\..\inc;..\..\..\..\inc\cmsis;..\..\..\..\inc\prf;..\..\..\module\crc;..\..\..\module\debug;..\..\..\module\debug\RTT;..\..\..\module\static_buffer;..\..\..\module\tinyfs;..\..\..\module\tinycrypt\lib\include;..\..\..\peripheral\qspi_flash;..\..\..\peripheral\cache;..\..\..\peripheral\calc;..\..\..\peripheral\uart;..\..\..\peripheral\trng;..\..\..\peripheral\ecc;..\..\..\peripheral\crypt;..\..\..\peripheral\iwdt;..\..\..\peripheral\adc;..\..\..\peripheral\timer;..\..\..\peripheral;..\..\..\soc\arm_cm;..\..\..\soc\arm_cm\le501x;..\..\..\soc\arm_cm\le501x\integration;..\..\..;..;</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -354,7 +354,7 @@
               <MiscControls></MiscControls>
               <Define></Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\..\..\inc;..\..\..\..\inc\cmsis;..\..\..\..\inc\prf;..\..\..\module\crc;..\..\..\module\debug;..\..\..\module\debug\RTT;..\..\..\module\static_buffer;..\..\..\module\tinyfs;..\..\..\module\tinycrypt\lib\include;..\..\..\peripheral\qspi_flash;..\..\..\peripheral\cache;..\..\..\peripheral\calc;..\..\..\peripheral\uart;..\..\..\peripheral\trng;..\..\..\peripheral\ecc;..\..\..\peripheral\crypt;..\..\..\peripheral\gpio;..\..\..\peripheral\iwdt;..\..\..\peripheral\adc;..\..\..\peripheral\timer;..\..\..\peripheral;..\..\..\soc\arm_cm;..\..\..\soc\arm_cm\le501x;..\..\..\soc\arm_cm\le501x\integration;..\..\..;..;</IncludePath>
+              <IncludePath>..\..\..\..\inc;..\..\..\..\inc\cmsis;..\..\..\..\inc\prf;..\..\..\module\crc;..\..\..\module\debug;..\..\..\module\debug\RTT;..\..\..\module\static_buffer;..\..\..\module\tinyfs;..\..\..\module\tinycrypt\lib\include;..\..\..\peripheral\qspi_flash;..\..\..\peripheral\cache;..\..\..\peripheral\calc;..\..\..\peripheral\uart;..\..\..\peripheral\trng;..\..\..\peripheral\ecc;..\..\..\peripheral\crypt;..\..\..\peripheral\iwdt;..\..\..\peripheral\adc;..\..\..\peripheral\timer;..\..\..\peripheral;..\..\..\soc\arm_cm;..\..\..\soc\arm_cm\le501x;..\..\..\soc\arm_cm\le501x\integration;..\..\..;..;</IncludePath>
             </VariousControls>
           </Aads>
           <LDads>
@@ -436,6 +436,11 @@
               <FilePath>..\..\..\module\tinycrypt\lib\source\ecc_platform_specific.c</FilePath>
             </File>
             <File>
+              <FileName>fifo.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\module\static_buffer\fifo.c</FilePath>
+            </File>
+            <File>
               <FileName>flash_svcall.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\soc\arm_cm\flash_svcall.c</FilePath>
@@ -494,11 +499,6 @@
               <FileName>lsecc.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\peripheral\ecc\lsecc.c</FilePath>
-            </File>
-            <File>
-              <FileName>lsgpio.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\peripheral\gpio\lsgpio.c</FilePath>
             </File>
             <File>
               <FileName>lsiwdt.c</FileName>
