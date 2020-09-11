@@ -1,6 +1,6 @@
 #include "uart_param.h"
 #include "field_manipulate.h"
-#include "uart.h"
+#include "lsuart.h"
 #include "ARMCM3.h"
 #include "HAL_def.h"
 #include "reg_sysc_per.h"

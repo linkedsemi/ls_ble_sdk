@@ -1,7 +1,7 @@
 #include "uart_param.h"
 #include "reg_rcc.h"
 #include "field_manipulate.h"
-#include "uart.h"
+#include "lsuart.h"
 #include "le501x.h"
 #include "HAL_def.h"
 #include "sys_stat.h"

@@ -1,6 +1,6 @@
 
 #include <stdio.h>
-#include "uart.h"
+#include "lsuart.h"
 #include "uart_param.h" 
 #include "log.h"
 

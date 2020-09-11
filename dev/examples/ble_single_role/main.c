@@ -5,7 +5,7 @@
 #include "log.h"
 #include "ls_dbg.h"
 #include "cpu.h"
-#include "uart.h"
+#include "lsuart.h"
 #include "builtin_timer.h"
 #include <string.h>
 #include "co_math.h"

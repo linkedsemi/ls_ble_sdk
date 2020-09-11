@@ -23,7 +23,7 @@ UART
 .. code ::
 
     #include "io_config.h"
-    #include "uart.h"
+    #include "lsuart.h"
     UART_HandleTypeDef UART_Config; 
 
     void uart1_init()

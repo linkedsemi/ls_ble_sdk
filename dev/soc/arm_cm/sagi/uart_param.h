@@ -2,7 +2,7 @@
 #define UART_PARAM_H_
 
 #include <stddef.h>
-#include "uart.h"
+#include "lsuart.h"
 #include "reg_uart.h"
 #include "field_manipulate.h"
 

@@ -4,7 +4,7 @@
 #include "at_cmd_parse.h"
 #include "builtin_timer.h"
 #include "ls_sys.h"
-#include "uart.h"
+#include "lsuart.h"
 #include "cpu.h"
 #include "io_config.h"
 #include "tinyfs.h"

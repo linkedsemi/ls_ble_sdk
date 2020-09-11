@@ -17,7 +17,7 @@
         "reg_lsqspi.h": "c",
         "spi_flash_int.h": "c",
         "spi_flash.h": "c",
-        "uart.h": "c",
+        "lsuart.h": "c",
         "reg_uart.h": "c",
         "log.h": "c",
         "ls_ip_config.h": "c",

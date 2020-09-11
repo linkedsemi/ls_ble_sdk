@@ -12,8 +12,6 @@
 #include "reg_lsgpio.h"
 #include "ls_dbg.h"
 #include "reg_lsqspi.h"
-#include "uart.h"
-#include "lsgpio.h"
 #include "cpu.h"
 #include "io_config.h"
 #include "systick.h"

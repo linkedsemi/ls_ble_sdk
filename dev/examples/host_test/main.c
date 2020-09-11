@@ -1,6 +1,6 @@
 #include "ls_ble.h"
 #include "platform.h"
-#include "uart.h"
+#include "lsuart.h"
 //#include "io_config.h"
 UART_HandleTypeDef UART_Config; 
 static void (*eif_read_callback)(void *,uint8_t);

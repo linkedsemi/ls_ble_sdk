@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include "log.h"
 #include "SEGGER_RTT.h"
-#include "uart.h"
+#include "lsuart.h"
 #include "io_config.h"
 
 #define JLINK_RTT           1

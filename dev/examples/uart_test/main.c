@@ -1,4 +1,4 @@
-#include "uart.h"
+#include "lsuart.h"
 #include "lsgpio.h"
 #include "le501x.h"
 #include "platform.h"

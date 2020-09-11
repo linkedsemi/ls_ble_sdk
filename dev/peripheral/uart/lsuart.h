@@ -1,5 +1,5 @@
-#ifndef UART_H_
-#define UART_H_
+#ifndef LSUART_H_
+#define LSUART_H_
 #include <stdbool.h>
 #include "reg_uart.h"
 #include "HAL_def.h"
