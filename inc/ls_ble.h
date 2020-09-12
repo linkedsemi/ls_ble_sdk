@@ -526,6 +526,23 @@ enum gatt_evt_type
     GATT_EVT_MAX
 };
 
+enum svc_set_value_status
+{
+    SVC_SET_VAL_NO_ERROR,
+    SVC_SET_VAL_NOT_SUPPORTED,
+    SVC_SET_VAL_INVALID_HANDLE,
+    SVC_SET_VAL_INVALID_OFFSET,
+    SVC_SET_VAL_INVALID_LENGTH,
+};
+
+enum svc_get_value_status
+{
+    SVC_GET_VAL_NO_ERROR,
+    SVC_GET_VAL_NOT_SUPPORTED,
+    SVC_GET_VAL_INVALID_HANDLE,
+    SVC_GET_VAL_APP_ERROR,
+};
+
 struct gatt_svc_env
 {
     void *hdr;
@@ -654,6 +671,10 @@ void dev_manager_stack_init(struct ble_stack_cfg *cfg);
 void dev_manager_get_identity_bdaddr(uint8_t *addr,bool *random);
 
 void dev_manager_add_service(struct svc_decl *svc);
+
+uint8_t dev_manager_svc_set_value(uint16_t handle, uint16_t length, uint8_t *value);
+
+uint8_t dev_manager_svc_get_value(uint16_t handle, uint8_t *value, uint16_t *length);
 
 void dev_manager_create_legacy_adv_object(struct legacy_adv_obj_param *p_param);
 
