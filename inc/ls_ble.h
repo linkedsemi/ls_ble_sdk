@@ -408,6 +408,9 @@ struct pair_feature
 
 struct gap_connected
 {
+    uint16_t con_interval;
+    uint16_t con_latency;
+    uint16_t sup_to;
     uint8_t peer_id;
 };
 
