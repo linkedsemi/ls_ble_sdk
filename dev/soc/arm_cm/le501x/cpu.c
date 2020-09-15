@@ -2,7 +2,7 @@
 #include "cpu.h"
 #include "compile_flag.h"
 
-static uint32_t critical_nested_cnt;
+uint32_t critical_nested_cnt;
 XIP_BANNED void enter_critical()
 {
     __disable_irq();

@@ -15,6 +15,7 @@
 #include "common.h"
 #include "systick.h"
 #include "prf_fotas.h"
+#include "cpu.h"
 #define FOTA_IMAGE_BASE (0x1803d000)
 #define APP_IMAGE_BASE (0x18002000)
 #define OTA_COPY_STATUS_OFFSET (OTA_INFO_OFFSET + FLASH_PAGE_SIZE)
@@ -215,11 +216,13 @@ static bool ota_copy_info_get(struct fota_image_info *ptr)
 
 void boot_ram_start(uint32_t exec_addr)
 {
+    extern uint32_t critical_nested_cnt;
+    critical_nested_cnt = 0;
     switch_to_rc32k();
     clk_switch();
     power_up_hardware_modules();
     remove_hw_isolation();
-    __disable_irq();
+    enter_critical();
     systick_start();
     spi_flash_drv_var_init(false,false);
     spi_flash_init();
