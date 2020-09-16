@@ -13,10 +13,6 @@
 
 #define TIMx   LSGPTIM3
 
-#define LED_PORT_0 LSGPIOA
-#define LED_PORT_1 LSGPIOA
-#define LED_PIN_0 GPIO_PIN_0
-#define LED_PIN_1 GPIO_PIN_1
 
 #define GENERIC_LEVEL_MIN (-32767-1)
 
@@ -31,5 +27,6 @@ void sigmesh_set_lightness(uint16_t level);
 void sigmesh_set_onoff(uint8_t on_off);
 uint16_t sigmesh_get_lightness(void);
 uint8_t sigmesh_get_onoff(void);
+void light_button_init(void);
 
 #endif

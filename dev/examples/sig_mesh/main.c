@@ -30,7 +30,6 @@ uint8_t vendor_tid = 0;
 #define RECORD_KEY2 2
 
 tinyfs_dir_t mesh_dir;
-struct mesh_model_info model_env;
 
 SIGMESH_NodeInfo_TypeDef Node_Get_Proved_State = 0;
 SIGMESH_NodeInfo_TypeDef Node_Proved_State = 0;
@@ -38,13 +37,15 @@ SIGMESH_NodeInfo_TypeDef Node_Proved_State = 0;
 static uint8_t dev_uuid[16] = {0x92,0x88,0x8A,0xFB,0xF0,0xCA,0x8F,0x45,0xB2,0xDF,0x93,0xEE,0x71,0x12,0x7C,0x68};
 static uint8_t auth_data[16] = {0xF4,0xC7,0x0B,0xE8,0x10,0xE1,0x3A,0xAE,0xF8,0x3B,0x05,0xD4,0xA1,0xDA,0x8C,0xF3};
 uint8_t rsp_data_info[40] = {0};
-uint8_t tmall_ModelHandle = 0;
+struct mesh_model_info model_env;
+struct mesh_publish_info_ind mesh_publish_env;
+uint8_t model_tid = 0;
 
 static uint16_t mesh_src_addr;
 static uint8_t adv_obj_hdl;
 static bool mesh_node_prov_state = false;
 static void create_adv_obj(void);
-
+void app_client_model_tx_message_handler(uint8_t update_state);
 
 void auto_check_unbind(void)
 {
@@ -120,6 +121,25 @@ static void gatt_manager_callback(enum gatt_evt_type type, union gatt_evt_u *evt
     
 }
 
+void app_client_model_tx_message_handler(uint8_t update_state)
+{
+    if (mesh_publish_env.model_lid)
+    {
+       struct model_cli_trans_info param;
+        model_tid++;
+
+       param.mdl_lid = mesh_publish_env.model_lid;
+       param.app_key_lid = model_env.app_key_lid;
+       param.dest_addr =  mesh_publish_env.addr;
+       param.state_1 = update_state;
+       param.state_2 = 0x00;
+       param.delay_ms=50;
+       param.trans_info=(uint16_t)(model_tid<<8);
+       param.trans_time_ms=100;
+       mesh_model_client_tx_message_handler(&param);
+    }
+}
+
 static void mesh_manager_callback(enum mesh_evt_type type, union ls_sig_mesh_evt_u *evt)
 {
     switch (type)
@@ -138,17 +158,19 @@ static void mesh_manager_callback(enum mesh_evt_type type, union ls_sig_mesh_evt
     break;
     case MESH_ACTIVE_REGISTER_MODEL:
     {
-        LOG_I("mesh model nb:%d",evt->sig_mdl_info.nb_model);
-        for(uint8_t i=0; i<evt->sig_mdl_info.nb_model; i++)
+        for (uint8_t i = 0; i < model_env.nb_model; i++)
         {
-            LOG_I("Model id:%04x",evt->sig_mdl_info.info[i].model_id);
-            LOG_I("Model handle:%04x",evt->sig_mdl_info.info[i].model_lid);
-            LOG_I("Element id:%04x",evt->sig_mdl_info.info[i].element_id);
+            model_env.info[i].model_lid = evt->sig_mdl_info.info[i].model_lid;
         }
+        model_env.app_key_lid = evt->sig_mdl_info.app_key_lid;
+
     }
     break;
     case MESH_ACTIVE_MODEL_PUBLISH:
     {
+        mesh_publish_env.model_lid = evt->mesh_publish_info.model_lid;
+        mesh_publish_env.period_ms = evt->mesh_publish_info.period_ms;
+        mesh_publish_env.addr =  evt->mesh_publish_info.addr;
     }
     break;
     case MESH_ACTIVE_MODEL_GROUP_MEMBERS:
@@ -268,17 +290,17 @@ static void mesh_manager_callback(enum mesh_evt_type type, union ls_sig_mesh_evt
     break;
     case MESH_ADV_REPORT:
     {
-        if(evt->adv_report.adv_addr->addr[5] == 0x20 && evt->adv_report.adv_addr->addr[4] == 0x17)
-        {
-            LOG_I("dev addr: %02x:%02x:%02x:%02x:%02x:%02x",evt->adv_report.adv_addr->addr[5],
-                                                            evt->adv_report.adv_addr->addr[4],
-                                                            evt->adv_report.adv_addr->addr[3],
-                                                            evt->adv_report.adv_addr->addr[2],
-                                                            evt->adv_report.adv_addr->addr[1],
-                                                            evt->adv_report.adv_addr->addr[0]);
-            //LOG_HEX(evt->adv_report.adv_addr.addr,6);
-            LOG_HEX(evt->adv_report.data,evt->adv_report.length);
-        }
+        // if(evt->adv_report.adv_addr->addr[5] == 0x20 && evt->adv_report.adv_addr->addr[4] == 0x17)
+        // {
+        //     LOG_I("dev addr: %02x:%02x:%02x:%02x:%02x:%02x",evt->adv_report.adv_addr->addr[5],
+        //                                                     evt->adv_report.adv_addr->addr[4],
+        //                                                     evt->adv_report.adv_addr->addr[3],
+        //                                                     evt->adv_report.adv_addr->addr[2],
+        //                                                     evt->adv_report.adv_addr->addr[1],
+        //                                                     evt->adv_report.adv_addr->addr[0]);
+        //     //LOG_HEX(evt->adv_report.adv_addr.addr,6);
+        //     LOG_HEX(evt->adv_report.data,evt->adv_report.length);
+        // }
         
     }
     break;
@@ -372,11 +394,17 @@ static void dev_manager_callback(enum dev_evt_type type, union dev_evt_u *evt)
     {
         prf_ls_sig_mesh_callback_init(mesh_manager_callback);
 
-        model_env.nb_model = 2;
+        model_env.nb_model = 3;
         model_env.info[0].sig_model_cfg_idx = MESH_MDL_CFG_ONOFF;
         model_env.info[0].element_id = 0;
         model_env.info[1].sig_model_cfg_idx = MESH_MDL_CFG_LEVEL;
         model_env.info[1].element_id = 0;
+        model_env.info[2].sig_model_cfg_idx = MESH_CMDL_CFG_IDX_GENC_ONOFF;
+        model_env.info[2].element_id = 0;
+        model_env.app_key_lid = 0;
+        model_env.info[0].model_lid =0;
+        model_env.info[1].model_lid =0;
+        model_env.info[2].model_lid =0;
         ls_sig_mesh_init(&model_env);
     }
     break;
@@ -405,6 +433,7 @@ int main()
 {
     sys_init_app();
     sigmesh_pwm_init();
+    light_button_init();
     ble_init();
     auto_check_unbind();
     dev_manager_init(dev_manager_callback);

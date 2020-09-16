@@ -265,6 +265,28 @@ struct rsp_model_info
     uint8_t info[MAX_MESH_MODEL_MSG_BUFFER];
 };
 
+struct model_cli_set_state_info
+{
+    uint32_t state_1;
+    uint32_t state_2;
+    uint16_t dest_addr;
+    uint16_t set_info;
+    uint8_t mdl_lid;
+    uint8_t app_key_lid;
+};
+
+struct model_cli_trans_info
+{
+    uint32_t state_1;
+    uint32_t state_2;
+    uint32_t trans_time_ms;
+    uint16_t trans_info;
+    uint16_t dest_addr;
+    uint16_t delay_ms;
+    uint8_t mdl_lid;
+    uint8_t app_key_lid;
+};
+
 struct start_glp_info
 {
     uint8_t RxDelyMs;
@@ -313,16 +335,24 @@ struct report_mesh_timer_state_info
 
 struct model_id_info
 {
-    uint8_t sig_model_cfg_idx;
     uint8_t element_id;
     uint8_t model_lid;
+    uint16_t sig_model_cfg_idx;
     uint32_t model_id;
 };
 
 struct mesh_model_info
 {
     uint8_t nb_model;
+    uint8_t app_key_lid;
     struct model_id_info info[MAX_MESH_MODEL_NB];
+};
+
+struct mesh_publish_info_ind
+{
+    uint8_t  model_lid;
+    uint32_t period_ms;
+    uint16_t addr;
 };
 
 union ls_sig_mesh_evt_u {
@@ -337,6 +367,7 @@ union ls_sig_mesh_evt_u {
     struct adv_report_evt adv_report;
     struct model_state_upd mdl_state_upd_ind;
     struct mesh_model_info sig_mdl_info;
+    struct mesh_publish_info_ind mesh_publish_info;
 };
 
 struct ls_sig_mesh_cfg
@@ -369,6 +400,8 @@ void set_prov_param(struct mesh_prov_info *param);
 void set_prov_auth_info(struct mesh_prov_auth_info *param);
 void model_subscribe(uint8_t const ModelHandle, uint16_t const Addr);
 void rsp_model_info_ind(struct rsp_model_info *param);
+void mesh_model_client_set_state_handler(struct model_cli_set_state_info *param);
+void mesh_model_client_tx_message_handler(struct model_cli_trans_info *param);
 void TIMER_Set(uint8_t TimerID, uint32_t DelayMS);
 void TIMER_Cancel(uint8_t TimerID);
 void SIGMESH_UnbindAll(void);

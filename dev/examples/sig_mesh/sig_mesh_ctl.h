@@ -9,8 +9,9 @@ extern uint16_t mesh_key_lid;
 enum MESH_MDL_CFG
 {
     /// ************ Generic Server ************
+    MESH_MDL_CFG_GENS_MIN = 0,
     /// Generic OnOff Server
-    MESH_MDL_CFG_ONOFF = 0,
+    MESH_MDL_CFG_ONOFF = MESH_MDL_CFG_GENS_MIN,
     /// Generic Level Server
     MESH_MDL_CFG_LEVEL,
     /// Generic Default Transition Time
@@ -25,11 +26,45 @@ enum MESH_MDL_CFG
     MESH_MDL_CFG_LOCATION,
     /// ************ Lighting Server ***********
     /// Light Lightness Server
-    MESH_MDL_CFG_LIGHTS_LN = 50,
+    MESH_MDL_CFG_LIGHTS_LN = MESH_MDL_CFG_GENS_MIN+50,
     /// Light CTL Server
     MESH_MDL_CFG_LIGHTS_CTL,
     /// Light HSL Server
     MESH_MDL_CFG_LIGHTS_HSL
+};
+
+/// Client Model Index
+enum MESH_MDL_CLI_CFG
+{
+    /// ************ Generic ************
+    MESH_CMDL_CFG_IDX_GENC_MIN                 = 0x100,
+    /// Generic OnOff Client
+    MESH_CMDL_CFG_IDX_GENC_ONOFF               = MESH_CMDL_CFG_IDX_GENC_MIN,
+    /// Generic Level Client
+    MESH_CMDL_CFG_IDX_GENC_LEVEL,
+    /// Generic Default Transition Time Client
+    MESH_CMDL_CFG_IDX_GENC_DFT_TRANS_TIME,
+    /// Generic Power OnOff Client
+    MESH_CMDL_CFG_IDX_GENC_POWER_ONOFF,
+    /// Generic Power Level Client
+    MESH_CMDL_CFG_IDX_GENC_POWER_LEVEL,
+    /// Generic Battery Client
+    MESH_CMDL_CFG_IDX_GENC_BATTERY,
+    /// Generic Location Client
+    MESH_CMDL_CFG_IDX_GENC_LOCATION,
+    /// Generic Property Client
+    MESH_CMDL_CFG_IDX_GENC_PROPERTY,
+
+    /// ************ Lighting ***********
+
+    /// Light Lightness Client
+    MESH_CMDL_CFG_IDX_LIGHTC_LN                = MESH_CMDL_CFG_IDX_GENC_MIN+50,
+    /// Light CTL Client
+    MESH_CMDL_CFG_IDX_LIGHTC_CTL,
+    /// Light HSL Client
+    MESH_CMDL_CFG_IDX_LIGHTC_HSL,
+    /// Light xyL Client
+    MESH_CMDL_CFG_IDX_LIGHTC_XYL,
 };
 
 // Generic OnOff Set
