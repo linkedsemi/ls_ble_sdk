@@ -306,10 +306,10 @@ static void UART_SetConfig(UART_HandleTypeDef *huart)
         Set PCE and PS bits according to huart->Init.Parity value
         Set TE and RE bits according to huart->Init.Mode value
         Set OVER8 bit according to huart->Init.OverSampling value*/
+    huart->UARTX->FCR = UART_FCR_TFRST_MASK | UART_FCR_RFRST_MASK | UART_FCR_FIFOEN_MASK;
     huart->UARTX->LCR = FIELD_BUILD(UART_LCR_DLS,huart->Init.WordLength)|FIELD_BUILD(UART_LCR_STOP,huart->Init.StopBits)
                                   |FIELD_BUILD(UART_LCR_PS,huart->Init.Parity)|FIELD_BUILD(UART_LCR_MSB,huart->Init.MSBEN)
                                   |FIELD_BUILD(UART_LCR_RXEN,1)|FIELD_BUILD(UART_LCR_BRWEN,1);
-    huart->UARTX->FCR = UART_FCR_TFRST_MASK | UART_FCR_RFRST_MASK | UART_FCR_FIFOEN_MASK;
     huart->UARTX->BRR  =  huart->Init.BaudRate;
     REG_FIELD_WR(huart->UARTX->LCR,UART_LCR_BRWEN,0);
 }
@@ -385,7 +385,7 @@ static void UART_Receive_IT(UART_HandleTypeDef *huart)
             {
                 REG_FIELD_WR(huart->UARTX->FCR,UART_FCR_RXTL,UART_FIFO_RL_8);
                 huart->RxState = HAL_UART_STATE_READY;
-                REG_FIELD_WR(huart->UARTX->IDR,UART_IDR_RXRD,1);//need?
+                REG_FIELD_WR(huart->UARTX->IDR,UART_IDR_RXRD,1);
                 HAL_UART_RxCpltCallback(huart,huart->rx_arg);
                 return;
             }

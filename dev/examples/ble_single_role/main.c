@@ -218,6 +218,7 @@ static void ls_single_role_timer_cb(void *param)
 }
 static void ls_uart_init(void)
 {
+    uart1_io_init(PB00, PB01);
     UART_Config.UARTX = UART1;
     UART_Config.Init.BaudRate = UART_BAUDRATE_115200;
     UART_Config.Init.MSBEN = 0;
@@ -225,8 +226,6 @@ static void ls_uart_init(void)
     UART_Config.Init.StopBits = UART_STOPBITS1;
     UART_Config.Init.WordLength = UART_BYTESIZE8;
     HAL_UART_Init(&UART_Config);
-
-    uart1_io_init(PB00, PB01);
 }
 #if SLAVE_SERVER_ROLE == 1
 static void ls_uart_server_init(void)

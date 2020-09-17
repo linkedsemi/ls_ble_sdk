@@ -46,7 +46,7 @@ bool uart_eif_flow_off(void)
 
 static void uart_test_init(void)
 {
-//    uart1_io_init(PB00,PB01);
+    uart1_io_init(PB00,PB01);
     UART_Config.UARTX = UART1;
     UART_Config.Init.BaudRate = UART_BAUDRATE_115200;
     UART_Config.Init.MSBEN = 0;
