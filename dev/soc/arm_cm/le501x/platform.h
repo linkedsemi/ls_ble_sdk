@@ -63,6 +63,8 @@ void power_up_hardware_modules(void);
 
 void remove_hw_isolation(void);
 
+uint32_t config_word_get(uint32_t offset);
+
 #define DELAY_US(a) arm_cm_delay_asm((a)*(SDK_HCLK_MHZ/4))
 
 #endif

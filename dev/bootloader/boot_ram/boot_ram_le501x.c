@@ -16,8 +16,8 @@
 #include "systick.h"
 #include "prf_fotas.h"
 #include "cpu.h"
-#define FOTA_IMAGE_BASE (0x1803d000)
-#define APP_IMAGE_BASE (0x18002000)
+#define APP_IMAGE_BASE_OFFSET (0x24)
+#define FOTA_IMAGE_BASE_OFFSET (0x28)
 #define OTA_COPY_STATUS_OFFSET (OTA_INFO_OFFSET + FLASH_PAGE_SIZE)
 
 static void swd_pull_down()
@@ -181,19 +181,19 @@ static bool need_foreground_ota()
 static void boot_app(uint32_t base)
 {
     uint32_t *msp = (void *)base;
-    void (**reset_handler)(void) = (void *)(APP_IMAGE_BASE + 4);
+    void (**reset_handler)(void) = (void *)(base + 4);
     __set_MSP(*msp);
     (*reset_handler)();
 }
 
-static void fw_copy(struct fota_image_info *ptr)
+static void fw_copy(struct fota_image_info *ptr,uint32_t image_base)
 {
     static uint8_t fw_buf[FLASH_PAGE_SIZE];
     uint16_t i;
     for(i=0;i<CEILING(ptr->size, FLASH_PAGE_SIZE);++i)
     {
         spi_flash_quad_io_read(ptr->base - FLASH_BASE_ADDR + i*FLASH_PAGE_SIZE, fw_buf, FLASH_PAGE_SIZE);
-        spi_flash_quad_page_program(APP_IMAGE_BASE - FLASH_BASE_ADDR + i*FLASH_PAGE_SIZE,fw_buf, FLASH_PAGE_SIZE);
+        spi_flash_quad_page_program(image_base - FLASH_BASE_ADDR + i*FLASH_PAGE_SIZE,fw_buf, FLASH_PAGE_SIZE);
     }
 }
 
@@ -234,15 +234,15 @@ void boot_ram_start(uint32_t exec_addr)
     uint32_t image_base;
     if(need_foreground_ota())
     {
-        image_base = FOTA_IMAGE_BASE;
+        image_base = config_word_get(FOTA_IMAGE_BASE_OFFSET);
     }else{
+        image_base = config_word_get(APP_IMAGE_BASE_OFFSET);
         struct fota_image_info image;
         if(ota_copy_info_get(&image))
         {
-            fw_copy(&image);
+            fw_copy(&image,image_base);
             ota_settings_erase();
         }
-        image_base = APP_IMAGE_BASE;
     }
     boot_app(image_base);
 }

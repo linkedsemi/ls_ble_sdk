@@ -15,12 +15,16 @@ if ic == 'le501x':
     spi_clk = 0
     cfg_info = 0xffffffbf
     image_crypt = 0xffffffff
-    sbl_code_start = flash_base+0x1000
+    data_storage_base = 0x18001000
+    data_storage_size = 0x3000
+    sbl_code_start = data_storage_base+data_storage_size
     sbl_code_length = len(sbl_data)
+    app_image_base = sbl_code_start+0x1000
+    fota_image_base = 0x1803d000
     crc_rslt = zlib.crc32(sbl_data)
     crc_bytes = struct.pack("I",crc_rslt)
     sbl_data = sbl_data + crc_bytes
-    info_head = struct.pack('LLHHLLLLLL',test_word0,test_word1,cap_delay,spi_clk,cfg_info,image_crypt,0xffffffff,0xffffffff,sbl_code_start,sbl_code_length)
+    info_head = struct.pack('LLHHLLLLLLLLL',test_word0,test_word1,cap_delay,spi_clk,cfg_info,image_crypt,0xffffffff,0xffffffff,sbl_code_start,sbl_code_length,app_image_base,fota_image_base,data_storage_base)
 else:
     flash_base = 0x00800000
     code_offset = 0x1000

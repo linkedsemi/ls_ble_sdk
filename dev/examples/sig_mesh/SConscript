@@ -7,4 +7,4 @@ src = [
 inc = [
     '.'
 ]
-app_build('sig_mesh',src,inc)
+app_build('sig_mesh',src,inc,mesh=True)

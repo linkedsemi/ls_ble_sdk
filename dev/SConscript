@@ -1,5 +1,5 @@
 
-Import('dev_env','target_fw','target_lib')
+Import('dev_env','target_fw','target_ble_lib','target_mesh_lib','target_mesh_fw')
 
 module_src,module_inc = SConscript(dirs='module',exports = ['dev_env'])
 peripheral_src,peripheral_inc = SConscript(dirs='peripheral',exports = ['dev_env'])
@@ -11,7 +11,6 @@ dev_env['SDK_SRC'] = sdk_src
 dev_env['SDK_STARTUP_SRC'] = startup_src
 dev_env.Append(CPPPATH = list(map(lambda x:'#/'+x.srcnode().path,sdk_inc)))
 dev_env.Append(LINKFLAGS = ' $GC_OPTION ')
-dev_env['TARGET_LIB'] = target_lib
     
 def image_build(name,src,inc,linkscript = ''):
     global dev_env
@@ -32,17 +31,21 @@ def image_build(name,src,inc,linkscript = ''):
 
     return img_env,img_target
   
-def app_build(app_name,src,inc,linkscript = ''):
-    global target_lib
+def app_build(app_name,src,inc,linkscript = '',mesh = False):
+    global target_ble_lib
     global target_fw
+    global target_mesh_fw
     app_env,app_target = image_build(app_name,src,inc,linkscript)
-    app_env.Append(LIBS = [target_lib])
+    app_env.Append(LIBS = [target_ble_lib])
+    if mesh:
+        app_env.Append(LIBS = [target_mesh_lib])
+        app_env.Depends(app_target,[target_mesh_fw])
+    else:
+        app_env.Depends(app_target,[target_fw])
     if not 'mdk' in app_env['TOOLS']:
         app_env.AddPostAction(app_target,Action('$OBJCOPY -O ihex $TARGET ${TARGET.base}.hex'))
-        app_env.Depends(app_target,[target_fw])
 
     return app_env,app_target
-
 
 SConscript(dirs = 'examples',exports=['app_build','image_build','dev_env'])
 SConscript(dirs = 'bootloader',exports=['dev_env'])

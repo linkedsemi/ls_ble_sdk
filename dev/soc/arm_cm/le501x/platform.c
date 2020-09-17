@@ -26,6 +26,7 @@
 #include "ls_dbg.h"
 #include "systick.h"
 
+#define DATA_STORAGE_BASE_OFFSET (0x2c)
 #define BASEBAND_MEMORY_ADDR   (0x50004000)
 #define IRQ_NVIC_PRIO(IRQn,priority) (((priority << (8U - __NVIC_PRIO_BITS)) & (uint32_t)0xFFUL) << _BIT_SHIFT(IRQn))
 
@@ -85,11 +86,16 @@ void ble_irq_clr_and_enable()
     ble_irq_enable();
 }
 
+uint32_t config_word_get(uint32_t offset)
+{
+    uint32_t data;
+    spi_flash_quad_io_read(offset,(uint8_t *)&data,sizeof(data));
+    return data;
+}
+
 static uint32_t flash_data_storage_base_offset()
 {
-    extern uint32_t __stack_lma__;
-    return ((uint32_t)&__stack_lma__ & ~0xfff) 
-        - TINYFS_SECTION_NUM*TINYFS_SECTION_SIZE - LSQSPI_MEM_MAP_BASE_ADDR;
+    return config_word_get(DATA_STORAGE_BASE_OFFSET);
 }
 
 void irq_reinit()
