@@ -17,9 +17,11 @@ if ic == 'le501x':
     image_crypt = 0xffffffff
     data_storage_base = 0x18001000
     data_storage_size = 0x3000
-    sbl_code_start = data_storage_base+data_storage_size
+    sbl_code_start = 0x18004000
+    assert(sbl_code_start >= data_storage_base + data_storage_size)
     sbl_code_length = len(sbl_data)
-    app_image_base = sbl_code_start+0x1000
+    app_image_base = 0x18005000
+    assert(app_image_base >= sbl_code_start + sbl_code_length)
     fota_image_base = 0x1803d000
     crc_rslt = zlib.crc32(sbl_data)
     crc_bytes = struct.pack("I",crc_rslt)
