@@ -15,7 +15,7 @@ Keil+JLink 构建、烧录、调试
 
  .. image:: MDK_02.png
 
-3. 在 flash download 选项卡中配置下载选项
+3. 在 flash download 选项卡中配置下载选项，不能选择 ``Erase Full Chip`` 选项
 
  .. image:: MDK_03.png
 
@@ -29,9 +29,9 @@ Keil+JLink 构建、烧录、调试
 
 烧录
 --------------
-#. 请完成 :ref:`vscode_debug` 中的JLINK烧录、调试的准备工作；
+#. **务必** 先完成 :ref:`vscode_debug` 中的JLINK烧录、调试的准备工作，以及 :ref:`env_setup` 中Python 3 + MDK-KEIL的环境搭建；
 
-#. 打开ble_sdk_app\\dev\\examples\\sbl\\mdk路径下的工程,编译生成 sbl\\mdk\\UVBuild\\info_sbl.hex 文件；
+#. 打开 ``ble_sdk_app\dev\examples\sbl\mdk`` 路径下的工程,编译生成 sbl\\mdk\\UVBuild\\info_sbl.hex 文件；
 
 #. 使用JFlash工具将 info_sbl.hex 和 dev\\soc\\arm_cm\\le501x\\bin\\fw.hex 分别烧录到芯片内；
 

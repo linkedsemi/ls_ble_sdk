@@ -31,7 +31,7 @@ SDK 下载链接：
 
 #. keil版本需要安装5.25以上,或者直接使用我们链接提供的版本， **不建议使用5.29以上版本**
 
-#. 打开下载的 `ls_ble_sdk <https://github.com/linkedsemi/ls_ble_sdk>`_ 目录，将当前目录下的 tools\\prog\\LinkedSemi\\flash_prog.elf 文件复制一份并修改文件名为flash_prog.FLM,并将flash_prog.FLM文件拷贝到keil安装目录下的 ARM\\Flash 路径中 
+#. 打开下载的 `ls_ble_sdk <https://gitee.com/linkedsemi/ls_ble_sdk>`_ 目录，将当前目录下的 ``tools\prog\LinkedSemi\flash_prog.elf`` 文件复制一份并修改文件名为flash_prog.FLM,并将flash_prog.FLM文件拷贝到keil安装目录下的 ``ARM\Flash`` 路径中 
 
 #. 将fromelf执行文件的所在路径添加系统环境变量中，重启keil生效，该文件所在路径在keil的安装目录下面 ``Keil_v5\ARM\ARMCC\bin`` ，否则在使用keil编译时会报“fromelf不是内部或外部命令，也不是可运行的程序或批处理文件”的警告。（ `如何设置添加环境变量 <https://jingyan.baidu.com/article/47a29f24610740c0142399ea.html>`_ ） 
 
