@@ -4,30 +4,16 @@
 #include "reg_rf.h"
 #include "reg_mdm2.h"
 #include "reg_syscfg.h"
-
 #define RF_GAIN_TBL_SIZE           (8)
 #define RF_PWR_TBL_SIZE            (8)
 
-#define PLL_GAIN_CAL_FRQ_DIS0  20
+#define PLL_GAIN_CAL_FRQ_DIS0  26
 
 uint8_t   pll_int_vtxd_ext;
 struct {
     uint8_t ldo_tx_trim:3,
             ldo_rx_trim:3;
 }rf_ret;
-
-// Gain table
-static const uint8_t RF_RX_GAIN_TBL[RF_GAIN_TBL_SIZE] =
-{
-    [0] = 43,
-    [1] = 37,
-    [2] = 31,
-    [3] = 25,
-    [4] = 19,
-    [5] = 13,
-    [6] = 7,
-    [7] = 1
-};
 
 // Power table
 static const int8_t RF_TX_PW_CONV_TBL[RF_PWR_TBL_SIZE] =
@@ -112,9 +98,9 @@ static void rf_reg_init()
                | FIELD_BUILD(RF_EN_PAHP, 0)
                | FIELD_BUILD(RF_EN_DAC_ZB, 0)
                | FIELD_BUILD(RF_EN_DAC_BLE, 0)
-               | FIELD_BUILD(RF_EN_PA_STG2, 0)
-               | FIELD_BUILD(RF_EN_PA_STG1, 0)
-               | FIELD_BUILD(RF_EN_PA, 0)
+               | FIELD_BUILD(RF_EN_PA_STG2, 1)
+               | FIELD_BUILD(RF_EN_PA_STG1, 1)
+               | FIELD_BUILD(RF_EN_PA, 1)
                | FIELD_BUILD(RF_EN_PLL, 1)
                | FIELD_BUILD(RF_EN_AGC, 0)
                | FIELD_BUILD(RF_EN_ADC, 1)
@@ -159,8 +145,8 @@ static void rf_reg_init()
                | FIELD_BUILD(RF_PA_BG_ADJ,4)
                | FIELD_BUILD(RF_EN_PA_IBG,1)
                | FIELD_BUILD(RF_PLL_BAND_CAL_SEL,0)
-               | FIELD_BUILD(RF_PLL_AFC_FRAC_EN,0)
-               | FIELD_BUILD(RF_PLL_AFC_DC_EN,0)
+               | FIELD_BUILD(RF_PLL_AFC_FRAC_EN,1)
+               | FIELD_BUILD(RF_PLL_AFC_DC_EN,1)
                | FIELD_BUILD(RF_PLL_VCTRL_EXT_EN,0)
                | FIELD_BUILD(RF_PLL_DIV_ADJ,2)
                | FIELD_BUILD(RF_PLL_SEL_RTX_BW,0);
@@ -172,19 +158,19 @@ static void rf_reg_init()
                | FIELD_BUILD(RF_PLL_FREQ_EXT_EN,0)
                | FIELD_BUILD(RF_PLL_FAST_LOCK_EN,1)
                | FIELD_BUILD(RF_PLL_REF_SEL,0)
-               | FIELD_BUILD(RF_PLL_VREF_ADJ,0)
+               | FIELD_BUILD(RF_PLL_VREF_ADJ,7)//
                | FIELD_BUILD(RF_PLL_FBDIV_PD_BYPS,0)
-               | FIELD_BUILD(RF_PLL_BW_ADJ,6)
+               | FIELD_BUILD(RF_PLL_BW_ADJ,2)  // 4uA  EYE OK!!
                | FIELD_BUILD(RF_PLL_LOCK_BYPS,0)
                | FIELD_BUILD(RF_PLL_CP_OS_ADJ,0)
                | FIELD_BUILD(RF_PLL_CP_OS_EN,0)
-               | FIELD_BUILD(RF_PLL_VCO_ADJ,2);//2020 5.22CAI 2-6
+               | FIELD_BUILD(RF_PLL_VCO_ADJ,2);//2020 5.22CAI 2-6  
     RF->REG14 = FIELD_BUILD(RF_PLL_FRAC,0)
                | FIELD_BUILD(RF_DAC_CAL_DATA_EXT,0)
                | FIELD_BUILD(RF_DAC_CAL_EN_EXT,0)
                | FIELD_BUILD(RF_DAC_EXT_EN,0)
                | FIELD_BUILD(RF_DAC_BLE_DELAY_ADJ,0x10);
-    RF->REG18 = FIELD_BUILD(RF_DAC_REFL_ADJ,4)
+    RF->REG18 = FIELD_BUILD(RF_DAC_REFL_ADJ,3)//9.16
                | FIELD_BUILD(RF_ADC_MUX_SEL,0)
                | FIELD_BUILD(RF_ADC_VREF_ADJ,0)
                | FIELD_BUILD(RF_ADC_TEST_SEL,0)
@@ -197,7 +183,7 @@ static void rf_reg_init()
                | FIELD_BUILD(RF_EN_LDO_PA_BYPS,0)
                | FIELD_BUILD(RF_EN_LDO_VCO_BYPS,0)
                | FIELD_BUILD(RF_ADC_REFBUF_LP,0)
-               | FIELD_BUILD(RF_DAC_REFH_ADJ,1)
+               | FIELD_BUILD(RF_DAC_REFH_ADJ,1) 
                | FIELD_BUILD(RF_PLL_DI_P,0x1f)
                | FIELD_BUILD(RF_PLL_FBDIV_PD,0)
                | FIELD_BUILD(RF_PLL_SDM_TEST_EN,0)
@@ -205,7 +191,7 @@ static void rf_reg_init()
     RF->REG20 = FIELD_BUILD(RF_BPF_IADJ,4)
                | FIELD_BUILD(RF_BPF_BW_ADJ,1)
                | FIELD_BUILD(RF_BPF_MODE_SEL,0)
-               | FIELD_BUILD(RF_BPF_CENT_ADJ,2)
+               | FIELD_BUILD(RF_BPF_CENT_ADJ,2)//9.14
                | FIELD_BUILD(RF_AT0_SEL,0xe)
                | FIELD_BUILD(RF_AT1_SEL,0xe);
     RF->REG24 = FIELD_BUILD(RF_AGC_S00L,8)
@@ -233,13 +219,13 @@ static void rf_reg_init()
                | FIELD_BUILD(RF_AGC_S10_LNA_ADJ,3)
                | FIELD_BUILD(RF_AGC_S01_LNA_ADJ,3)
                | FIELD_BUILD(RF_AGC_S00_LNA_ADJ,0);
-    RF->REG2C = FIELD_BUILD(RF_PLL_GAIN_CAL_SEL,0)
+    RF->REG2C = FIELD_BUILD(RF_PLL_GAIN_CAL_SEL,5)   //9.13
                | FIELD_BUILD(RF_PLL_FBDIV_RST_SEL,0)
                | FIELD_BUILD(RF_PLL_FBDIV_RST_EXT,0)
                | FIELD_BUILD(RF_PLL_PS_CNT_RST_SEL,0)
                | FIELD_BUILD(RF_AGC_TEST_S,0)
                | FIELD_BUILD(RF_PA_MN_TUNE,1)
-               | FIELD_BUILD(RF_PLL_GAIN_CAL_TH,0x64)
+               | FIELD_BUILD(RF_PLL_GAIN_CAL_TH,0x1e)
                | FIELD_BUILD(RF_PLL_VTXD_EXT,pll_int_vtxd_ext)
                | FIELD_BUILD(RF_PLL_VTXD_EXT_EN,1)
                | FIELD_BUILD(RF_PLL_GAIN_CAL_EN,0)
@@ -254,7 +240,7 @@ static void rf_reg_init()
                | FIELD_BUILD(RF_PAHP_ADJ,0xf);
     RF->REG50 = FIELD_BUILD(RF_ANA_TEST_EN,0)
                | FIELD_BUILD(RF_PLL_AFC_BP,0)
-               | FIELD_BUILD(RF_PLL_GAIN_BP,1)
+               | FIELD_BUILD(RF_PLL_GAIN_BP,0)
                | FIELD_BUILD(RF_PPF_RC_BP,1)
                | FIELD_BUILD(RF_LDO_TEST_EN,0)
                | FIELD_BUILD(RF_RD_CLK_EN,1)
@@ -264,14 +250,6 @@ static void rf_reg_init()
                | FIELD_BUILD(RF_PA_VB_TARGET,4)
                | FIELD_BUILD(RF_LDO_START_CNT,6)
                | FIELD_BUILD(RF_PA_STEP_SET,1);
-    RF->REG58 = FIELD_BUILD(RF_EN_DAC_CNT,10)
-               | FIELD_BUILD(RF_PLL_CAL_EN_CNT,0x08)
-               | FIELD_BUILD(RF_PLL_GAIN_CAL_EN_CNT,4)
-               | FIELD_BUILD(RF_EN_PA_CNT,0x48);
-    RF->REG5C = FIELD_BUILD(RF_EN_PA_STG1_CNT,0x4a)
-               | FIELD_BUILD(RF_EN_PA_STG2_CNT,0x4c)
-               | FIELD_BUILD(RF_PLL_LOCK_CNT,0x4f)
-               | FIELD_BUILD(RF_EN_RX_CNT,2);
 
     RF->REG64 = FIELD_BUILD(RF_RSSI_OFFSET, 0X80)
                |FIELD_BUILD(RF_ADC_MDM_EN, 1);      
@@ -280,43 +258,53 @@ static void rf_reg_init()
                | FIELD_BUILD(RF_INT_VTXD_CHN_THR0,0xc)
                | FIELD_BUILD(RF_INT_VTXD_EXT2,pll_int_vtxd_ext)
                | FIELD_BUILD(RF_INT_VTXD_EXT1,pll_int_vtxd_ext);
+}
 
+static void BPF_CAL()
+{
+    // BPF CAL start
+    REG_FIELD_WR(RF->REG04,RF_BPF_CAL_EN,0); // 0->1
+    REG_FIELD_WR(RF->REG04,RF_BPF_CAL_EN,1); 	
+
+    while((!(REG_FIELD_RD(RF->REG34,RF_BPF_CAL_DONE))))
+    ;
+
+    uint8_t BPF_CODE = REG_FIELD_RD(RF->REG38,RF_BPF_CAL_CODE);    
+    REG_FIELD_WR(RF->REG04,RF_BPF_CAL_CODE_EXT_EN,1);
+    REG_FIELD_WR(RF->REG04,RF_BPF_CAL_CODE_EXT,BPF_CODE);
+    REG_FIELD_WR(RF->REG04,RF_BPF_CAL_EN,0); 
+    //bpf end
 }
 
 static uint16_t rf_pll_gain_cal(uint8_t tx_channel_dis)
 {
     uint8_t pll_gain_cal_val            =0;
-	int32_t cnt_timeout                 =0;
 
     REG_FIELD_WR(RF->REG10, RF_PLL_RTX_SEL, 1);  
-    REG_FIELD_WR(RF->REG1C, RF_PLL_FRAC_INT_MODE, 1);  //Integer mode
-
+    REG_FIELD_WR(RF->REG1C, RF_PLL_FRAC_INT_MODE, 0);  //Integer mode
+    REG_FIELD_WR(RF->REG00,RF_EN_DAC_BLE,1); 
+    REG_FIELD_WR(RF->REG30,RF_LDO_PA_TRIM,1);
 	REG_FIELD_WR(RF->REG10, RF_PLL_DI_S, tx_channel_dis);
+    REG_FIELD_WR(RF->REG14, RF_PLL_FRAC, 0X000000);
     //AFC 
-    REG_FIELD_WR(RF->REG10,RF_PLL_VREF_ADJ,0);//vref_calib 
+
     REG_FIELD_WR(RF->REG10,RF_PLL_FREQ_EXT_EN,0);         
     REG_FIELD_WR(RF->REG10, RF_PLL_CAL_EN, 0);// AFC CAL disable
 	REG_FIELD_WR(RF->REG10, RF_PLL_CAL_EN, 1);// AFC CAL enable
-
-    cnt_timeout=500;
-    while((!(REG_FIELD_RD(RF->REG38,RF_PLL_BAND_CAL_DONE))) 
-        && (cnt_timeout>0))
-        {cnt_timeout--;}
+    while((!(REG_FIELD_RD(RF->REG38,RF_PLL_BAND_CAL_DONE))))
+    ;
 
     // gain cal 
     REG_FIELD_WR(RF->REG00,RF_EN_DAC_BLE,1); 
     REG_FIELD_WR(RF->REG2C,RF_PLL_VTXD_EXT_EN,0); 
     REG_FIELD_WR(RF->REG2C,RF_PLL_GAIN_CAL_EN,0); 
     REG_FIELD_WR(RF->REG2C,RF_PLL_GAIN_CAL_EN,1);  
-
-    cnt_timeout=500;
-    while((!(REG_FIELD_RD(RF->REG38,RF_PLL_GAIN_CAL_DONE)))
-        && (cnt_timeout>0))
-        {cnt_timeout--;}
+    while((!(REG_FIELD_RD(RF->REG38,RF_PLL_GAIN_CAL_DONE))))
+    ;
 
     pll_gain_cal_val =REG_FIELD_RD(RF->REG38, RF_PLL_DAC_ADJ_TEST);
+    REG_FIELD_WR(RF->REG30,RF_EN_AT,0x0);
     REG_FIELD_WR(RF->REG2C,RF_PLL_VTXD_EXT_EN,1); 
-    //REG_FIELD_WR(RF->REG10,RF_PLL_FREQ_EXT_EN,1);   
     REG_FIELD_WR(RF->REG10, RF_PLL_CAL_EN, 0);// PLL CAL disable
     REG_FIELD_WR(RF->REG2C,RF_PLL_GAIN_CAL_EN,0);  //gain cal disable
     REG_FIELD_WR(RF->REG1C, RF_PLL_FRAC_INT_MODE, 0);
@@ -326,32 +314,26 @@ static uint16_t rf_pll_gain_cal(uint8_t tx_channel_dis)
 static void pll_gain()
 {
     uint8_t pll_gain_cal_val=0;
-
     // AFE TEST mode enable
     REG_FIELD_WR(RF->REG50,RF_ANA_TEST_EN,1);
     REG_FIELD_WR(RF->REG50,RF_LDO_TEST_EN,1);
+    REG_FIELD_WR(RF->REG10,RF_PLL_RTX_SEL,1);
     REG_FIELD_WR(RF->REG50,RF_PLL_TEST_EN,1);
     //TX
-    REG_FIELD_WR(RF->REG10,RF_PLL_RTX_SEL,1);
-    REG_FIELD_WR(RF->REG00,RF_EN_PA,1);
-    REG_FIELD_WR(RF->REG00,RF_EN_PA_STG1,1);
-    REG_FIELD_WR(RF->REG00,RF_EN_PA_STG2,1);
-    REG_FIELD_WR(RF->REG00,RF_EN_LDO_RX,0);
-
+    BPF_CAL();
     pll_gain_cal_val = rf_pll_gain_cal(PLL_GAIN_CAL_FRQ_DIS0);
     pll_int_vtxd_ext = pll_gain_cal_val; 
-
     REG_FIELD_WR(RF->REG2C,RF_PLL_VTXD_EXT_EN,0);  
     REG_FIELD_WR(RF->REG2C,RF_PLL_VTXD_EXT,pll_int_vtxd_ext);
     REG_FIELD_WR(RF->REG70,RF_INT_VTXD_EXT1,pll_int_vtxd_ext);
     REG_FIELD_WR(RF->REG70,RF_INT_VTXD_EXT2,pll_int_vtxd_ext);
-    REG_FIELD_WR(RF->REG2C,RF_PLL_VTXD_EXT_EN,1);
+    REG_FIELD_WR(RF->REG2C,RF_PLL_VTXD_EXT_EN,0);
+
 
     REG_FIELD_WR(RF->REG10,RF_PLL_RTX_SEL,0);
     REG_FIELD_WR(RF->REG00,RF_EN_PA_STG2,0);
     REG_FIELD_WR(RF->REG00,RF_EN_PA_STG1,0);
     REG_FIELD_WR(RF->REG00,RF_EN_PA,0);
-    REG_FIELD_WR(RF->REG00,RF_EN_LDO_RX,1);
     //AFE TEST mode disable
     REG_FIELD_WR(RF->REG50,RF_ANA_TEST_EN,0);
     REG_FIELD_WR(RF->REG50,RF_LDO_TEST_EN,0);
@@ -372,7 +354,7 @@ static void modem_reg_init()
 static void rf_reg_retention()
 {
     uint32_t rf_reg08 = RF->REG08;
-    rf_ret.ldo_tx_trim = REG_FIELD_RD(rf_reg08,RF_LDO_TX_TRIM);
+    rf_ret.ldo_tx_trim = REG_FIELD_RD(rf_reg08,RF_LDO_TX_TRIM);//9.14
     rf_ret.ldo_rx_trim = REG_FIELD_RD(rf_reg08,RF_LDO_RX_TRIM);
 }
 
