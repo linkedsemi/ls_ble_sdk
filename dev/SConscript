@@ -36,12 +36,12 @@ def app_build(app_name,src,inc,linkscript = '',mesh = False):
     global target_fw
     global target_mesh_fw
     app_env,app_target = image_build(app_name,src,inc,linkscript)
-    app_env.Append(LIBS = [target_ble_lib])
     if mesh:
         app_env.Append(LIBS = [target_mesh_lib])
         app_env.Depends(app_target,[target_mesh_fw])
         stack_hex = target_mesh_fw
     else:
+        app_env.Append(LIBS = [target_ble_lib])
         app_env.Depends(app_target,[target_fw])
         stack_hex = target_fw
     if not 'mdk' in app_env['TOOLS']:
