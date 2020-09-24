@@ -9,12 +9,15 @@ typedef uint8_t SIGMESH_NodeInfo_TypeDef;
 #define UUID_MESH_DEV_LEN (16)
 #define MESH_AUTH_DATA_LEN (16)
 #define MAX_MESH_MODEL_NB (14)
+#define MAX_AUTO_PROV_MESH_MODEL_NB (10)
 //#define MAX_MESH_MODEL_MSG_BUFFER      (380)
 #define MAX_MESH_MODEL_MSG_BUFFER (60)
 
 //mesh server model index
 #define GENERIC_ONOFF_SERVER             (0x1000)
+#define GENERIC_ONOFF_CLIENT             (0x1001)
 #define GENERIC_LVL_SERVER               (0x1002)
+#define GENERIC_LVL_CLIENT               (0x1003)
 #define LIGHTNESS_SERVER                 (0x1300)
 #define LIGHTS_CTL_SERVER                (0x1303)
 #define LIGHTS_HSL_SERVER                (0x1307)
@@ -84,6 +87,7 @@ enum mesh_evt_type
     MESH_STATE_UPD_IND = 22,
     MESH_ACTIVE_GLP_START = 23,
     MESH_ACTIVE_GLP_STOP = 24,
+    MESH_ACTIVE_AUTO_PROV =25,
 };
 
 /// Mesh Supported Features
@@ -355,6 +359,16 @@ struct mesh_publish_info_ind
     uint16_t addr;
 };
 
+struct mesh_auto_prov_info
+{
+    uint16_t unicast_addr;
+    uint8_t model_nb;
+    uint16_t group_addr;
+    uint32_t model_id[MAX_AUTO_PROV_MESH_MODEL_NB];
+    uint8_t app_key[16];
+    uint8_t net_key[16];
+};
+
 union ls_sig_mesh_evt_u {
     struct reqister_model_info register_model_param;
     struct report_model_loc_id_info loc_id_param;
@@ -368,6 +382,7 @@ union ls_sig_mesh_evt_u {
     struct model_state_upd mdl_state_upd_ind;
     struct mesh_model_info sig_mdl_info;
     struct mesh_publish_info_ind mesh_publish_info;
+    struct mesh_auto_prov_info mesh_auto_prov_param;
 };
 
 struct ls_sig_mesh_cfg
@@ -413,4 +428,5 @@ void stop_ls_sig_mesh_gatt(void);
 void ls_sig_mesh_proxy_adv_ctl(uint8_t enable);
 void start_glp_handler(struct start_glp_info *param);
 void stop_glp_handler(void);
+void ls_sig_mesh_auto_prov_handler(struct mesh_auto_prov_info const *param, bool const auto_prov_mesh_flag);
 #endif //(_LS_SIG_MESH_H_

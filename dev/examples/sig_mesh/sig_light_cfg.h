@@ -7,6 +7,7 @@
 #include "platform.h"
 #include "reg_rcc.h"
 #include "lsgpio.h"
+#include "lsuart.h"
 #include "field_manipulate.h"
 
 #include <string.h>
@@ -28,5 +29,6 @@ void sigmesh_set_onoff(uint8_t on_off);
 uint16_t sigmesh_get_lightness(void);
 uint8_t sigmesh_get_onoff(void);
 void light_button_init(void);
+void ls_button_timer_init(void);
 
 #endif

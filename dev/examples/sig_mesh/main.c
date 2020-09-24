@@ -20,11 +20,11 @@
 
 #define COMPANY_ID 0x093A
 #define COMPA_DATA_PAGES 1
-#define MAX_NB_ADDR_REPLAY 20
+#define MAX_NB_ADDR_REPLAY 5
 #define PROV_AUTH_ACCEPT 1
 #define PROV_AUTH_NOACCEPT 0
 static bool sent_adv_ready=true;
-
+static bool ls_sig_mesh_auto_prov=false;
 uint8_t vendor_tid = 0;
 #define RECORD_KEY1 1
 #define RECORD_KEY2 2
@@ -36,16 +36,22 @@ SIGMESH_NodeInfo_TypeDef Node_Proved_State = 0;
 
 static uint8_t dev_uuid[16] = {0x92,0x88,0x8A,0xFB,0xF0,0xCA,0x8F,0x45,0xB2,0xDF,0x93,0xEE,0x71,0x12,0x7C,0x68};
 static uint8_t auth_data[16] = {0xF4,0xC7,0x0B,0xE8,0x10,0xE1,0x3A,0xAE,0xF8,0x3B,0x05,0xD4,0xA1,0xDA,0x8C,0xF3};
+
+//just for auto prov mode
+uint8_t net_key[16] = {0x4D,0xC8,0x86,0xC8,0x0A,0x53,0xEF,0x80,0x5B,0x5C,0x30,0x59,0xF6,0xE3,0xA7,0xAD};
+uint8_t app_key[16] = {0x8E,0x40,0x71,0xA5,0x3F,0x7A,0xEA,0xF0,0x81,0xB9,0xCF,0x8B,0x83,0x05,0x12,0x52};
+
+
 uint8_t rsp_data_info[40] = {0};
 struct mesh_model_info model_env;
-struct mesh_publish_info_ind mesh_publish_env;
+struct mesh_publish_info_ind mesh_publish_env[MAX_MESH_MODEL_NB];
 uint8_t model_tid = 0;
 
 static uint16_t mesh_src_addr;
 static uint8_t adv_obj_hdl;
 static bool mesh_node_prov_state = false;
 static void create_adv_obj(void);
-void app_client_model_tx_message_handler(uint8_t update_state);
+void app_client_model_tx_message_handler(uint32_t tx_msg, uint16_t model_cfg_idx );
 
 void auto_check_unbind(void)
 {
@@ -121,17 +127,33 @@ static void gatt_manager_callback(enum gatt_evt_type type, union gatt_evt_u *evt
     
 }
 
-void app_client_model_tx_message_handler(uint8_t update_state)
+void app_client_model_tx_message_handler(uint32_t tx_msg, uint16_t model_cfg_idx )
 {
-    if (mesh_publish_env.model_lid)
+    if (model_cfg_idx == MESH_CMDL_CFG_IDX_GENC_LEVEL)
     {
        struct model_cli_trans_info param;
         model_tid++;
 
-       param.mdl_lid = mesh_publish_env.model_lid;
+       param.mdl_lid = mesh_publish_env[3].model_lid;
        param.app_key_lid = model_env.app_key_lid;
-       param.dest_addr =  mesh_publish_env.addr;
-       param.state_1 = update_state;
+       param.dest_addr =  mesh_publish_env[3].addr;
+       param.state_1 = tx_msg;
+       param.state_2 = 0x00;
+       param.delay_ms=50;
+       param.trans_info=(uint16_t)(model_tid<<8);
+       param.trans_time_ms=100;
+       mesh_model_client_tx_message_handler(&param);
+    }
+
+    if (model_cfg_idx == MESH_CMDL_CFG_IDX_GENC_ONOFF)
+     {
+       struct model_cli_trans_info param;
+        model_tid++;
+
+       param.mdl_lid = mesh_publish_env[2].model_lid;
+       param.app_key_lid = model_env.app_key_lid;
+       param.dest_addr =  mesh_publish_env[2].addr;
+       param.state_1 = tx_msg;
        param.state_2 = 0x00;
        param.delay_ms=50;
        param.trans_info=(uint16_t)(model_tid<<8);
@@ -168,9 +190,16 @@ static void mesh_manager_callback(enum mesh_evt_type type, union ls_sig_mesh_evt
     break;
     case MESH_ACTIVE_MODEL_PUBLISH:
     {
-        mesh_publish_env.model_lid = evt->mesh_publish_info.model_lid;
-        mesh_publish_env.period_ms = evt->mesh_publish_info.period_ms;
-        mesh_publish_env.addr =  evt->mesh_publish_info.addr;
+        for (uint8_t i = 0; i < model_env.nb_model; i++)
+        {
+            if (evt->mesh_publish_info.model_lid == model_env.info[i].model_lid)
+            {
+                 mesh_publish_env[i].model_lid = evt->mesh_publish_info.model_lid;
+                 mesh_publish_env[i].period_ms = evt->mesh_publish_info.period_ms;
+                 mesh_publish_env[i].addr =  evt->mesh_publish_info.addr;
+            }
+        }
+       
     }
     break;
     case MESH_ACTIVE_MODEL_GROUP_MEMBERS:
@@ -304,12 +333,31 @@ static void mesh_manager_callback(enum mesh_evt_type type, union ls_sig_mesh_evt
         
     }
     break;
+    case MESH_ACTIVE_AUTO_PROV:
+    {
+        if (ls_sig_mesh_auto_prov == true)
+        {
+           struct mesh_auto_prov_info init_param;
+           init_param.model_nb = model_env.nb_model;
+           init_param.unicast_addr = 0x0002;  //Recommendation unicast_addr >= 0x0002 
+           init_param.group_addr = 0xC000;    //Recommendation group_addr >= 0xC000
+           init_param.model_id[0] = model_env.info[0].model_id;
+           init_param.model_id[1] = model_env.info[1].model_id;
+           init_param.model_id[2] = model_env.info[2].model_id;
+           init_param.model_id[3] = model_env.info[3].model_id;
+           memcpy(&init_param.app_key[0],&app_key[0],16);
+           memcpy(&init_param.net_key[0],&net_key[0],16);
+  
+           ls_sig_mesh_auto_prov_handler(&init_param,true);
+        }
+    }
+    break;
     default:
         break;
     }
 }
 
-uint8_t ble_device_name[DEV_NAME_MAX_LEN] = "LS501X_MESH_DEMO";
+char ble_device_name[DEV_NAME_MAX_LEN] = "ls_sig_mesh_node";
 void ls_sig_mesh_con_set_scan_rsp_data(uint8_t *scan_rsp_data, uint8_t *scan_rsp_data_len)
 {
     uint8_t *pos;
@@ -362,6 +410,7 @@ static void dev_manager_callback(enum dev_evt_type type, union dev_evt_u *evt)
             .controller_privacy = false,
         };
         dev_manager_stack_init(&cfg);
+        ls_sig_mesh_auto_prov = true;
     }
     break;
 
@@ -369,7 +418,7 @@ static void dev_manager_callback(enum dev_evt_type type, union dev_evt_u *evt)
     {
         uint8_t addr[6];
         struct ls_sig_mesh_cfg feature = {
-            .MeshFeatures = EN_RELAY_NODE | EN_MSG_API | EN_PB_GATT | EN_PROXY_NODE,
+            .MeshFeatures = EN_RELAY_NODE | EN_MSG_API,
             .MeshCompanyID = COMPANY_ID,
             .MeshProID = 0x001A,
             .MeshProVerID = 0x0001,
@@ -378,11 +427,17 @@ static void dev_manager_callback(enum dev_evt_type type, union dev_evt_u *evt)
             .NbCompDataPage = COMPA_DATA_PAGES,
         };
 
+        if (ls_sig_mesh_auto_prov == false)
+        {
+          feature.MeshFeatures |= EN_PB_GATT | EN_PROXY_NODE;
+        }
         bool type;
         dev_manager_get_identity_bdaddr(addr, &type);
+        memcpy(&dev_uuid[0],addr,6);
         LOG_I("stack ready:");
         LOG_HEX(addr,6);
         dev_manager_prf_ls_sig_mesh_add(NO_SEC, &feature);
+        ls_button_timer_init();
     }
     break;
 
@@ -394,17 +449,28 @@ static void dev_manager_callback(enum dev_evt_type type, union dev_evt_u *evt)
     {
         prf_ls_sig_mesh_callback_init(mesh_manager_callback);
 
-        model_env.nb_model = 3;
+        model_env.nb_model = 4;
         model_env.info[0].sig_model_cfg_idx = MESH_MDL_CFG_ONOFF;
         model_env.info[0].element_id = 0;
+        model_env.info[0].model_id =  GENERIC_ONOFF_SERVER;
+
         model_env.info[1].sig_model_cfg_idx = MESH_MDL_CFG_LEVEL;
         model_env.info[1].element_id = 0;
+        model_env.info[1].model_id  = GENERIC_LVL_SERVER;
+
         model_env.info[2].sig_model_cfg_idx = MESH_CMDL_CFG_IDX_GENC_ONOFF;
         model_env.info[2].element_id = 0;
+        model_env.info[2].model_id  = GENERIC_ONOFF_CLIENT;
+
+        model_env.info[3].sig_model_cfg_idx = MESH_CMDL_CFG_IDX_GENC_LEVEL;
+        model_env.info[3].element_id = 0;
+        model_env.info[3].model_id  = GENERIC_LVL_CLIENT;
+
         model_env.app_key_lid = 0;
         model_env.info[0].model_lid =0;
         model_env.info[1].model_lid =0;
         model_env.info[2].model_lid =0;
+        model_env.info[3].model_lid =0;
         ls_sig_mesh_init(&model_env);
     }
     break;
