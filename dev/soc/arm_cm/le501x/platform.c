@@ -240,6 +240,32 @@ void sys_init_app()
     module_init();
 }
 
+void ll_stack_var_ptr_init(void);
+
+static void ll_var_init()
+{
+    stack_data_bss_init();
+    bb_mem_clr();
+    ll_stack_var_ptr_init();
+    spi_flash_drv_var_init(true,false);
+}
+
+void sys_init_ll()
+{
+    analog_init();
+    ll_var_init();
+    io_init();
+    calc_acc_init();
+    cpu_sleep_recover_init();
+    mac_init();
+    rco_calib_mode_set(0);
+    rco_calibration_start();
+    modem_rf_init();
+    low_power_mode_init();
+    irq_init();
+    systick_start();
+}
+
 void platform_reset(uint32_t error)
 {
     __disable_irq();

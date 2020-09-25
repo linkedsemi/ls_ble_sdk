@@ -6,8 +6,11 @@
 #include "log.h"
 
 #define ENV_BUF_SIZE 2048
-//#define DB_BUF_SIZE 4096
+#if CONFIG_AOS
+#define DB_BUF_SIZE 0
+#else
 #define DB_BUF_SIZE 8192
+#endif
 #if 0
 #define MSG_BUF_SIZE 4096
 #define NON_RET_BUF_SIZE 12
@@ -188,3 +191,34 @@ uint8_t *get_peer_id_buf()
     return peer_id_buf;
 }
 
+void eif_init(void *read,void *write,void *flow_on,void *flow_off)
+{
+    eif_read = read;
+    eif_write = write;
+    eif_flow_on = flow_on;
+    eif_flow_off = flow_off;
+}
+
+void ll_stack_buffer_init(uint32_t env_size,uint32_t msg_size,uint32_t non_ret_size);
+
+void ll_stack_var_ptr_init()
+{
+    stack_assert_asm_fn = stack_assert_asm;
+    platform_reset_fn = platform_reset;
+    ecc_calc_fn = ecc_calc_start;
+    rand_fn = rand;
+    idiv_acc_fn = idiv_acc;
+    enter_critical_fn = enter_critical;
+    exit_critical_fn = exit_critical;
+    log_output_fn = log_output;
+    log_hex_output_fn = log_hex_output;
+    aes_encrypt_fn = ls_ip_aes_encrypt_start;
+    aes_encrypt_comp_fn = ls_ip_aes_encrypt_complete;
+
+    max_activity_num = SDK_MAX_ACT_NUM;
+    max_profile_num = SDK_MAX_PROFILE_NUM;
+    max_ral_num = SDK_MAX_RAL_NUM;
+    max_user_task_num = SDK_MAX_USER_TASK_NUM;
+
+    ll_stack_buffer_init(ENV_BUF_SIZE,MSG_BUF_SIZE,NON_RET_BUF_SIZE);
+}
