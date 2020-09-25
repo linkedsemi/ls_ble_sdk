@@ -47,13 +47,13 @@ struct deep_sleep_wakeup
             nrst:1,
             reserved0:1,
             pa00:1,
-            pa01:1,
+            pa07:1,
             pb11:1,
             wdt:1;
     uint8_t pb15_rising_edge:1,
             reserved1:3,
             pa00_rising_edge:1,
-            pa01_rising_edge:1,
+            pa07_rising_edge:1,
             pb11_rising_edge:1;
 };
 
