@@ -199,7 +199,7 @@ void eif_init(void *read,void *write,void *flow_on,void *flow_off)
     eif_flow_off = flow_off;
 }
 
-void ll_stack_buffer_init(uint32_t env_size,uint32_t msg_size,uint32_t non_ret_size);
+__attribute__((weak))  void ll_stack_buffer_init(uint32_t env_size,uint32_t msg_size,uint32_t non_ret_size){};
 
 void ll_stack_var_ptr_init()
 {
