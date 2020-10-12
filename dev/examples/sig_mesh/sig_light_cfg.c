@@ -7,15 +7,11 @@
 
 TIM_HandleTypeDef light_tim_hdl;
 TIM_OC_InitTypeDef light_tim_cfg;
-static struct light_state sigmesh_light_state;
+static struct light_state ls_mesh_light_state[3]={0};
 extern void app_client_model_tx_message_handler(uint32_t tx_msg, uint16_t model_cfg_idx );
 
 #define APP_STATE_OFF                (0)
 #define APP_STATE_ON                 (1)
-#define LIGHT_LED_1                  (PA00)
-#define LIGHT_LED_2                  (PA01)
-#define LIGHT_BUTTON_1               (PA07)
-#define LIGHT_BUTTON_2               (PB15)
  
 static void ls_uart_init(void);
  UART_HandleTypeDef UART_SIG_MESH_Config;
@@ -54,61 +50,92 @@ void ls_button_timer_init(void)
 }
 
 
-static void light_control(bool lightness_flag)
+static void light_control(bool lightness_flag, uint16_t const led_id)
 {
-    if((!lightness_flag) && (sigmesh_light_state.onoff_state == 0))
+    uint32_t channel_id;
+    uint8_t *onoff_state;
+    uint16_t *led_level;
+
+    if (led_id != LIGHT_LED_1)
     {
-        light_tim_cfg.Pulse = 0;
-
-        HAL_TIM_PWM_ConfigChannel(&light_tim_hdl, &light_tim_cfg, TIM_CHANNEL_1); 
-        HAL_TIM_PWM_Start(&light_tim_hdl, TIM_CHANNEL_1);
-
-        HAL_TIM_PWM_ConfigChannel(&light_tim_hdl, &light_tim_cfg, TIM_CHANNEL_2); 
-        HAL_TIM_PWM_Start(&light_tim_hdl, TIM_CHANNEL_2);
+	    channel_id = (led_id == LIGHT_LED_2)? TIM_CHANNEL_2:TIM_CHANNEL_3;
+	    onoff_state = (led_id == ls_mesh_light_state[0].led_idx)? &(ls_mesh_light_state[0].onoff_state):&(ls_mesh_light_state[1].onoff_state);
+	    led_level = (led_id == ls_mesh_light_state[0].led_idx)? &(ls_mesh_light_state[0].level):&(ls_mesh_light_state[1].level);
     }
     else
     {
-        light_tim_cfg.Pulse = sigmesh_light_state.level;
+        channel_id = TIM_CHANNEL_1;
+        onoff_state = &(ls_mesh_light_state[2].onoff_state);
+        led_level = &(ls_mesh_light_state[2].level);
+    }
         
-        HAL_TIM_PWM_ConfigChannel(&light_tim_hdl, &light_tim_cfg, TIM_CHANNEL_1); 
-        HAL_TIM_PWM_Start(&light_tim_hdl, TIM_CHANNEL_1);
+    if((!lightness_flag) && (*onoff_state == 0))
+    {
+        light_tim_cfg.Pulse = 0;
+
+        HAL_TIM_PWM_ConfigChannel(&light_tim_hdl, &light_tim_cfg, channel_id); 
+        HAL_TIM_PWM_Start(&light_tim_hdl, channel_id);
+    }
+    else
+    {
+        light_tim_cfg.Pulse = (*led_level);
         
-        HAL_TIM_PWM_ConfigChannel(&light_tim_hdl, &light_tim_cfg, TIM_CHANNEL_2); 
-        HAL_TIM_PWM_Start(&light_tim_hdl, TIM_CHANNEL_2);
+        HAL_TIM_PWM_ConfigChannel(&light_tim_hdl, &light_tim_cfg, channel_id); 
+        HAL_TIM_PWM_Start(&light_tim_hdl, channel_id);
     }
 }
 
-void sigmesh_set_lightness(uint16_t level)
+void ls_mesh_light_set_lightness(uint16_t level, uint16_t const led_id)
 {
-    if(sigmesh_light_state.level != level)
+    uint8_t *onoff_state;
+    uint16_t *led_level;
+
+    if (led_id != LIGHT_LED_1)
     {
-        sigmesh_light_state.onoff_state = 1;
-        sigmesh_light_state.level = level;
-        light_control(true);
+	  onoff_state = (led_id == ls_mesh_light_state[0].led_idx)? &(ls_mesh_light_state[0].onoff_state):&(ls_mesh_light_state[1].onoff_state);
+	  led_level = (led_id == ls_mesh_light_state[0].led_idx)? &(ls_mesh_light_state[0].level):&(ls_mesh_light_state[1].level);
     }
-}
-
-void sigmesh_set_onoff(uint8_t on_off)
-{
-    if(sigmesh_light_state.onoff_state != (on_off & 0x1))
+    else
     {
-        if(sigmesh_light_state.level == 0)
-        {
-            sigmesh_light_state.level = 0x5ff;
-        }
-        sigmesh_light_state.onoff_state = (on_off & 0x1);
-        light_control(false);
+       onoff_state = &(ls_mesh_light_state[2].onoff_state);
+	   led_level = &(ls_mesh_light_state[2].level);
+    }
+    
+      if(*led_level != level)
+      {
+        *onoff_state = 1;
+        *led_level = level;
+        light_control(true,led_id);
+      }
+}
+
+void ls_mesh_light_set_onoff(uint8_t on_off, uint16_t const led_id)
+{
+    uint8_t *onoff_state;
+    if (led_id != LIGHT_LED_1)
+    {
+	    onoff_state = (led_id == ls_mesh_light_state[0].led_idx)? &(ls_mesh_light_state[0].onoff_state):&(ls_mesh_light_state[1].onoff_state);
+    }
+    else
+    {
+        onoff_state = &(ls_mesh_light_state[2].onoff_state);
+    }
+    
+    if(*onoff_state != on_off)
+    {
+        *onoff_state = on_off;
+        light_control(false,led_id);
     }
 }
 
-uint8_t sigmesh_get_onoff(void)
+uint8_t ls_mesh_light_get_onoff(uint16_t const led_id)
 {
-    return sigmesh_light_state.onoff_state;
+    return (led_id == ls_mesh_light_state[0].led_idx)?(ls_mesh_light_state[0].onoff_state):((led_id == ls_mesh_light_state[1].led_idx)?(ls_mesh_light_state[1].onoff_state):(ls_mesh_light_state[2].onoff_state));
 }
 
-uint16_t sigmesh_get_lightness(void)
+uint16_t ls_mesh_light_get_lightness(uint16_t const led_id)
 {
-    return sigmesh_light_state.level;
+	return (led_id == ls_mesh_light_state[0].led_idx)?(ls_mesh_light_state[0].level):((led_id == ls_mesh_light_state[1].led_idx)?(ls_mesh_light_state[1].level):(ls_mesh_light_state[2].level));
 }
 
 void HAL_TIM_PWM_MspInit(TIM_HandleTypeDef *htim)
@@ -120,9 +147,10 @@ void HAL_TIM_PWM_MspInit(TIM_HandleTypeDef *htim)
     /* Configure PA00, PA01 for PWM output*/
     gptimb1_ch1_io_init(LIGHT_LED_1,true,0);
 	gptimb1_ch2_io_init(LIGHT_LED_2,true,0);
+    gptimb1_ch3_io_init(LIGHT_LED_3,true,0);
 }
 
-void sigmesh_pwm_init(void)
+void ls_mesh_pwm_init(void)
 {
     uint16_t level_t = 0x5FF;
     light_tim_hdl.Instance = TIMx;
@@ -138,7 +166,23 @@ void sigmesh_pwm_init(void)
     light_tim_cfg.OCPolarity = TIM_OCPOLARITY_HIGH;
     light_tim_cfg.OCFastMode = TIM_OCFAST_DISABLE;
 
-    sigmesh_set_lightness(level_t);
+    ls_mesh_light_state[0].led_idx = LIGHT_LED_2;
+    ls_mesh_light_state[0].level = level_t;
+    ls_mesh_light_state[0].onoff_state = APP_STATE_OFF;
+
+
+	ls_mesh_light_state[1].led_idx = LIGHT_LED_3;
+    ls_mesh_light_state[1].level = level_t;
+    ls_mesh_light_state[1].onoff_state = APP_STATE_OFF;
+
+    ls_mesh_light_state[2].led_idx = LIGHT_LED_1;
+    ls_mesh_light_state[2].level = level_t;
+    ls_mesh_light_state[2].onoff_state = APP_STATE_OFF;
+
+    ls_mesh_light_set_lightness(0xffff,LIGHT_LED_1);
+    ls_mesh_light_set_lightness(level_t,LIGHT_LED_2);
+    ls_mesh_light_set_lightness(level_t,LIGHT_LED_3);
+
 }
 
 void light_button_init(void)
@@ -172,9 +216,8 @@ void io_exti_callback(uint8_t pin) // override io_exti_callback
          on_off++;
          button1_valid =true;
        }
-
        app_client_model_tx_message_handler(((on_off & 0x00000001)?APP_STATE_ON:APP_STATE_OFF),MESH_CMDL_CFG_IDX_GENC_ONOFF);
-       sigmesh_set_onoff(((on_off & 0x00000001)?APP_STATE_ON:APP_STATE_OFF));
+       ls_mesh_light_set_onoff(((on_off & 0x00000001)?APP_STATE_ON:APP_STATE_OFF),0xff);
     }   
     break;
     case LIGHT_BUTTON_2:
@@ -182,7 +225,7 @@ void io_exti_callback(uint8_t pin) // override io_exti_callback
         button2.count++;
        if (button2_valid == false)
        {
-          light_lvl++;
+          light_lvl=0x12345678;
           button2_valid =true;
           button2.check_count = button2.count;
           app_client_model_tx_message_handler(light_lvl,MESH_CMDL_CFG_IDX_GENC_LEVEL);
@@ -204,7 +247,6 @@ static void ls_uart_init(void)
     UART_SIG_MESH_Config.Init.StopBits = UART_STOPBITS1;
     UART_SIG_MESH_Config.Init.WordLength = UART_BYTESIZE8;
     HAL_UART_Init(&UART_SIG_MESH_Config);
-
 }
 
 static void ls_button_timer_cb(void *param)

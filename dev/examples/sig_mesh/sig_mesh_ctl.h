@@ -157,6 +157,17 @@ struct mesh_vendor_model_indication
     uint8_t *attr_parameter;
 }__attribute__((packed));
 
+enum SIGMESH_MODEL_DEF
+{
+    MODEL0_GENERIC_ONOFF_SVC,
+    MODEL1_GENERIC_LVL_SVC,
+    MODEL2_GENERIC_LVL_SVC,
+    MODEL3_GENERIC_ONOFF_CLI,
+    MODEL4_GENERIC_LVL_CLI,
+    MODEL5_GENERIC_ONOFF_SVC,
+    USR_MODEL_MAX_NUM
+};
+extern struct mesh_model_info model_env;
 void mesh_send_custom_adv(uint16_t duration,uint8_t *adv_data,uint8_t adv_data_length);
 void sig_mesh_mdl_state_upd_hdl(struct model_state_upd* msg);
 #endif // _SIG_MESH_CTL_H_
