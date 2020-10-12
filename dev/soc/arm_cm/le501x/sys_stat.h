@@ -15,6 +15,8 @@ void i2c1_status_set(bool);
 
 void i2c2_status_set(bool);
 
+void rtc_status_set(bool);
+
 void adtimer1_status_set(bool);
 
 void bstimer1_status_set(bool);

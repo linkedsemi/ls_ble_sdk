@@ -12,6 +12,7 @@ src = [
     'integration/calc_acc.c',
     'integration/lscache_param.c',
     'integration/io_config.c',
+    'integration/rtc_param.c',
     'sleep.c',
     'sys_stat.c',
 ]
