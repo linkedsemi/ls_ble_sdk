@@ -429,4 +429,5 @@ void ls_sig_mesh_proxy_adv_ctl(uint8_t enable);
 void start_glp_handler(struct start_glp_info *param);
 void stop_glp_handler(void);
 void ls_sig_mesh_auto_prov_handler(struct mesh_auto_prov_info const *param, bool const auto_prov_mesh_flag);
+void prov_succeed_src_addr_ind(uint16_t src);
 #endif //(_LS_SIG_MESH_H_
