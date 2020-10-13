@@ -30,7 +30,7 @@ static void RTC_SetConfig(uint8_t cksel)
 {
     LS_ASSERT(cksel < CKSEL_MAX);
     REG_FIELD_WR(RTC_Config.Instance->CTRL,RTC_CTRL_RTCEN,0);
-    REG_FIELD_WR(RTC_Config.Instance->WKUP,RTC_WKUP_WKSEL,0x1);
+    // REG_FIELD_WR(RTC_Config.Instance->WKUP,RTC_WKUP_WKSEL,0);
     REG_FIELD_WR(RTC_Config.Instance->CTRL,RTC_CTRL_CKSEL,cksel);
 }
 
