@@ -48,6 +48,8 @@ void RTC_Deinit(void)
 
 void RTC_CalendarSet(_calendar_cal *calendar_cal,_calendar_time *calendar_time)
 {
+    REG_FIELD_WR(RTC_Config.Instance->CTRL,RTC_CTRL_RTCEN,0);
+    
     REG_FIELD_WR(RTC_Config.Instance->CAL,RTC_CAL_YEAR_T,(calendar_cal->year/10)%100);
     REG_FIELD_WR(RTC_Config.Instance->CAL,RTC_CAL_YEAR_U,(calendar_cal->year%100)%10);
     REG_FIELD_WR(RTC_Config.Instance->CAL,RTC_CAL_MON_T,calendar_cal->mon/10);

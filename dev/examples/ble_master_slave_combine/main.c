@@ -177,6 +177,7 @@ static void ls_uart_server_client_uart_tx(void);
 static void ls_uart_server_read_req_ind(uint8_t att_idx, uint8_t con_idx);
 static void ls_uart_server_write_req_ind(uint8_t att_idx, uint8_t con_idx, uint16_t length, uint8_t const *value);
 static void ls_uart_server_send_notification(void);
+static void start_adv(void);
 
 static void ls_uart_client_init(void);
 static void start_scan(void);
@@ -572,7 +573,7 @@ static void gap_manager_callback(enum gap_evt_type type,union gap_evt_u *evt,uin
             uart_server_mtu_array[search_idx] = UART_SERVER_MTU_DFT;
             if (uart_server_connected_num == UART_SERVER_MASTER_NUM - 1)
             {
-                dev_manager_start_adv(adv_obj_hdl,advertising_data,sizeof(advertising_data),scan_response_data,sizeof(scan_response_data));
+                start_adv();
             }
         }
         else if ((search_idx = search_client_conidx(con_idx)) != 0xff)
@@ -766,6 +767,13 @@ static void create_adv_obj()
     };
     dev_manager_create_legacy_adv_object(&adv_param);
 }
+static void start_adv(void)
+{
+    LS_ASSERT(adv_obj_hdl != 0xff);
+    uint8_t adv_data_length = ADV_DATA_PACK(advertising_data, 1, GAP_ADV_TYPE_SHORTENED_NAME, UART_SVC_ADV_NAME, sizeof(UART_SVC_ADV_NAME));
+    dev_manager_start_adv(adv_obj_hdl, advertising_data, adv_data_length, scan_response_data, 0);
+    LOG_I("adv start");
+}
 static void create_scan_obj(void)
 {
     dev_manager_create_scan_object(PUBLIC_OR_RANDOM_STATIC_ADDR);
@@ -842,8 +850,7 @@ static void dev_manager_callback(enum dev_evt_type type,union dev_evt_u *evt)
     case ADV_OBJ_CREATED:
         LS_ASSERT(evt->obj_created.status == 0);
         adv_obj_hdl = evt->obj_created.handle;
-        dev_manager_start_adv(adv_obj_hdl,advertising_data,sizeof(advertising_data),scan_response_data,sizeof(scan_response_data));
-        LOG_I("adv start");
+        start_adv();
         if (scan_obj_hdl == 0xff)
         {
             create_scan_obj();
@@ -853,8 +860,7 @@ static void dev_manager_callback(enum dev_evt_type type,union dev_evt_u *evt)
         LOG_I("adv stopped, uart_server_connected_num = %d", uart_server_connected_num);
         if(uart_server_connected_num < UART_SERVER_MASTER_NUM)
         {
-            LOG_I("adv restart");
-            dev_manager_start_adv(adv_obj_hdl,advertising_data,sizeof(advertising_data),scan_response_data,sizeof(scan_response_data));
+            start_adv();
         }
     break;
     case SCAN_OBJ_CREATED:

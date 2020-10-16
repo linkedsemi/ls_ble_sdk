@@ -306,7 +306,7 @@ static void start_adv(void)
 {
     LS_ASSERT(adv_obj_hdl != 0xff);
     uint8_t adv_data_length = ADV_DATA_PACK(advertising_data, 1, GAP_ADV_TYPE_SHORTENED_NAME, UART_SVC_ADV_NAME, sizeof(UART_SVC_ADV_NAME));
-    dev_manager_start_adv(adv_obj_hdl, advertising_data, adv_data_length, scan_response_data, sizeof(scan_response_data));
+    dev_manager_start_adv(adv_obj_hdl, advertising_data, adv_data_length, scan_response_data, 0);
 }
 #endif
 #if MASTER_CLIENT_ROLE == 1

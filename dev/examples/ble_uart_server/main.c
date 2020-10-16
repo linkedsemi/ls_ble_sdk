@@ -107,7 +107,7 @@ static void ls_uart_init(void);
 static void ls_uart_server_read_req_ind(uint8_t att_idx, uint8_t con_idx);
 static void ls_uart_server_write_req_ind(uint8_t att_idx, uint8_t con_idx, uint16_t length, uint8_t const *value);
 static void ls_uart_server_send_notification(void);
-
+static void start_adv(void);
 
 static void ls_uart_server_init(void)
 {
@@ -226,8 +226,8 @@ static void gap_manager_callback(enum gap_evt_type type,union gap_evt_u *evt,uin
     case DISCONNECTED:
         connect_id = 0xff;
         uart_server_mtu = UART_SERVER_MTU_DFT;
-        dev_manager_start_adv(adv_obj_hdl,advertising_data,sizeof(advertising_data),scan_response_data,sizeof(scan_response_data));
         LOG_I("disconnected!");
+        start_adv();
     break;
     case CONN_PARAM_REQ:
         //LOG_I
@@ -285,6 +285,13 @@ static void create_adv_obj()
     };
     dev_manager_create_legacy_adv_object(&adv_param);
 }
+static void start_adv(void)
+{
+    LS_ASSERT(adv_obj_hdl != 0xff);
+    uint8_t adv_data_length = ADV_DATA_PACK(advertising_data, 1, GAP_ADV_TYPE_SHORTENED_NAME, UART_SVC_ADV_NAME, sizeof(UART_SVC_ADV_NAME));
+    dev_manager_start_adv(adv_obj_hdl, advertising_data, adv_data_length, scan_response_data, 0);
+    LOG_I("adv start");
+}
 /*
 static void create_highduty_adv_obj(void)
 {
@@ -340,13 +347,13 @@ static void dev_manager_callback(enum dev_evt_type type,union dev_evt_u *evt)
     case ADV_OBJ_CREATED:
         LS_ASSERT(evt->obj_created.status == 0);
         adv_obj_hdl = evt->obj_created.handle;
-        dev_manager_start_adv(adv_obj_hdl,advertising_data,sizeof(advertising_data),scan_response_data,sizeof(scan_response_data));
+        start_adv();
     break;
     case ADV_STOPPED:
         if (update_adv_intv_flag)
         {
             update_adv_intv_flag = false;
-            dev_manager_start_adv(adv_obj_hdl,advertising_data,sizeof(advertising_data),scan_response_data,sizeof(scan_response_data));
+            start_adv();
         }    
     break;
     case SCAN_STOPPED:
