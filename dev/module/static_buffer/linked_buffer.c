@@ -98,3 +98,7 @@ bool linked_buf_contain_element(linked_buffer_t *ptr,struct co_list_hdr *hdr)
     return contain;
 }
 
+uint16_t linked_buf_element_size(linked_buffer_t *ptr)
+{
+    return ptr->element_size;
+}

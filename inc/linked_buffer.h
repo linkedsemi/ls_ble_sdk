@@ -41,5 +41,7 @@ uint8_t linked_buf_retain(linked_buffer_t *ptr,struct co_list_hdr *hdr);
 
 bool linked_buf_contain_element(linked_buffer_t *ptr,struct co_list_hdr *hdr);
 
+uint16_t linked_buf_element_size(linked_buffer_t *ptr);
+
 #endif
 

@@ -9,10 +9,10 @@ extern uint32_t __data_end__;
 __attribute__ ((naked)) void Reset_Handler()
 {
     SystemInit();
-    uint32_t *dst = &__data_lma__;
-    uint32_t *src = &__data_start__;
+    uint32_t *src = &__data_lma__;
+    uint32_t *start = &__data_start__;
     uint32_t *end = &__data_end__;
-    memcpy32(dst,src,end-src);
+    memcpy32(start,src,end-start);
     _start();
 }
 

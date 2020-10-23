@@ -1,27 +1,46 @@
 import os
 SetOption('warn', ['no-duplicate-environment'] + GetOption('warn'))
-
-tool = ARGUMENTS.get('toolchain','arm-gcc')
-toolpath = ['tools']
 VariantDir('build', '.',duplicate=0)
-env = Environment(ENV = os.environ,tools=[tool],toolpath=toolpath)
+plf ={
+    'le501x': ('arm_cm','cortex-m0'),
+    'sagi': ('arm_cm','cortex-m3'),
+    'taurus': ('rv32','e902'),
+}
+ic = ARGUMENTS.get('ic','le501x')
+base_arch,cpu = plf[ic]
+default_toolchain = {
+    'arm_cm': 'arm-gcc',
+    'rv32': 'riscv-gcc',
+}
+tool = ARGUMENTS.get('toolchain',default_toolchain[base_arch])
+env = Environment(ENV = os.environ,tools=[tool],toolpath=['tools'])
 print(env['TOOLS'])
+env['IC'] = ic
+env['CPU'] = cpu
+env['BASE_ARCH'] = base_arch
 
-env['IC'] = ARGUMENTS.get('ic','le501x')
 if env['IC'] == 'le501x':
     env['CPU'] = 'cortex-m0'
     env['STACK_BIN_OUTPUT_DIR'] = Dir('#dev/soc/arm_cm/le501x/bin/')
-else:
+elif env['IC'] == 'sagi':
     env['CPU'] = 'cortex-m3'
+elif env['IC'] == 'taurus':
+    env['ARCH'] = 'rv32emac'
+    env['ABI'] = 'ilp32e'
+
+if env['BASE_ARCH'] == 'rv32':
+    env['ARCH_FLAGS'] = ' -mabi=$ABI -march=$ARCH -mstrict-align -msave-restore '
+else:
+    env['ARCH_FLAGS'] = ' -mabi=aapcs -mthumb -mcpu=$CPU -mno-unaligned-access '
 
 if 'mdk' in env['TOOLS']:
     env['COMPILER'] = 'armcc'
     
 else:
     env['COMPILER'] = 'gnu'
-    env['CFLAGS'] = '-O2 -Os -mabi=aapcs -mthumb -mcpu=$CPU -std=c11 -g -g3 -ffunction-sections -fdata-sections -fstrict-volatile-bitfields -fno-common -mno-unaligned-access -fno-optimize-sibling-calls -Wall'
+    env['CFLAGS'] = '${ARCH_FLAGS} -O2 -Os -std=c11 -g -g3 -ffunction-sections -fdata-sections -fstrict-volatile-bitfields -fno-common -fno-optimize-sibling-calls -Wall'
     env['ASFLAGS'] = ' -g'
-    env['LINKFLAGS'] = '-O2 -Os -mabi=aapcs -mthumb -mcpu=$CPU -std=c11 -g -g3 -specs=nano.specs -specs=nosys.specs -T ${LINKSCRIPT} -Wl,-Map=${TARGET.base}.map -Wl,--cref'
+    env['LINKFLAGS'] = '${ARCH_FLAGS} -O2 -Os -std=c11 -g -g3 -specs=nano.specs -specs=nosys.specs -T ${LINKSCRIPT} -Wl,-Map=${TARGET.base}.map -Wl,--cref'
     env['GC_OPTION'] = ' -Wl,--gc-sections '
 env['CPPPATH'] = ['#inc','#inc/cmsis','#inc/prf']
 dev_env = env.Clone()
