@@ -16,6 +16,7 @@
 #include "systick.h"
 #include "prf_fotas.h"
 #include "cpu.h"
+#define FLASH_SECTOR_SIZE (4096)
 #define APP_IMAGE_BASE_OFFSET (0x24)
 #define FOTA_IMAGE_BASE_OFFSET (0x28)
 #define OTA_COPY_STATUS_OFFSET (OTA_INFO_OFFSET + FLASH_PAGE_SIZE)
@@ -192,6 +193,11 @@ static void fw_copy(struct fota_image_info *ptr,uint32_t image_base)
     uint16_t i;
     for(i=0;i<CEILING(ptr->size, FLASH_PAGE_SIZE);++i)
     {
+        if ((i % (FLASH_SECTOR_SIZE/FLASH_PAGE_SIZE)) == 0)
+        {
+            spi_flash_sector_erase(image_base - FLASH_BASE_ADDR + i*FLASH_PAGE_SIZE);
+        }
+        
         spi_flash_quad_io_read(ptr->base - FLASH_BASE_ADDR + i*FLASH_PAGE_SIZE, fw_buf, FLASH_PAGE_SIZE);
         spi_flash_quad_page_program(image_base - FLASH_BASE_ADDR + i*FLASH_PAGE_SIZE,fw_buf, FLASH_PAGE_SIZE);
     }
@@ -232,18 +238,20 @@ void boot_ram_start(uint32_t exec_addr)
     swd_pull_down();
     trim_head_load();
     uint32_t image_base;
+    struct fota_image_info image;
+    image_base = config_word_get(APP_IMAGE_BASE_OFFSET);
+    if(ota_copy_info_get(&image))
+    {
+        fw_copy(&image,image_base);
+        ota_settings_erase();
+    }
     if(need_foreground_ota())
     {
         image_base = config_word_get(FOTA_IMAGE_BASE_OFFSET);
-    }else{
-        image_base = config_word_get(APP_IMAGE_BASE_OFFSET);
-        struct fota_image_info image;
-        if(ota_copy_info_get(&image))
-        {
-            fw_copy(&image,image_base);
-            ota_settings_erase();
-        }
     }
+    // else{
+    //     image_base = config_word_get(APP_IMAGE_BASE_OFFSET);
+    // }
     boot_app(image_base);
 }
 

@@ -16,7 +16,7 @@
 #include "log.h"
 #include "common.h"
 #include "systick.h"
-#define APP_IMAGE_BASE (0x1800D000)
+#define APP_IMAGE_BASE (0x18005000)
 #define OTA_COPY_STATUS_OFFSET (OTA_INFO_OFFSET + FLASH_PAGE_SIZE)
 #define FW_ECC_VERIFY (0)
 
@@ -64,6 +64,7 @@ static void prf_fota_server_callback(enum fotas_evt_type type,union fotas_evt_u 
         {
             if(evt->fotas_finish.new_image->base != APP_IMAGE_BASE)
             {
+                LOG_I("set ota copy info\n");
                 ota_copy_info_set(evt->fotas_finish.new_image);
             }
             platform_reset(RESET_OTA_SUCCEED);
