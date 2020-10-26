@@ -5,6 +5,7 @@
 #include "le501x.h"
 #include "HAL_def.h"
 #include "sys_stat.h"
+#include "platform.h"
 
 static UART_HandleTypeDef *UART_inst_env[3];
 void (*uart_isr)(UART_HandleTypeDef *);
@@ -44,6 +45,21 @@ void uart_clock_enable(UART_HandleTypeDef *inst,uint8_t status)
     }
 }
 
+void UART1_Handler(void)
+{
+    uart_isr( UART_inst_env[0]);
+}
+
+void UART2_Handler(void)
+{
+    uart_isr( UART_inst_env[1]);
+}
+
+void UART3_Handler(void)
+{
+    uart_isr( UART_inst_env[2]);
+}
+
 void uart_int_op(void (*isr)(UART_HandleTypeDef *),UART_HandleTypeDef *inst,uint8_t states)
 {
     if (states)
@@ -54,18 +70,21 @@ void uart_int_op(void (*isr)(UART_HandleTypeDef *),UART_HandleTypeDef *inst,uint
             NVIC_ClearPendingIRQ(UART1_IRQn);
             UART_inst_env[0] = inst;
             NVIC_EnableIRQ(UART1_IRQn);
+            arm_cm_set_int_isr(UART1_IRQn,UART1_Handler);
         }
         if (inst->UARTX == UART2)
         {
             NVIC_ClearPendingIRQ(UART2_IRQn);
             UART_inst_env[1] = inst;
             NVIC_EnableIRQ(UART2_IRQn);
+            arm_cm_set_int_isr(UART2_IRQn,UART2_Handler);
         }
         if (inst->UARTX == UART3)
         {
             NVIC_ClearPendingIRQ(UART3_IRQn);
             UART_inst_env[2] = inst;
             NVIC_EnableIRQ(UART3_IRQn);
+            arm_cm_set_int_isr(UART3_IRQn,UART3_Handler);
         }
     }
     else
@@ -102,19 +121,5 @@ void uart_status_set(UART_HandleTypeDef *inst,uint8_t status)
     }
 }
 
-void UART1_Handler(void)
-{
-    uart_isr( UART_inst_env[0]);
-}
-
-void UART2_Handler(void)
-{
-    uart_isr( UART_inst_env[1]);
-}
-
-void UART3_Handler(void)
-{
-    uart_isr( UART_inst_env[2]);
-}
 
 

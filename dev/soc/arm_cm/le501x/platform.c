@@ -25,7 +25,7 @@
 #include "io_config.h"
 #include "ls_dbg.h"
 #include "systick.h"
-
+#define ISR_VECTOR_ADDR ((uint32_t *)(0x0))
 #define DATA_STORAGE_BASE_OFFSET (0x2c)
 #define BASEBAND_MEMORY_ADDR   (0x50004000)
 #define IRQ_NVIC_PRIO(IRQn,priority) (((priority << (8U - __NVIC_PRIO_BITS)) & (uint32_t)0xFFUL) << _BIT_SHIFT(IRQn))
@@ -175,6 +175,19 @@ uint8_t get_wakeup_source()
 {
     struct reset_retain_struct *reset_retain_ptr = (struct reset_retain_struct*)RESET_RETAIN_BASE;
     return reset_retain_ptr->wakeup_source;
+}
+
+void arm_cm_set_int_isr(uint8_t type,void (*isr)())
+{
+    ISR_VECTOR_ADDR[type + 16] = (uint32_t)isr;
+}
+
+void cpu_recover_asm(void);
+
+void cpu_sleep_recover_init()
+{
+    ISR_VECTOR_ADDR[1] = (uint32_t)cpu_recover_asm;
+    arm_cm_set_int_isr(LPWKUP_IRQn,LPWKUP_Handler);
 }
 
 static void module_init()

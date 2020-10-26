@@ -83,38 +83,38 @@ __isr_vector:
 	.long	SysTick_Handler       /* SysTick Handler */
 
 	/* External interrupts */
-	.long	EXTI_Handler
-	.long	WWDT_Handler
-	.long	LPWKUP_Handler
-	.long	BLE_Handler
-	.long	RTC_Handler
-	.long	DMA_Handler
-	.long	QSPI_Handler
-	.long	ECC_Handler
-	.long	CACHE_Handler
-	.long	TRNG_Handler
-	.long	IWDT_Handler
-	.long	CRYPT_Handler
-	.long	PDM_Handler
-	.long	BLE_WKUP_Handler
-	.long	ADC_Handler
-	.long	ADTIM1_Handler
-	.long	BSTIM1_Handler
-	.long	GPTIMA1_Handler
-	.long	GPTIMB1_Handler
-	.long	BLE_Handler
-	.long	LVD33_Handler
-	.long	GPTIMC1_Handler
-	.long	LPTIM_Handler
-	.long	I2C1_Handler
-	.long	I2C2_Handler
-	.long	SPI1_Handler
-	.long	SPI2_Handler
-	.long	UART1_Handler
-	.long	UART2_Handler
-	.long	UART3_Handler
-	.long	BLE_Handler
-	.long	BLE_Handler
+	.long	Default_Handler
+	.long	Default_Handler
+	.long	Default_Handler
+	.long	Default_Handler
+	.long	Default_Handler
+	.long	Default_Handler
+	.long	Default_Handler
+	.long	Default_Handler
+	.long	Default_Handler
+	.long	Default_Handler
+	.long	Default_Handler
+	.long	Default_Handler
+	.long	Default_Handler
+	.long	Default_Handler
+	.long	Default_Handler
+	.long	Default_Handler
+	.long	Default_Handler
+	.long	Default_Handler
+	.long	Default_Handler
+	.long	Default_Handler
+	.long	Default_Handler
+	.long	Default_Handler
+	.long	Default_Handler
+	.long	Default_Handler
+	.long	Default_Handler
+	.long	Default_Handler
+	.long	Default_Handler
+	.long	Default_Handler
+	.long	Default_Handler
+	.long	Default_Handler
+	.long	Default_Handler
+	.long	Default_Handler
 
 	.size	__isr_vector, . - __isr_vector
 
@@ -192,34 +192,5 @@ Default_Handler:
 	def_irq_handler	SVC_Handler
 	def_irq_handler	PendSV_Handler
 	def_irq_handler	SysTick_Handler
-	def_irq_handler	EXTI_Handler
-	def_irq_handler	WWDT_Handler
-	def_irq_handler	LPWKUP_Handler
-	def_irq_handler	BLE_Handler
-	def_irq_handler	RTC_Handler
-	def_irq_handler	DMA_Handler
-	def_irq_handler	QSPI_Handler
-	def_irq_handler	ECC_Handler
-	def_irq_handler	CACHE_Handler
-	def_irq_handler	TRNG_Handler
-	def_irq_handler	IWDT_Handler
-	def_irq_handler	CRYPT_Handler
-	def_irq_handler	PDM_Handler
-	def_irq_handler	BLE_WKUP_Handler
-	def_irq_handler	ADC_Handler
-	def_irq_handler	ADTIM1_Handler
-	def_irq_handler	BSTIM1_Handler
-	def_irq_handler	GPTIMA1_Handler
-	def_irq_handler	GPTIMB1_Handler
-	def_irq_handler	LVD33_Handler
-	def_irq_handler	GPTIMC1_Handler
-	def_irq_handler	LPTIM_Handler
-	def_irq_handler	I2C1_Handler
-	def_irq_handler	I2C2_Handler
-	def_irq_handler	SPI1_Handler
-	def_irq_handler	SPI2_Handler
-	def_irq_handler	UART1_Handler
-	def_irq_handler	UART2_Handler
-	def_irq_handler	UART3_Handler
 
 	.end

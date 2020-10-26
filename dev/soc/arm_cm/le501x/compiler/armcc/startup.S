@@ -93,38 +93,38 @@ __Vectors       DCD     __initial_sp              ; Top of Stack
 
                 ; External Interrupts
 
-                DCD    EXTI_Handler
-                DCD    WWDT_Handler
-                DCD    LPWKUP_Handler
-                DCD    BLE_Handler
-                DCD    RTC_Handler
-                DCD    DMA_Handler
-                DCD    QSPI_Handler
-                DCD    ECC_Handler
-                DCD    CACHE_Handler
-                DCD    TRNG_Handler
-                DCD    IWDT_Handler
-                DCD    CRYPT_Handler
-                DCD    PDM_Handler
-                DCD    BLE_WKUP_Handler
-                DCD    ADC_Handler
-                DCD    ADTIM1_Handler
-                DCD    BSTIM1_Handler
-                DCD    GPTIMA1_Handler
-                DCD    GPTIMB1_Handler
-                DCD    BLE_Handler
-                DCD    LVD33_Handler
-                DCD    GPTIMC1_Handler
-                DCD    LPTIM_Handler
-                DCD    I2C1_Handler
-                DCD    I2C2_Handler
-                DCD    SPI1_Handler
-                DCD    SPI2_Handler
-                DCD    UART1_Handler
-                DCD    UART2_Handler
-                DCD    UART3_Handler
-                DCD    BLE_Handler
-                DCD    BLE_Handler
+                DCD    Default_Handler
+                DCD    Default_Handler
+                DCD    Default_Handler
+                DCD    Default_Handler
+                DCD    Default_Handler
+                DCD    Default_Handler
+                DCD    Default_Handler
+                DCD    Default_Handler
+                DCD    Default_Handler
+                DCD    Default_Handler
+                DCD    Default_Handler
+                DCD    Default_Handler
+                DCD    Default_Handler
+                DCD    Default_Handler
+                DCD    Default_Handler
+                DCD    Default_Handler
+                DCD    Default_Handler
+                DCD    Default_Handler
+                DCD    Default_Handler
+                DCD    Default_Handler
+                DCD    Default_Handler
+                DCD    Default_Handler
+                DCD    Default_Handler
+                DCD    Default_Handler
+                DCD    Default_Handler
+                DCD    Default_Handler
+                DCD    Default_Handler
+                DCD    Default_Handler
+                DCD    Default_Handler
+                DCD    Default_Handler
+                DCD    Default_Handler
+                DCD    Default_Handler
 
 __Vectors_End
 
@@ -155,70 +155,12 @@ Default_Handler PROC
                 EXPORT  SVC_Handler               [WEAK]
                 EXPORT  PendSV_Handler            [WEAK]
                 EXPORT  SysTick_Handler           [WEAK]
-                
-                EXPORT  EXTI_Handler              [WEAK]
-                EXPORT  WWDT_Handler              [WEAK]
-                EXPORT  LPWKUP_Handler            [WEAK]
-                EXPORT  BLE_Handler               [WEAK]
-                EXPORT  RTC_Handler               [WEAK]
-                EXPORT  DMA_Handler               [WEAK]
-                EXPORT  QSPI_Handler              [WEAK]
-                EXPORT  ECC_Handler               [WEAK]
-                EXPORT  CACHE_Handler             [WEAK]
-                EXPORT  TRNG_Handler              [WEAK]
-                EXPORT  IWDT_Handler              [WEAK]
-                EXPORT  CRYPT_Handler             [WEAK]
-                EXPORT  PDM_Handler               [WEAK]
-                EXPORT  BLE_WKUP_Handler          [WEAK]
-                EXPORT  ADC_Handler               [WEAK]
-                EXPORT  ADTIM1_Handler            [WEAK]
-                EXPORT  BSTIM1_Handler            [WEAK]
-                EXPORT  GPTIMA1_Handler           [WEAK]
-                EXPORT  GPTIMB1_Handler           [WEAK]
-                EXPORT  LVD33_Handler             [WEAK]
-                EXPORT  GPTIMC1_Handler           [WEAK]
-                EXPORT  LPTIM_Handler             [WEAK]
-                EXPORT  I2C1_Handler              [WEAK]
-                EXPORT  I2C2_Handler              [WEAK]
-                EXPORT  SPI1_Handler              [WEAK]
-                EXPORT  SPI2_Handler              [WEAK]
-                EXPORT  UART1_Handler             [WEAK]
-                EXPORT  UART2_Handler             [WEAK]
-                EXPORT  UART3_Handler             [WEAK]
+
 NMI_Handler      
 HardFault_Handler
 SVC_Handler      
 PendSV_Handler   
 SysTick_Handler  
-EXTI_Handler
-WWDT_Handler
-LPWKUP_Handler
-BLE_WKUP_Handler
-BLE_Handler
-RTC_Handler
-DMA_Handler
-QSPI_Handler
-ECC_Handler
-CACHE_Handler
-TRNG_Handler
-IWDT_Handler
-CRYPT_Handler
-PDM_Handler
-ADC_Handler
-ADTIM1_Handler
-BSTIM1_Handler
-GPTIMA1_Handler
-GPTIMB1_Handler
-LVD33_Handler
-GPTIMC1_Handler
-LPTIM_Handler
-I2C1_Handler
-I2C2_Handler
-SPI1_Handler
-SPI2_Handler
-UART1_Handler
-UART2_Handler
-UART3_Handler
                 B       .
                 ENDP
                 

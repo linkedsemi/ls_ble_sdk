@@ -15,13 +15,10 @@
 #include "cpu.h"
 #include "io_config.h"
 #include "systick.h"
-#define ISR_VECTOR_ADDR ((uint32_t *)(0x0))
 
 bool waiting_ble_wkup_irq;
 static uint8_t wkup_stat;
 void cpu_sleep_asm(void);
-
-void cpu_recover_asm(void);
 
 #if SDK_DCDC_BYPASS
 void dcdc_off(){}
@@ -96,13 +93,6 @@ XIP_BANNED void after_wfi()
     SYSCFG->ANACFG0 |= (SYSCFG_EN_DPLL_MASK | SYSCFG_EN_DPLL_16M_RF_MASK | SYSCFG_EN_DPLL_128M_RF_MASK | SYSCFG_EN_DPLL_128M_EXT_MASK | SYSCFG_EN_QCLK_MASK);
     wait_dpll_lock();
     clk_switch();
-}
-
-
-
-void cpu_sleep_recover_init()
-{
-    ISR_VECTOR_ADDR[1] = (uint32_t)cpu_recover_asm;
 }
 
 void clr_ble_wkup_req()
