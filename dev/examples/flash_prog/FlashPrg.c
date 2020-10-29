@@ -26,6 +26,7 @@
 #include "spi_flash.h"
 #include "lsqspi_param.h"
 #include "le501x.h"
+#include "platform.h"
 /* 
    Mandatory Flash Programming Functions (Called by FlashOS):
                 int Init        (unsigned long adr,   // Initialize Flash
@@ -65,7 +66,9 @@ int Init (unsigned long adr, unsigned long clk, unsigned long fnc) {
     spi_flash_drv_var_init(false,false);
     spi_flash_init();
     spi_flash_software_reset();
+    DELAY_US(500);
     spi_flash_release_from_deep_power_down();
+    DELAY_US(100);
     spi_flash_qe_status_read_and_set();
     spi_flash_xip_start();
     return (0);                                  // Finished without Errors
