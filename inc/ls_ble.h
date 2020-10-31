@@ -505,6 +505,11 @@ struct gap_update_conn_param
     uint16_t ce_len_max;
 };
 
+struct gap_set_pkt_size
+{
+    uint16_t pkt_size;
+};
+
 enum gatt_evt_type
 {
     SERVER_READ_REQ = 0,
@@ -733,6 +738,8 @@ void gap_manager_get_peer_addr(uint8_t conidx,struct ble_addr *addr);
 void gap_manager_get_identity_addr(uint8_t peer_id,struct ble_addr *addr);
 
 void gap_manager_update_conn_param(uint8_t con_idx,struct gap_update_conn_param *p_param);
+
+void gap_manager_set_pkt_size(uint8_t con_idx, struct gap_set_pkt_size *p_param);
 
 void gatt_manager_init(void (*evt_cb)(enum gatt_evt_type,union gatt_evt_u *,uint8_t));
 

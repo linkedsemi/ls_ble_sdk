@@ -39,7 +39,7 @@ static void lscrypt_reset(void)
     REG_FIELD_WR(LSCRYPT->RES2,CRYPT_RES2,0);
     REG_FIELD_WR(LSCRYPT->RES3,CRYPT_RES3,0);
 }
-
+void CRYPT_Handler(void);
 void lscrypt_init(void)
 {
     __HAL_RCC_CRYPT_CLK_ENABLE();
@@ -53,7 +53,8 @@ void lscrypt_init(void)
     REG_FIELD_WR(LSCRYPT->CR,CRYPT_DMAEN,0);  //enable DMA
     REG_FIELD_WR(LSCRYPT->CR,CRYPT_CRYSEL,0);  //enable AES  algorithm
     REG_FIELD_WR(LSCRYPT->CR,CRYPT_IE,1);     //enable CRYPT interrupt	           
-                
+
+    arm_cm_set_int_isr(CRYPT_IRQn,CRYPT_Handler);             
     NVIC_EnableIRQ(CRYPT_IRQn);
 }
 

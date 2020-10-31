@@ -108,6 +108,7 @@ static void ls_uart_server_read_req_ind(uint8_t att_idx, uint8_t con_idx);
 static void ls_uart_server_write_req_ind(uint8_t att_idx, uint8_t con_idx, uint16_t length, uint8_t const *value);
 static void ls_uart_server_send_notification(void);
 static void start_adv(void);
+static void ls_uart_server_data_length_update(uint8_t con_idx);
 
 static void ls_uart_server_init(void)
 {
@@ -134,7 +135,7 @@ static void ls_uart_server_timer_cb(void *param)
         exit_critical();
     }
     uint8_t input_char = (uint8_t)SEGGER_RTT_GetKey();
-    if(input_char != 0xff && input_char > '0' && input_char <= '9')
+    if(connect_id == 0xff && input_char != 0xff && input_char > '0' && input_char <= '9')
     {
         ls_uart_server_update_adv_interval(input_char);
     }
@@ -215,6 +216,15 @@ static void ls_uart_server_send_notification(void)
     }    
 }
 
+static void ls_uart_server_data_length_update(uint8_t con_idx)
+{
+    struct gap_set_pkt_size dlu_param = 
+    {
+        .pkt_size = 251,
+    };
+    gap_manager_set_pkt_size(con_idx, &dlu_param);
+}
+
 static void gap_manager_callback(enum gap_evt_type type,union gap_evt_u *evt,uint8_t con_idx)
 {
     switch(type)
@@ -260,6 +270,7 @@ static void gatt_manager_callback(enum gatt_evt_type type,union gatt_evt_u *evt,
     case MTU_CHANGED_INDICATION:
         uart_server_mtu = evt->mtu_changed_ind.mtu;
         LOG_I("mtu: %d", uart_server_mtu);
+        ls_uart_server_data_length_update(con_idx);
     break;
     default:
         LOG_I("Event not handled!");
