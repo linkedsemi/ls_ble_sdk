@@ -15,14 +15,6 @@ SECTIONS
         KEEP(*(.isr_vector))
         __vector__end__ = .;
     }>RAM AT>FLASH
-    
-    .reset_retain (NOLOAD) :
-    {
-        . = ALIGN(4);
-        reset_retain_start = .;
-        . += 2*4;
-        reset_retain_end = .;
-    }>RAM AT>FLASH
 
     __data_lma__ = __vector_lma__ + SIZEOF(.vector);
     
@@ -68,14 +60,22 @@ SECTIONS
         __bss_end__ = ALIGN(4);
     }>RAM
 
-
     .heap (NOLOAD):
     {
         __end__ = .;
         PROVIDE(end = .);
         *(.heap*)
-        __HeapLimit = .;
     } > RAM
+
+    .reset_retain MAX(__HeapLimit, 0x6AE8) (NOLOAD):
+    {
+        . = ALIGN(4);
+        
+        reset_retain_start = .;
+        . += 2*4;
+        reset_retain_end = .;
+    } > RAM
+    ASSERT(reset_retain_end <= 0xb800, "Error end address for reset retain")
 
     /* .stack_dummy section doesn't contains any symbols. It is only
      * used for linker to calculate size of stack sections, and assign
