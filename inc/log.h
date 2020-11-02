@@ -23,7 +23,7 @@
 #endif /* !defined(LOG_LVL) */
 
 void log_output(bool linefeed,const char *format,...);
-void log_init(void);
+void ls_log_init(void);
 void log_hex_output(const void * data_pointer , uint16_t data_length);
 extern void (*log_output_fn)(bool linefeed,const char *format,...);
 extern void (*log_hex_output_fn)(const void * data_pointer , uint16_t data_length);
@@ -60,7 +60,7 @@ extern void (*log_hex_output_fn)(const void * data_pointer , uint16_t data_lengt
 #if (GLOBAL_OUTPUT_LVL)
 #define LOG_RAW(...)                        log_output_fn(false, __VA_ARGS__)
 #define LOG_HEX(data_pointer,data_length)   log_hex_output_fn(data_pointer,data_length)
-#define LOG_INIT()  log_init()
+#define LOG_INIT()  ls_log_init()
 #else
 #define LOG_RAW(...)             
 #define LOG_HEX(data_pointer,data_length)  

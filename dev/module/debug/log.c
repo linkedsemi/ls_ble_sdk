@@ -110,7 +110,7 @@ void log_output(bool linefeed,const char *format,...)
     }
 }
 
-void log_init()
+void ls_log_init()
 {
     #if(LOG_BACKEND&JLINK_RTT)
     {
