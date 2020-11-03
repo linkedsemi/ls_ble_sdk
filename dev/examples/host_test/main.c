@@ -61,10 +61,7 @@ int main()
     sys_init_itf();
     uart_test_init();
     ble_init();
-    while(1)
-    {
-        ble_loop();
-    }
+    ble_loop();
     return 0;
 }
 

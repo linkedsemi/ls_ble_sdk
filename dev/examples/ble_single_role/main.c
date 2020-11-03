@@ -889,8 +889,5 @@ int main()
     dev_manager_init(dev_manager_callback);
     gap_manager_init(gap_manager_callback);
     gatt_manager_init(gatt_manager_callback);
-    while(1)
-    {
-        ble_loop();
-    }
+    ble_loop();
 }
