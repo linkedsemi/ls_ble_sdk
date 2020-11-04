@@ -175,8 +175,8 @@ void trim_val_load()
 static bool need_foreground_ota()
 {
     uint32_t ota_status;
-    spi_flash_quad_io_read(OTA_INFO_OFFSET,(uint8_t *)&ota_status, sizeof(ota_status));
-    return ota_status!=0xffffffff;
+    ota_status = READ_REG(SYSCFG->BKD[7]);
+    return ota_status == 0x5A5A3C3C;
 }
 
 static void boot_app(uint32_t base)
@@ -205,7 +205,7 @@ static void fw_copy(struct fota_image_info *ptr,uint32_t image_base)
 
 static void ota_settings_erase()
 {
-    spi_flash_sector_erase(OTA_INFO_OFFSET);
+    SYSCFG->BKD[7] = 0;
 }
 
 static bool ota_copy_info_get(struct fota_image_info *ptr)
@@ -249,9 +249,6 @@ void boot_ram_start(uint32_t exec_addr)
     {
         image_base = config_word_get(FOTA_IMAGE_BASE_OFFSET);
     }
-    // else{
-    //     image_base = config_word_get(APP_IMAGE_BASE_OFFSET);
-    // }
     boot_app(image_base);
 }
 
