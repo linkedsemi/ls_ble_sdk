@@ -184,15 +184,7 @@ XIP_BANNED static void flash_writing_critical(void (*func)(void *),void *param)
     DELAY_US(500);
     flash_writing = true;
     exit_critical();
-    int32_t criterion = func == do_spi_flash_prog_func ? 1000 : 6900;
-    while(1)
-    {   
-        int32_t diff = systick_time_diff(systick_get_value(),writing_end_time);
-        if(diff/SDK_HCLK_MHZ> criterion)
-        {
-            break;
-        }
-    }
+    systick_poll_timeout(writing_end_time,func == do_spi_flash_prog_func ? 1000*SDK_HCLK_MHZ : 6900*SDK_HCLK_MHZ,NULL,NULL);
     enter_critical();
     spi_flash_write_status_check();
     exit_critical();

@@ -1,7 +1,6 @@
 Import('dev_env')
 
 src = [
-    'flash_svcall.c',
     'svcall.c',
     'systick.c',
 ]

@@ -17,7 +17,7 @@ typedef enum IRQn
   MAC1_IRQn	       = 22,
   MAC2_IRQn        = 23,
   SWINT1_IRQn      = 24,
-  SWINT2_IRQn      = 25,
+  USB_IRQn         = 25,
   QSPI_IRQn        = 26,
   CACHE_IRQn       = 27,
   GPTIMA1_IRQn	   = 28,
@@ -35,6 +35,8 @@ typedef enum IRQn
   WWDT_IRQn        = 40,
   ADC_IRQn         = 41,
   TK_IRQn          = 42,
+  SWINT2_IRQn      = 43,
+  SWINT3_IRQn      = 44,
   IRQn_MAX,
 }IRQn_Type;
 

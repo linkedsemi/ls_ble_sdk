@@ -30,6 +30,7 @@ elif env['IC'] == 'taurus':
 
 if env['BASE_ARCH'] == 'rv32':
     env['ARCH_FLAGS'] = ' -mabi=$ABI -march=$ARCH -mstrict-align -msave-restore '
+    env['AS_ARCH_FLAGS'] = ' -mabi=$ABI -march=$ARCH '
 else:
     env['ARCH_FLAGS'] = ' -mabi=aapcs -mthumb -mcpu=$CPU -mno-unaligned-access '
 
@@ -39,7 +40,7 @@ if 'mdk' in env['TOOLS']:
 else:
     env['COMPILER'] = 'gnu'
     env['CFLAGS'] = '${ARCH_FLAGS} -O2 -Os -std=c11 -g -g3 -ffunction-sections -fdata-sections -fstrict-volatile-bitfields -fno-common -fno-optimize-sibling-calls -Wall'
-    env['ASFLAGS'] = ' -g'
+    env['ASFLAGS'] = '${AS_ARCH_FLAGS} -g '
     env['LINKFLAGS'] = '${ARCH_FLAGS} -O2 -Os -std=c11 -g -g3 -specs=nano.specs -specs=nosys.specs -T ${LINKSCRIPT} -Wl,-Map=${TARGET.base}.map -Wl,--cref'
     env['GC_OPTION'] = ' -Wl,--gc-sections '
 env['CPPPATH'] = ['#inc','#inc/cmsis','#inc/prf']

@@ -68,7 +68,7 @@ uint32_t config_word_get(uint32_t offset);
 void arm_cm_set_int_isr(uint8_t type,void (*isr)());
 
 
-#define DELAY_US(a) arm_cm_delay_asm((a)*(SDK_HCLK_MHZ/4))
+#define DELAY_US(a) arm_cm_delay_asm((a)*(SDK_HCLK_MHZ/5))
 
 #define OSTICK_HS_INC(Hz) (2000*1000/((Hz)*625))
 #define OSTICK_HUS_INC(Hz) (2000*1000/(Hz) - 625*OSTICK_HS_INC(Hz))

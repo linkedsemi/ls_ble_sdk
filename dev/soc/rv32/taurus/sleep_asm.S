@@ -1,5 +1,5 @@
 
-    .option rvc    
+    .option rvc
     .section .xip_banned,"x"
     .global cpu_sleep_asm
     .type   cpu_sleep_asm, %function

@@ -442,121 +442,106 @@ void gptimc1_bk_io_deinit(void)
     set_gpio_mode((gpio_pin_t *)&gptimc1_bk);
 }
 
+void ana_func1_io_init(uint8_t ain)
+{
+    ana_io_init((gpio_pin_t *)&ain,ANA_FUNC1);
+}
+
+void ain_io_deinit(uint8_t ain)
+{
+    set_gpio_mode((gpio_pin_t *)&ain);
+    io_cfg_disable(ain);
+}
+
 void adc12b_in0_io_init(void)
 {
-    uint8_t adc12b_ain0 = PB12;
-    ana_io_init((gpio_pin_t *)&adc12b_ain0,ANA_FUNC1);
+    ana_func1_io_init(PB12);
 }
 
 void adc12b_in0_io_deinit(void)
 {    
-    uint8_t adc12b_ain0 = PB12;
-    set_gpio_mode((gpio_pin_t *)&adc12b_ain0);
-    io_cfg_disable(adc12b_ain0);
+    ain_io_deinit(PB12);
 }
 
 void adc12b_in1_io_init(void)
 {
-    uint8_t adc12b_ain1 = PB13;
-    ana_io_init((gpio_pin_t *)&adc12b_ain1,ANA_FUNC1);
+    ana_func1_io_init(PB13);
 }
 
 void adc12b_in1_io_deinit(void)
 {
-    uint8_t adc12b_ain1 = PB13;
-    io_cfg_disable(adc12b_ain1);
+    ain_io_deinit(PB13);
 }
 
 void adc12b_in2_io_init(void)
 {
-    uint8_t adc12b_ain2 = PC00;
-    ana_io_init((gpio_pin_t *)&adc12b_ain2,ANA_FUNC1);
+    ana_func1_io_init(PC00);
 }
 
 void adc12b_in2_io_deinit(void)
 {
-    uint8_t adc12b_ain2 = PC00;
-    set_gpio_mode((gpio_pin_t *)&adc12b_ain2);
-    io_cfg_disable(adc12b_ain2);
+    ain_io_deinit(PC00);
 }
 
 void adc12b_in3_io_init(void)
 {
-    uint8_t adc12b_ain3 = PC01;
-    ana_io_init((gpio_pin_t *)&adc12b_ain3,ANA_FUNC1);
+    ana_func1_io_init(PC01);
 }
 
 void adc12b_in3_io_deinit(void)
 {
-     uint8_t adc12b_ain3 = PC01;
-    set_gpio_mode((gpio_pin_t *)&adc12b_ain3);
-    io_cfg_disable(adc12b_ain3);
+    ain_io_deinit(PC01);
 }
 
 void adc12b_in4_io_init(void)
 {
-    uint8_t adc12b_ain4 = PA00;
-    ana_io_init((gpio_pin_t *)&adc12b_ain4,ANA_FUNC1);
+    ana_func1_io_init(PA00);
 }
 
 void adc12b_in4_io_deinit(void)
 {
-    uint8_t adc12b_ain4 = PA00;
-    set_gpio_mode((gpio_pin_t *)&adc12b_ain4);
-    io_cfg_disable(adc12b_ain4);
+    ain_io_deinit(PA00);
 }
 
 void adc12b_in5_io_init(void)
 {
-    uint8_t adc12b_ain5 = PA01;
-    ana_io_init((gpio_pin_t *)&adc12b_ain5,ANA_FUNC1);
+    ana_func1_io_init(PA01);
 }
 
 void adc12b_in5_io_deinit(void)
 {
-    uint8_t adc12b_ain5 = PA01;
-    set_gpio_mode((gpio_pin_t *)&adc12b_ain5);
-    io_cfg_disable(adc12b_ain5);
+    ain_io_deinit(PA01);
 }
 
 
 void adc12b_in6_io_init(void)
 {
-    uint8_t adc12b_ain6 = PA02;
-    ana_io_init((gpio_pin_t *)&adc12b_ain6,ANA_FUNC1);
+    ana_func1_io_init(PA02);
 }
 
 void adc12b_in6_io_deinit(void)
 {
-    uint8_t adc12b_ain6 = PA02;
-    set_gpio_mode((gpio_pin_t *)&adc12b_ain6);
-    io_cfg_disable(adc12b_ain6);
+    ain_io_deinit(PA02);
 }
 
 void adc12b_in7_io_init(void)
 {
-    uint8_t adc12b_ain7 = PA03;
-    ana_io_init((gpio_pin_t *)&adc12b_ain7,ANA_FUNC1);
+    ana_func1_io_init(PA03);
 }
 
 void adc12b_in7_io_deinit(void)
 {
-    uint8_t adc12b_ain7 = PA03;
-    set_gpio_mode((gpio_pin_t *)&adc12b_ain7);
-    io_cfg_disable(adc12b_ain7);
+    ain_io_deinit(PA03);
 }
 
 void adc12b_in8_io_init(void)
 {
-    uint8_t adc12b_ain8 = PA04;
-    ana_io_init((gpio_pin_t *)&adc12b_ain8,ANA_FUNC1);
+    ana_func1_io_init(PA04);
 }
 
 void adc12b_in8_io_deinit(void)
 {
-    uint8_t adc12b_ain8 = PA04;
-    set_gpio_mode((gpio_pin_t *)&adc12b_ain8);
-    io_cfg_disable(adc12b_ain8);
+    ain_io_deinit(PA04);
 }
 
 

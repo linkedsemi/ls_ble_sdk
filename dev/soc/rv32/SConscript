@@ -1,0 +1,15 @@
+Import('dev_env')
+
+src = [
+
+]
+inc = [
+    '.',
+]
+
+taurus_src,taurus_inc = SConscript(dirs='taurus',exports = ['dev_env'])
+src_files = File(src) + taurus_src
+inc_dirs = Dir(inc) + taurus_inc
+start_files = File(['startup.c'])
+
+Return("src_files","inc_dirs","start_files")

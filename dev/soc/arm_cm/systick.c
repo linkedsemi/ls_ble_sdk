@@ -67,3 +67,34 @@ XIP_BANNED int32_t systick_time_diff(uint32_t a,uint32_t b)
         return diff;
     }
 }
+
+bool systick_poll_timeout(uint32_t start,uint32_t timeout,bool (*poll)(void *),void *param)
+{
+    uint32_t end = start + timeout;
+    uint8_t i = end>>24;
+    while(i)
+    {
+        if(poll)
+        {
+            if(poll(param))
+            {
+                return false;
+            }
+        }
+        if(systick_time_diff(systick_get_value(),start)<=0)
+        {
+            i -= 1;
+        }
+    }
+    while(systick_time_diff(systick_get_value(),end&0xffffff)<0)
+    {
+        if(poll)
+        {
+            if(poll(param))
+            {
+                return false;
+            }
+        }
+    }
+    return true;
+}

@@ -13,7 +13,7 @@ typedef struct{
 }linked_buffer_t;
 
 #define DEF_LINKED_BUF(buf_hdl,type,size) \
-    _Static_assert(offsetof(type,hdr)==0);\
+    _Static_assert(offsetof(type,hdr)==0,"hdr");\
     static type _##buf_hdl##_array[(size)]; \
     static uint8_t _##buf_hdl##_ref_cnt[(size)];\
     linked_buffer_t buf_hdl
@@ -40,8 +40,6 @@ uint8_t linked_buf_get_ref_cnt_by_idx(linked_buffer_t *ptr,uint16_t idx);
 uint8_t linked_buf_retain(linked_buffer_t *ptr,struct co_list_hdr *hdr);
 
 bool linked_buf_contain_element(linked_buffer_t *ptr,struct co_list_hdr *hdr);
-
-uint16_t linked_buf_element_size(linked_buffer_t *ptr);
 
 #endif
 

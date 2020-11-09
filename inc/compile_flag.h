@@ -1,6 +1,6 @@
 #ifndef COMPILE_FLAG_H_
 #define COMPILE_FLAG_H_
-
+#include <stdint.h>
 #if (ROM_CODE==1 || BOOT_RAM==1)
 #define XIP_BANNED 
 #else

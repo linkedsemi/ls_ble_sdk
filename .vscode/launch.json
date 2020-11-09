@@ -582,5 +582,20 @@
                 "load", 
             ]
         },
+        {
+            "type": "gdb",
+            "request": "attach",
+            "cwd": "${workspaceRoot}",
+            "name": "TAURUS HOST_TEST",
+            "executable": "./build/examples/host_test.elf",
+            "target": ":1025",
+            "remote": true,
+            "gdbpath": "riscv-none-embed-gdb",
+            "autorun": [
+                "interrupt",
+                "load",
+                "monitor reset"
+            ]
+        },
     ]
 }

@@ -2,7 +2,7 @@
 #include <stdarg.h>
 #include "log.h"
 #include "compile_flag.h"
-#include "platform.h"
+//#include "platform.h"
 
 //void iob_output_set(uint8_t i);
 
