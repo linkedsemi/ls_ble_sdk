@@ -32,6 +32,7 @@ extern void (*log_output_fn)(bool linefeed,const char *format,...);
 extern void (*log_hex_output_fn)(const void * data_pointer , uint16_t data_length);
 extern void (*aes_encrypt_fn)(void (*)(void),const uint8_t*,const uint8_t*);
 extern void (*aes_encrypt_comp_fn)(void (*)(uint32_t *),uint32_t*);
+extern void (*stack_reset_hook_fn)(void);
 
 extern uint8_t main_task;
 extern uint8_t max_activity_num;
@@ -135,6 +136,7 @@ void stack_var_ptr_init()
     log_hex_output_fn = log_hex_output;
     aes_encrypt_fn = ls_ip_aes_encrypt_start;
     aes_encrypt_comp_fn = ls_ip_aes_encrypt_complete;
+    stack_reset_hook_fn = NULL;
 
     max_activity_num = SDK_MAX_ACT_NUM;
     max_profile_num = SDK_MAX_PROFILE_NUM;
@@ -199,7 +201,9 @@ void eif_init(void *read,void *write,void *flow_on,void *flow_off)
     eif_flow_off = flow_off;
 }
 
-__attribute__((weak))  void ll_stack_buffer_init(uint32_t env_size,uint32_t msg_size,uint32_t non_ret_size){};
+__attribute__((weak)) void ll_stack_buffer_init(uint32_t env_size,uint32_t msg_size,uint32_t non_ret_size){};
+
+__attribute__((weak)) void ll_stack_reset_hook(){};
 
 void ll_stack_var_ptr_init()
 {
@@ -214,6 +218,7 @@ void ll_stack_var_ptr_init()
     log_hex_output_fn = log_hex_output;
     aes_encrypt_fn = ls_ip_aes_encrypt_start;
     aes_encrypt_comp_fn = ls_ip_aes_encrypt_complete;
+    stack_reset_hook_fn = ll_stack_reset_hook;
 
     max_activity_num = SDK_MAX_ACT_NUM;
     max_profile_num = SDK_MAX_PROFILE_NUM;
