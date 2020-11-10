@@ -741,6 +741,8 @@ void gap_manager_update_conn_param(uint8_t con_idx,struct gap_update_conn_param 
 
 void gap_manager_set_pkt_size(uint8_t con_idx, struct gap_set_pkt_size *p_param);
 
+void gap_manager_delete_bonding(uint8_t peer_id);
+
 void gatt_manager_init(void (*evt_cb)(enum gatt_evt_type,union gatt_evt_u *,uint8_t));
 
 void gatt_manager_svc_register(uint16_t start_hdl,uint8_t att_num,struct gatt_svc_env *svc);
