@@ -114,7 +114,7 @@ typedef enum
     HAL_UART_STATE_READY             = 0x20U,    /*!< Peripheral Initialized and ready for use
                                                     Value is allowed for gState and RxState */
     HAL_UART_STATE_BUSY              = 0x24U,    /*!< an internal process is ongoing
-                                                    Value is allowed for gState only */
+                                                    // Value is allowed for gState only */
     HAL_UART_STATE_BUSY_TX           = 0x21U,    /*!< Data Transmission process is ongoing
                                                     Value is allowed for gState only */
     HAL_UART_STATE_BUSY_RX           = 0x22U,    /*!< Data Reception process is ongoing
@@ -125,7 +125,7 @@ typedef enum
     HAL_UART_STATE_TIMEOUT           = 0xA0U,    /*!< Timeout state
                                                     Value is allowed for gState only */
     HAL_UART_STATE_ERROR             = 0xE0U     /*!< Error
-                                                   Value is allowed for gState only */
+                                                    Value is allowed for gState only */
 } HAL_UART_StateTypeDef;
 
 

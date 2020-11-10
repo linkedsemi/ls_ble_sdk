@@ -285,53 +285,53 @@ static void BPF_CAL()
     //bpf end
 }
 
-static uint16_t rf_pll_gain_cal(uint8_t tx_channel_dis)
-{
-    uint8_t pll_gain_cal_val            =0;
+// static uint16_t rf_pll_gain_cal(uint8_t tx_channel_dis)
+// {
+//     uint8_t pll_gain_cal_val            =0;
 
-    REG_FIELD_WR(RF->REG10, RF_PLL_RTX_SEL, 1);  
-    REG_FIELD_WR(RF->REG1C, RF_PLL_FRAC_INT_MODE, 0);  //Integer mode
-    REG_FIELD_WR(RF->REG00,RF_EN_DAC_BLE,1); 
-    REG_FIELD_WR(RF->REG30,RF_LDO_PA_TRIM,1);
-	REG_FIELD_WR(RF->REG10, RF_PLL_DI_S, tx_channel_dis);
-    REG_FIELD_WR(RF->REG14, RF_PLL_FRAC, 0X000000);
-    //AFC 
+//     REG_FIELD_WR(RF->REG10, RF_PLL_RTX_SEL, 1);  
+//     REG_FIELD_WR(RF->REG1C, RF_PLL_FRAC_INT_MODE, 0);  //Integer mode
+//     REG_FIELD_WR(RF->REG00,RF_EN_DAC_BLE,1); 
+//     REG_FIELD_WR(RF->REG30,RF_LDO_PA_TRIM,1);
+// 	REG_FIELD_WR(RF->REG10, RF_PLL_DI_S, tx_channel_dis);
+//     REG_FIELD_WR(RF->REG14, RF_PLL_FRAC, 0X000000);
+//     //AFC 
 
-    REG_FIELD_WR(RF->REG10,RF_PLL_FREQ_EXT_EN,0);         
-    REG_FIELD_WR(RF->REG10, RF_PLL_CAL_EN, 0);// AFC CAL disable
-	REG_FIELD_WR(RF->REG10, RF_PLL_CAL_EN, 1);// AFC CAL enable
-    while((!(REG_FIELD_RD(RF->REG38,RF_PLL_BAND_CAL_DONE))))
-    ;
+//     REG_FIELD_WR(RF->REG10,RF_PLL_FREQ_EXT_EN,0);         
+//     REG_FIELD_WR(RF->REG10, RF_PLL_CAL_EN, 0);// AFC CAL disable
+// 	REG_FIELD_WR(RF->REG10, RF_PLL_CAL_EN, 1);// AFC CAL enable
+//     while((!(REG_FIELD_RD(RF->REG38,RF_PLL_BAND_CAL_DONE))))
+//     ;
 
-    // gain cal 
-    REG_FIELD_WR(RF->REG00,RF_EN_DAC_BLE,1); 
-    REG_FIELD_WR(RF->REG2C,RF_PLL_VTXD_EXT_EN,0); 
-    REG_FIELD_WR(RF->REG2C,RF_PLL_GAIN_CAL_EN,0); 
-    REG_FIELD_WR(RF->REG2C,RF_PLL_GAIN_CAL_EN,1);  
-    while((!(REG_FIELD_RD(RF->REG38,RF_PLL_GAIN_CAL_DONE))))
-    ;
+//     // gain cal 
+//     REG_FIELD_WR(RF->REG00,RF_EN_DAC_BLE,1); 
+//     REG_FIELD_WR(RF->REG2C,RF_PLL_VTXD_EXT_EN,0); 
+//     REG_FIELD_WR(RF->REG2C,RF_PLL_GAIN_CAL_EN,0); 
+//     REG_FIELD_WR(RF->REG2C,RF_PLL_GAIN_CAL_EN,1);  
+//     while((!(REG_FIELD_RD(RF->REG38,RF_PLL_GAIN_CAL_DONE))))
+//     ;
 
-    pll_gain_cal_val =REG_FIELD_RD(RF->REG38, RF_PLL_DAC_ADJ_TEST);
-    REG_FIELD_WR(RF->REG30,RF_EN_AT,0x0);
-    REG_FIELD_WR(RF->REG2C,RF_PLL_VTXD_EXT_EN,1); 
-    REG_FIELD_WR(RF->REG10, RF_PLL_CAL_EN, 0);// PLL CAL disable
-    REG_FIELD_WR(RF->REG2C,RF_PLL_GAIN_CAL_EN,0);  //gain cal disable
-    REG_FIELD_WR(RF->REG1C, RF_PLL_FRAC_INT_MODE, 0);
-    return pll_gain_cal_val;
-}
+//     pll_gain_cal_val =REG_FIELD_RD(RF->REG38, RF_PLL_DAC_ADJ_TEST);
+//     REG_FIELD_WR(RF->REG30,RF_EN_AT,0x0);
+//     REG_FIELD_WR(RF->REG2C,RF_PLL_VTXD_EXT_EN,1); 
+//     REG_FIELD_WR(RF->REG10, RF_PLL_CAL_EN, 0);// PLL CAL disable
+//     REG_FIELD_WR(RF->REG2C,RF_PLL_GAIN_CAL_EN,0);  //gain cal disable
+//     REG_FIELD_WR(RF->REG1C, RF_PLL_FRAC_INT_MODE, 0);
+//     return pll_gain_cal_val;
+// }
 
-static void pll_gain()
-{
-    uint8_t pll_gain_cal_val=0;
-    //TX
-    pll_gain_cal_val = rf_pll_gain_cal(PLL_GAIN_CAL_FRQ_DIS0);
-    pll_int_vtxd_ext = pll_gain_cal_val; 
-    REG_FIELD_WR(RF->REG2C,RF_PLL_VTXD_EXT_EN,0);  
-    REG_FIELD_WR(RF->REG2C,RF_PLL_VTXD_EXT,pll_int_vtxd_ext);
-    REG_FIELD_WR(RF->REG70,RF_INT_VTXD_EXT1,pll_int_vtxd_ext);
-    REG_FIELD_WR(RF->REG70,RF_INT_VTXD_EXT2,pll_int_vtxd_ext);
-    REG_FIELD_WR(RF->REG2C,RF_PLL_VTXD_EXT_EN,0);
-}
+// static void pll_gain()
+// {
+//     uint8_t pll_gain_cal_val=0;
+//     //TX
+//     pll_gain_cal_val = rf_pll_gain_cal(PLL_GAIN_CAL_FRQ_DIS0);
+//     pll_int_vtxd_ext = pll_gain_cal_val; 
+//     REG_FIELD_WR(RF->REG2C,RF_PLL_VTXD_EXT_EN,0);  
+//     REG_FIELD_WR(RF->REG2C,RF_PLL_VTXD_EXT,pll_int_vtxd_ext);
+//     REG_FIELD_WR(RF->REG70,RF_INT_VTXD_EXT1,pll_int_vtxd_ext);
+//     REG_FIELD_WR(RF->REG70,RF_INT_VTXD_EXT2,pll_int_vtxd_ext);
+//     REG_FIELD_WR(RF->REG2C,RF_PLL_VTXD_EXT_EN,0);
+// }
 
 static void modem_reg_init()
 {

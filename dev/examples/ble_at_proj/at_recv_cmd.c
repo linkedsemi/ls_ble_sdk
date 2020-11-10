@@ -245,7 +245,7 @@ static void ls_uart_init(void)
 
 void uart_write(uint8_t *value, uint16_t length)
 {
-    HAL_UART_Transmit(&UART_Server_Config, value, length, NULL);
+    HAL_UART_Transmit(&UART_Server_Config, value, length, 0);
 }
 
 void uart_tx_it(uint8_t *value, uint16_t length)
