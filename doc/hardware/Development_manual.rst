@@ -10,7 +10,7 @@
 1.1 功能介绍
 +++++++++++++
 
-LE5010芯片支持SIG MESH和私有MESH，供电电压在1.7V-3.6V，可以使用干电池或者对应电压的锂电池供电。
+LE5010芯片支持SIG MESH，天猫MESH和私有MESH，供电电压在1.7V-3.6V，可以使用干电池或者对应电压的锂电池供电。
 
 +++++++++++++++
 1.2 引脚定义图
@@ -239,6 +239,10 @@ C1、C2、C3              (±10%)/10V/1uF/0402                3
 
 外形尺寸：
 
+**QFN48尺寸图**
+
+..  image::  LE5010_QFN48_Size.png
+
 **QFN32尺寸图**
 
 ..  image::  LE5010_QFN3_Size.png
@@ -247,11 +251,12 @@ C1、C2、C3              (±10%)/10V/1uF/0402                3
 
 ..  image::  SOP16.png
 
-QFN32_SCH  :download:`CN <./LE5010_QFN32_CN.pdf> EN <./LE5010_QFN32_EN.pdf>`
+QFN32_SCH  :download:`CN <./LE5010_QFN32_CN.pdf>` :download:`EN <./LE5010_QFN32_EN.pdf>`
 
 SOP16_SCH  :download:`CN <./LE5010_SOP16_IO.pdf>`
 
 AD_PCB  :download:`LE5010_QFN32_PCB <./LEM5010.PcbDoc>` 
 
+AD_LIB  :download:`AD_LIB <./LE5010.IntLib>` 
 
  
