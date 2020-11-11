@@ -68,7 +68,7 @@ XIP_BANNED int32_t systick_time_diff(uint32_t a,uint32_t b)
     }
 }
 
-bool systick_poll_timeout(uint32_t start,uint32_t timeout,bool (*poll)(void *),void *param)
+XIP_BANNED bool systick_poll_timeout(uint32_t start,uint32_t timeout,bool (*poll)(void *),void *param)
 {
     uint32_t end = start + timeout;
     uint8_t i = end>>24;
