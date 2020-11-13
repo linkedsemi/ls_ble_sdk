@@ -268,6 +268,7 @@ void sys_init_ll()
     analog_init();
     ll_var_init();
     io_init();
+    lsecc_init();
     calc_acc_init();
     cpu_sleep_recover_init();
     mac_init();
