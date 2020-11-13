@@ -3,9 +3,9 @@ src = [
     'cpu.c',
     'platform.c',
     'stack_var.c',
-    'compiler/$COMPILER/sleep_asm.s',
-    'compiler/$COMPILER/svcall_asm.s',
-    'compiler/$COMPILER/delay_asm.s',
+    'compiler/$COMPILER/sleep_asm.S',
+    'compiler/$COMPILER/svcall_asm.S',
+    'compiler/$COMPILER/delay_asm.S',
     'integration/lsqspi_param.c',
     'integration/uart_param.c',
     'integration/modem_rf_le501x.c',
@@ -21,7 +21,7 @@ inc = [
     'integration',
 ]
 start_src = [
-    'compiler/$COMPILER/startup.s',
+    'compiler/$COMPILER/startup.S',
 ]
 src_files = File(dev_env.subst(src))
 inc_dirs = Dir(inc)

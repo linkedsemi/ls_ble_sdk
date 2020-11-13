@@ -22,7 +22,7 @@
  * limitations under the License.
  */
  
-#include "FlashOS.H"        // FlashOS Structures
+#include "FlashOS.h"        // FlashOS Structures
 #include "lsqspi_param.h"
 
 struct FlashDevice const FlashDevice  __attribute__ ((section ("DevDscr")))  =  {

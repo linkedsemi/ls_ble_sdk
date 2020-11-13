@@ -22,7 +22,7 @@
  * limitations under the License.
  */
 #include <stdbool.h> 
-#include "FlashOS.H"        // FlashOS Structures
+#include "FlashOS.h"        // FlashOS Structures
 #include "spi_flash.h"
 #include "lsqspi_param.h"
 #include "le501x.h"

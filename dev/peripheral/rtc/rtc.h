@@ -2,7 +2,7 @@
 #define RTC_H_
 #include <stdbool.h>
 #include "reg_rtc.h"
-#include "HAL_def.H"
+#include "HAL_def.h"
 #include "sdk_config.h"
 #include "le501x.h"
 #include "field_manipulate.h"
