@@ -73,6 +73,8 @@ void io_init(void);
 
 void io_cfg_output(uint8_t pin);
 
+void io_cfg_outot(uint8_t pin);
+
 void io_cfg_input(uint8_t pin);
 
 void io_cfg_disable(uint8_t pin);
@@ -107,6 +109,9 @@ void iic1_io_deinit(void);
 
 void uart1_io_init(uint8_t txd,uint8_t rxd);
 void uart1_io_deinit(void);
+
+void uart1_7816_io_init(uint8_t txd,uint8_t ck);
+void uart1_7816_io_deinit();
 
 void uart2_io_init(uint8_t txd,uint8_t rxd);
 void uart2_io_deinit(void);

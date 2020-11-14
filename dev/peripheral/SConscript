@@ -11,7 +11,7 @@ src = [
     'adc/lsadc.c',
     'timer/lstimer.c',
     'rtc/rtc.c',
-
+    'uart/smartcard.c',
 ]
 
 if dev_env['IC'] != 'taurus':

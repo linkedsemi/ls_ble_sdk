@@ -8,6 +8,7 @@
 
 gpio_pin_t uart1_txd;
 gpio_pin_t uart1_rxd;
+gpio_pin_t uart1_ck;
 gpio_pin_t uart2_txd;
 gpio_pin_t uart2_rxd;
 gpio_pin_t uart3_txd;
@@ -103,6 +104,15 @@ static void set_gpio_mode(gpio_pin_t *pin)
     MODIFY_REG(gpiox->MODE, GPIO_MODE0_MASK << (pin->num << 1u), SET_GPIO_MODE_GPIO << (pin->num << 1u));
 }
 
+static void uart_7816_io_cfg(uint8_t txd,uint8_t ck)
+{
+    io_set_pin(txd);
+    io_set_pin(ck);
+    io_cfg_outot(txd);
+    io_cfg_output(txd);
+    io_cfg_output(ck);
+}
+
 void uart1_io_init(uint8_t txd,uint8_t rxd)
 {
     *(uint8_t *)&uart1_txd = txd;
@@ -147,6 +157,29 @@ void uart3_io_deinit()
     set_gpio_mode((gpio_pin_t *)&uart3_txd);
     set_gpio_mode((gpio_pin_t *)&uart3_rxd);
 }
+
+void uart1_7816_io_deinit()
+{
+    set_gpio_mode((gpio_pin_t *)&uart1_txd);
+    set_gpio_mode((gpio_pin_t *)&uart1_ck);
+}
+
+void io_cfg_outot(uint8_t pin)
+{
+    gpio_pin_t *x = (gpio_pin_t *)&pin;
+    reg_lsgpio_t *gpiox = GPIO_GetPort(x->port);
+    gpiox->OT |= 1<< x->num;
+}
+
+void uart1_7816_io_init(uint8_t txd,uint8_t ck)
+{
+    *(uint8_t *)&uart1_txd = txd;
+    *(uint8_t *)&uart1_ck = ck;
+    uart_7816_io_cfg(txd,ck);
+    af_io_init((gpio_pin_t *)&txd,AF_UART1_TXD);
+    af_io_init((gpio_pin_t *)&ck,AF_UART1_CK);
+}
+
 
 static void timer_ch_io_output_cfg(uint8_t pin,uint8_t default_val)
 {

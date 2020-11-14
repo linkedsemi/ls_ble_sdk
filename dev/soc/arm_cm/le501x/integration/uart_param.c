@@ -10,6 +10,9 @@
 static UART_HandleTypeDef *UART_inst_env[3];
 void (*uart_isr)(UART_HandleTypeDef *);
 
+static SMARTCARD_HandleTypeDef *SMARTCARD_inst_env[3];
+void (*smartcard_isr)(SMARTCARD_HandleTypeDef *);
+
 void uart_sw_reset(UART_HandleTypeDef *inst)
 {
     if (inst->UARTX == UART1)
@@ -121,5 +124,101 @@ void uart_status_set(UART_HandleTypeDef *inst,uint8_t status)
     }
 }
 
+void smartcard_int_op(void (*isr)(SMARTCARD_HandleTypeDef *),SMARTCARD_HandleTypeDef *inst,uint8_t states)
+{
+    if (states)
+    {
+        smartcard_isr=isr; 
+        if (inst->Instance == UART1)
+        {
+            NVIC_ClearPendingIRQ(UART1_IRQn);
+            SMARTCARD_inst_env[0] = inst;
+						UART_inst_env[0] = NULL;
+            NVIC_EnableIRQ(UART1_IRQn);
+        }
+        if (inst->Instance == UART2)
+        {
+            NVIC_ClearPendingIRQ(UART2_IRQn);
+            SMARTCARD_inst_env[1] = inst;
+						UART_inst_env[1] = NULL;
+            NVIC_EnableIRQ(UART2_IRQn);
+        }
+        if (inst->Instance == UART3)
+        {
+            NVIC_ClearPendingIRQ(UART3_IRQn);
+            SMARTCARD_inst_env[2] = inst;
+						UART_inst_env[2] = NULL;
+            NVIC_EnableIRQ(UART3_IRQn);
+        }
+    }
+    else
+    {
+        if (inst->Instance == UART1)
+        {
+            NVIC_DisableIRQ(UART1_IRQn);
+        }
+        if (inst->Instance == UART2)
+        {
+            NVIC_DisableIRQ(UART2_IRQn);
+        }
+        if (inst->Instance == UART3)
+        {
+            NVIC_DisableIRQ(UART3_IRQn);
+        }
+        smartcard_isr = NULL ;
+    }
+}
+
+
+void smartcard_sw_reset(SMARTCARD_HandleTypeDef *inst)
+{
+    if (inst->Instance == UART1)
+    {
+        REG_FIELD_WR(RCC->APB2RST, RCC_UART1, 1);
+        REG_FIELD_WR(RCC->APB2RST, RCC_UART1, 0);
+    }
+    if (inst->Instance == UART2)
+    {
+        REG_FIELD_WR(RCC->APB1RST, RCC_UART2, 1);
+        REG_FIELD_WR(RCC->APB1RST, RCC_UART2, 0);
+    }
+    if (inst->Instance == UART3)
+    {
+        REG_FIELD_WR(RCC->APB1RST, RCC_UART3, 1);
+        REG_FIELD_WR(RCC->APB1RST, RCC_UART3, 0);
+    }
+}
+
+void smartcard_status_set(SMARTCARD_HandleTypeDef *inst,uint8_t status)
+{
+    switch((uint32_t)inst->Instance)
+    {
+    case (uint32_t)UART1:
+        uart1_status_set(status);
+    break;
+    case (uint32_t)UART2:
+        uart2_status_set(status);
+    break;
+    case (uint32_t)UART3:
+        uart3_status_set(status);
+    break;
+    }
+}
+
+void smartcard_clock_enable(SMARTCARD_HandleTypeDef *inst,uint8_t status)
+{
+    if (inst->Instance == UART1)
+    {
+        REG_FIELD_WR(RCC->APB2EN, RCC_UART1, status);
+    }
+    if (inst->Instance == UART2)
+    {
+        REG_FIELD_WR(RCC->APB1EN, RCC_UART2, status);
+    }
+    if (inst->Instance == UART3)
+    {
+        REG_FIELD_WR(RCC->APB1EN, RCC_UART3, status);
+    }
+}
 
 
