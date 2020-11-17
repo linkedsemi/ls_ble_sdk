@@ -405,12 +405,37 @@ static void UART_Receive_IT(UART_HandleTypeDef *huart)
   *                the configuration information for the specified UART module.
   * @retval None
   */
+volatile uint8_t uart_rto_flag = 0;  // debug
 
 void HAL_UARTx_IRQHandler(UART_HandleTypeDef *huart)
 {
     uint32_t isrflags   = huart->UARTX->IFM;  
     uint32_t status_reg = huart->UARTX->SR;
-
+		if ((isrflags & UART_IT_RTO) !=0 )
+		{
+			uint8_t *bufPtr;
+      uint32_t	dma_recved=0;
+			DMA_CTRLSTURCT_TypeDef *ctrlstrcut;
+				// get DMA received bytes from ctrl struct.
+				// calculated address of data to be save by manual read
+			ctrlstrcut = (DMA_CTRLSTURCT_TypeDef *)(huart->rxDMARto.ctrl_struct);
+			dma_recved = huart->rxDMARto.set_size - ctrlstrcut->ctrl.N_MINUS_1;
+			huart->rxDMARto.recv_size = dma_recved;
+			bufPtr = (uint8_t *)(huart->rxDMARto.dst_end_ptr) + dma_recved;
+				// disable DMA
+			while (READ_BIT(huart->UARTX->SR,UART_SR_DR))
+			{
+			*bufPtr++ = (uint8_t)(huart->UARTX->RBR & (uint8_t)0xff);
+			huart->rxDMARto.recv_size++;
+			}
+			WRITE_REG(huart->UARTX->ICR, UART_IT_RTO);
+			// disable DMA
+			ctrlstrcut->ctrl.N_MINUS_1 = 0;
+			huart->hdmarx.Instance->ENCLR = 1 << huart->hdmarx.Config.chnIndex;
+			DMA1INT->DONEICF = 1<< huart->hdmarx.Config.chnIndex;
+			huart->hdmarx.XferCpltCallback(&huart->hdmarx);
+			uart_rto_flag=1;
+		}
     /* UART in mode Transmitter ------------------------------------------------*/
     if (( isrflags& UART_IT_TXS) != 0) 
     {
