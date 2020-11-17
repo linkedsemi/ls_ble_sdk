@@ -12,6 +12,7 @@ src = [
     'timer/lstimer.c',
     'rtc/rtc.c',
     'uart/smartcard.c',
+    'dma/dma.c'
 ]
 
 if dev_env['IC'] != 'taurus':
@@ -29,6 +30,7 @@ inc = [
     'adc',
     'timer',
     'rtc',
+    'dma',
     '.',
 ]
 src_files = File(src)

@@ -13,8 +13,8 @@ typedef enum
     HAL_BUSY           = 0x02U,
     HAL_STATE_ERROR    = 0x03U,
     HAL_TIMEOUT  = 0x04U,
-    HAL_INVALID_OPERATION,
-    HAL_DMAC_NO_AVAILABLE_CHANNEL
+    HAL_ERROR    = 0x05U,
+    HAL_INVALID_OPERATION = 0x06U,
 } HAL_StatusTypeDef;
 
 typedef enum
