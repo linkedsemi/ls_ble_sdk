@@ -1,14 +1,13 @@
 #include "main.h"
 #include "io_config.h"
 #if 1
-#define  PERIOD_VALUE       (666 - 1)  /* Period Value  */
-#define  PULSE1_VALUE       333        /* Capture Compare 1 Value  */
-#define  PULSE2_VALUE       249        /* Capture Compare 2 Value  */
-#define  PULSE3_VALUE       166        /* Capture Compare 3 Value  */
-#define  PULSE4_VALUE       83         /* Capture Compare 4 Value  */
+#define PERIOD_VALUE (666 - 1) /* Period Value  */
+#define PULSE1_VALUE 333       /* Capture Compare 1 Value  */
+#define PULSE2_VALUE 249       /* Capture Compare 2 Value  */
+#define PULSE3_VALUE 166       /* Capture Compare 3 Value  */
+#define PULSE4_VALUE 83        /* Capture Compare 4 Value  */
 
-
-TIM_HandleTypeDef    TimHandle;
+TIM_HandleTypeDef TimHandle;
 
 /* Timer Output Compare Configuration Structure declaration */
 TIM_OC_InitTypeDef sConfig;
@@ -25,24 +24,14 @@ static void Error_Handler(void);
 /* Private functions ---------------------------------------------------------*/
 void HAL_TIM_PWM_MspInit(TIM_HandleTypeDef *htim)
 {
-  /*##-1- Enable peripherals and GPIO Clocks #################################*/
-  /* TIMx Peripheral clock enable */
-//   TIMx_CLK_ENABLE();
-    // REG_FIELD_WR(RCC->APB1RST, RCC_GPTIMB1, 1);
-    // REG_FIELD_WR(RCC->APB1RST, RCC_GPTIMB1, 0);
-    // REG_FIELD_WR(RCC->APB1EN, RCC_GPTIMB1, 1);
+    /* TIMx Peripheral clock enable */
     __HAL_RCC_TIM3_CLK_ENABLE();
-  /* Enable all GPIO Channels Clock requested */
- // TIMx_CHANNEL_GPIO_PORT();
-    __HAL_RCC_GPIOA_CLK_ENABLE();
-  /* Configure PA00, PA01, PA07, PA08 for PWM output 
-  */
 
-  /* Enable all GPIO Channels Clock requested */
-	gptimb1_ch1_io_init(PA00,true,0);
-	gptimb1_ch2_io_init(PA01,true,0);
-    gptimb1_ch3_io_init(PA07,true,0);
-    gptimb1_ch4_io_init(PA08,true,0);
+    /* Configure PA00, PA01, PA07, PA08 for PWM output */
+    gptimb1_ch1_io_init(PA00, true, 0);
+    gptimb1_ch2_io_init(PA01, true, 0);
+    gptimb1_ch3_io_init(PA07, true, 0);
+    gptimb1_ch4_io_init(PA08, true, 0);
 }
 /**
   * @brief  Main program
@@ -51,145 +40,93 @@ void HAL_TIM_PWM_MspInit(TIM_HandleTypeDef *htim)
   */
 int main(void)
 {
-  /* LE501x HAL library initialization:
-       - Configure the Systick to generate an interrupt each 1 msec
-       - Set NVIC Group Priority to 4
-       - Global MSP (MCU Support Package) initialization
-     */
-  //HAL_Init();
-  
-  /* Configure the system clock to 16 MHz */
-  SystemClock_Config();
-  
-  /* Configure LED3 */
-  //BSP_LED_Init(LED3);
+    /* Configure the system clock to 16 MHz */
+    SystemClock_Config();
 
-  /* Compute the prescaler value to have TIM3 counter clock equal to 16 MHz */
-  //uhPrescalerValue = (uint32_t) ((SystemCoreClock /2) / 21000000) - 1;
+    /*##-1- Configure the TIM peripheral #######################################*/
+    TimHandle.Instance = TIMx;
+    TimHandle.Init.Prescaler = 0; // 16MHz
+    TimHandle.Init.Period = PERIOD_VALUE;
+    TimHandle.Init.ClockDivision = 0;
+    TimHandle.Init.CounterMode = TIM_COUNTERMODE_UP;
+    TimHandle.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+    if (HAL_TIM_PWM_Init(&TimHandle) != HAL_OK)
+    {
+        /* Initialization Error */
+        Error_Handler();
+    }
 
-  /*##-1- Configure the TIM peripheral #######################################*/ 
-  /* -----------------------------------------------------------------------
-  TIM3 Configuration: generate 4 PWM signals with 4 different duty cycles.
-    
-    In this example TIM3 input clock (TIM3CLK) is set to 2 * APB1 clock (PCLK1), 
-    since APB1 prescaler is different from 1.   
-      TIM3CLK = 2 * PCLK1  
-      PCLK1 = HCLK / 4 
-      => TIM3CLK = HCLK / 2 = SystemCoreClock /2
-          
-    To get TIM3 counter clock at 21 MHz, the prescaler is computed as follows:
-       Prescaler = (TIM3CLK / TIM3 counter clock) - 1
-       Prescaler = ((SystemCoreClock /2) /21 MHz) - 1
-                                              
-    To get TIM3 output clock at 30 KHz, the period (ARR)) is computed as follows:
-       ARR = (TIM3 counter clock / TIM3 output clock) - 1
-           = 665
-                  
-    TIM3 Channel1 duty cycle = (TIM3_CCR1/ TIM3_ARR)* 100 = 50%
-    TIM3 Channel2 duty cycle = (TIM3_CCR2/ TIM3_ARR)* 100 = 37.5%
-    TIM3 Channel3 duty cycle = (TIM3_CCR3/ TIM3_ARR)* 100 = 25%
-    TIM3 Channel4 duty cycle = (TIM3_CCR4/ TIM3_ARR)* 100 = 12.5%
+    /*##-2- Configure the PWM channels #########################################*/
+    /* Common configuration for all channels */
+    sConfig.OCMode = TIM_OCMODE_PWM1;
+    sConfig.OCPolarity = TIM_OCPOLARITY_HIGH;
+    sConfig.OCFastMode = TIM_OCFAST_DISABLE;
 
-    Note: 
-     SystemCoreClock variable holds HCLK frequency and is defined in system_stm32f4xx.c file.
-     Each time the core clock (HCLK) changes, user had to update SystemCoreClock 
-     variable value. Otherwise, any configuration based on this variable will be incorrect.
-     This variable is updated in three ways:
-      1) by calling CMSIS function SystemCoreClockUpdate()
-      2) by calling HAL API function HAL_RCC_GetSysClockFreq()
-      3) each time HAL_RCC_ClockConfig() is called to configure the system clock frequency     
-  ----------------------------------------------------------------------- */ 
-  
-  /* Initialize TIMx peripheral as follow:
-       + Prescaler = (SystemCoreClock/2)/21000000
-       + Period = 665
-       + ClockDivision = 0
-       + Counter direction = Up
-  */
-  TimHandle.Instance = TIMx;
-  
-  TimHandle.Init.Prescaler = 0; // 16MHz
-  TimHandle.Init.Period = PERIOD_VALUE;
-  TimHandle.Init.ClockDivision = 0;
-  TimHandle.Init.CounterMode = TIM_COUNTERMODE_UP;
-  TimHandle.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
-  if(HAL_TIM_PWM_Init(&TimHandle) != HAL_OK)
-  {
-    /* Initialization Error */
-    Error_Handler();
-  }
-  
-  /*##-2- Configure the PWM channels #########################################*/ 
-  /* Common configuration for all channels */
-  sConfig.OCMode = TIM_OCMODE_PWM1;
-  sConfig.OCPolarity = TIM_OCPOLARITY_HIGH;
-  sConfig.OCFastMode = TIM_OCFAST_DISABLE;
+    /* Set the pulse value for channel 1 */
+    sConfig.Pulse = PULSE1_VALUE;
+    if (HAL_TIM_PWM_ConfigChannel(&TimHandle, &sConfig, TIM_CHANNEL_1) != HAL_OK)
+    {
+        /* Configuration Error */
+        Error_Handler();
+    }
 
-  /* Set the pulse value for channel 1 */
-  sConfig.Pulse = PULSE1_VALUE;  
-  if(HAL_TIM_PWM_ConfigChannel(&TimHandle, &sConfig, TIM_CHANNEL_1) != HAL_OK)
-  {
-    /* Configuration Error */
-    Error_Handler();
-  }
-  
-  /* Set the pulse value for channel 2 */
-  sConfig.OCPolarity = TIM_OCPOLARITY_LOW;
-  sConfig.Pulse = PULSE2_VALUE;
-  if(HAL_TIM_PWM_ConfigChannel(&TimHandle, &sConfig, TIM_CHANNEL_2) != HAL_OK)
-  {
-    /* Configuration Error */
-    Error_Handler();
-  }
-  
-  /* Set the pulse value for channel 3 */
-  sConfig.OCPolarity = TIM_OCPOLARITY_HIGH;
-  sConfig.Pulse = PULSE3_VALUE;
-  if(HAL_TIM_PWM_ConfigChannel(&TimHandle, &sConfig, TIM_CHANNEL_3) != HAL_OK)
-  {
-    /* Configuration Error */
-    Error_Handler();
-  }
-  
-  /* Set the pulse value for channel 4 */
-  sConfig.OCPolarity = TIM_OCPOLARITY_LOW;
-  sConfig.Pulse = PULSE4_VALUE;
-  if(HAL_TIM_PWM_ConfigChannel(&TimHandle, &sConfig, TIM_CHANNEL_4) != HAL_OK)
-  {
-    /* Configuration Error */
-    Error_Handler();
-  }
-  
-  /*##-3- Start PWM signals generation #######################################*/ 
-  /* Start channel 1 */
-  if(HAL_TIM_PWM_Start(&TimHandle, TIM_CHANNEL_1) != HAL_OK)
-  {
-    /* PWM Generation Error */
-    Error_Handler();
-  }
-  /* Start channel 2 */
-  if(HAL_TIM_PWM_Start(&TimHandle, TIM_CHANNEL_2) != HAL_OK)
-  {
-    /* PWM Generation Error */
-    Error_Handler();
-  }
-  /* Start channel 3 */
-  if(HAL_TIM_PWM_Start(&TimHandle, TIM_CHANNEL_3) != HAL_OK)
-  {
-    /* PWM Generation Error */
-    Error_Handler();
-  }
-  /* Start channel 4 */
-  if(HAL_TIM_PWM_Start(&TimHandle, TIM_CHANNEL_4) != HAL_OK)
-  {
-    /* PWM Generation Error */
-    Error_Handler();
-  }
+    /* Set the pulse value for channel 2 */
+    sConfig.OCPolarity = TIM_OCPOLARITY_LOW;
+    sConfig.Pulse = PULSE2_VALUE;
+    if (HAL_TIM_PWM_ConfigChannel(&TimHandle, &sConfig, TIM_CHANNEL_2) != HAL_OK)
+    {
+        /* Configuration Error */
+        Error_Handler();
+    }
 
-  /* Infinite loop */
-  while (1)
-  {
-  }
+    /* Set the pulse value for channel 3 */
+    sConfig.OCPolarity = TIM_OCPOLARITY_HIGH;
+    sConfig.Pulse = PULSE3_VALUE;
+    if (HAL_TIM_PWM_ConfigChannel(&TimHandle, &sConfig, TIM_CHANNEL_3) != HAL_OK)
+    {
+        /* Configuration Error */
+        Error_Handler();
+    }
+
+    /* Set the pulse value for channel 4 */
+    sConfig.OCPolarity = TIM_OCPOLARITY_LOW;
+    sConfig.Pulse = PULSE4_VALUE;
+    if (HAL_TIM_PWM_ConfigChannel(&TimHandle, &sConfig, TIM_CHANNEL_4) != HAL_OK)
+    {
+        /* Configuration Error */
+        Error_Handler();
+    }
+
+    /*##-3- Start PWM signals generation #######################################*/
+    /* Start channel 1 */
+    if (HAL_TIM_PWM_Start(&TimHandle, TIM_CHANNEL_1) != HAL_OK)
+    {
+        /* PWM Generation Error */
+        Error_Handler();
+    }
+    /* Start channel 2 */
+    if (HAL_TIM_PWM_Start(&TimHandle, TIM_CHANNEL_2) != HAL_OK)
+    {
+        /* PWM Generation Error */
+        Error_Handler();
+    }
+    /* Start channel 3 */
+    if (HAL_TIM_PWM_Start(&TimHandle, TIM_CHANNEL_3) != HAL_OK)
+    {
+        /* PWM Generation Error */
+        Error_Handler();
+    }
+    /* Start channel 4 */
+    if (HAL_TIM_PWM_Start(&TimHandle, TIM_CHANNEL_4) != HAL_OK)
+    {
+        /* PWM Generation Error */
+        Error_Handler();
+    }
+
+    /* Infinite loop */
+    while (1)
+    {
+    }
 }
 
 /**
@@ -199,11 +136,11 @@ int main(void)
   */
 static void Error_Handler(void)
 {
-  /* Turn LED3 on */
-  //BSP_LED_On(LED3);
-  while(1)
-  {
-  }
+    /* Turn LED3 on */
+    //BSP_LED_On(LED3);
+    while (1)
+    {
+    }
 }
 #endif
 /**

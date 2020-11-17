@@ -1,22 +1,3 @@
-/**
-  ******************************************************************************
-  * @file    lstimer.h
-  * @author  MCD Application Team
-  * @brief   Header file of TIM HAL module.
-  ******************************************************************************
-  * @attention
-  *
-  * <h2><center>&copy; Copyright (c) 2016 STMicroelectronics.
-  * All rights reserved.</center></h2>
-  *
-  * This software component is licensed by ST under BSD 3-Clause license,
-  * the "License"; You may not use this file except in compliance with the
-  * License. You may obtain a copy of the License at:
-  *                        opensource.org/licenses/BSD-3-Clause
-  *
-  ******************************************************************************
-  */
-
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef LSTIMER_H_
 #define LSTIMER_H_
@@ -28,8 +9,12 @@ extern "C" {
 /* Includes ------------------------------------------------------------------*/
 #include "HAL_def.h"
 #include "reg_timer.h"
+#include "reg_rcc.h"
+#include "field_manipulate.h"
+#include "le501x.h"
+#include "platform.h"
 
-/** @addtogroup STM32F1xx_HAL_Driver
+/** @addtogroup le501x_HAL_Driver
   * @{
   */
 
@@ -1988,8 +1973,6 @@ mode.
   */
 /* End of private macros -----------------------------------------------------*/
 
-/* Include TIM HAL Extended module */
-//#include "stm32f1xx_hal_tim_ex.h"
 
 /* Exported functions --------------------------------------------------------*/
 /** @addtogroup TIM_Exported_Functions TIM Exported Functions
@@ -2395,4 +2378,4 @@ void TIMEx_DMACommutationHalfCplt(DMA_HandleTypeDef *hdma);
 
 #endif /* LSTIMER_H_ */
 
-/************************ (C) COPYRIGHT Linkedsemi *****END OF FILE****/
+/*****************************END OF FILE****************************/

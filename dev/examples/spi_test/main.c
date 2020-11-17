@@ -7,14 +7,6 @@
    \____/ \___/ \_| \_/\_| \_/ \____/  |_____/  |_____| \____/  \_| \/ |_/ \_____/
 
 	********************************************************************************/
-/**
-  ******************************************************************************
-  * @file    SMARTCARD/Src/main.c
-  * @author  MCD Application Team
-  * @brief   This sample code shows how to use STM32F1xx SMARTCARD HAL API to communicate
-  *          with card compatible with T0 protocol.
-  ******************************************************************************
-  */
 
 /* Includes ------------------------------------------------------------------*/
 #include "ls_ble.h"
@@ -206,4 +198,4 @@ void assert_failed(uint8_t *file, uint32_t line)
   * @}
   */
 
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
+/*****************************END OF FILE*************************/

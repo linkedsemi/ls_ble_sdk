@@ -1,14 +1,8 @@
 #ifndef __MAIN_H
 #define __MAIN_H
 
-#include "reg_timer.h"
 #include "lstimer.h"
-#include "le501x.h"
-#include "platform.h"
-#include "reg_rcc.h"
 #include "lsgpio.h"
-#include "field_manipulate.h"
-
 #include <string.h>
 
 #define TIMx                           LSGPTIM3
