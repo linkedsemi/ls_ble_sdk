@@ -12,7 +12,7 @@
 
 #endif 
 
-#define UART_BUADRATE_ENUM_GEN(BAUD)  (UART_CLOCK/BAUD)
+#define UART_BUADRATE_ENUM_GEN(BAUD)  ((((UART_CLOCK<<4)/BAUD) +8)>>4)
 
 typedef enum
 {

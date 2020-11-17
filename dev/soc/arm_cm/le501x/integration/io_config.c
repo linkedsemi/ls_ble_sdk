@@ -108,7 +108,7 @@ static void uart_7816_io_cfg(uint8_t txd,uint8_t ck)
 {
     io_set_pin(txd);
     io_set_pin(ck);
-    io_cfg_outot(txd);
+    io_cfg_opendrain(txd);
     io_cfg_output(txd);
     io_cfg_output(ck);
 }
@@ -164,11 +164,18 @@ void uart1_7816_io_deinit()
     set_gpio_mode((gpio_pin_t *)&uart1_ck);
 }
 
-void io_cfg_outot(uint8_t pin)
+void io_cfg_opendrain(uint8_t pin)
 {
     gpio_pin_t *x = (gpio_pin_t *)&pin;
     reg_lsgpio_t *gpiox = GPIO_GetPort(x->port);
     gpiox->OT |= 1<< x->num;
+}
+
+void io_cfg_pushpull(uint8_t pin)
+{
+    gpio_pin_t *x = (gpio_pin_t *)&pin;
+    reg_lsgpio_t *gpiox = GPIO_GetPort(x->port);
+    gpiox->OT |= 0<< x->num;
 }
 
 void uart1_7816_io_init(uint8_t txd,uint8_t ck)
