@@ -206,6 +206,7 @@ static void fw_copy(struct fota_image_info *ptr,uint32_t image_base)
 static void ota_settings_erase()
 {
     SYSCFG->BKD[7] = 0;
+    spi_flash_sector_erase(OTA_INFO_OFFSET);
 }
 
 static bool ota_copy_info_get(struct fota_image_info *ptr)
