@@ -1,4 +1,4 @@
-Import("dev_env")
+Import("env")
 src = [
     'lsqspi_param.c',
     'uart_param.c',
@@ -20,5 +20,5 @@ start_src = [
 src_files = File(src)
 inc_dirs = Dir(inc)
 start_files = File(start_src)
-dev_env['LINKSCRIPT'] = File("link_script.txt")
+env['LINKSCRIPT'] = File("link_script.txt")
 Return("src_files","inc_dirs","start_files")

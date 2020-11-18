@@ -1,4 +1,4 @@
-Import('dev_env')
+Import('env')
 
 src = [
     'svcall.c',
@@ -6,14 +6,15 @@ src = [
 ]
 inc = [
     '.',
+    'cmsis',
 ]
-if dev_env['IC']!= 'le501x':
-    sagi_src,sagi_inc,sagi_start_src = SConscript(dirs='sagi',exports = ['dev_env'])
+if env['IC']!= 'le501x':
+    sagi_src,sagi_inc,sagi_start_src = SConscript(dirs='sagi',exports = ['env'])
     src_files = File(src) + sagi_src
     inc_dirs = Dir(inc) + sagi_inc
     start_files = sagi_start_src
 else:
-    le501x_src,le501x_inc,le501x_start_src = SConscript(dirs='le501x',exports = ['dev_env'])
+    le501x_src,le501x_inc,le501x_start_src = SConscript(dirs='le501x',exports = ['env'])
     src_files = File(src) + le501x_src
     inc_dirs = Dir(inc) + le501x_inc
     start_files = le501x_start_src

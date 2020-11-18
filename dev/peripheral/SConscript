@@ -1,4 +1,4 @@
-Import('dev_env')
+Import('env')
 src = [
     'qspi_flash/lsqspi.c',
     'qspi_flash/spi_flash.c',
@@ -15,7 +15,7 @@ src = [
     'dma/dma.c'
 ]
 
-if dev_env['IC'] != 'taurus':
+if env['IC'] != 'taurus':
     src += ['calc/calc_div.c',]
 
 inc = [

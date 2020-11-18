@@ -43,29 +43,5 @@ else:
     env['ASFLAGS'] = '${AS_ARCH_FLAGS} -g '
     env['LINKFLAGS'] = '${ARCH_FLAGS} -O2 -Os -std=c11 -g -g3 -specs=nano.specs -specs=nosys.specs -T ${LINKSCRIPT} -Wl,-Map=${TARGET.base}.map -Wl,--cref'
     env['GC_OPTION'] = ' -Wl,--gc-sections '
-env['CPPPATH'] = ['#inc','#inc/cmsis','#inc/prf']
-dev_env = env.Clone()
 
-if not 'mdk' in env['TOOLS']:
-    stack = SConscript('build/stack/SConscript',exports=['env'],must_exist=False)
-else:
-    stack = None
-
-if env['IC']!= 'le501x':
-    target_ble_lib = stack
-    target_fw = stack
-    target_mesh_lib = stack
-    target_mesh_fw = stack
-else:
-    if stack is None:
-        target_fw = File('#dev/soc/arm_cm/le501x/bin/fw.hex')
-        target_ble_lib = File('#dev/soc/arm_cm/le501x/bin/libfw.o')
-        target_mesh_lib = File('#dev/soc/arm_cm/le501x/bin/libmesh.o')
-        target_mesh_fw = File('#dev/soc/arm_cm/le501x/bin/fw_with_mesh.hex')
-    else:
-        target_fw = stack[0]
-        target_ble_lib = stack[1]
-        target_mesh_lib = stack[2]
-        target_mesh_fw = stack[3]
-
-SConscript('build/dev/SConscript',exports=['dev_env','target_fw','target_ble_lib','target_mesh_lib','target_mesh_fw'])
+SConscript('build/dev/SConscript',exports=['env'])

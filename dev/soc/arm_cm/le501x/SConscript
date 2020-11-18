@@ -1,4 +1,4 @@
-Import("dev_env")
+Import("env")
 src = [
     'cpu.c',
     'platform.c',
@@ -23,8 +23,8 @@ inc = [
 start_src = [
     'compiler/$COMPILER/startup.S',
 ]
-src_files = File(dev_env.subst(src))
+src_files = File(env.subst(src))
 inc_dirs = Dir(inc)
-start_files = File(dev_env.subst(start_src))
-dev_env['LINKSCRIPT'] = File(dev_env.subst("compiler/$COMPILER/link_script.txt"))
+start_files = File(env.subst(start_src))
+env['LINKSCRIPT'] = File(env.subst("compiler/$COMPILER/link_script.txt"))
 Return("src_files","inc_dirs","start_files")

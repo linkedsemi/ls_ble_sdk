@@ -1,4 +1,4 @@
-Import('dev_env')
+Import('env')
 src = [
     'common/common.c',
     'crc/crc16.c',
@@ -25,7 +25,10 @@ inc = [
     'static_buffer',
     'tinyfs',
     'tinycrypt/lib/include',
+    'ble',
+    'ble/prf',
+    'common',
 ]
-src_files = File(dev_env.subst(src))
+src_files = File(env.subst(src))
 inc_dirs = Dir(inc)
 Return("src_files","inc_dirs")
