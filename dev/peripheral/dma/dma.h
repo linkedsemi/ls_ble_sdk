@@ -104,7 +104,7 @@ typedef union
         uint32_t  SRC_INC       : 2;       /*!< source address increment. depends on SRC_SIZE */
         uint32_t  DST_SIZE      : 2;       /*!< destination data size, 00 - byte... */
         uint32_t  DST_INC       : 2;       /*!< destination address increment. depends on SRC_SIZE */
-    };
+    }s;
     uint32_t word;
 } DMA_CTRL_TypeDef;
 

@@ -117,14 +117,14 @@ HAL_StatusTypeDef HAL_DMA_Init(DMA_HandleTypeDef *hdma)
     
     /* set control struture */
 		/* src/dst address, transfer cycle numbers (n_minus_1), are set on-fly */
-		ctrlstruct->ctrl.CYCLE_CTRL = hdma->Config.cycle_ctrl;
-		ctrlstruct->ctrl.NEXT_USEBURST = hdma->Config.next_useburst;
-		ctrlstruct->ctrl.DST_INC = hdma->Config.dst_inc;
-		ctrlstruct->ctrl.SRC_INC = hdma->Config.src_inc;
-		ctrlstruct->ctrl.SRC_SIZE = hdma->Config.data_size;
-		ctrlstruct->ctrl.RPOWER = hdma->Config.rpower;
-    ctrlstruct->ctrl.DST_PROT_CTRL = 0;
-		ctrlstruct->ctrl.SRC_PROT_CTRL = 0;
+		ctrlstruct->ctrl.s.CYCLE_CTRL = hdma->Config.cycle_ctrl;
+		ctrlstruct->ctrl.s.NEXT_USEBURST = hdma->Config.next_useburst;
+		ctrlstruct->ctrl.s.DST_INC = hdma->Config.dst_inc;
+		ctrlstruct->ctrl.s.SRC_INC = hdma->Config.src_inc;
+		ctrlstruct->ctrl.s.SRC_SIZE = hdma->Config.data_size;
+		ctrlstruct->ctrl.s.RPOWER = hdma->Config.rpower;
+    ctrlstruct->ctrl.s.DST_PROT_CTRL = 0;
+		ctrlstruct->ctrl.s.SRC_PROT_CTRL = 0;
 				
     /* config registers */
     chnPos = (1<<hdma->Config.chnIndex); // get position in DMA registers.
@@ -275,7 +275,7 @@ static void DMA_SetConfig(DMA_HandleTypeDef *hdma, uint32_t SrcAddress, uint32_t
         ctrlstruct = (DMA_CTRLSTURCT_TypeDef *)(DMA1->ALTBPTR) + hdma->Config.chnIndex;
 
 		/* configure number of DMA xfers */
-		ctrlstruct->ctrl.N_MINUS_1 = DataLength - 1;
+		ctrlstruct->ctrl.s.N_MINUS_1 = DataLength - 1;
 		
     /* configure destiniation address */    
 		if (hdma->Config.dst_inc == DMA_INC_NONE)
@@ -288,7 +288,7 @@ static void DMA_SetConfig(DMA_HandleTypeDef *hdma, uint32_t SrcAddress, uint32_t
 		else
 			ctrlstruct->src_end_ptr = (uint32_t *)(SrcAddress + ((DataLength -1) << hdma->Config.data_size));
 		
-		ctrlstruct->ctrl.CYCLE_CTRL = hdma->Config.cycle_ctrl;
+		ctrlstruct->ctrl.s.CYCLE_CTRL = hdma->Config.cycle_ctrl;
 		
     return;
 }

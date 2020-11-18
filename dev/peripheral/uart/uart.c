@@ -419,7 +419,7 @@ void HAL_UARTx_IRQHandler(UART_HandleTypeDef *huart)
 				// get DMA received bytes from ctrl struct.
 				// calculated address of data to be save by manual read
 			ctrlstrcut = (DMA_CTRLSTURCT_TypeDef *)(huart->rxDMARto.ctrl_struct);
-			dma_recved = huart->rxDMARto.set_size - ctrlstrcut->ctrl.N_MINUS_1;
+			dma_recved = huart->rxDMARto.set_size - ctrlstrcut->ctrl.s.N_MINUS_1;
 			huart->rxDMARto.recv_size = dma_recved;
 			bufPtr = (uint8_t *)(huart->rxDMARto.dst_end_ptr) + dma_recved;
 				// disable DMA
@@ -430,7 +430,7 @@ void HAL_UARTx_IRQHandler(UART_HandleTypeDef *huart)
 			}
 			WRITE_REG(huart->UARTX->ICR, UART_IT_RTO);
 			// disable DMA
-			ctrlstrcut->ctrl.N_MINUS_1 = 0;
+			ctrlstrcut->ctrl.s.N_MINUS_1 = 0;
 			huart->hdmarx.Instance->ENCLR = 1 << huart->hdmarx.Config.chnIndex;
 			DMA1INT->DONEICF = 1<< huart->hdmarx.Config.chnIndex;
 			huart->hdmarx.XferCpltCallback(&huart->hdmarx);

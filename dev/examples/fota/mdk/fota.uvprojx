@@ -15,7 +15,7 @@
         <TargetCommonOption>
           <Device>ARMCM0</Device>
           <Vendor>ARM</Vendor>
-          <PackID>ARM.CMSIS.5.6.0</PackID>
+          <PackID>ARM.CMSIS.5.3.0</PackID>
           <PackURL>http://www.keil.com/pack/</PackURL>
           <Cpu>IRAM(0x20000000,0x00020000) IROM(0x00000000,0x00040000) CPUTYPE("Cortex-M0") CLOCK(12000000) ESEL ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
@@ -32,7 +32,7 @@
           <SLE66CMisc></SLE66CMisc>
           <SLE66AMisc></SLE66AMisc>
           <SLE66LinkerMisc></SLE66LinkerMisc>
-          <SFDFile></SFDFile>
+          <SFDFile>$$Device:ARMCM0$Device\ARM\SVD\ARMCM0.svd</SFDFile>
           <bCustSvd>0</bCustSvd>
           <UseEnv>0</UseEnv>
           <BinPath></BinPath>
@@ -183,7 +183,6 @@
             <hadXRAM>0</hadXRAM>
             <uocXRam>0</uocXRam>
             <RvdsVP>0</RvdsVP>
-            <RvdsMve>0</RvdsMve>
             <hadIRAM2>0</hadIRAM2>
             <hadIROM2>0</hadIROM2>
             <StupSel>8</StupSel>
@@ -337,7 +336,7 @@
               <MiscControls>--c99 -O2 --wchar32</MiscControls>
               <Define></Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\..\..\inc;..\..\..\..\inc\cmsis;..\..\..\..\inc\prf;..\..\..\module\crc;..\..\..\module\debug;..\..\..\module\debug\RTT;..\..\..\module\static_buffer;..\..\..\module\tinyfs;..\..\..\module\tinycrypt\lib\include;..\..\..\peripheral\qspi_flash;..\..\..\peripheral\cache;..\..\..\peripheral\calc;..\..\..\peripheral\uart;..\..\..\peripheral\trng;..\..\..\peripheral\ecc;..\..\..\peripheral\crypt;..\..\..\peripheral\iwdt;..\..\..\peripheral\adc;..\..\..\peripheral\timer;..\..\..\peripheral;..\..\..\soc\arm_cm;..\..\..\soc\arm_cm\le501x;..\..\..\soc\arm_cm\le501x\integration;..\..\..;..;</IncludePath>
+              <IncludePath>..\..\..\..\inc;..\..\..\..\inc\cmsis;..\..\..\..\inc\prf;..\..\..\module\crc;..\..\..\module\debug;..\..\..\module\debug\RTT;..\..\..\module\static_buffer;..\..\..\module\tinyfs;..\..\..\module\tinycrypt\lib\include;..\..\..\peripheral\qspi_flash;..\..\..\peripheral\cache;..\..\..\peripheral\calc;..\..\..\peripheral\uart;..\..\..\peripheral\trng;..\..\..\peripheral\ecc;..\..\..\peripheral\crypt;..\..\..\peripheral\iwdt;..\..\..\peripheral\adc;..\..\..\peripheral\timer;..\..\..\peripheral\rtc;..\..\..\peripheral\dma;..\..\..\peripheral;..\..\..\soc\arm_cm;..\..\..\soc\arm_cm\le501x;..\..\..\soc\arm_cm\le501x\integration;..\..\..\soc;..\..\..;..;</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -355,7 +354,7 @@
               <MiscControls></MiscControls>
               <Define></Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\..\..\inc;..\..\..\..\inc\cmsis;..\..\..\..\inc\prf;..\..\..\module\crc;..\..\..\module\debug;..\..\..\module\debug\RTT;..\..\..\module\static_buffer;..\..\..\module\tinyfs;..\..\..\module\tinycrypt\lib\include;..\..\..\peripheral\qspi_flash;..\..\..\peripheral\cache;..\..\..\peripheral\calc;..\..\..\peripheral\uart;..\..\..\peripheral\trng;..\..\..\peripheral\ecc;..\..\..\peripheral\crypt;..\..\..\peripheral\iwdt;..\..\..\peripheral\adc;..\..\..\peripheral\timer;..\..\..\peripheral;..\..\..\soc\arm_cm;..\..\..\soc\arm_cm\le501x;..\..\..\soc\arm_cm\le501x\integration;..\..\..;..;</IncludePath>
+              <IncludePath>..\..\..\..\inc;..\..\..\..\inc\cmsis;..\..\..\..\inc\prf;..\..\..\module\crc;..\..\..\module\debug;..\..\..\module\debug\RTT;..\..\..\module\static_buffer;..\..\..\module\tinyfs;..\..\..\module\tinycrypt\lib\include;..\..\..\peripheral\qspi_flash;..\..\..\peripheral\cache;..\..\..\peripheral\calc;..\..\..\peripheral\uart;..\..\..\peripheral\trng;..\..\..\peripheral\ecc;..\..\..\peripheral\crypt;..\..\..\peripheral\iwdt;..\..\..\peripheral\adc;..\..\..\peripheral\timer;..\..\..\peripheral\rtc;..\..\..\peripheral\dma;..\..\..\peripheral;..\..\..\soc\arm_cm;..\..\..\soc\arm_cm\le501x;..\..\..\soc\arm_cm\le501x\integration;..\..\..\soc;..\..\..;..;</IncludePath>
             </VariousControls>
           </Aads>
           <LDads>
@@ -379,7 +378,22 @@
       </TargetOption>
       <Groups>
         <Group>
-          <GroupName>Group1</GroupName>
+          <GroupName>app</GroupName>
+          <Files>
+            <File>
+              <FileName>main.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\main.c</FilePath>
+            </File>
+            <File>
+              <FileName>pub_key.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\pub_key.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>module</GroupName>
           <Files>
             <File>
               <FileName>SEGGER_RTT.c</FileName>
@@ -392,34 +406,14 @@
               <FilePath>..\..\..\module\debug\RTT\SEGGER_RTT_printf.c</FilePath>
             </File>
             <File>
-              <FileName>calc_acc.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\soc\arm_cm\le501x\integration\calc_acc.c</FilePath>
-            </File>
-            <File>
-              <FileName>calc_div.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\peripheral\calc\calc_div.c</FilePath>
-            </File>
-            <File>
               <FileName>common.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\module\common\common.c</FilePath>
             </File>
             <File>
-              <FileName>cpu.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\soc\arm_cm\le501x\cpu.c</FilePath>
-            </File>
-            <File>
               <FileName>crc16.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\module\crc\crc16.c</FilePath>
-            </File>
-            <File>
-              <FileName>delay_asm.s</FileName>
-              <FileType>2</FileType>
-              <FilePath>..\..\..\soc\arm_cm\le501x\compiler\armcc\delay_asm.s</FilePath>
             </File>
             <File>
               <FileName>ecc.c</FileName>
@@ -442,21 +436,6 @@
               <FilePath>..\..\..\module\static_buffer\fifo.c</FilePath>
             </File>
             <File>
-              <FileName>flash_svcall.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\soc\arm_cm\flash_svcall.c</FilePath>
-            </File>
-            <File>
-              <FileName>io_config.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\soc\arm_cm\le501x\integration\io_config.c</FilePath>
-            </File>
-            <File>
-              <FileName>libfw.o</FileName>
-              <FileType>3</FileType>
-              <FilePath>..\..\..\soc\arm_cm\le501x\bin\libfw.o</FilePath>
-            </File>
-            <File>
               <FileName>linked_buffer.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\module\static_buffer\linked_buffer.c</FilePath>
@@ -472,9 +451,49 @@
               <FilePath>..\..\..\module\debug\ls_dbg.c</FilePath>
             </File>
             <File>
-              <FileName>ls_dbg_asm.s</FileName>
+              <FileName>ls_dbg_asm.S</FileName>
               <FileType>2</FileType>
-              <FilePath>..\..\..\module\debug\asm\armcc\ls_dbg_asm.s</FilePath>
+              <FilePath>..\..\..\module\debug\arm_cm\armcc\ls_dbg_asm.S</FilePath>
+            </File>
+            <File>
+              <FileName>sha256.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\module\tinycrypt\lib\source\sha256.c</FilePath>
+            </File>
+            <File>
+              <FileName>tinyfs.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\module\tinyfs\tinyfs.c</FilePath>
+            </File>
+            <File>
+              <FileName>tinyfs_nvm.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\module\tinyfs\tinyfs_nvm.c</FilePath>
+            </File>
+            <File>
+              <FileName>tinyfs_write_cache.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\module\tinyfs\tinyfs_write_cache.c</FilePath>
+            </File>
+            <File>
+              <FileName>utils.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\module\tinycrypt\lib\source\utils.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>peripheral</GroupName>
+          <Files>
+            <File>
+              <FileName>calc_div.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\peripheral\calc\calc_div.c</FilePath>
+            </File>
+            <File>
+              <FileName>dma.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\peripheral\dma\dma.c</FilePath>
             </File>
             <File>
               <FileName>lsadc.c</FileName>
@@ -485,11 +504,6 @@
               <FileName>lscache.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\peripheral\cache\lscache.c</FilePath>
-            </File>
-            <File>
-              <FileName>lscache_param.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\soc\arm_cm\le501x\integration\lscache_param.c</FilePath>
             </File>
             <File>
               <FileName>lscrypt.c</FileName>
@@ -512,11 +526,6 @@
               <FilePath>..\..\..\peripheral\qspi_flash\lsqspi.c</FilePath>
             </File>
             <File>
-              <FileName>lsqspi_param.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\soc\arm_cm\le501x\integration\lsqspi_param.c</FilePath>
-            </File>
-            <File>
               <FileName>lstimer.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\peripheral\timer\lstimer.c</FilePath>
@@ -527,9 +536,69 @@
               <FilePath>..\..\..\peripheral\trng\lstrng.c</FilePath>
             </File>
             <File>
-              <FileName>main.c</FileName>
+              <FileName>rtc.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\main.c</FilePath>
+              <FilePath>..\..\..\peripheral\rtc\rtc.c</FilePath>
+            </File>
+            <File>
+              <FileName>smartcard.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\peripheral\uart\smartcard.c</FilePath>
+            </File>
+            <File>
+              <FileName>spi_flash.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\peripheral\qspi_flash\spi_flash.c</FilePath>
+            </File>
+            <File>
+              <FileName>uart.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\peripheral\uart\uart.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>soc</GroupName>
+          <Files>
+            <File>
+              <FileName>calc_acc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\soc\arm_cm\le501x\integration\calc_acc.c</FilePath>
+            </File>
+            <File>
+              <FileName>cpu.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\soc\arm_cm\le501x\cpu.c</FilePath>
+            </File>
+            <File>
+              <FileName>delay_asm.S</FileName>
+              <FileType>2</FileType>
+              <FilePath>..\..\..\soc\arm_cm\le501x\compiler\armcc\delay_asm.S</FilePath>
+            </File>
+            <File>
+              <FileName>flash_svcall.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\soc\flash_svcall.c</FilePath>
+            </File>
+            <File>
+              <FileName>io_config.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\soc\arm_cm\le501x\integration\io_config.c</FilePath>
+            </File>
+            <File>
+              <FileName>libfw.o</FileName>
+              <FileType>3</FileType>
+              <FilePath>..\..\..\soc\arm_cm\le501x\bin\libfw.o</FilePath>
+            </File>
+            <File>
+              <FileName>lscache_param.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\soc\arm_cm\le501x\integration\lscache_param.c</FilePath>
+            </File>
+            <File>
+              <FileName>lsqspi_param.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\soc\arm_cm\le501x\integration\lsqspi_param.c</FilePath>
             </File>
             <File>
               <FileName>modem_rf_le501x.c</FileName>
@@ -542,14 +611,9 @@
               <FilePath>..\..\..\soc\arm_cm\le501x\platform.c</FilePath>
             </File>
             <File>
-              <FileName>pub_key.c</FileName>
+              <FileName>rtc_param.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\pub_key.c</FilePath>
-            </File>
-            <File>
-              <FileName>sha256.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\module\tinycrypt\lib\source\sha256.c</FilePath>
+              <FilePath>..\..\..\soc\arm_cm\le501x\integration\rtc_param.c</FilePath>
             </File>
             <File>
               <FileName>sleep.c</FileName>
@@ -557,14 +621,9 @@
               <FilePath>..\..\..\soc\arm_cm\le501x\sleep.c</FilePath>
             </File>
             <File>
-              <FileName>sleep_asm.s</FileName>
+              <FileName>sleep_asm.S</FileName>
               <FileType>2</FileType>
-              <FilePath>..\..\..\soc\arm_cm\le501x\compiler\armcc\sleep_asm.s</FilePath>
-            </File>
-            <File>
-              <FileName>spi_flash.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\peripheral\qspi_flash\spi_flash.c</FilePath>
+              <FilePath>..\..\..\soc\arm_cm\le501x\compiler\armcc\sleep_asm.S</FilePath>
             </File>
             <File>
               <FileName>stack_var.c</FileName>
@@ -572,9 +631,9 @@
               <FilePath>..\..\..\soc\arm_cm\le501x\stack_var.c</FilePath>
             </File>
             <File>
-              <FileName>startup.s</FileName>
+              <FileName>startup.S</FileName>
               <FileType>2</FileType>
-              <FilePath>..\..\..\soc\arm_cm\le501x\compiler\armcc\startup.s</FilePath>
+              <FilePath>..\..\..\soc\arm_cm\le501x\compiler\armcc\startup.S</FilePath>
             </File>
             <File>
               <FileName>svcall.c</FileName>
@@ -582,9 +641,9 @@
               <FilePath>..\..\..\soc\arm_cm\svcall.c</FilePath>
             </File>
             <File>
-              <FileName>svcall_asm.s</FileName>
+              <FileName>svcall_asm.S</FileName>
               <FileType>2</FileType>
-              <FilePath>..\..\..\soc\arm_cm\le501x\compiler\armcc\svcall_asm.s</FilePath>
+              <FilePath>..\..\..\soc\arm_cm\le501x\compiler\armcc\svcall_asm.S</FilePath>
             </File>
             <File>
               <FileName>sys_stat.c</FileName>
@@ -597,34 +656,9 @@
               <FilePath>..\..\..\soc\arm_cm\systick.c</FilePath>
             </File>
             <File>
-              <FileName>tinyfs.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\module\tinyfs\tinyfs.c</FilePath>
-            </File>
-            <File>
-              <FileName>tinyfs_nvm.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\module\tinyfs\tinyfs_nvm.c</FilePath>
-            </File>
-            <File>
-              <FileName>tinyfs_write_cache.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\module\tinyfs\tinyfs_write_cache.c</FilePath>
-            </File>
-            <File>
-              <FileName>uart.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\peripheral\uart\uart.c</FilePath>
-            </File>
-            <File>
               <FileName>uart_param.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\soc\arm_cm\le501x\integration\uart_param.c</FilePath>
-            </File>
-            <File>
-              <FileName>utils.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\module\tinycrypt\lib\source\utils.c</FilePath>
             </File>
           </Files>
         </Group>
