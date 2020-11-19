@@ -29,13 +29,15 @@ SDK 下载链接：
 一、Python 3 + MDK-KEIL
 -------------------------
 
-#. keil版本需要安装5.25以上,或者直接使用我们链接提供的版本， **不建议使用5.29以上版本**
+1. keil版本需要安装5.25以上,或者直接使用我们链接提供的版本， **不建议使用5.29以上版本**
 
-#. 打开下载的 `ls_ble_sdk <https://gitee.com/linkedsemi/ls_ble_sdk>`_ 目录，将当前目录下的 ``tools\prog\LinkedSemi\flash_prog.elf`` 文件复制一份并修改文件名为flash_prog.FLM,并将flash_prog.FLM文件拷贝到keil安装目录下的 ``ARM\Flash`` 路径中 
+2. 打开下载的 `ls_ble_sdk <https://gitee.com/linkedsemi/ls_ble_sdk>`_ 目录，将当前目录下的 ``tools\prog\LinkedSemi\flash_prog.elf`` 文件复制一份并修改文件名为flash_prog.FLM,并将flash_prog.FLM文件拷贝到keil安装目录下的 ``ARM\Flash`` 路径中 
 
-#. 将fromelf执行文件的所在路径添加系统环境变量中，重启keil生效，该文件所在路径在keil的安装目录下面 ``Keil_v5\ARM\ARMCC\bin`` ，否则在使用keil编译时会报“fromelf不是内部或外部命令，也不是可运行的程序或批处理文件”的警告。（ `如何设置添加环境变量 <https://jingyan.baidu.com/article/47a29f24610740c0142399ea.html>`_ ） 
+3. 将fromelf执行文件的所在路径添加系统环境变量中，重启keil生效，该文件所在路径在keil的安装目录下面 ``Keil_v5\ARM\ARMCC\bin`` ，否则在使用keil编译时会报“fromelf不是内部或外部命令，也不是可运行的程序或批处理文件”的警告。（ `如何设置添加环境变量 <https://jingyan.baidu.com/article/47a29f24610740c0142399ea.html>`_ ） 
 
-#. 安装 Python3 及Python依赖库
+ .. image:: AddFromelf.png
+
+4. 安装 Python3 及Python依赖库
 
 安装 Python 相关详细说明
 ++++++++++++++++++++++++
@@ -57,11 +59,11 @@ SDK 下载链接：
 
     pip install -r requirements.txt
 
-6. python依赖库安装完成之后，在命令行中执行::
+6. python依赖库安装完成之后，设置后缀名为.py的文件默认打开方式为Python，在命令行中执行::
 
     hexmerge.py -h
 
-   若得到hexmerge帮助信息，则环境安装基本完成，如果 Windows 系统有弹窗提示 ``你要以何方式打开此.py文件`` ,则需要设置后缀名为.py的文件默认打开方式为Python，然后再重新执行 ``hexmerge.py -h`` 。
+   若得到hexmerge帮助信息，则环境安装基本完成。
 
 二、Python 3 + VS Code + GCC(ARM)
 -----------------------------------
