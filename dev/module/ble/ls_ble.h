@@ -11,6 +11,44 @@
 
 #define DEV_NAME_MAX_LEN 0x20
 
+/**defgroup BLE_GAP_IO_CAPS GAP IO Capabilities**/
+#define BLE_GAP_IO_CAPS_DISPLAY_ONLY      0x0   /**< Display Only. */
+#define BLE_GAP_IO_CAPS_DISPLAY_YESNO     0x1   /**< Display and Yes/No entry. */
+#define BLE_GAP_IO_CAPS_KEYBOARD_ONLY     0x2   /**< Keyboard Only. */
+#define BLE_GAP_IO_CAPS_NONE              0x3   /**< No I/O capabilities. */
+#define BLE_GAP_IO_CAPS_KEYBOARD_DISPLAY  0x4   /**< Keyboard and Display. */
+
+/**defgroup SEC_AUTH_FLAG  SEC Auth Flag**/
+#define AUTH_NONE               0                 /**< No auth requirement. */
+#define AUTH_BOND              (1 << 0)           /**< Bond flag. */
+#define AUTH_MITM              (1 << 2)           /**< MITM flag. */
+#define AUTH_SEC_CON           (1 << 3)           /**< Security connection flag. */
+#define AUTH_KEY_PRESS_NOTIFY  (1 << 4)           /**< Key press notify flag. */
+#define AUTH_ALL               (AUTH_BOND | AUTH_MITM | AUTH_SEC_CON | AUTH_KEY_PRESS_NOTIFY)  /**< All authentication flags are on. */
+
+/**defgroup SEC_KEY_DIST_FLAG  SEC Key Distribution Flag**/
+#define KDIST_NONE      0            /**< No key needs to be distributed. */
+#define KDIST_ENCKEY   (1 << 0)      /**< Distribute encryption and master identification info. */
+#define KDIST_IDKEY    (1 << 1)      /**< Distribute identity and address info. */
+#define KDIST_SIGNKEY  (1 << 2)      /**< Distribute signing info. */
+#define KDIST_ALL      (KDIST_ENCKEY | KDIST_IDKEY | KDIST_SIGNKEY)  /**< Distribute all info. */
+
+/**defgroup SEC mode and level**/
+#define SEC_MODE1_LEVEL1  0x00    /**< No security is needed. */
+#define SEC_MODE1_LEVEL2  0x01    /**< Encrypted link is required. Unnecessary: MITM and SC. */
+#define SEC_MODE1_LEVEL3  0x02    /**< Encrypted link is required. Necessary: MITM; unnecessary: SC. */
+#define SEC_MODE1_LEVEL4  0x03    /**< Encrypted link is required. Necessary: MITM and SC. */
+#define SEC_MODE2_LEVEL1  0x04    /**< Data signing is required. Unnecessary: MITM and SC. */
+#define SEC_MODE2_LEVEL2  0x05    /**< Data signing is required. Necessary: MITM; unnecessary: SC. */
+
+/**defgroup SEC Parameter**/
+#define OOB_DATA_FLAG                     0x0                               /**< Indicate whether OOB is supported. */
+#define AUTHREQ                           (AUTH_MITM | AUTH_BOND)           /**< Set the auth. */
+#define KEY_SIZE                          0x10                              /**< Indicate the supported maximum LTK size (range: 7-16). */
+#define INIT_KEY_DIST                     (KDIST_ENCKEY | KDIST_IDKEY)      /**< Set the initial key distribution. */
+#define RESP_KEY_DIST                     (KDIST_ENCKEY | KDIST_IDKEY)      /**< Set the response key distribution. */
+#define passkey_number                    {'1','2','3','4','5','6'}         /**< Set the passkey,size(6). */
+
 enum gap_own_addr_type
 {
     PUBLIC_OR_RANDOM_STATIC_ADDR,
@@ -218,6 +256,7 @@ enum prf_id
     PRF_MESH,
     PRF_FOTA_SERVER,
     PRF_HID,
+    PRF_BASS,
 };
 
 struct profile_added_evt

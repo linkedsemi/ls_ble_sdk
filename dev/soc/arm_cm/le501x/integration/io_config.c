@@ -810,7 +810,7 @@ static void exti_io_handler(uint8_t port,uint8_t num)
     io_exti_callback(pin);
 }
 
-void EXTI_Handler()
+void EXTI_Handler(void)
 {
     uint16_t int_stat = EXTI->EEIFM;
     uint8_t i;

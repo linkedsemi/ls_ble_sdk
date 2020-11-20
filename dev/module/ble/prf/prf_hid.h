@@ -56,6 +56,7 @@ struct hid_db_cfg
 enum hid_evt_type
 {
     HID_REPORT_READ,
+    HID_NTF_CFG,
 };
 
 struct hid_read_report_req_evt
@@ -64,13 +65,19 @@ struct hid_read_report_req_evt
     uint8_t* value;
 };
 
+struct hid_ntf_cfg_evt
+{
+    uint16_t value;
+};
 union hid_evt_u
 {
     struct hid_read_report_req_evt read_report_req;
+    struct hid_ntf_cfg_evt ntf_cfg;
 };
 
 
 void prf_hid_server_callback_init(void (*evt_cb)(enum hid_evt_type, union hid_evt_u *,uint8_t));
 void dev_manager_prf_hid_server_add(uint8_t sec_lvl, struct hid_db_cfg* cfg,uint16_t len);
-
+void app_hid_send_keyboard_report(uint8_t report_idx, uint8_t *report_data, uint8_t len);
+void hid_ntf_cfg_init(uint16_t ntf_cfg,uint8_t con_idx,uint8_t peer_id);
 #endif

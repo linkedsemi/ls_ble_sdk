@@ -102,6 +102,7 @@ void io_exti_config(uint8_t pin,exti_edge_t edge);
 void io_exti_enable(uint8_t pin,bool enable);
 
 void io_exti_callback(uint8_t pin);
+void EXTI_Handler(void);
 
 void qspi_flash_io_init(void);
 void qspi_flash_io_deinit(void);
