@@ -5,6 +5,8 @@
 #include "reg_syscfg.h"
 #include "sleep.h"
 #include "ls_dbg.h"
+#include "platform.h"
+#include "le501x.h"
 
 gpio_pin_t uart1_txd;
 gpio_pin_t uart1_rxd;
@@ -584,7 +586,7 @@ void adc12b_in8_io_deinit(void)
     ain_io_deinit(PA04);
 }
 
-
+void EXTI_Handler(void);
 void io_init(void)
 {
     RCC->AHBEN |= RCC_GPIOA_MASK | RCC_GPIOB_MASK | RCC_GPIOC_MASK;
@@ -596,6 +598,7 @@ void io_init(void)
     LSGPIOB->IE = 0;
     LSGPIOB->OE = 0;
     LSGPIOB->PUPD = 0x2800;
+    arm_cm_set_int_isr(EXTI_IRQn,EXTI_Handler);
 }
 
 void io_cfg_output(uint8_t pin)
