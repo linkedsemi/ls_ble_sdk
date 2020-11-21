@@ -405,6 +405,26 @@ XIP_BANNED void clk_switch()
 
 #endif
 
+void ota_settings_erase(void)
+{
+    SYSCFG->BKD[7] = 0;
+    spi_flash_sector_erase(OTA_INFO_OFFSET);
+}
+
+void ota_settings_write(uint32_t ota_settings_type)
+{
+    LS_ASSERT(ota_settings_type < OTA_SETTINGS_TYPE_MAX); 
+    spi_flash_quad_page_program(OTA_INFO_OFFSET,(uint8_t *)&ota_settings_type,sizeof(ota_settings_type));
+}
+
+uint32_t ota_settings_read(void)
+{
+    uint32_t ota_settings;
+    spi_flash_quad_io_read(OTA_INFO_OFFSET,(uint8_t *)&ota_settings,sizeof(ota_settings));
+    return ota_settings;
+}
+
+// only for foreground OTA
 void request_ota_reboot()
 {
     SYSCFG->BKD[7] = 0x5A5A3C3C;

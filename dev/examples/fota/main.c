@@ -49,6 +49,8 @@ static void prf_fota_server_callback(enum fotas_evt_type type,union fotas_evt_u 
     {
     case FOTAS_START_REQ_EVT:
     {
+        // ota_settings_write(SINGLE_FOREGROUND); 
+        ota_settings_write(DOUBLE_FOREGROUND); 
         enum fota_start_cfm_status status;
         if(fw_signature_check(evt->fotas_start_req.digest, evt->fotas_start_req.signature))
         {
@@ -64,13 +66,15 @@ static void prf_fota_server_callback(enum fotas_evt_type type,union fotas_evt_u 
         {
             if(evt->fotas_finish.new_image->base != APP_IMAGE_BASE)
             {
-                LOG_I("set ota copy info\n");
                 ota_copy_info_set(evt->fotas_finish.new_image);
+            }
+            else
+            {
+                ota_settings_erase();
             }
             platform_reset(RESET_OTA_SUCCEED);
         }else
         {
-            //TODO ota_settings_erase or not
             platform_reset(RESET_OTA_FAILED);
         }
     break;

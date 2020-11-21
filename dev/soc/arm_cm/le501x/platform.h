@@ -10,6 +10,14 @@
 #define RESET_OTA_FAILED       0xBDBDBDBD
 #define RESET_OTA_REQ          0xDDDDDDDD
 
+enum OTA_settings_type
+{
+    SINGLE_FOREGROUND = 0,
+    DOUBLE_FOREGROUND = 1,
+    DOUBLE_BACKGROUND = 2,
+    OTA_SETTINGS_TYPE_MAX = DOUBLE_BACKGROUND + 1,
+};
+
 struct reset_retain_struct
 {
     uint32_t reset_reason;
@@ -69,6 +77,12 @@ void arm_cm_set_int_isr(uint8_t type,void (*isr)());
 
 
 #define DELAY_US(a) arm_cm_delay_asm((a)*(SDK_HCLK_MHZ/5))
+
+void ota_settings_erase(void);
+
+void ota_settings_write(uint32_t ota_settings_type);
+
+uint32_t ota_settings_read(void);
 
 #define OSTICK_HS_INC(Hz) (2000*1000/((Hz)*625))
 #define OSTICK_HUS_INC(Hz) (2000*1000/(Hz) - 625*OSTICK_HS_INC(Hz))
