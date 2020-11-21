@@ -3,6 +3,7 @@ Import('env')
 src = [
     'svcall.c',
     'systick.c',
+    'swint_handler.c',
 ]
 inc = [
     '.',

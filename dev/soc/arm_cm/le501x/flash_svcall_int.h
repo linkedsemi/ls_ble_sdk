@@ -2,7 +2,7 @@
 #define FLASH_SVCALL_INT_H_
 #include <stdbool.h>
 #include "le501x.h"
-
+#include "flash_svcall.h"
 #define GLOBAL_INT_MASK_STATUS() __get_PRIMASK()
 
 #if defined(__CC_ARM)
@@ -22,19 +22,6 @@
   }                                                     \
   _Pragma("GCC diagnostic pop")
 #endif
-
-enum svcall_num_enum
-{
-    SVCALL_FLASH_PROGRAM,
-    SVCALL_FLASH_SECTOR_ERASE,
-    SVCALL_FLASH_FAST_READ,
-    SVCALL_FLASH_QUAD_READ,
-    SVCALL_FLASH_CHIP_ERASE,
-    SVCALL_FLASH_ERASE_SECURITY,
-    SVCALL_FLASH_PROGRAM_SECURITY,
-    SVCALL_FLASH_READ_SECURITY,
-    SVCALL_NUM_MAX,
-};
 
 SVCALL(SVCALL_FLASH_PROGRAM,void,do_spi_flash_program_svcall(uint32_t offset,uint8_t *data,uint16_t length,bool quad));
 SVCALL(SVCALL_FLASH_SECTOR_ERASE,void, do_spi_flash_sector_erase_svcall(uint32_t addr));

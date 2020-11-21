@@ -1,4 +1,4 @@
-Import("dev_env")
+Import("env")
 src = [
     'exception_entry.S',
     'exception_isr.c',
@@ -8,12 +8,13 @@ src = [
     'cpu.c',
     'platform.c',
     'io_config.c',
+    'lsqspi_param.c',
 ]
 inc = [
     '.',
 ]
 
-src_files = File(dev_env.subst(src))
+src_files = File(env.subst(src))
 inc_dirs = Dir(inc)
-dev_env['LINKSCRIPT'] = File(dev_env.subst("link_script.txt"))
+env['LINKSCRIPT'] = File(env.subst("link_script.txt"))
 Return("src_files","inc_dirs")

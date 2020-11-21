@@ -25,7 +25,7 @@ XIP_BANNED void lsqspi_direct_read_config(struct lsqspi_instance *inst,struct ls
         | FIELD_BUILD(LSQSPI_RD_NUM_DUMMY, param->dummy_bytes);
 }
 
-#if (defined(SAGI_BOOT_ROM))
+#if (defined(BOOT_ROM))
 XIP_BANNED static void lsqspi_operation_wait(reg_lsqspi_t *reg)
 {
     reg->CFG;

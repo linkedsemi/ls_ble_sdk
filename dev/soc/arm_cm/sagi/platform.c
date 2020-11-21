@@ -3,6 +3,7 @@
 #include "reg_sysc_awo.h"
 #include "field_manipulate.h"
 #include "io_config.h"
+#include "swint_call_asm.h"
 void modem_rf_init(void);
 
 __attribute__((weak)) void SystemInit(){}
@@ -86,9 +87,19 @@ void ble_pkt_irq_unmask()
     __NVIC_EnableIRQ(MAC1_IRQn);
 }
 
+void ble_pkt_irq_clr()
+{
+    __NVIC_ClearPendingIRQ(MAC1_IRQn);
+}
+
 void swint2_set()
 {
     __NVIC_SetPendingIRQ(SWINT2_IRQn);
+}
+
+void ll_swint_set()
+{
+    SWINT_SET_INLINE_ASM(SWINT1_IRQn);
 }
 
 void iob_output_set(uint8_t i)

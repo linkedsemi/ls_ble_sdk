@@ -4,6 +4,6 @@
 
 #define UART1 ((reg_uart_t *)0x50084000)
 #define UART2 ((reg_uart_t *)0x50084800)
-
+#define UART3 ((reg_uart_t *)0x50085000)
 
 #endif

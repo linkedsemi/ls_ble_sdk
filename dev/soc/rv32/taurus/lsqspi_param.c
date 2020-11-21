@@ -2,28 +2,28 @@
 #include "field_manipulate.h"
 #include "compile_flag.h"
 #include "reg_sysc_cpu.h"
-#include "ARMCM3.h"
 #include "platform.h"
+
 XIP_BANNED void lsqspi_sw_rst(struct lsqspi_instance *inst)
 {
     lsqspi_clk_set(inst,false);
-    SYSC_CPU->PD_CPU_SRST = SYSC_CPU_SRST_CLR_LSQSPI0_N_MASK;
-    SYSC_CPU->PD_CPU_SRST = SYSC_CPU_SRST_SET_LSQSPI0_N_MASK;
+    SYSC_CPU->PD_CPU_SRST = SYSC_CPU_SRST_CLR_QSPI_N_MASK;
+    SYSC_CPU->PD_CPU_SRST = SYSC_CPU_SRST_SET_QSPI_N_MASK;
 }
 
 XIP_BANNED void lsqspi_clk_set(struct lsqspi_instance *inst,bool enable)
 {
     if(enable)
     {
-        SYSC_CPU->PD_CPU_CLKG = SYSC_CPU_CLKG_SET_LSQSPI0_MASK;
+        SYSC_CPU->PD_CPU_CLKG = SYSC_CPU_CLKG_SET_QSPI_MASK;
     }else
     {
-        SYSC_CPU->PD_CPU_CLKG = SYSC_CPU_CLKG_CLR_LSQSPI0_MASK;
+        SYSC_CPU->PD_CPU_CLKG = SYSC_CPU_CLKG_CLR_QSPI_MASK;
     }
     DELAY_US(1);
 }
 
-#if (defined(SAGI_BOOT_ROM))
+#if (defined(BOOT_ROM))
 XIP_BANNED uint8_t lsqspi_rd_cap_dly_get(struct lsqspi_instance *inst)
 {
     return 0;

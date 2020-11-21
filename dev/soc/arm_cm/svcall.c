@@ -1,7 +1,6 @@
 #include "spi_flash_int.h"
 #include "flash_svcall_int.h"
-
-
+#include "flash_svcall.h"
 typedef uint32_t (*svcall_fn_t)(uint32_t,uint32_t,uint32_t,uint32_t);
 
 const svcall_fn_t svcall_table[SVCALL_NUM_MAX] = {

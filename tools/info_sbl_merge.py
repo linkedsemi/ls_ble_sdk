@@ -32,7 +32,7 @@ else:
     code_offset = 0x1000
     sbl_code_length = len(sbl_data)
     sbl_code_start = flash_base+code_offset
-    sbl_code_exec_addr = 0x400100
+    sbl_code_exec_addr = 0x401000
     feature_mask = 0xffffffff
     info_head = struct.pack('LLLLLL',test_word0,test_word1,code_offset,sbl_code_length,sbl_code_exec_addr,feature_mask)
     

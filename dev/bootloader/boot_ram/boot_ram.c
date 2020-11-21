@@ -1,18 +1,21 @@
 #include "io_config.h"
 #include "reg_v33_rg.h"
-#include "ARMCM3.h"
-#include "sleep.h"
+//#include "ARMCM3.h"
+//#include "sleep.h"
 #include "tinycrypt/sha256.h"
 #include <string.h>
-
+#define ROM_SIZE 0x20000
 void cpu_sleep_asm(void);
 void cpu_recover_asm(void);
 void boot_ram_start(uint32_t exec_addr)
 {
+    io_cfg_output(PA01);
+    io_set_pin(PA01);
+    io_clr_pin(PA01);
     struct tc_sha256_state_struct sha256;
     uint8_t digest[TC_SHA256_DIGEST_SIZE];
     tc_sha256_init(&sha256);
-    uint32_t size = 0x28000;
+    uint32_t size = ROM_SIZE;
     uint8_t *data = 0;
     tc_sha256_update(&sha256,data, size);
     tc_sha256_final(digest, &sha256);

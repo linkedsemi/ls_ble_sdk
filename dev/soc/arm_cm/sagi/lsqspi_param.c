@@ -23,7 +23,7 @@ XIP_BANNED void lsqspi_clk_set(struct lsqspi_instance *inst,bool enable)
     DELAY_US(1);
 }
 
-#if (defined(SAGI_BOOT_ROM))
+#if (defined(BOOT_ROM))
 XIP_BANNED uint8_t lsqspi_rd_cap_dly_get(struct lsqspi_instance *inst)
 {
     return 0;

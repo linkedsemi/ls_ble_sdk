@@ -4,7 +4,7 @@
 #include "reg_uart.h"
 #include "HAL_def.h"
 #include "sdk_config.h"
-#include "dma.h"
+
 #if FPGA 
 #define UART_CLOCK   16000000
 #else 
@@ -129,14 +129,6 @@ typedef enum
 } HAL_UART_StateTypeDef;
 
 
-typedef struct 
-{
-    uint32_t *dst_end_ptr;
-    uint32_t *ctrl_struct;
-    uint8_t  set_size;     // Required receive byte size for DMA recv transfer, max 256 */
-    uint8_t  recv_size;    // calculated received bytes, max 256
-} UART_DMA_RtoTypeDef;
-
 /**
   * @brief  UART handle Structure definition
   */
@@ -152,10 +144,6 @@ typedef struct __UART_HandleTypeDef
     uint16_t                      TxXferCount;      /*!< UART Tx Transfer Counter           */
 
     uint16_t                      RxXferCount;      /*!< UART Rx Transfer Counter           */
-
-    DMA_HandleTypeDef             hdmatx;          /*!< UART Tx DMA Handle parameters      */
-    DMA_HandleTypeDef             hdmarx;          /*!< UART Rx DMA Handle parameters      */
-    UART_DMA_RtoTypeDef           rxDMARto;
 
     HAL_UART_StateTypeDef         gState;           /*!< UART state information related to global Handle management
                                                                 and also related to Tx operations.
@@ -231,9 +219,7 @@ typedef struct __UART_HandleTypeDef
 #define UART_RXFIFORST      0x2     // Receiver FIFO reset
 #define UART_TXFIFORST      0x4     // Transmit FIFO reset
 #define UART_FIFO_RL_1      0x0     // FIFO trigger level   
-#define UART_FIFO_RL_4      0x1
 #define UART_FIFO_RL_8      0x2
-#define UART_FIFO_RL_14     0x3
 #define UART_FIFO_TL_0      0x0     // FIFO trigger level 
 #define UART_FIFO_TL_2      0x1     // FIFO trigger level 
 #define UART_FIFO_TL_4      0x2     // FIFO trigger level 
@@ -254,8 +240,6 @@ HAL_StatusTypeDef HAL_UART_Init(UART_HandleTypeDef *huart);
 HAL_StatusTypeDef HAL_UART_DeInit(UART_HandleTypeDef *huart);
 void HAL_UARTx_IRQHandler(UART_HandleTypeDef *huart);
 
-HAL_StatusTypeDef HAL_UART_Transmit_DMA(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size);
-HAL_StatusTypeDef HAL_UART_Receive_DMA(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size);
 
 
 #endif // _UART_BASE_H_

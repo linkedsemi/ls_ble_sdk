@@ -308,7 +308,7 @@ static void UART_SetConfig(UART_HandleTypeDef *huart)
     REG_FIELD_WR(huart->UARTX->LCR,UART_LCR_BRWEN,0);
     huart->UARTX->FCR = UART_FCR_TFRST_MASK | UART_FCR_RFRST_MASK | UART_FCR_FIFOEN_MASK;
     huart->UARTX->LCR = FIELD_BUILD(UART_LCR_DLS,huart->Init.WordLength)|FIELD_BUILD(UART_LCR_STOP,huart->Init.StopBits)
-                                  |FIELD_BUILD(UART_LCR_PARITY,huart->Init.Parity)|FIELD_BUILD(UART_LCR_MSB,huart->Init.MSBEN)
+                                  |FIELD_BUILD(UART_LCR_PS,huart->Init.Parity)|FIELD_BUILD(UART_LCR_MSB,huart->Init.MSBEN)
                                   |FIELD_BUILD(UART_LCR_RXEN,1)|FIELD_BUILD(UART_LCR_BRWEN,0);
 }
 
@@ -405,37 +405,12 @@ static void UART_Receive_IT(UART_HandleTypeDef *huart)
   *                the configuration information for the specified UART module.
   * @retval None
   */
-volatile uint8_t uart_rto_flag = 0;  // debug
 
 void HAL_UARTx_IRQHandler(UART_HandleTypeDef *huart)
 {
     uint32_t isrflags   = huart->UARTX->IFM;  
     uint32_t status_reg = huart->UARTX->SR;
-		if ((isrflags & UART_IT_RTO) !=0 )
-		{
-			uint8_t *bufPtr;
-      uint32_t	dma_recved=0;
-			DMA_CTRLSTURCT_TypeDef *ctrlstrcut;
-				// get DMA received bytes from ctrl struct.
-				// calculated address of data to be save by manual read
-			ctrlstrcut = (DMA_CTRLSTURCT_TypeDef *)(huart->rxDMARto.ctrl_struct);
-			dma_recved = huart->rxDMARto.set_size - ctrlstrcut->ctrl.s.N_MINUS_1;
-			huart->rxDMARto.recv_size = dma_recved;
-			bufPtr = (uint8_t *)(huart->rxDMARto.dst_end_ptr) + dma_recved;
-				// disable DMA
-			while (READ_BIT(huart->UARTX->SR,UART_SR_DR))
-			{
-			*bufPtr++ = (uint8_t)(huart->UARTX->RBR & (uint8_t)0xff);
-			huart->rxDMARto.recv_size++;
-			}
-			WRITE_REG(huart->UARTX->ICR, UART_IT_RTO);
-			// disable DMA
-			ctrlstrcut->ctrl.s.N_MINUS_1 = 0;
-			huart->hdmarx.Instance->ENCLR = 1 << huart->hdmarx.Config.chnIndex;
-			DMA1INT->DONEICF = 1<< huart->hdmarx.Config.chnIndex;
-			huart->hdmarx.XferCpltCallback(&huart->hdmarx);
-			uart_rto_flag=1;
-		}
+
     /* UART in mode Transmitter ------------------------------------------------*/
     if (( isrflags& UART_IT_TXS) != 0) 
     {
@@ -474,175 +449,6 @@ HAL_StatusTypeDef HAL_UART_AutoBaudRate_Detect(UART_HandleTypeDef *huart,uint8_t
 
 HAL_StatusTypeDef HAL_UART_AutoBaudRate_Detect_IT(UART_HandleTypeDef * huart,uint8_t mode);
 
-
-/**
-  * @brief DMA UART transmit process complete callback.
-  * @param hdma DMA handle.
-  * @retval None
-  */
-static void UART_DMATransmitCplt(DMA_HandleTypeDef *hdma)
-{
-	UART_HandleTypeDef *huart = (UART_HandleTypeDef *)(hdma->Parent);
-	
-	if ((huart->gState == HAL_UART_STATE_BUSY_TX) && (huart->gState != HAL_UART_STATE_BUSY_TX))
-		CLEAR_BIT(huart->UARTX->MCR, UART_MCR_DMAEN_MASK);
-		
-    huart->TxXferCount = 0U;
-
-    /* Enable the UART Transmit Complete Interrupt */
-    WRITE_REG(huart->UARTX->IER, UART_TC_MASK);
-
-    /*Call legacy weak Tx complete callback*/
-    HAL_UART_TxCpltCallback(huart,NULL);
-}
-
-static void UART_DMAReceiveCplt(DMA_HandleTypeDef *hdma)
-{
-    UART_HandleTypeDef *huart = (UART_HandleTypeDef *)(hdma->Parent);
-
-    if ((huart->RxState == HAL_UART_STATE_BUSY_RX) && (huart->gState != HAL_UART_STATE_BUSY_TX))
-        CLEAR_BIT(huart->UARTX->MCR, UART_MCR_DMAEN_MASK);
-
-    huart->RxXferCount = 0;
-    huart->RxState = HAL_UART_STATE_READY;
-
-    HAL_UART_RxCpltCallback(huart,NULL);
-
-    return;
-}
-
-/**
-  * @brief DMA UART communication error callback.
-  * @param hdma DMA handle.
-  * @retval None
-  */
-static void UART_DMAError(DMA_HandleTypeDef *hdma)
-{
-  UART_HandleTypeDef *huart = (UART_HandleTypeDef *)(hdma->Parent);
-
-  //const HAL_UART_StateTypeDef gstate = huart->gState;
-  //const HAL_UART_StateTypeDef rxstate = huart->RxState;
-
-	huart->TxXferCount = 0U;
-	huart->RxXferCount = 0U;
-	/* stop uart DMA request */
-	CLEAR_BIT(huart->UARTX->MCR, UART_MCR_DMAEN_MASK);
-	
-	huart->gState = HAL_UART_STATE_READY;
-	huart->RxState = HAL_UART_STATE_READY;
-  huart->ErrorCode |= HAL_UART_ERROR_DMA;
-
-  /*Call legacy weak error callback*/
-	/* User can add custom code to process UART settings when DMA error there */
-  //HAL_UART_ErrorCallback(huart,NULL);
-
-}
-
-HAL_StatusTypeDef HAL_UART_Transmit_DMA(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size)
-{
-	/* Check that a Tx process is not already ongoing */
-	if (huart->gState != HAL_UART_STATE_READY)
-		return HAL_BUSY;
-	
-	if ((pData == NULL) || (Size == 0U))
-		return HAL_ERROR;
-
-	//__HAL_LOCK(huart);
-	
-	huart->pTxBuffPtr  = pData;
-//	huart->TxXferSize  = Size;
-	huart->TxXferCount = Size;
-
-	huart->ErrorCode = HAL_UART_ERROR_NONE;
-	huart->gState = HAL_UART_STATE_BUSY_TX;	
-	
-
-	/* Set the UART DMA transfer complete callback */
-	huart->hdmatx.XferCpltCallback = UART_DMATransmitCplt;
-
-	/* Set the DMA error callback */
-	huart->hdmatx.XferErrorCallback = UART_DMAError;
-
-	/* Enable the UART transmit DMA channel */
-	if (HAL_DMA_Start_IT(&huart->hdmatx, (uint32_t)huart->pTxBuffPtr, (uint32_t)&huart->UARTX->TBR, Size) != HAL_OK)
-	{
-		/* Set error code to DMA */
-		huart->ErrorCode = HAL_UART_ERROR_DMA;
-
-		//__HAL_UNLOCK(huart);
-
-		/* Restore huart->gState to ready */
-		huart->gState = HAL_UART_STATE_READY;
-
-		return HAL_ERROR;
-	}		
-	
-	
-	/* Clear the TC flag in the ICR register */
-	WRITE_REG(huart->UARTX->ICR, UART_TC_MASK);
-	WRITE_REG(huart->UARTX->ICR, UART_IT_TXS); // threshold empty 
-
-	//__HAL_UNLOCK(huart);
-
-	/* Enable the DMA transfer */
-	SET_BIT(huart->UARTX->MCR, UART_MCR_DMAEN_MASK);
-
-	return HAL_OK;
-}
-
-HAL_StatusTypeDef HAL_UART_Receive_DMA(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size)
-{
-	if (huart->RxState != HAL_UART_STATE_READY)
-		return HAL_BUSY;
-	
-	if ((pData == NULL) || (Size == 0U))  // TODO: add address check here?
-		return HAL_ERROR;
-	
-	//__HAL_LOCK(huart);
-	
-	huart->pRxBuffPtr = pData;
-	//huart->RxXferSize = Size;
-	huart->ErrorCode = HAL_UART_ERROR_NONE;
-	huart->RxState = HAL_UART_STATE_BUSY_RX;
-	
-
-	if(&(huart->hdmarx) != NULL)
-    {
-      /* Set the UART DMA transfer complete callback */
-      huart->hdmarx.XferCpltCallback = UART_DMAReceiveCplt;
-
-      /* Set the DMA error callback */
-      huart->hdmarx.XferErrorCallback = UART_DMAError;
-
-      /* Enable the DMA channel */
-      if (HAL_DMA_Start_IT(&huart->hdmarx, (uint32_t)&huart->UARTX->RBR, (uint32_t)huart->pRxBuffPtr, Size) != HAL_OK)
-      {
-        /* Set error code to DMA */
-        huart->ErrorCode = HAL_UART_ERROR_DMA;
-
-        //__HAL_UNLOCK(huart);
-
-        /* Restore huart->gState to ready */
-        huart->gState = HAL_UART_STATE_READY;
-
-        return HAL_ERROR;
-      }
-    }
-		
-		if (huart->rxDMARto.dst_end_ptr != 0)
-		{
-			huart->rxDMARto.set_size = Size - 1;
-			huart->rxDMARto.dst_end_ptr = (void *)pData;
-		}
-    //__HAL_UNLOCK(huart);
-
-    /* Enable the DMA transfer for the receiver request by setting the DMAR bit
-    in the UART CR3 register */
-	  SET_BIT(huart->UARTX->MCR, UART_MCR_DMAEN_MASK);
-
-    return HAL_OK; 
-
-}
 
 
 

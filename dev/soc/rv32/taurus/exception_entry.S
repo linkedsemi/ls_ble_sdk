@@ -20,7 +20,7 @@ exception_entry:
     sw      t1, 8(sp)
     sw      t2, 4(sp)
     sw      ra, 0(sp)
-    bgtz    a0, trap_c
+    bgtz    a0, trap_handler
 int_call:
     csrrwi  t0, mnxti, 8
     beqz    t0, exception_exit
@@ -47,3 +47,8 @@ exception_exit:
     mret
     .size	exception_entry, . - exception_entry
 
+    .global trap_handler
+    .type   trap_handler, %function
+trap_handler:
+    j trap_handler
+    
