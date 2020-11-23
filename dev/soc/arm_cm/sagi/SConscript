@@ -1,7 +1,7 @@
 Import("env")
 src = [
     'lsqspi_param.c',
-    'uart_param.c',
+    'uart_msp.c',
     'platform.c',
     'cpu.c',
     'modem_rf_sagi.c',

@@ -4,7 +4,7 @@ src = [
     'exception_isr.c',
     'sleep_asm.S',
     'delay_asm.S',
-    'uart_param.c',
+    'uart_msp.c',
     'cpu.c',
     'platform.c',
     'io_config.c',

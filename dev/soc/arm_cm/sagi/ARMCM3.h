@@ -77,6 +77,7 @@ typedef enum IRQn
   DAC_IRQn      = 34,
   MAC2_IRQn     = 35,
   ADC24_IRQn    = 36,
+  IRQn_Max,
 } IRQn_Type;
 
 

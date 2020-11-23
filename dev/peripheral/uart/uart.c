@@ -1,7 +1,8 @@
 
 #include <stdio.h>
 #include "lsuart.h"
-#include "uart_param.h" 
+#include "uart_msp.h" 
+#include "field_manipulate.h"
 #include "log.h"
 
 static void UART_EndTransmit_IT(UART_HandleTypeDef *huart);
@@ -26,12 +27,10 @@ HAL_StatusTypeDef HAL_UART_Init(UART_HandleTypeDef *huart)
 
     /* Check the parameters */
     //TODO
-    uart_sw_reset(huart);
-    uart_clock_enable(huart,1);
+    HAL_UART_MSP_Init(huart);
+    HAL_UART_MSP_Busy_Set(huart);
     /* Set the UART Communication parameters */
     UART_SetConfig(huart);
-    uart_int_op(HAL_UARTx_IRQHandler,huart,1);
-    uart_status_set(huart, 1);
 
     /* Initialize the UART state */
     huart->ErrorCode = HAL_UART_ERROR_NONE;
@@ -61,9 +60,8 @@ HAL_StatusTypeDef HAL_UART_DeInit(UART_HandleTypeDef *huart)
 
     /* Check the parameters */
     //  assert_param(IS_UART_INSTANCE(huart->UARTX));
-    uart_clock_enable(huart,0);
-    uart_int_op(HAL_UARTx_IRQHandler,huart,0);
-    uart_status_set(huart, 0);
+    HAL_UART_MSP_DeInit(huart);
+    HAL_UART_MSP_Idle_Set(huart);
 
     huart->ErrorCode = HAL_UART_ERROR_NONE;
     huart->gState = HAL_UART_STATE_RESET;

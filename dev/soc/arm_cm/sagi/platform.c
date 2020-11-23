@@ -5,6 +5,12 @@
 #include "io_config.h"
 #include "swint_call_asm.h"
 void modem_rf_init(void);
+#define ISR_VECTOR_ADDR ((uint32_t *)(0x400000))
+
+void MAC1_Handler(void);
+void MAC2_Handler(void);
+void SWINT1_Handler(void);
+void SWINT2_Handler(void);
 
 __attribute__((weak)) void SystemInit(){}
 
@@ -58,6 +64,11 @@ void iob_output_enable(uint8_t i)
     SYSC_AWO->IO[1].OE_DOT |= 1<<(i+16);
 }
 
+void arm_cm_set_int_isr(uint8_t type,void (*isr)())
+{
+    ISR_VECTOR_ADDR[type + 16] = (uint32_t)isr;
+}
+
 void sys_init_itf()
 {
     *(volatile uint32_t *)0x50089020 = 3<<8 | 4 <<0; //uart pin_sel
@@ -65,7 +76,12 @@ void sys_init_itf()
     SYSC_AWO->PIN_SEL3 = FIELD_BUILD(SYSC_AWO_MAC_DBG_EN, 0xFFFF);
     SCB->CCR |= SCB_CCR_UNALIGN_TRP_Msk;
     irq_priority();
+    arm_cm_set_int_isr(MAC1_IRQn,MAC1_Handler);
+    arm_cm_set_int_isr(MAC2_IRQn,MAC2_Handler);
+    arm_cm_set_int_isr(SWINT1_IRQn,SWINT1_Handler);
+    arm_cm_set_int_isr(SWINT2_IRQn,SWINT2_Handler);
     __NVIC_EnableIRQ(MAC1_IRQn);
+    __NVIC_EnableIRQ(MAC2_IRQn);
     __NVIC_EnableIRQ(SWINT1_IRQn);
     __NVIC_EnableIRQ(SWINT2_IRQn);
     modem_rf_init();
