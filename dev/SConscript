@@ -71,7 +71,7 @@ def app_build(app_name,src,inc,linkscript = '',mesh = False):
         stack_hex = target_fw
     if not 'mdk' in app_env['TOOLS']:
         app_hex = app_env.Command('#build/examples/'+app_name+'.hex',app_target,Action('$OBJCOPY -O ihex $SOURCES $TARGET'))
-        app_env.Command('#build/examples/'+app_name+'_production.hex',['#build/examples/info_sbl.hex',app_hex,stack_hex],Action('hexmerge.py $SOURCES > $TARGET'))
+        app_env.Command('#build/examples/'+app_name+'_production.hex',['#build/examples/info_sbl.hex',app_hex,stack_hex],Action('python tools/hexmerge.py $SOURCES > $TARGET'))
     return app_env,app_target
 
 SConscript(dirs = 'examples',exports=['app_build','image_build','dev_env'])
