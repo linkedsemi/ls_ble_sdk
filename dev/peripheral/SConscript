@@ -4,15 +4,16 @@ src = [
     'qspi_flash/spi_flash.c',
     'uart/uart.c',
     'cache/lscache.c',
-#    'trng/lstrng.c',
-#    'ecc/lsecc.c',
-#    'crypt/lscrypt.c',
-#    'iwdt/lsiwdt.c',
-#    'adc/lsadc.c',
-#    'timer/lstimer.c',
-#    'rtc/rtc.c',
+    'trng/lstrng.c',
+    'ecc/lsecc.c',
+    'crypt/lscrypt.c',
+    'iwdt/lsiwdt.c',
+    'adc/lsadc.c',
+    'timer/lstimer.c',
+    'rtc/rtc.c',
 #    'uart/smartcard.c',
-#    'dma/dma.c'
+   'dma/dma.c',
+    'pdm/dmic.c',
 ]
 
 if env['IC'] != 'taurus':
@@ -31,6 +32,7 @@ inc = [
     'timer',
     'rtc',
     'dma',
+    'pdm',
     '.',
 ]
 src_files = File(src)

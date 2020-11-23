@@ -21,6 +21,9 @@ typedef enum
     CH_I2C1_TX = 13,
     CH_I2C2_RX = 14,
     CH_I2C2_TX = 15,
+	
+    CH_PDMCH0_RX = 17,
+	CH_PDMCH1_RX = 18,
     CH_CRYPT_WR = 19,
     CH_CRYPT_RD = 20,
     CH_TRNG = 21,
