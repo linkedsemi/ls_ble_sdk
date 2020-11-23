@@ -337,7 +337,7 @@
               <MiscControls>--c99 -O2 --wchar32</MiscControls>
               <Define></Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\..\module\crc;..\..\..\module\debug;..\..\..\module\debug\RTT;..\..\..\module\static_buffer;..\..\..\module\tinyfs;..\..\..\module\tinycrypt\lib\include;..\..\..\module\ble;..\..\..\module\ble\prf;..\..\..\module\common;..\..\..\peripheral\qspi_flash;..\..\..\peripheral\cache;..\..\..\peripheral\calc;..\..\..\peripheral\uart;..\..\..\peripheral\trng;..\..\..\peripheral\ecc;..\..\..\peripheral\crypt;..\..\..\peripheral\iwdt;..\..\..\peripheral\adc;..\..\..\peripheral\timer;..\..\..\peripheral\rtc;..\..\..\peripheral\dma;..\..\..\peripheral;..\..\..\soc\arm_cm;..\..\..\soc\arm_cm\cmsis;..\..\..\soc\arm_cm\le501x;..\..\..\soc\arm_cm\le501x\integration;..\..\..\soc;..\..\..;..;</IncludePath>
+              <IncludePath>..\..\..\module\crc;..\..\..\module\debug;..\..\..\module\debug\RTT;..\..\..\module\static_buffer;..\..\..\module\tinyfs;..\..\..\module\tinycrypt\lib\include;..\..\..\module\ble;..\..\..\module\ble\prf;..\..\..\module\common;..\..\..\module\adpcm;..\..\..\peripheral\qspi_flash;..\..\..\peripheral\cache;..\..\..\peripheral\calc;..\..\..\peripheral\uart;..\..\..\peripheral\trng;..\..\..\peripheral\ecc;..\..\..\peripheral\crypt;..\..\..\peripheral\iwdt;..\..\..\peripheral\adc;..\..\..\peripheral\timer;..\..\..\peripheral\rtc;..\..\..\peripheral\dma;..\..\..\peripheral\pdm;..\..\..\peripheral;..\..\..\soc\arm_cm;..\..\..\soc\arm_cm\cmsis;..\..\..\soc\arm_cm\le501x;..\..\..\soc\arm_cm\le501x\integration;..\..\..\soc;..\..\..;..;</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -355,7 +355,7 @@
               <MiscControls></MiscControls>
               <Define></Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\..\module\crc;..\..\..\module\debug;..\..\..\module\debug\RTT;..\..\..\module\static_buffer;..\..\..\module\tinyfs;..\..\..\module\tinycrypt\lib\include;..\..\..\module\ble;..\..\..\module\ble\prf;..\..\..\module\common;..\..\..\peripheral\qspi_flash;..\..\..\peripheral\cache;..\..\..\peripheral\calc;..\..\..\peripheral\uart;..\..\..\peripheral\trng;..\..\..\peripheral\ecc;..\..\..\peripheral\crypt;..\..\..\peripheral\iwdt;..\..\..\peripheral\adc;..\..\..\peripheral\timer;..\..\..\peripheral\rtc;..\..\..\peripheral\dma;..\..\..\peripheral;..\..\..\soc\arm_cm;..\..\..\soc\arm_cm\cmsis;..\..\..\soc\arm_cm\le501x;..\..\..\soc\arm_cm\le501x\integration;..\..\..\soc;..\..\..;..;</IncludePath>
+              <IncludePath>..\..\..\module\crc;..\..\..\module\debug;..\..\..\module\debug\RTT;..\..\..\module\static_buffer;..\..\..\module\tinyfs;..\..\..\module\tinycrypt\lib\include;..\..\..\module\ble;..\..\..\module\ble\prf;..\..\..\module\common;..\..\..\module\adpcm;..\..\..\peripheral\qspi_flash;..\..\..\peripheral\cache;..\..\..\peripheral\calc;..\..\..\peripheral\uart;..\..\..\peripheral\trng;..\..\..\peripheral\ecc;..\..\..\peripheral\crypt;..\..\..\peripheral\iwdt;..\..\..\peripheral\adc;..\..\..\peripheral\timer;..\..\..\peripheral\rtc;..\..\..\peripheral\dma;..\..\..\peripheral\pdm;..\..\..\peripheral;..\..\..\soc\arm_cm;..\..\..\soc\arm_cm\cmsis;..\..\..\soc\arm_cm\le501x;..\..\..\soc\arm_cm\le501x\integration;..\..\..\soc;..\..\..;..;</IncludePath>
             </VariousControls>
           </Aads>
           <LDads>
@@ -410,6 +410,11 @@
               <FileName>SEGGER_RTT_printf.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\module\debug\RTT\SEGGER_RTT_printf.c</FilePath>
+            </File>
+            <File>
+              <FileName>adpcm.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\module\adpcm\adpcm.c</FilePath>
             </File>
             <File>
               <FileName>common.c</FileName>
@@ -502,6 +507,11 @@
               <FilePath>..\..\..\peripheral\dma\dma.c</FilePath>
             </File>
             <File>
+              <FileName>dmic.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\peripheral\pdm\dmic.c</FilePath>
+            </File>
+            <File>
               <FileName>lsadc.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\peripheral\adc\lsadc.c</FilePath>
@@ -545,11 +555,6 @@
               <FileName>rtc.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\peripheral\rtc\rtc.c</FilePath>
-            </File>
-            <File>
-              <FileName>smartcard.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\peripheral\uart\smartcard.c</FilePath>
             </File>
             <File>
               <FileName>spi_flash.c</FileName>
@@ -652,6 +657,11 @@
               <FilePath>..\..\..\soc\arm_cm\le501x\compiler\armcc\svcall_asm.S</FilePath>
             </File>
             <File>
+              <FileName>swint_handler.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\soc\arm_cm\swint_handler.c</FilePath>
+            </File>
+            <File>
               <FileName>sys_stat.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\soc\arm_cm\le501x\sys_stat.c</FilePath>
@@ -662,9 +672,9 @@
               <FilePath>..\..\..\soc\arm_cm\systick.c</FilePath>
             </File>
             <File>
-              <FileName>uart_param.c</FileName>
+              <FileName>uart_msp.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\soc\arm_cm\le501x\integration\uart_param.c</FilePath>
+              <FilePath>..\..\..\soc\arm_cm\le501x\integration\uart_msp.c</FilePath>
             </File>
           </Files>
         </Group>

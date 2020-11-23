@@ -17,6 +17,7 @@ src = [
     'tinycrypt/lib/source/ecc.c',
     'tinycrypt/lib/source/ecc_dsa.c',
     'tinycrypt/lib/source/ecc_platform_specific.c',
+    'adpcm/adpcm.c',
 ]
 inc = [
     'crc',
@@ -28,6 +29,7 @@ inc = [
     'ble',
     'ble/prf',
     'common',
+    'adpcm',
 ]
 src_files = File(env.subst(src))
 inc_dirs = Dir(inc)
