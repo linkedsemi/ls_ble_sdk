@@ -14,6 +14,8 @@ src = [
     'uart/smartcard.c',
     'dma/dma.c',
     'pdm/dmic.c',
+    'spi/lsspi.c',
+    'spi/lsi2s.c',
 ]
 
 if env['IC'] != 'taurus':
@@ -33,6 +35,7 @@ inc = [
     'rtc',
     'dma',
     'pdm',
+    'spi',
     '.',
 ]
 src_files = File(src)

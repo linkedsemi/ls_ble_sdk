@@ -106,6 +106,15 @@ void io_exti_callback(uint8_t pin);
 void qspi_flash_io_init(void);
 void qspi_flash_io_deinit(void);
 
+void spi2_clk_io_init(uint8_t clk);
+void spi2_nss_io_init(uint8_t nss);
+void spi2_mosi_io_init(uint8_t mosi);
+void spi2_miso_io_init(uint8_t miso);
+void spi2_clk_io_deinit(void);
+void spi2_nss_io_deinit(void);
+void spi2_mosi_io_deinit(void);
+void spi2_miso_io_deinit(void);
+
 void iic1_io_init(uint8_t scl,uint8_t sda);
 void iic1_io_deinit(void);
 

@@ -37,7 +37,7 @@
             "interface": "swd",
             "preAttachCommands":[
                 "monitor flash breakpoints = 0",
-                "add-symbol-file build/fw.elf", 
+                //"add-symbol-file build/fw.elf",  
             ]
         },
         {
@@ -67,7 +67,7 @@
                 "monitor flash breakpoints = 0",
                 "monitor reset",
                 "load", 
-                "add-symbol-file build/fw.elf",               
+                //"add-symbol-file build/fw.elf",                
             ]
         },
         {
@@ -81,7 +81,7 @@
             "interface": "swd",
             "preAttachCommands":[
                 "monitor flash breakpoints = 0",
-                "add-symbol-file build/fw.elf", 
+                //"add-symbol-file build/fw.elf",  
             ]
         },
         {
@@ -119,7 +119,7 @@
                 "monitor flash breakpoints = 0",
                 "monitor reset",
                 "load", 
-                "add-symbol-file build/fw.elf",               
+                //"add-symbol-file build/fw.elf",                
             ]
         },
         {
@@ -133,7 +133,7 @@
             "interface": "swd",
             "preAttachCommands":[
                 "monitor flash breakpoints = 0",
-                "add-symbol-file build/fw.elf", 
+                //"add-symbol-file build/fw.elf",  
             ]
         },
         {
@@ -150,7 +150,7 @@
                 "monitor flash breakpoints = 0",
                 "monitor reset",
                 "load", 
-                "add-symbol-file build/fw.elf",               
+                //"add-symbol-file build/fw.elf",                
             ]
         },
         {
@@ -164,7 +164,7 @@
             "interface": "swd",
             "preAttachCommands":[
                 "monitor flash breakpoints = 0",
-                "add-symbol-file build/fw.elf", 
+                //"add-symbol-file build/fw.elf",  
             ]
         },
         {
@@ -181,7 +181,7 @@
                 "monitor flash breakpoints = 0",
                 "monitor reset",
                 "load", 
-                "add-symbol-file build/fw.elf", 
+                //"add-symbol-file build/fw.elf",  
             ]
         },
         {
@@ -195,7 +195,7 @@
             "interface": "swd",
             "preAttachCommands":[
                 "monitor flash breakpoints = 0",
-                "add-symbol-file build/fw.elf", 
+                //"add-symbol-file build/fw.elf",  
             ]
         },
         {
@@ -212,7 +212,7 @@
                 "monitor flash breakpoints = 0",
                 "monitor reset",
                 "load", 
-                "add-symbol-file build/fw.elf", 
+                //"add-symbol-file build/fw.elf",  
             ]
         },
         {
@@ -226,7 +226,7 @@
             "interface": "swd",
             "preAttachCommands":[
                 "monitor flash breakpoints = 0",
-                "add-symbol-file build/fw.elf", 
+                //"add-symbol-file build/fw.elf",  
             ]
         },
         {
@@ -243,7 +243,7 @@
                 "monitor flash breakpoints = 0",
                 "monitor reset",
                 "load", 
-                "add-symbol-file build/fw.elf", 
+                //"add-symbol-file build/fw.elf",  
             ]
         },
         {
@@ -257,7 +257,7 @@
             "interface": "swd",
             "preAttachCommands":[
                 "monitor flash breakpoints = 0",
-                "add-symbol-file build/fw.elf", 
+                //"add-symbol-file build/fw.elf",  
             ]
         },
         {
@@ -274,7 +274,7 @@
                 "monitor flash breakpoints = 0",
                 "monitor reset",
                 "load", 
-                "add-symbol-file build/fw.elf", 
+                //"add-symbol-file build/fw.elf",  
             ]
         },
         {
@@ -288,7 +288,7 @@
             "interface": "swd",
             "preAttachCommands":[
                 "monitor flash breakpoints = 0",
-                "add-symbol-file build/fw.elf", 
+                //"add-symbol-file build/fw.elf",  
             ]
         },
         {
@@ -305,7 +305,7 @@
                 "monitor flash breakpoints = 0",
                 "monitor reset",
                 "load", 
-                "add-symbol-file build/fw.elf", 
+                //"add-symbol-file build/fw.elf",  
             ]
         },
         {
@@ -319,7 +319,7 @@
             "interface": "swd",
             "preAttachCommands":[
                 "monitor flash breakpoints = 0",
-                "add-symbol-file build/fw.elf", 
+                //"add-symbol-file build/fw.elf",  
             ]
         },
         {
@@ -336,7 +336,7 @@
                 "monitor flash breakpoints = 0",
                 "monitor reset",
                 "load", 
-                "add-symbol-file build/fw.elf",               
+                //"add-symbol-file build/fw.elf",                
             ]
         },
         {
@@ -350,7 +350,7 @@
             "interface": "swd",
             "preAttachCommands":[
                 "monitor flash breakpoints = 0",
-                "add-symbol-file build/fw.elf", 
+                //"add-symbol-file build/fw.elf",  
             ]
         },
         {
@@ -367,7 +367,7 @@
                 "monitor flash breakpoints = 0",
                 "monitor reset",
                 "load", 
-//                "add-symbol-file build/fw.elf",               
+//                //"add-symbol-file build/fw.elf",                
             ]
         },
         {
@@ -381,7 +381,38 @@
             "interface": "swd",
             "preAttachCommands":[
                 "monitor flash breakpoints = 0",
-//                "add-symbol-file build/fw.elf", 
+//                //"add-symbol-file build/fw.elf",  
+            ]
+        },
+        {
+            "type": "cortex-debug",
+            "request": "launch",
+            "servertype": "jlink",
+            "cwd": "${workspaceRoot}",
+            "executable": "./build/examples/spi_test.elf",
+            "name": "Debug SPI_TEST",
+            "device": "LE501X",
+            "interface": "swd",
+            "runToMain": false,
+            "preLaunchCommands" :[
+                "monitor flash breakpoints = 0",
+                "monitor reset",
+                "load", 
+//                //"add-symbol-file build/fw.elf",                
+            ]
+        },
+        {
+            "type": "cortex-debug",
+            "request": "attach",
+            "servertype": "jlink",
+            "cwd": "${workspaceRoot}",
+            "executable": "./build/examples/spi_test.elf",
+            "name": "Attach SPI_TEST",
+            "device": "LE501X",
+            "interface": "swd",
+            "preAttachCommands":[
+                "monitor flash breakpoints = 0",
+//                //"add-symbol-file build/fw.elf",  
             ]
         },
         {
@@ -398,7 +429,7 @@
                 "monitor flash breakpoints = 0",
                 "monitor reset",
                 "load", 
-//                "add-symbol-file build/fw.elf",               
+//                //"add-symbol-file build/fw.elf",                
             ]
         },
         {
@@ -412,7 +443,7 @@
             "interface": "swd",
             "preAttachCommands":[
                 "monitor flash breakpoints = 0",
-//                "add-symbol-file build/fw.elf", 
+//                //"add-symbol-file build/fw.elf",  
             ]
         },
         {
@@ -457,7 +488,7 @@
                 "monitor flash breakpoints = 0",
                 "monitor reset",
                 "load", 
-                "add-symbol-file build/fw.elf",               
+                //"add-symbol-file build/fw.elf",                
             ]
         },
         {
@@ -471,7 +502,7 @@
             "interface": "swd",
             "preAttachCommands":[
                 "monitor flash breakpoints = 0",
-                "add-symbol-file build/fw.elf", 
+                //"add-symbol-file build/fw.elf",  
             ]
         },
         {
@@ -488,7 +519,7 @@
                 "monitor flash breakpoints = 0",
                 "monitor reset",
                 "load", 
-                "add-symbol-file build/fw.elf",               
+                //"add-symbol-file build/fw.elf",                
             ]
         },
         {
@@ -502,7 +533,7 @@
             "interface": "swd",
             "preAttachCommands":[
                 "monitor flash breakpoints = 0",
-                "add-symbol-file build/fw.elf", 
+                //"add-symbol-file build/fw.elf",  
             ]
         },
         {
@@ -519,7 +550,7 @@
                 "monitor flash breakpoints = 0",
                 "monitor reset",
                 "load", 
-                "add-symbol-file build/fw.elf",               
+                //"add-symbol-file build/fw.elf",                
             ]
         },
         {
@@ -533,7 +564,7 @@
             "interface": "swd",
             "preAttachCommands":[
                 "monitor flash breakpoints = 0",
-                "add-symbol-file build/fw.elf", 
+                //"add-symbol-file build/fw.elf",  
             ]
         },
         {
@@ -550,7 +581,7 @@
                 "monitor flash breakpoints = 0",
                 "monitor reset",
                 "load", 
-                "add-symbol-file build/fw.elf", 
+                //"add-symbol-file build/fw.elf",  
             ]
         },
         {
@@ -564,7 +595,7 @@
             "interface": "swd",
             "preAttachCommands":[
                 "monitor flash breakpoints = 0",
-                "add-symbol-file build/fw.elf", 
+                //"add-symbol-file build/fw.elf",  
             ]
         },
         {
@@ -581,7 +612,7 @@
                 "monitor flash breakpoints = 0",
                 "monitor reset",
                 "load", 
-                "add-symbol-file build/fw.elf",               
+                //"add-symbol-file build/fw.elf",                
             ]
         },
         {
@@ -595,7 +626,7 @@
             "interface": "swd",
             "preAttachCommands":[
                 "monitor flash breakpoints = 0",
-                "add-symbol-file build/fw.elf", 
+                //"add-symbol-file build/fw.elf",  
             ]
         },
         {

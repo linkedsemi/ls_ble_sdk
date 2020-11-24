@@ -8,6 +8,10 @@
 #include "platform.h"
 #include "le501x.h"
 
+gpio_pin_t spi2_clk;
+gpio_pin_t spi2_nss;
+gpio_pin_t spi2_mosi;
+gpio_pin_t spi2_miso;
 gpio_pin_t uart1_txd;
 gpio_pin_t uart1_rxd;
 gpio_pin_t uart1_ck;
@@ -113,6 +117,78 @@ static void uart_7816_io_cfg(uint8_t txd,uint8_t ck)
     io_cfg_opendrain(txd);
     io_cfg_output(txd);
     io_cfg_output(ck);
+}
+
+static void spi_clk_io_cfg(uint8_t clk)
+{
+    io_set_pin(clk);
+    io_cfg_output(clk);
+}
+
+static void spi_nss_io_cfg(uint8_t nss)
+{
+    io_set_pin(nss);
+    io_cfg_output(nss);
+}
+
+static void spi_mosi_io_cfg(uint8_t mosi)
+{
+    io_set_pin(mosi);
+    io_cfg_output(mosi);
+}
+
+static void spi_miso_io_cfg(uint8_t miso)
+{
+    io_cfg_input(miso);
+}
+
+void spi2_clk_io_init(uint8_t clk)
+{
+    *(uint8_t *)&spi2_clk = clk;
+    spi_clk_io_cfg( clk);
+    af_io_init((gpio_pin_t *)&clk,AF_SPI2_SCK);
+}
+
+void spi2_nss_io_init(uint8_t nss)
+{
+    *(uint8_t *)&spi2_nss = nss;
+    spi_nss_io_cfg( nss);
+    af_io_init((gpio_pin_t *)&nss,AF_SPI2_NSS);    
+}
+
+void spi2_mosi_io_init(uint8_t mosi)
+{
+    *(uint8_t *)&spi2_mosi = mosi;
+    spi_mosi_io_cfg( mosi);
+    af_io_init((gpio_pin_t *)&mosi,AF_SPI2_MOSI);
+}
+
+void spi2_miso_io_init(uint8_t miso)
+{
+
+    *(uint8_t *)&spi2_miso = miso;
+    spi_miso_io_cfg( miso);
+    af_io_init((gpio_pin_t *)&miso,AF_SPI2_MISO); 
+}
+
+void spi2_clk_io_deinit(void)
+{
+    set_gpio_mode((gpio_pin_t *)&spi2_clk);
+}
+
+void spi2_nss_io_deinit(void)
+{
+    set_gpio_mode((gpio_pin_t *)&spi2_nss);
+}
+
+void spi2_mosi_io_deinit(void)
+{
+    set_gpio_mode((gpio_pin_t *)&spi2_mosi);
+}
+
+void spi2_miso_io_deinit(void)
+{
+    set_gpio_mode((gpio_pin_t *)&spi2_miso);
 }
 
 void uart1_io_init(uint8_t txd,uint8_t rxd)

@@ -8,6 +8,7 @@ src = [
     'compiler/$COMPILER/delay_asm.S',
     'integration/lsqspi_param.c',
     'integration/uart_msp.c',
+    'integration/spi_msp.c',
     'integration/modem_rf_le501x.c',
     'integration/calc_acc.c',
     'integration/lscache_param.c',
