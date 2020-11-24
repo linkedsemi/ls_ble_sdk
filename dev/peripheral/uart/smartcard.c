@@ -17,11 +17,12 @@
 /* Includes ------------------------------------------------------------------*/
 #include <stdio.h>
 #include "lsuart.h"
-#include "uart_param.h" 
+#include "uart_msp.h" 
 #include "log.h"
 #include "lssmartcard.h"
 #include "systick.h"
 #include "ls_dbg.h"
+#include "field_manipulate.h"
 /** @addtogroup le501x_HAL_Driver
   * @{
   */
@@ -72,7 +73,7 @@ HAL_StatusTypeDef HAL_SMARTCARD_Init(SMARTCARD_HandleTypeDef *hsc)
   }
 
   /* Check the parameters */
- // LS_ASSERT(IS_SMARTCARD_INSTANCE(hsc->Instance));
+ // LS_ASSERT(IS_SMARTCARD_UARTX(hsc->UARTX));
 
   if(hsc->gState == HAL_SMARTCARD_STATE_RESET)
   {
@@ -85,29 +86,23 @@ HAL_StatusTypeDef HAL_SMARTCARD_Init(SMARTCARD_HandleTypeDef *hsc)
 
   hsc->gState = HAL_SMARTCARD_STATE_BUSY;
 
-	 /* Enable  peripheral clock*/
-	smartcard_sw_reset(hsc);
-	smartcard_clock_enable(hsc,1);
-	
- /*  peripheral op butting*/
-	smartcard_int_op(HAL_SMARTCARD_IRQHandler,hsc,1);
-	smartcard_status_set(hsc, 1);
-	
+    HAL_SMARTCARD_MSP_Init(hsc);
+    HAL_SMARTCARD_MSP_Busy_Set();
   /* Set the Prescaler */
-  MODIFY_REG(hsc->Instance->CR, UART_CR_PSC_MASK, hsc->Init.Prescaler);
+  MODIFY_REG(hsc->UARTX->CR, UART_CR_PSC_MASK, hsc->Init.Prescaler);
 
   /* Set the Guard Time */
-  MODIFY_REG(hsc->Instance->CR, UART_CR_GT_MASK, ((hsc->Init.GuardTime)<<UART_CR_GT_POS));
+  MODIFY_REG(hsc->UARTX->CR, UART_CR_GT_MASK, ((hsc->Init.GuardTime)<<UART_CR_GT_POS));
 
   /* Set the Smartcard Communication parameters */
   SMARTCARD_SetConfig(hsc);
 
   /* In SmartCard mode, the following bits must be kept cleared:
   - LINEN ��HDSEL and IREN bits in the MCR register.*/
-  CLEAR_BIT(hsc->Instance->MCR, (UART_MCR_LINEN_MASK | UART_MCR_IREN_MASK | UART_MCR_HDSEL_MASK));
+  CLEAR_BIT(hsc->UARTX->MCR, (UART_MCR_LINEN_MASK | UART_MCR_IREN_MASK | UART_MCR_HDSEL_MASK));
 
   /* Enable the SC mode by setting the SCEN bit in the CR3 register */
-  hsc->Instance->MCR |= (UART_MCR_SCEN_MASK);
+  hsc->UARTX->MCR |= (UART_MCR_SCEN_MASK);
 
   /* Initialize the SMARTCARD state*/
   hsc->ErrorCode = HAL_SMARTCARD_ERROR_NONE;
@@ -132,13 +127,13 @@ HAL_StatusTypeDef HAL_SMARTCARD_DeInit(SMARTCARD_HandleTypeDef *hsc)
   }
 
   /* Check the parameters */
-//  LS_ASSERT(IS_SMARTCARD_INSTANCE(hsc->Instance));
+//  LS_ASSERT(IS_SMARTCARD_UARTX(hsc->UARTX));
 
   hsc->gState = HAL_SMARTCARD_STATE_BUSY;
 
   /* DeInit the low level hardware */
-  HAL_SMARTCARD_MspDeInit(hsc);
-
+  HAL_SMARTCARD_MSP_DeInit(hsc);
+  HAL_SMARTCARD_MSP_Idle_Set();
   hsc->ErrorCode = HAL_SMARTCARD_ERROR_NONE;
   hsc->gState = HAL_SMARTCARD_STATE_RESET;
   hsc->RxState = HAL_SMARTCARD_STATE_RESET;
@@ -289,7 +284,7 @@ HAL_StatusTypeDef HAL_SMARTCARD_Transmit(SMARTCARD_HandleTypeDef *hsc, uint8_t *
     hsc->gState = HAL_SMARTCARD_STATE_BUSY_TX;
 
 	 /* Enable the SMARTCARD TX */
-    MODIFY_REG(hsc->Instance->LCR, UART_LCR_RXEN_MASK, SMARTCARD_MODE_TX); 
+    MODIFY_REG(hsc->UARTX->LCR, UART_LCR_RXEN_MASK, SMARTCARD_MODE_TX); 
 		
     /* Init tickstart for timeout managment */
     // tickstart = HAL_GetTick();
@@ -303,7 +298,7 @@ HAL_StatusTypeDef HAL_SMARTCARD_Transmit(SMARTCARD_HandleTypeDef *hsc, uint8_t *
     //   {
     //     return HAL_TIMEOUT;
     //   }
-      hsc->Instance->TBR = (*pData++ & 0xFF);
+      hsc->UARTX->TBR = (*pData++ & 0xFF);
     }
 
     // if(SMARTCARD_WaitOnFlagUntilTimeout(hsc, SMARTCARD_FLAG_TEMT, RESET, tickstart, Timeout) != HAL_OK)
@@ -311,7 +306,7 @@ HAL_StatusTypeDef HAL_SMARTCARD_Transmit(SMARTCARD_HandleTypeDef *hsc, uint8_t *
     //   return HAL_TIMEOUT;
     // }
 	 /* Enable the SMARTCARD RX */
-    MODIFY_REG(hsc->Instance->LCR, UART_LCR_RXEN_MASK, SMARTCARD_MODE_RX); 
+    MODIFY_REG(hsc->UARTX->LCR, UART_LCR_RXEN_MASK, SMARTCARD_MODE_RX); 
 		
 	/* At end of Tx process, restore hsc->gState to Ready */
     hsc->gState = HAL_SMARTCARD_STATE_READY;
@@ -354,7 +349,7 @@ HAL_StatusTypeDef HAL_SMARTCARD_Receive(SMARTCARD_HandleTypeDef *hsc, uint8_t *p
     hsc->RxState = HAL_SMARTCARD_STATE_BUSY_RX;
 
 	 /* Enable the SMARTCARD RX */
-    MODIFY_REG(hsc->Instance->LCR, UART_LCR_RXEN_MASK, UART_LCR_RXEN_MASK);
+    MODIFY_REG(hsc->UARTX->LCR, UART_LCR_RXEN_MASK, UART_LCR_RXEN_MASK);
 		
     /* Init tickstart for timeout managment */
     // tickstart = HAL_GetTick();
@@ -369,7 +364,7 @@ HAL_StatusTypeDef HAL_SMARTCARD_Receive(SMARTCARD_HandleTypeDef *hsc, uint8_t *p
     //   {
     //     return HAL_TIMEOUT;
     //   }
-      *pData++ = (uint8_t)(hsc->Instance->RBR & (uint8_t)0xFF);
+      *pData++ = (uint8_t)(hsc->UARTX->RBR & (uint8_t)0xFF);
       hsc->RxXferCount--;
     }
 
@@ -416,23 +411,23 @@ HAL_StatusTypeDef HAL_SMARTCARD_Transmit_IT(SMARTCARD_HandleTypeDef *hsc, uint8_
     hsc->gState = HAL_SMARTCARD_STATE_BUSY_TX;
 
 		/* Enable the SMARTCARD TX */
-    MODIFY_REG(hsc->Instance->LCR, UART_LCR_RXEN_MASK, SMARTCARD_MODE_TX); 
+    MODIFY_REG(hsc->UARTX->LCR, UART_LCR_RXEN_MASK, SMARTCARD_MODE_TX); 
 		
     /* Process Unlocked */
     __HAL_UNLOCK(hsc);
 
-	MODIFY_REG(hsc->Instance->FCR,UART_FCR_TXTL_MASK,SMARTCARD_FIFO_TL_0);
+	MODIFY_REG(hsc->UARTX->FCR,UART_FCR_TXTL_MASK,SMARTCARD_FIFO_TL_0);
 
     /* Enable the SMARTCARD Transmit data register empty Interrupt */
-        SET_BIT(hsc->Instance->ICR, SMARTCARD_IT_TXS); // threshold empty 
-        SET_BIT(hsc->Instance->ICR, SMARTCARD_IT_TC); // transmission complete, TODO: should not set here!
-        SET_BIT(hsc->Instance->IER, SMARTCARD_IT_TXS);
+        SET_BIT(hsc->UARTX->ICR, SMARTCARD_IT_TXS); // threshold empty 
+        SET_BIT(hsc->UARTX->ICR, SMARTCARD_IT_TC); // transmission complete, TODO: should not set here!
+        SET_BIT(hsc->UARTX->IER, SMARTCARD_IT_TXS);
 
         hsc->TxXferCount--; 
-        hsc->Instance->TBR = (*hsc->pTxBuffPtr++ & (uint8_t)0xFF);
+        hsc->UARTX->TBR = (*hsc->pTxBuffPtr++ & (uint8_t)0xFF);
         if(hsc->TxXferCount == 0)
         {
-            SET_BIT(hsc->Instance->IER,UART_IT_TC);
+            SET_BIT(hsc->UARTX->IER,UART_IT_TC);
         }
 
     return HAL_OK;
@@ -472,23 +467,23 @@ HAL_StatusTypeDef HAL_SMARTCARD_Receive_IT(SMARTCARD_HandleTypeDef *hsc, uint8_t
     hsc->RxState = HAL_SMARTCARD_STATE_BUSY_RX;
 
 	 /* Enable the SMARTCARD RX */
-    MODIFY_REG(hsc->Instance->LCR, UART_LCR_RXEN_MASK, SMARTCARD_MODE_RX); 
+    MODIFY_REG(hsc->UARTX->LCR, UART_LCR_RXEN_MASK, SMARTCARD_MODE_RX); 
 		
     /* Process Unlocked */
     __HAL_UNLOCK(hsc);
 
 		if(hsc->RxXferCount<8)
 		{
-				MODIFY_REG(hsc->Instance->FCR,UART_FCR_RXTL_MASK,SMARTCARD_FIFO_RL_1);
+				MODIFY_REG(hsc->UARTX->FCR,UART_FCR_RXTL_MASK,SMARTCARD_FIFO_RL_1);
 		}
 		else
 		{
-				MODIFY_REG(hsc->Instance->FCR,UART_FCR_RXTL_MASK,SMARTCARD_FIFO_RL_8);
+				MODIFY_REG(hsc->UARTX->FCR,UART_FCR_RXTL_MASK,SMARTCARD_FIFO_RL_8);
 		}	
 		
     /* Enable the SMARTCARD Data Register not empty Interrupts */
-    SET_BIT(hsc->Instance->ICR, SMARTCARD_IT_RXRD); 
-    SET_BIT(hsc->Instance->IER, SMARTCARD_IT_RXRD);
+    SET_BIT(hsc->UARTX->ICR, SMARTCARD_IT_RXRD); 
+    SET_BIT(hsc->UARTX->IER, SMARTCARD_IT_RXRD);
 
     return HAL_OK;
   }
@@ -506,8 +501,8 @@ HAL_StatusTypeDef HAL_SMARTCARD_Receive_IT(SMARTCARD_HandleTypeDef *hsc, uint8_t
   */
 void HAL_SMARTCARD_IRQHandler(SMARTCARD_HandleTypeDef *hsc)
 {
-	uint32_t srflags   = hsc->Instance->SR;
-  uint32_t ierflags  = hsc->Instance->IVS;
+	uint32_t srflags   = hsc->UARTX->SR;
+  uint32_t ierflags  = hsc->UARTX->IVS;
 
 	
 	/* SMARTCARD frame error interrupt occurred ----------------------------*/
@@ -537,7 +532,7 @@ void HAL_SMARTCARD_IRQHandler(SMARTCARD_HandleTypeDef *hsc)
   if(((srflags & SMARTCARD_FLAG_TBEM) != RESET) && ((ierflags & SMARTCARD_IT_TXS) != RESET))
   {
     SMARTCARD_Transmit_IT(hsc);
-    SET_BIT(hsc->Instance->ICR, UART_TXS_MASK);
+    SET_BIT(hsc->UARTX->ICR, UART_TXS_MASK);
   }
 
   /* SMARTCARD in mode Transmitter (transmission end) -----------------------*/
@@ -545,7 +540,7 @@ void HAL_SMARTCARD_IRQHandler(SMARTCARD_HandleTypeDef *hsc)
   {
 
     SMARTCARD_EndTransmit_IT(hsc);
-		SET_BIT(hsc->Instance->ICR,UART_TC_MASK);
+		SET_BIT(hsc->UARTX->ICR,UART_TC_MASK);
   }
 }
 
@@ -668,8 +663,8 @@ uint32_t HAL_SMARTCARD_GetError(SMARTCARD_HandleTypeDef *hsc)
 //       if((Timeout == 0U)||((HAL_GetTick() - Tickstart ) > Timeout))
 //       {
 //         /* Disable TXE and RXNE interrupts for the interrupt process */
-//         SET_BIT(hsc->Instance->IDR, SMARTCARD_IT_RXRD | SMARTCARD_IT_TXS);
-//         SET_BIT(hsc->Instance->ICR, SMARTCARD_IT_RXRD | SMARTCARD_IT_TXS);
+//         SET_BIT(hsc->UARTX->IDR, SMARTCARD_IT_RXRD | SMARTCARD_IT_TXS);
+//         SET_BIT(hsc->UARTX->ICR, SMARTCARD_IT_RXRD | SMARTCARD_IT_TXS);
 
 //         hsc->gState= HAL_SMARTCARD_STATE_READY;
 //         hsc->RxState= HAL_SMARTCARD_STATE_READY;
@@ -696,33 +691,33 @@ static HAL_StatusTypeDef SMARTCARD_Transmit_IT(SMARTCARD_HandleTypeDef *hsc)
   /* Check that a Tx process is ongoing */
   if(hsc->gState == HAL_SMARTCARD_STATE_BUSY_TX)
   {
-    hsc->Instance->TBR = (*hsc->pTxBuffPtr++ & 0xFF);
+    hsc->UARTX->TBR = (*hsc->pTxBuffPtr++ & 0xFF);
 
     if(--hsc->TxXferCount == 0U)
     {
       /* Disable the SMARTCARD Transmit data register empty Interrupt */
-      SET_BIT(hsc->Instance->IDR, SMARTCARD_IT_TXS);
-	  SET_BIT(hsc->Instance->ICR, SMARTCARD_IT_TXS);
+      SET_BIT(hsc->UARTX->IDR, SMARTCARD_IT_TXS);
+	  SET_BIT(hsc->UARTX->ICR, SMARTCARD_IT_TXS);
       /* Enable the SMARTCARD Transmit Complete Interrupt */
-      SET_BIT(hsc->Instance->IER, SMARTCARD_IT_TC);
+      SET_BIT(hsc->UARTX->IER, SMARTCARD_IT_TC);
     }
-		if(!READ_BIT(hsc->Instance->FCR, UART_FCR_TXFL_MASK))
+		if(!READ_BIT(hsc->UARTX->FCR, UART_FCR_TXFL_MASK))
 		{
 			if (hsc->TxXferCount == 0U)
 			{
-					SET_BIT(hsc->Instance->IDR,SMARTCARD_IT_TXS);
-					SET_BIT(hsc->Instance->IER,SMARTCARD_IT_TC);
+					SET_BIT(hsc->UARTX->IDR,SMARTCARD_IT_TXS);
+					SET_BIT(hsc->UARTX->IER,SMARTCARD_IT_TC);
 			}
 			else
 			{
-				while(READ_BIT(hsc->Instance->SR,  UART_SR_TFNF_MASK))
+				while(READ_BIT(hsc->UARTX->SR,  UART_SR_TFNF_MASK))
 				{
 					if (hsc->TxXferCount == 0U)
 					{
 							break;
 					}
 					hsc->TxXferCount--;
-					hsc->Instance->TBR = (*hsc->pTxBuffPtr++ & (uint8_t)0xFF);
+					hsc->UARTX->TBR = (*hsc->pTxBuffPtr++ & (uint8_t)0xFF);
 				}
 			}
 		}
@@ -743,8 +738,8 @@ static HAL_StatusTypeDef SMARTCARD_Transmit_IT(SMARTCARD_HandleTypeDef *hsc)
 static HAL_StatusTypeDef SMARTCARD_EndTransmit_IT(SMARTCARD_HandleTypeDef *hsc)
 {
   /* Disable the SMARTCARD Transmit Complete Interrupt */
-	SET_BIT(hsc->Instance->IDR, SMARTCARD_IT_TC);
-	SET_BIT(hsc->Instance->ICR, SMARTCARD_IT_TC);
+	SET_BIT(hsc->UARTX->IDR, SMARTCARD_IT_TC);
+	SET_BIT(hsc->UARTX->ICR, SMARTCARD_IT_TC);
 
   /* Tx process is ended, restore hsc->gState to Ready */
   hsc->gState = HAL_SMARTCARD_STATE_READY;
@@ -768,15 +763,15 @@ static HAL_StatusTypeDef SMARTCARD_Receive_IT(SMARTCARD_HandleTypeDef *hsc)
   /* Check that a Rx process is ongoing */
   if(hsc->RxState == HAL_SMARTCARD_STATE_BUSY_RX)
   {
-		fifo_level = REG_FIELD_RD(hsc->Instance->FCR, UART_FCR_RXFL);
+		fifo_level = REG_FIELD_RD(hsc->UARTX->FCR, UART_FCR_RXFL);
 		
 		for (;fifo_level>0;fifo_level--)
 		{
-			*hsc->pRxBuffPtr++ = (uint8_t)(hsc->Instance->RBR & (uint8_t)0x00FF);
+			*hsc->pRxBuffPtr++ = (uint8_t)(hsc->UARTX->RBR & (uint8_t)0x00FF);
 			if(--hsc->RxXferCount == 0U)
 			{
-				SET_BIT(hsc->Instance->IDR, SMARTCARD_IT_RXRD);
-				SET_BIT(hsc->Instance->ICR, SMARTCARD_IT_RXRD);
+				SET_BIT(hsc->UARTX->IDR, SMARTCARD_IT_RXRD);
+				SET_BIT(hsc->UARTX->ICR, SMARTCARD_IT_RXRD);
 
 
 				/* Rx process is completed, restore hsc->RxState to Ready */
@@ -790,19 +785,19 @@ static HAL_StatusTypeDef SMARTCARD_Receive_IT(SMARTCARD_HandleTypeDef *hsc)
 		
 			if(hsc->RxXferCount>0x0E)
 			{
-				MODIFY_REG(hsc->Instance->FCR,UART_FCR_RXTL_MASK,SMARTCARD_FIFO_RL_14);
+				MODIFY_REG(hsc->UARTX->FCR,UART_FCR_RXTL_MASK,SMARTCARD_FIFO_RL_14);
 			}
 			else if(hsc->RxXferCount>0x08) 
 			{
-				MODIFY_REG(hsc->Instance->FCR,UART_FCR_RXTL_MASK,SMARTCARD_FIFO_RL_8);				
+				MODIFY_REG(hsc->UARTX->FCR,UART_FCR_RXTL_MASK,SMARTCARD_FIFO_RL_8);				
 			}
 			else if(hsc->RxXferCount>0x04) 
 			{
-				MODIFY_REG(hsc->Instance->FCR,UART_FCR_RXTL_MASK,SMARTCARD_FIFO_RL_4);				
+				MODIFY_REG(hsc->UARTX->FCR,UART_FCR_RXTL_MASK,SMARTCARD_FIFO_RL_4);				
 			}
 			else
 			{
-				MODIFY_REG(hsc->Instance->FCR,UART_FCR_RXTL_MASK,SMARTCARD_FIFO_RL_1);
+				MODIFY_REG(hsc->UARTX->FCR,UART_FCR_RXTL_MASK,SMARTCARD_FIFO_RL_1);
 			}
 		}
 
@@ -826,7 +821,7 @@ static void SMARTCARD_SetConfig(SMARTCARD_HandleTypeDef *hsc)
  // uint32_t pclk;
 
   /* Check the parameters */
-//  LS_ASSERT(IS_SMARTCARD_INSTANCE(hsc->Instance));
+//  LS_ASSERT(IS_SMARTCARD_UARTX(hsc->UARTX));
   LS_ASSERT(IS_SMARTCARD_BAUDRATE(hsc->Init.BaudRate));
   LS_ASSERT(IS_SMARTCARD_WORD_LENGTH(hsc->Init.WordLength));
   LS_ASSERT(IS_SMARTCARD_STOPBITS(hsc->Init.StopBits));
@@ -836,10 +831,10 @@ static void SMARTCARD_SetConfig(SMARTCARD_HandleTypeDef *hsc)
 
   /*-------------------------- USART BRR Configuration -----------------------*/
   //pclk = HAL_RCC_GetHCLKFreq();
-  SET_BIT(hsc->Instance->LCR,UART_LCR_BRWEN_MASK);	
-  //hsc->Instance->BRR = SMARTCARD_BRR(pclk, hsc->Init.BaudRate);
-	hsc->Instance->BRR = SMARTCARD_BUADRATE_ENUM_GEN(hsc->Init.BaudRate);
-	CLEAR_BIT(hsc->Instance->LCR,UART_LCR_BRWEN_MASK);
+  SET_BIT(hsc->UARTX->LCR,UART_LCR_BRWEN_MASK);	
+  //hsc->UARTX->BRR = SMARTCARD_BRR(pclk, hsc->Init.BaudRate);
+	hsc->UARTX->BRR = SMARTCARD_BUADRATE_ENUM_GEN(hsc->Init.BaudRate);
+	CLEAR_BIT(hsc->UARTX->LCR,UART_LCR_BRWEN_MASK);
 	
 	/*-------------------------- USART LCR Configuration -----------------------*/
   /*  Configure the SMARTCARD STOP[2],Word Length, Parity and mode:
@@ -847,25 +842,25 @@ static void SMARTCARD_SetConfig(SMARTCARD_HandleTypeDef *hsc)
      Set the M bits according to hsc->Init.WordLength value
      Set PCE and PS bits according to hsc->Init.Parity value
      Set TE and RE bits according to hsc->Init.Mode value */
-	CLEAR_BIT(hsc->Instance->LCR, (UART_LCR_STOP_MASK | UART_LCR_DLS_MASK | UART_LCR_PE_MASK | UART_LCR_PS_MASK | UART_LCR_RXEN_MASK));
-  SET_BIT(hsc->Instance->LCR, (uint32_t)hsc->Init.StopBits | hsc->Init.WordLength | hsc->Init.Parity | hsc->Init.Mode);
+	CLEAR_BIT(hsc->UARTX->LCR, (UART_LCR_STOP_MASK | UART_LCR_DLS_MASK | UART_LCR_PE_MASK | UART_LCR_PS_MASK | UART_LCR_RXEN_MASK));
+  SET_BIT(hsc->UARTX->LCR, (uint32_t)hsc->Init.StopBits | hsc->Init.WordLength | hsc->Init.Parity | hsc->Init.Mode);
 
   /*---------------------------- USART MCR Configuration ---------------------*/
   /* Configure the SMARTCARD Clock -----------------------*/
-  SET_BIT(hsc->Instance->MCR, (uint32_t)UART_MCR_CLKEN_MASK);
+  SET_BIT(hsc->UARTX->MCR, (uint32_t)UART_MCR_CLKEN_MASK);
   /* Configure the Smartcard NACK state and RETRYTIME*/
-  MODIFY_REG(hsc->Instance->MCR, UART_MCR_SCNACK_MASK | UART_MCR_SCCNT_MASK, hsc->Init.Retry | hsc->Init.NACKState);
+  MODIFY_REG(hsc->UARTX->MCR, UART_MCR_SCNACK_MASK | UART_MCR_SCCNT_MASK, hsc->Init.Retry | hsc->Init.NACKState);
 
     /* ---------------------- UART Fifo configuration ------------------------ */
     /* by default, even use DMA transfer, it's better to enable FIFOEN with 1 byte */
-    SET_BIT(hsc->Instance->FCR, UART_FCR_FIFOEN_MASK); // enable UART Fifo
-    SET_BIT(hsc->Instance->FCR, UART_FCR_RFRST_MASK | UART_FCR_TFRST_MASK);  // reset UART RX/TX Fifo
-    MODIFY_REG(hsc->Instance->FCR, UART_FCR_RXFL_MASK, 0);
-    MODIFY_REG(hsc->Instance->FCR, UART_FCR_TXFL_MASK, 0);
+    SET_BIT(hsc->UARTX->FCR, UART_FCR_FIFOEN_MASK); // enable UART Fifo
+    SET_BIT(hsc->UARTX->FCR, UART_FCR_RFRST_MASK | UART_FCR_TFRST_MASK);  // reset UART RX/TX Fifo
+    MODIFY_REG(hsc->UARTX->FCR, UART_FCR_RXFL_MASK, 0);
+    MODIFY_REG(hsc->UARTX->FCR, UART_FCR_TXFL_MASK, 0);
 		
   /*-------------------------- USART IER Configuration -----------------------*/
   /* Clear INT bits */
-	SET_BIT(hsc->Instance->IDR, SMARTCARD_IT_MASK);
+	SET_BIT(hsc->UARTX->IDR, SMARTCARD_IT_MASK);
 
 }
 

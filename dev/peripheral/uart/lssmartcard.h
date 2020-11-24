@@ -139,7 +139,7 @@ typedef enum
   */
 typedef struct __SMARTCARD_HandleTypeDef
 {
-  reg_uart_t                    	 *Instance;        /*!< USART registers base address */
+  reg_uart_t                    	 *UARTX;        /*!< USART registers base address */
 
   SMARTCARD_InitTypeDef            Init;             /*!< SmartCard communication parameters */
 

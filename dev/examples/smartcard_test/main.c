@@ -79,7 +79,7 @@ int main(void)
   - USART Clock enabled
   */
   /* USART Clock set to 2 MHz (PCLK1 (16 MHz) / 8) => prescaler set to 0x03 */
-  SCHandle.Instance = UART1;
+  SCHandle.UARTX = UART1;
   SCHandle.Init.BaudRate = 5376;  /* Starting baudrate = 2MHz / 372etu */
   SCHandle.Init.WordLength = SMARTCARD_WORDLENGTH_8B;
   SCHandle.Init.StopBits = SMARTCARD_STOPBITS_1_5;
@@ -141,20 +141,20 @@ int main(void)
   * @retval 0  : pBuff1 identical to pBuff2
   *         >0 : pBuff1 differs from pBuff2
   */
-static uint16_t Buffercmp(uint8_t* pBuff1, uint8_t* pBuff2, uint16_t Length)
-{
-  while (Length--)
-  {
-    if((*pBuff1) != *pBuff2)
-    {
-      return Length;
-    }
-    pBuff1++;
-    pBuff2++;
-  }
+// static uint16_t Buffercmp(uint8_t* pBuff1, uint8_t* pBuff2, uint16_t Length)
+// {
+//   while (Length--)
+//   {
+//     if((*pBuff1) != *pBuff2)
+//     {
+//       return Length;
+//     }
+//     pBuff1++;
+//     pBuff2++;
+//   }
 
-  return 0;
-}
+//   return 0;
+// }
 
 /**
   * @brief  This function is executed in case of error occurrence.

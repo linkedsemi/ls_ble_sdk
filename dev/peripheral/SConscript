@@ -11,8 +11,8 @@ src = [
     'adc/lsadc.c',
     'timer/lstimer.c',
     'rtc/rtc.c',
-#    'uart/smartcard.c',
-   'dma/dma.c',
+    'uart/smartcard.c',
+    'dma/dma.c',
     'pdm/dmic.c',
 ]
 
