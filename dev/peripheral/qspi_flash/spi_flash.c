@@ -19,6 +19,7 @@
 #define READ_STATUS_REGISTER_0_OPCODE 0x05
 #define READ_STATUS_REGISTER_1_OPCODE 0x35
 #define WRITE_ENABLE_OPCODE 0x06
+#define PAGE_ERASE_OPCODE 0x81
 #define SECTOR_ERASE_OPCODE 0x20
 #define CHIP_ERASE_OPCODE 0x60
 #define PAGE_PROGRAM_OPCODE 0x02
@@ -254,23 +255,36 @@ void spi_flash_page_program(uint32_t offset,uint8_t *data,uint16_t length)
     spi_flash_program_operation(offset,data,length,false);
 }
 
-XIP_BANNED static void do_spi_flash_sector_erase_func(void *addr_buf)
-{
-    lsqspi_stig_write_register(&lsqspi_inst,SECTOR_ERASE_OPCODE, addr_buf, 3);
-}
-
-void do_spi_flash_sector_erase(uint32_t offset)
+struct flash_erase_param
 {
     uint8_t addr[3];
-    addr[0] = offset>>16&0xff;
-    addr[1] = offset>>8&0xff;
-    addr[2] = offset&0xff;
-    flash_writing_critical(do_spi_flash_sector_erase_func,addr);
+    uint8_t opcode;
+};
+
+XIP_BANNED static void do_spi_flash_erase_func(void *param)
+{
+    struct flash_erase_param *erase_param = param;
+    lsqspi_stig_write_register(&lsqspi_inst,erase_param->opcode, erase_param->addr, 3);
+}
+
+void do_spi_flash_erase(uint32_t offset,uint8_t opcode)
+{
+    struct flash_erase_param param;
+    param.addr[0] = offset>>16&0xff;
+    param.addr[1] = offset>>8&0xff;
+    param.addr[2] = offset&0xff;
+    param.opcode = opcode;
+    flash_writing_critical(do_spi_flash_erase_func,&param);
+}
+
+void spi_flash_page_erase(uint32_t offset)
+{
+    spi_flash_erase_operation(offset,PAGE_ERASE_OPCODE);
 }
 
 void spi_flash_sector_erase(uint32_t offset)
 {
-    spi_flash_sector_erase_operation(offset);
+    spi_flash_erase_operation(offset,SECTOR_ERASE_OPCODE);
 }
 
 XIP_BANNED static void do_spi_flash_chip_erase_func(void *param)
@@ -288,12 +302,17 @@ void spi_flash_chip_erase()
     spi_flash_chip_erase_operation();
 }
 
-XIP_BANNED static void do_spi_flash_quad_io_read_func(void *param)
+XIP_BANNED static void do_spi_flash_read_func(void *param)
 {
     lsqspi_stig_read_data(&lsqspi_inst,param);
 }
 
-void do_spi_flash_quad_io_read(uint32_t offset,uint8_t *data,uint16_t length)
+void do_spi_flash_read(void *param)
+{
+    flash_reading_critical(do_spi_flash_read_func,param);
+}
+
+void spi_flash_quad_io_read(uint32_t offset, uint8_t * data, uint16_t length)
 {
     struct lsqspi_stig_rd_wr_param param;
     param.start.data = data;
@@ -308,20 +327,10 @@ void do_spi_flash_quad_io_read(uint32_t offset,uint8_t *data,uint16_t length)
     param.size = length;
     param.mode_bits = 0;
     param.quad_data = 1;
-    flash_reading_critical(do_spi_flash_quad_io_read_func,&param);
+    spi_flash_read_operation(&param);
 }
 
-void spi_flash_quad_io_read(uint32_t offset, uint8_t * data, uint16_t length)
-{
-    spi_flash_quad_io_read_operation( offset,  data,  length);
-}
-
-XIP_BANNED static void do_spi_flash_fast_read_func(void *param)
-{
-    lsqspi_stig_read_data(&lsqspi_inst,param);
-}
-
-void do_spi_flash_fast_read(uint32_t offset,uint8_t *data,uint16_t length)
+void spi_flash_fast_read(uint32_t offset, uint8_t * data, uint16_t length)
 {
     struct lsqspi_stig_rd_wr_param param;
     param.start.data = data;
@@ -335,12 +344,7 @@ void do_spi_flash_fast_read(uint32_t offset,uint8_t *data,uint16_t length)
     param.start.opcode_en = 1;
     param.size = length;
     param.quad_data = 0;
-    flash_reading_critical(do_spi_flash_fast_read_func,&param);
-}
-
-void spi_flash_fast_read(uint32_t offset, uint8_t * data, uint16_t length)
-{
-    spi_flash_fast_read_operation(offset, data, length);
+    spi_flash_read_operation(&param);
 }
 
 XIP_BANNED void spi_flash_deep_power_down()

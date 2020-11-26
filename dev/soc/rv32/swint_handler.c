@@ -16,20 +16,14 @@ XIP_BANNED void do_spi_flash_program_svcall(uint32_t offset,uint8_t *data,uint16
     SWINT_FUNC_CALL_INLINE_ASM(do_spi_flash_program,flash_swint_set);
 }
 
-XIP_BANNED void do_spi_flash_sector_erase_svcall(uint32_t addr)
+XIP_BANNED void do_spi_flash_erase_svcall(uint32_t offset,uint8_t opcode)
 {
-    SWINT_FUNC_CALL_INLINE_ASM(do_spi_flash_sector_erase,flash_swint_set);
+    SWINT_FUNC_CALL_INLINE_ASM(do_spi_flash_erase,flash_swint_set);
 }
 
-XIP_BANNED void do_spi_flash_fast_read_svcall(uint32_t offset, uint8_t * data, uint16_t length)
+XIP_BANNED void do_spi_flash_read_svcall(void *param)
 {
-    SWINT_FUNC_CALL_INLINE_ASM(do_spi_flash_fast_read,flash_swint_set);
-
-}
-
-XIP_BANNED void do_spi_flash_quad_io_read_svcall(uint32_t offset, uint8_t * data, uint16_t length)
-{
-    SWINT_FUNC_CALL_INLINE_ASM(do_spi_flash_quad_io_read,flash_swint_set);
+    SWINT_FUNC_CALL_INLINE_ASM(do_spi_flash_read,flash_swint_set);
 }
 
 XIP_BANNED void do_spi_flash_chip_erase_svcall(void)

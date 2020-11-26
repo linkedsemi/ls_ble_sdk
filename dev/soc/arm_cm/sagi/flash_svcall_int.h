@@ -1,16 +1,9 @@
 #ifndef FLASH_SVCALL_INT_H_
 #define FLASH_SVCALL_INT_H_
 #include "ARMCM3.h"
+#include "svcall.h"
 
 #define GLOBAL_INT_MASK_STATUS() __get_BASEPRI()
 
-void do_spi_flash_program_svcall(uint32_t offset,uint8_t *data,uint16_t length,bool quad);
-void do_spi_flash_sector_erase_svcall(uint32_t addr);
-void do_spi_flash_fast_read_svcall(uint32_t offset, uint8_t * data, uint16_t length);
-void do_spi_flash_quad_io_read_svcall(uint32_t offset, uint8_t * data, uint16_t length);
-void do_spi_flash_chip_erase_svcall(void);
-void do_spi_flash_erase_security_area_svcall(uint8_t idx);
-void do_spi_flash_program_security_area_svcall(uint8_t idx, uint16_t addr, uint8_t * data, uint16_t length);
-void do_spi_flash_read_security_area_svcall(uint8_t idx, uint16_t addr, uint8_t * data, uint16_t length);
 
 #endif

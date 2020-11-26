@@ -3,11 +3,9 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-void do_spi_flash_fast_read(uint32_t offset,uint8_t *data,uint16_t length);
+void do_spi_flash_read(void *param);
 
-void do_spi_flash_quad_io_read(uint32_t offset,uint8_t *data,uint16_t length);
-
-void do_spi_flash_sector_erase(uint32_t offset);
+void do_spi_flash_erase(uint32_t offset,uint8_t opcode);
 
 void do_spi_flash_program(uint32_t offset,uint8_t *data,uint16_t length,bool quad);
 

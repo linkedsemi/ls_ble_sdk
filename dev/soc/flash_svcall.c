@@ -29,19 +29,14 @@ void spi_flash_program_operation(uint32_t offset,uint8_t *data,uint16_t length,b
     FLASH_EXECUTE_NO_RETVAL(do_spi_flash_program,offset,data,length,quad);
 }
 
-void spi_flash_sector_erase_operation(uint32_t offset)
+void spi_flash_erase_operation(uint32_t offset,uint8_t opcode)
 {
-    FLASH_EXECUTE_NO_RETVAL(do_spi_flash_sector_erase,offset);
+    FLASH_EXECUTE_NO_RETVAL(do_spi_flash_erase,offset,opcode);
 }
 
-void spi_flash_fast_read_operation(uint32_t offset, uint8_t * data, uint16_t length)
+void spi_flash_read_operation(void*param)
 {
-    FLASH_EXECUTE_NO_RETVAL(do_spi_flash_fast_read, offset, data, length);
-}
-
-void spi_flash_quad_io_read_operation(uint32_t offset, uint8_t * data, uint16_t length)
-{
-    FLASH_EXECUTE_NO_RETVAL(do_spi_flash_quad_io_read, offset, data, length);
+    FLASH_EXECUTE_NO_RETVAL(do_spi_flash_read, param);
 }
 
 void spi_flash_chip_erase_operation()

@@ -27,6 +27,8 @@ void spi_flash_quad_page_program(uint32_t offset,uint8_t *data,uint16_t length);
 
 void spi_flash_page_program(uint32_t offset,uint8_t *data,uint16_t length);
 
+void spi_flash_page_erase(uint32_t offset);
+
 void spi_flash_sector_erase(uint32_t offset);
 
 void spi_flash_chip_erase(void);
