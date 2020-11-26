@@ -24,8 +24,6 @@ void *ll_malloc(uint32_t size);
 
 void ll_free(void *data);
 
-void ll_aes_128(uint8_t *key,uint8_t *plaintext,uint8_t *ciphertext,void (*cb)(void *param),void *param);
-
 void rand_gen_by_word(uint8_t *ptr,uint8_t word_num);
 
 void memcpy32(uint32_t *dest, const uint32_t *src, uint32_t size_word);
