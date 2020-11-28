@@ -10,6 +10,7 @@ bool in_interrupt(void);
 
 void disable_global_irq(void);
 
+void enable_global_irq(void);
 
 #endif
 

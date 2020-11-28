@@ -29,7 +29,7 @@ elif env['IC'] == 'taurus':
     env['ABI'] = 'ilp32e'
 
 if env['BASE_ARCH'] == 'rv32':
-    env['ARCH_FLAGS'] = ' -mabi=$ABI -march=$ARCH -mstrict-align -msave-restore '
+    env['ARCH_FLAGS'] = ' -mabi=$ABI -march=$ARCH -mstrict-align -msave-restore -msmall-data-limit=0'
     env['AS_ARCH_FLAGS'] = ' -mabi=$ABI -march=$ARCH '
 else:
     env['ARCH_FLAGS'] = ' -mabi=aapcs -mthumb -mcpu=$CPU -mno-unaligned-access '
@@ -43,5 +43,7 @@ else:
     env['ASFLAGS'] = '${AS_ARCH_FLAGS} -g '
     env['LINKFLAGS'] = '${ARCH_FLAGS} -O2 -Os -std=c11 -g -g3 -specs=nano.specs -specs=nosys.specs -T ${LINKSCRIPT} -Wl,-Map=${TARGET.base}.map -Wl,--cref'
     env['GC_OPTION'] = ' -Wl,--gc-sections '
+
+env['CPPDEFINES'] = '-D{}'.format(env['IC'].upper())
 
 SConscript('build/dev/SConscript',exports=['env'])
