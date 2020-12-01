@@ -16,6 +16,7 @@
 #include "systick.h"
 #include "prf_fotas.h"
 #include "cpu.h"
+#define JUST_JUMP 0
 #define FLASH_SECTOR_SIZE (4096)
 #define APP_IMAGE_BASE_OFFSET (0x24)
 #define FOTA_IMAGE_BASE_OFFSET (0x28)
@@ -223,8 +224,10 @@ void boot_ram_start(uint32_t exec_addr)
     critical_nested_cnt = 0;
     switch_to_rc32k();
     clk_switch();
-    power_up_hardware_modules();
-    remove_hw_isolation();
+    SYSCFG->PMU_PWR = FIELD_BUILD(SYSCFG_PERI_PWR2_PD, 0) 
+                    | FIELD_BUILD(SYSCFG_PERI_ISO2_EN,0)
+                    | FIELD_BUILD(SYSCFG_ERAM_PWR7_PD,0)
+                    | FIELD_BUILD(SYSCFG_ERAM_ISO7_EN,0);
     enter_critical();
     systick_start();
     spi_flash_drv_var_init(false,false);
@@ -235,8 +238,9 @@ void boot_ram_start(uint32_t exec_addr)
     swd_pull_down();
     trim_head_load();
     uint32_t image_base;
-    struct fota_image_info image;
     image_base = config_word_get(APP_IMAGE_BASE_OFFSET);
+    #if (JUST_JUMP==0)
+    struct fota_image_info image;
     if(ota_copy_info_get(&image))
     {
         fw_copy(&image,image_base);
@@ -246,6 +250,7 @@ void boot_ram_start(uint32_t exec_addr)
     {
         image_base = config_word_get(FOTA_IMAGE_BASE_OFFSET);
     }
+    #endif
     boot_app(image_base);
 }
 

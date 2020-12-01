@@ -8,16 +8,15 @@
 #define ENV_BUF_SIZE 2048
 #if CONFIG_AOS
 #define DB_BUF_SIZE 0
+#define MSG_BUF_SIZE 2048
+#define NON_RET_BUF_SIZE (12)
 #else
 #define DB_BUF_SIZE 8192
-#endif
-#if 0
-#define MSG_BUF_SIZE 4096
-#define NON_RET_BUF_SIZE 12
-#else
 #define MSG_BUF_SIZE 8192
 #define NON_RET_BUF_SIZE (380*2)
+
 #endif
+
 
 
 extern void (*stack_assert_asm_fn)(uint32_t,uint32_t,uint32_t);

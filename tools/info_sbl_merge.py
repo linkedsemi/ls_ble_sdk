@@ -26,7 +26,7 @@ if ic == 'le501x':
     crc_rslt = zlib.crc32(sbl_data)
     crc_bytes = struct.pack("I",crc_rslt)
     sbl_data = sbl_data + crc_bytes
-    info_head = struct.pack('LLHHLLLLLLLLL',test_word0,test_word1,cap_delay,spi_clk,cfg_info,image_crypt,0xffffffff,0xffffffff,sbl_code_start,sbl_code_length,app_image_base,fota_image_base,data_storage_base)
+    info_head = struct.pack('IIHHIIIIIIIII',test_word0,test_word1,cap_delay,spi_clk,cfg_info,image_crypt,0xffffffff,0xffffffff,sbl_code_start,sbl_code_length,app_image_base,fota_image_base,data_storage_base)
 else:
     flash_base = 0x00800000
     code_offset = 0x1000
@@ -34,7 +34,7 @@ else:
     sbl_code_start = flash_base+code_offset
     sbl_code_exec_addr = 0x401000
     feature_mask = 0xffffffff
-    info_head = struct.pack('LLLLLL',test_word0,test_word1,code_offset,sbl_code_length,sbl_code_exec_addr,feature_mask)
+    info_head = struct.pack('IIIIII',test_word0,test_word1,code_offset,sbl_code_length,sbl_code_exec_addr,feature_mask)
     
 
 mac_addr_base = flash_base + 0x30
