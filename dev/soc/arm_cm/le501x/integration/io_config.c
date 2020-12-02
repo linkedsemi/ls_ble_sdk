@@ -675,6 +675,7 @@ void io_init(void)
     LSGPIOB->OE = 0;
     LSGPIOB->PUPD = 0x2800;
     arm_cm_set_int_isr(EXTI_IRQn,EXTI_Handler);
+    __NVIC_EnableIRQ(EXTI_IRQn);
 }
 
 void io_cfg_output(uint8_t pin)
