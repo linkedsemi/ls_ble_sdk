@@ -36,9 +36,9 @@
 /** @addtogroup TIM_Private_Functions
   * @{
   */
-static void TIM_OC1_SetConfig(reg_timer_t *TIMx, TIM_OC_InitTypeDef *OC_Config);
-static void TIM_OC3_SetConfig(reg_timer_t *TIMx, TIM_OC_InitTypeDef *OC_Config);
-static void TIM_OC4_SetConfig(reg_timer_t *TIMx, TIM_OC_InitTypeDef *OC_Config);
+void TIM_OC1_SetConfig(reg_timer_t *TIMx, TIM_OC_InitTypeDef *OC_Config);
+void TIM_OC3_SetConfig(reg_timer_t *TIMx, TIM_OC_InitTypeDef *OC_Config);
+void TIM_OC4_SetConfig(reg_timer_t *TIMx, TIM_OC_InitTypeDef *OC_Config);
 static void TIM_TI1_ConfigInputStage(reg_timer_t *TIMx, uint32_t TIM_ICPolarity, uint32_t TIM_ICFilter);
 static void TIM_TI2_SetConfig(reg_timer_t *TIMx, uint32_t TIM_ICPolarity, uint32_t TIM_ICSelection,
                               uint32_t TIM_ICFilter);
@@ -5700,7 +5700,7 @@ void TIM_Base_SetConfig(reg_timer_t *TIMx, TIM_Base_InitTypeDef *Structure)
 
   /* Generate an update event to reload the Prescaler
      and the repetition counter (only for advanced timer) value immediately */
-  TIMx->EGR = TIMER_EGR_UG;
+  //TIMx->EGR = TIMER_EGR_UG;
 }
 
 /**
@@ -5709,7 +5709,7 @@ void TIM_Base_SetConfig(reg_timer_t *TIMx, TIM_Base_InitTypeDef *Structure)
   * @param  OC_Config The ouput configuration structure
   * @retval None
   */
-static void TIM_OC1_SetConfig(reg_timer_t *TIMx, TIM_OC_InitTypeDef *OC_Config)
+void TIM_OC1_SetConfig(reg_timer_t *TIMx, TIM_OC_InitTypeDef *OC_Config)
 {
   uint32_t tmpccmrx;
   uint32_t tmpccer;
@@ -5860,7 +5860,7 @@ void TIM_OC2_SetConfig(reg_timer_t *TIMx, TIM_OC_InitTypeDef *OC_Config)
   * @param  OC_Config The ouput configuration structure
   * @retval None
   */
-static void TIM_OC3_SetConfig(reg_timer_t *TIMx, TIM_OC_InitTypeDef *OC_Config)
+void TIM_OC3_SetConfig(reg_timer_t *TIMx, TIM_OC_InitTypeDef *OC_Config)
 {
   uint32_t tmpccmrx;
   uint32_t tmpccer;
@@ -5934,7 +5934,7 @@ static void TIM_OC3_SetConfig(reg_timer_t *TIMx, TIM_OC_InitTypeDef *OC_Config)
   * @param  OC_Config The ouput configuration structure
   * @retval None
   */
-static void TIM_OC4_SetConfig(reg_timer_t *TIMx, TIM_OC_InitTypeDef *OC_Config)
+void TIM_OC4_SetConfig(reg_timer_t *TIMx, TIM_OC_InitTypeDef *OC_Config)
 {
   uint32_t tmpccmrx;
   uint32_t tmpccer;
