@@ -12,7 +12,9 @@ void MAC2_Handler(void);
 void SWINT1_Handler(void);
 void SWINT2_Handler(void);
 
-__attribute__((weak)) void SystemInit(){}
+__attribute__((weak)) void SystemInit(){
+    SCB->VTOR = (uint32_t)ISR_VECTOR_ADDR;
+}
 
 static void irq_priority()
 {
@@ -69,8 +71,15 @@ void arm_cm_set_int_isr(uint8_t type,void (*isr)())
     ISR_VECTOR_ADDR[type + 16] = (uint32_t)isr;
 }
 
+void pll_enable()
+{
+    SYSC_AWO->PD_AWO_ANA0 |= SYSC_AWO_AWO_EN_DPLL_MASK | SYSC_AWO_AWO_EN_DPLL_16M_RF_MASK | SYSC_AWO_AWO_EN_DPLL_128M_RF_MASK | SYSC_AWO_AWO_EN_DPLL_128M_EXT_MASK;
+}
+
 void sys_init_itf()
 {
+    pll_enable();
+    REG_FIELD_WR(SYSC_AWO->PD_AWO_CLK_CTRL,SYSC_AWO_CLK_SEL_HBUS_L0,4);
     *(volatile uint32_t *)0x50089020 = 3<<8 | 4 <<0; //uart pin_sel
     *(volatile uint32_t *)0x5000d044 = 3<<16; // uart pin_sel
     SYSC_AWO->PIN_SEL3 = FIELD_BUILD(SYSC_AWO_MAC_DBG_EN, 0xFFFF);

@@ -4,9 +4,49 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
+        {
+            "name": "TAURUS HOST TEST",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "build/examples/host_test.elf",
+            "args": [],
+            "stopAtEntry": true,
+            "cwd": "${workspaceFolder}",
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "miDebuggerPath": "riscv-none-embed-gdb",
+            "setupCommands": [
+                {
+                    "description": "为 gdb 启用整齐打印",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ],
+            "miDebuggerServerAddress": "localhost:1025",
+            //"debugServerPath": "D:\\C-Sky\\CSkyDebugServer\\bin\\DebugServerConsole.exe",
+            //"serverStarted": "DebuggerServer$"
+            "launchCompleteCommand": "None",
 
-
-    
+        },
+        {
+            "type": "cortex-debug",
+            "request": "launch",
+            "servertype": "jlink",
+            "cwd": "${workspaceRoot}",
+            "executable": "./build/examples/host_test.elf",
+            "name": "Debug SAGI HOST_TEST",
+            "device": "ARMCM3",
+            "interface": "swd",
+            "runToMain": true,
+            "preLaunchCommands" :[
+                "monitor flash breakpoints = 0",
+                "load", 
+            ],
+            "postLaunchCommands":[
+                "monitor reg pc = (0x400004)",
+                "monitor reg sp = (0x400000)"
+            ],
+        },
         {
             "name": "Python: info sbl merge",
             "type": "python",
@@ -60,7 +100,7 @@
             "cwd": "${workspaceRoot}",
             "executable": "./build/examples/host_test.elf",
             "name": "Debug HOST_TEST",
-            "device": "ARMCM3",
+            "device": "LE501X",
             "interface": "swd",
             "runToMain": true,
             "preLaunchCommands" :[
@@ -642,21 +682,6 @@
             "preLaunchCommands" :[
                 "monitor reset",
                 "load", 
-            ]
-        },
-        {
-            "type": "gdb",
-            "request": "attach",
-            "cwd": "${workspaceRoot}",
-            "name": "TAURUS HOST_TEST",
-            "executable": "./build/examples/host_test.elf",
-            "target": ":1025",
-            "remote": true,
-            "gdbpath": "riscv-none-embed-gdb",
-            "autorun": [
-                "interrupt",
-                "load",
-                "monitor reset"
             ]
         },
     ]

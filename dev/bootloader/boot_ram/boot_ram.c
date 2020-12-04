@@ -5,6 +5,7 @@
 #include "tinycrypt/sha256.h"
 #include <string.h>
 #define ROM_SIZE 0x20000
+#define ROM_BASE (0x780000)
 void cpu_sleep_asm(void);
 void cpu_recover_asm(void);
 void boot_ram_start(uint32_t exec_addr)
@@ -16,10 +17,10 @@ void boot_ram_start(uint32_t exec_addr)
     uint8_t digest[TC_SHA256_DIGEST_SIZE];
     tc_sha256_init(&sha256);
     uint32_t size = ROM_SIZE;
-    uint8_t *data = 0;
+    uint8_t *data = (uint8_t *)ROM_BASE;
     tc_sha256_update(&sha256,data, size);
     tc_sha256_final(digest, &sha256);
-    uint32_t *dst = (uint32_t *)0x3007a8;
+    uint32_t *dst = (uint32_t *)0x7e07a8;
     uint32_t *src =(uint32_t *)digest;
     while(src<(uint32_t *)&digest[TC_SHA256_DIGEST_SIZE])
     {
@@ -28,7 +29,7 @@ void boot_ram_start(uint32_t exec_addr)
     io_cfg_output(PA01);
     io_set_pin(PA01);
     io_clr_pin(PA01);
-    *(uint32_t *)0x300000 = 0xf0000000;
+    *(uint32_t *)0x7e0000 = 0xf0000000;
     while(1);
 /*
     __enable_irq();

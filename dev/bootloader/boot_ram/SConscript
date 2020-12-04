@@ -7,7 +7,7 @@ if dev_env['IC'] != 'le501x':
     src = [
         'boot_ram.c',
     ]
-    bram_env.Append(CFLAGS = ' -fPIE ')
+    bram_env.Append(CFLAGS = ' ')
     bram_env['LINKSCRIPT'] = File('bram.ld')
     bram_target = bram_env.Program('#build/boot_ram/bram',dev_env['SDK_SRC'] + src,OBJPREFIX = 'boot_ram-')
     bram_env.Append(LINKFLAGS = ' -T ' + File('brom.sym').srcnode().path + ' -static-pie -nostartfiles')
