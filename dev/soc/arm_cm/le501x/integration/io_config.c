@@ -75,7 +75,7 @@ static void uart_io_cfg(uint8_t txd,uint8_t rxd)
     io_cfg_input(rxd);
 }
 
-static void af_io_init(gpio_pin_t *pin,enum GPIO_AF af)
+void af_io_init(gpio_pin_t *pin,enum GPIO_AF af)
 {
     reg_lsgpio_t *port = GPIO_GetPort(pin->port);
     switch(pin->num)
@@ -104,7 +104,7 @@ static void ana_io_init(gpio_pin_t *pin,enum GPIO_ANA_FUNC ana)
   
 }
 
-static void set_gpio_mode(gpio_pin_t *pin)
+void set_gpio_mode(gpio_pin_t *pin)
 {
     reg_lsgpio_t *gpiox = GPIO_GetPort(pin->port);
     MODIFY_REG(gpiox->MODE, GPIO_MODE0_MASK << (pin->num << 1u), SET_GPIO_MODE_GPIO << (pin->num << 1u));
