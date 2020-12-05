@@ -22,7 +22,7 @@ bool in_interrupt()
     return (SCB->ICSR & SCB_ICSR_VECTACTIVE_Msk) != 0;
 }
 
-void disable_global_irq()
+XIP_BANNED void disable_global_irq()
 {
     __disable_irq();
 }

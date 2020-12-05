@@ -22,7 +22,7 @@ bool in_interrupt()
     return false;
 }
 
-void disable_global_irq()
+XIP_BANNED void disable_global_irq()
 {
     __disable_irq();
 }
