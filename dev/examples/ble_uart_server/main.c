@@ -98,7 +98,7 @@ static bool update_adv_intv_flag = false;
 static uint16_t cccd_config = 0;
 
 static uint8_t adv_obj_hdl;
-static uint8_t advertising_data[28];
+static uint8_t advertising_data[28] = {0x05, 0x09, 'u', 'a', 'r', 't'};
 static uint8_t scan_response_data[31];
 
 static void ls_uart_server_init(void);
