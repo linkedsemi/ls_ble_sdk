@@ -7,3 +7,4 @@ doc/_build/
 *.lst
 *.uvguix.*
 *.map
+*_flash_algo.elf

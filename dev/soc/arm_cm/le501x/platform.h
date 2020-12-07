@@ -4,8 +4,7 @@
 #include <stdbool.h>
 #include "sdk_config.h"
 #include "compile_flag.h"
-
-#define OTA_INFO_OFFSET (0x7f000)
+#include "prf_fotas.h"
 #define RESET_OTA_SUCCEED      0xDBDBDBDB
 #define RESET_OTA_FAILED       0xBDBDBDBD
 #define RESET_OTA_REQ          0xDDDDDDDD
@@ -83,6 +82,14 @@ void ota_settings_erase(void);
 void ota_settings_write(uint32_t ota_settings_type);
 
 uint32_t ota_settings_read(void);
+
+bool ota_copy_info_get(struct fota_image_info *ptr);
+
+void ota_copy_info_set(struct fota_image_info *ptr);
+
+uint32_t get_app_image_base(void);
+
+uint32_t get_fota_image_base(void);
 
 #define OSTICK_HS_INC(Hz) (2000*1000/((Hz)*625))
 #define OSTICK_HUS_INC(Hz) (2000*1000/(Hz) - 625*OSTICK_HS_INC(Hz))

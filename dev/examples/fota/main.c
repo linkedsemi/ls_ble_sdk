@@ -16,8 +16,6 @@
 #include "log.h"
 #include "common.h"
 #include "systick.h"
-#define APP_IMAGE_BASE (0x18005000)
-#define OTA_COPY_STATUS_OFFSET (OTA_INFO_OFFSET + FLASH_PAGE_SIZE)
 #define FW_ECC_VERIFY (0)
 
 static uint8_t adv_obj_hdl;
@@ -36,12 +34,6 @@ bool fw_signature_check(struct fw_digest *digest,struct fota_signature *signatur
     return true;
 }
 #endif
-
-
-static void ota_copy_info_set(struct fota_image_info *ptr)
-{
-    spi_flash_quad_page_program(OTA_COPY_STATUS_OFFSET, (uint8_t *)ptr, sizeof(struct fota_image_info));
-}
 
 static void prf_fota_server_callback(enum fotas_evt_type type,union fotas_evt_u *evt,uint8_t con_idx)
 {
@@ -64,7 +56,7 @@ static void prf_fota_server_callback(enum fotas_evt_type type,union fotas_evt_u 
     case FOTAS_FINISH_EVT:
         if(evt->fotas_finish.integrity_checking_result)
         {
-            if(evt->fotas_finish.new_image->base != APP_IMAGE_BASE)
+            if(evt->fotas_finish.new_image->base != get_app_image_base())
             {
                 ota_copy_info_set(evt->fotas_finish.new_image);
             }

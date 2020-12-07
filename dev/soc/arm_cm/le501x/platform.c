@@ -26,6 +26,8 @@
 #include "ls_dbg.h"
 #include "systick.h"
 #define ISR_VECTOR_ADDR ((uint32_t *)(0x0))
+#define APP_IMAGE_BASE_OFFSET (0x24)
+#define FOTA_IMAGE_BASE_OFFSET (0x28)
 #define DATA_STORAGE_BASE_OFFSET (0x2c)
 #define BASEBAND_MEMORY_ADDR   (0x50004000)
 #define IRQ_NVIC_PRIO(IRQn,priority) (((priority << (8U - __NVIC_PRIO_BITS)) & (uint32_t)0xFFUL) << _BIT_SHIFT(IRQn))
@@ -405,22 +407,32 @@ XIP_BANNED void clk_switch()
 
 #endif
 
+uint32_t get_ota_info_offset()
+{
+    uint8_t manufacturer_id;
+    uint8_t mem_type_id;
+    uint8_t capacity_id;
+    spi_flash_read_id(&manufacturer_id,&mem_type_id,&capacity_id);
+    uint32_t flash_size = 1<<capacity_id;
+    return flash_size - FLASH_PAGE_SIZE;
+}
+
 void ota_settings_erase(void)
 {
     SYSCFG->BKD[7] = 0;
-    spi_flash_sector_erase(OTA_INFO_OFFSET);
+    spi_flash_sector_erase(get_ota_info_offset());
 }
 
 void ota_settings_write(uint32_t ota_settings_type)
 {
     LS_ASSERT(ota_settings_type < OTA_SETTINGS_TYPE_MAX); 
-    spi_flash_quad_page_program(OTA_INFO_OFFSET,(uint8_t *)&ota_settings_type,sizeof(ota_settings_type));
+    spi_flash_quad_page_program(get_ota_info_offset(),(uint8_t *)&ota_settings_type,sizeof(ota_settings_type));
 }
 
 uint32_t ota_settings_read(void)
 {
     uint32_t ota_settings;
-    spi_flash_quad_io_read(OTA_INFO_OFFSET,(uint8_t *)&ota_settings,sizeof(ota_settings));
+    spi_flash_quad_io_read(get_ota_info_offset(),(uint8_t *)&ota_settings,sizeof(ota_settings));
     return ota_settings;
 }
 
@@ -431,5 +443,34 @@ void request_ota_reboot()
     platform_reset(RESET_OTA_REQ);
 }
 
+uint32_t get_ota_status_offset()
+{
+    return get_ota_info_offset() + 0x10;    
+}
 
+bool ota_copy_info_get(struct fota_image_info *ptr)
+{
+    spi_flash_quad_io_read(get_ota_status_offset(),(uint8_t *)ptr, sizeof(struct fota_image_info));
+    if(ptr->base==0xffffffff && ptr->size ==0xffffffff)
+    {
+        return false;
+    }else
+    {
+        return true;
+    }
+}
 
+void ota_copy_info_set(struct fota_image_info *ptr)
+{
+    spi_flash_quad_page_program(get_ota_status_offset(), (uint8_t *)ptr, sizeof(struct fota_image_info));
+}
+
+uint32_t get_app_image_base()
+{
+    return config_word_get(APP_IMAGE_BASE_OFFSET);
+}
+
+uint32_t get_fota_image_base()
+{
+    return config_word_get(FOTA_IMAGE_BASE_OFFSET);
+}

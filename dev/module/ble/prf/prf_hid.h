@@ -1,5 +1,5 @@
-#ifndef PRF_FOTAS_H_
-#define PRF_FOTAS_H_
+#ifndef PRF_HID_H_
+#define PRF_HID_H_
 #include <stdint.h>
 
 #define HID_NB_ADD_MAX    (2)
