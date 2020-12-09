@@ -15,7 +15,7 @@ if ic == 'le501x':
     spi_clk = 0
     cfg_info = 0xffffffbf
     image_crypt = 0xffffffff
-    sbl_code_start = 0x18000100
+    sbl_code_start = 0x18000300
     sbl_code_length = len(sbl_data)
     data_storage_base = 0x18002000
     data_storage_size = 0x3000

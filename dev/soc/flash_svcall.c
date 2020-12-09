@@ -39,6 +39,11 @@ void spi_flash_read_operation(void*param)
     FLASH_EXECUTE_NO_RETVAL(do_spi_flash_read, param);
 }
 
+void spi_flash_read_reg_operation(void *param)
+{
+    FLASH_EXECUTE_NO_RETVAL(do_spi_flash_read_reg,param);
+}
+
 void spi_flash_chip_erase_operation()
 {
     FLASH_EXECUTE_NO_RETVAL(do_spi_flash_chip_erase);

@@ -28,6 +28,7 @@ enum svcall_num_enum
     SVCALL_FLASH_ERASE_SECURITY,
     SVCALL_FLASH_PROGRAM_SECURITY,
     SVCALL_FLASH_READ_SECURITY,
+    SVCALL_FLASH_READ_REG,
     SVCALL_NUM_MAX,
 };
 
@@ -38,5 +39,5 @@ SVCALL(SVCALL_FLASH_CHIP_ERASE,void,do_spi_flash_chip_erase_svcall(void));
 SVCALL(SVCALL_FLASH_ERASE_SECURITY,void,do_spi_flash_erase_security_area_svcall(uint8_t idx));
 SVCALL(SVCALL_FLASH_PROGRAM_SECURITY,void,do_spi_flash_program_security_area_svcall(uint8_t idx, uint16_t addr, uint8_t * data, uint16_t length));
 SVCALL(SVCALL_FLASH_READ_SECURITY,void,do_spi_flash_read_security_area_svcall(uint8_t idx, uint16_t addr, uint8_t * data, uint16_t length));
-
+SVCALL(SVCALL_FLASH_READ_REG,void,do_spi_flash_read_reg_svcall(void *param));
 #endif

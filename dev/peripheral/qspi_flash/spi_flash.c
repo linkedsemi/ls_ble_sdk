@@ -357,10 +357,32 @@ XIP_BANNED void spi_flash_release_from_deep_power_down()
     lsqspi_stig_send_command(&lsqspi_inst,RELEASE_FROM_DEEP_POWER_DOWN_OPCODE);
 }
 
+struct flash_read_reg_param
+{
+    uint8_t *buf;
+    uint8_t opcode;
+    uint8_t length;    
+};
+
+XIP_BANNED static void do_spi_flash_read_reg_func(void *param)
+{
+    struct flash_read_reg_param *ptr = param;
+    lsqspi_stig_read_register(&lsqspi_inst,ptr->opcode,ptr->buf,ptr->length);
+}
+
+void do_spi_flash_read_reg(void *param)
+{
+    flash_reading_critical(do_spi_flash_read_reg_func,param);
+}
+
 void spi_flash_read_id(uint8_t *manufacturer_id,uint8_t *mem_type_id,uint8_t *capacity_id)
 {
     uint8_t buf[3];
-    lsqspi_stig_read_register(&lsqspi_inst, READ_IDENTIFICATION_OPCODE, buf, 3);
+    struct flash_read_reg_param param;
+    param.buf = buf;
+    param.opcode = READ_IDENTIFICATION_OPCODE;
+    param.length = sizeof(buf);
+    spi_flash_read_reg_operation(&param);
     *manufacturer_id = buf[0];
     *mem_type_id = buf[1];
     *capacity_id = buf[2];
@@ -380,7 +402,7 @@ void spi_flash_read_unique_id(uint8_t unique_serial_id[16])
     param.start.opcode_en = 1;
     param.size = 16;
     param.quad_data = false;
-    lsqspi_stig_read_data(&lsqspi_inst, &param);
+    spi_flash_read_operation(&param);
 }
 
 XIP_BANNED static void do_spi_flash_erase_security_area_func(void *param)

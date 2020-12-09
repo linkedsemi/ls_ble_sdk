@@ -17,5 +17,7 @@ void spi_flash_program_security_area_operation(uint8_t idx, uint16_t addr, uint8
 
 void spi_flash_read_security_area_operation(uint8_t idx, uint16_t addr, uint8_t * data, uint16_t length);
 
+void spi_flash_read_reg_operation(void *param);
+
 #endif
 

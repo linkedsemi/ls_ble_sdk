@@ -11,6 +11,7 @@ const svcall_fn_t svcall_table[SVCALL_NUM_MAX] = {
     [SVCALL_FLASH_ERASE_SECURITY] = (svcall_fn_t)do_spi_flash_erase_security_area,
     [SVCALL_FLASH_PROGRAM_SECURITY] = (svcall_fn_t)do_spi_flash_program_security_area,
     [SVCALL_FLASH_READ_SECURITY] = (svcall_fn_t)do_spi_flash_read_security_area,
+    [SVCALL_FLASH_READ_REG] = (svcall_fn_t)do_spi_flash_read_reg,
 };
 
 void SVC_Handler_C(uint32_t *svc_args)
