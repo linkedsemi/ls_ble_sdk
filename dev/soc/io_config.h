@@ -99,6 +99,10 @@ io_pull_type_t io_pull_read(uint8_t pin);
 
 void io_exti_config(uint8_t pin,exti_edge_t edge);
 
+void io_ext_intrp_enable(uint8_t pin);
+
+void io_ext_intrp_disable(uint8_t pin);
+
 void io_exti_enable(uint8_t pin,bool enable);
 
 void io_exti_callback(uint8_t pin);
