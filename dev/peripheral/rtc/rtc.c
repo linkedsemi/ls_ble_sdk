@@ -70,7 +70,7 @@ void RTC_CalendarSet(_calendar_cal *calendar_cal,_calendar_time *calendar_time)
 
 HAL_StatusTypeDef RTC_CalendarGet(_calendar_cal *calendar_cal,_calendar_time *calendar_time)
 {
-    uint8_t result = HAL_OK;
+    HAL_StatusTypeDef result = HAL_OK;
     if(!REG_FIELD_RD(RTC_Config.Instance->STA,RTC_STA_EMPTY))
     {
         calendar_cal->year  = REG_FIELD_RD(RTC_Config.Instance->CAL,RTC_CAL_YEAR_T)*10 + REG_FIELD_RD(RTC_Config.Instance->CAL,RTC_CAL_YEAR_U);

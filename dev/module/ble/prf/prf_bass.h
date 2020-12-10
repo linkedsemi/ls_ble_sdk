@@ -13,7 +13,7 @@ enum bass_evt_type
 
 union bass_evt_u
 {
-
+    uint8_t temp;
 };
 
 struct bas_db_cfg

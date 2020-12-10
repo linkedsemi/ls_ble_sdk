@@ -194,10 +194,10 @@ uint8_t *get_peer_id_buf()
 
 void eif_init(void *read,void *write,void *flow_on,void *flow_off)
 {
-    eif_read = read;
-    eif_write = write;
-    eif_flow_on = flow_on;
-    eif_flow_off = flow_off;
+    eif_read = (void (*)(uint8_t *,uint32_t,void (*)(void *,uint8_t),void*))read;
+    eif_write = (void (*)(uint8_t *,uint32_t,void (*)(void *,uint8_t),void*))write;
+    eif_flow_on = (void (*)(void))flow_on;
+    eif_flow_off = (_Bool (*)(void))flow_off;
 }
 
 __attribute__((weak)) void ll_stack_buffer_init(uint32_t env_size,uint32_t msg_size,uint32_t non_ret_size){};
@@ -206,9 +206,10 @@ __attribute__((weak)) void ll_stack_reset_hook(){};
 
 __attribute__((weak)) void ll_get_mac_addr(uint8_t *buf){}
 
+__attribute__((weak)) void (*ll_get_mac_addr_fn)(uint8_t *);
+
 void ll_stack_var_ptr_init()
 {
-    extern void (*ll_get_mac_addr_fn)(uint8_t *);
     ll_get_mac_addr_fn = ll_get_mac_addr;
     stack_assert_asm_fn = stack_assert_asm;
     platform_reset_fn = platform_reset;

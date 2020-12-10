@@ -48,25 +48,6 @@ void uart_log_pause(){}
 void uart_log_resume(){}
 #endif
 
-static void backend_write(char *ptr,int len)
-{
-    #if(LOG_BACKEND&JLINK_RTT)
-    {
-        SEGGER_RTT_Write(0, ptr, len);
-    }
-    #endif
-    #if(LOG_BACKEND&UART_LOG)
-    {
-        log_uart_tx(ptr,len);
-    }
-    #endif
-    #if(LOG_BACKEND&RAM_LOG)
-    {
-//        ram_log_print(linefeed,format,&args);
-    }
-    #endif
-}
-
 #if defined(__CC_ARM)
 int fputc(int ch, FILE *f)
 {
@@ -92,7 +73,21 @@ int fputc(int ch, FILE *f)
 
 int _write (int fd, char *ptr, int len)
 {
-    backend_write(ptr,len);
+    #if(LOG_BACKEND&JLINK_RTT)
+    {
+        SEGGER_RTT_Write(0, ptr, len);
+    }
+    #endif
+    #if(LOG_BACKEND&UART_LOG)
+    {
+        log_uart_tx(ptr,len);
+    }
+    #endif
+    #if(LOG_BACKEND&RAM_LOG)
+    {
+//        ram_log_print(linefeed,format,&args);
+    }
+    #endif
     return len;
 }
 

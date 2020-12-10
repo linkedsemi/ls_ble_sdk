@@ -62,10 +62,10 @@ uint32_t fir_coef_8khz[64] = {
     0x80140025, 0x80170033, 0x000a0005, 0x000e8021,
     0x800d8018, 0x801e0001, 0x80130000, 0x80018011};
 /* Private function prototypes -----------------------------------------------*/
-void DMIC_COEF_16KHz_Init();
-void DMIC_COEF_8KHz_Init();
+void DMIC_COEF_16KHz_Init(void);
+void DMIC_COEF_8KHz_Init(void);
 static void DMIC_DMACh0Cplt(DMA_HandleTypeDef *hdma);
-static void DMIC_DMACh1Cplt(DMA_HandleTypeDef *hdma);
+__attribute__((weak)) void DMIC_DMACh1Cplt(DMA_HandleTypeDef *hdma);
 
 void DMIC_MSPInit()
 {
@@ -84,7 +84,7 @@ void DMIC_MSPInit()
  */
 void DMIC_Init_16KHz_16Bit_Mono(DMIC_Init_TypeDef *dmicInit)
 {
-	dmicInit->clkratio = 124;        // DMIC clock freq = 128M/(124+1)=1.024MHz
+	dmicInit->clkratio = DMIC_CLK1P024MHZ_RATIO;//124;        // DMIC clock freq = 128M/(124+1)=1.024MHz
 	dmicInit->gain = 6;              // gain adjustment
 	dmicInit->sampleRate = 63;       // DMIC sample freq = 1.024MHz/(63+1)= 16000
 	dmicInit->mode = DMIC_MODE_Mono;  // Mono for voice 
@@ -257,7 +257,7 @@ static void DMIC_DMACh0Cplt(DMA_HandleTypeDef *hdma)
 }
 
 #ifdef DMIC_STEREO
-static void DMIC_DMACh1Cplt(DMA_HandleTypeDef *hdma)
+__attribute__((weak)) void DMIC_DMACh1Cplt(DMA_HandleTypeDef *hdma)
 {
   uint8_t Index;
   DMIC_HandleTypeDef *hdmic;

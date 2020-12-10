@@ -760,7 +760,7 @@ io_pull_type_t io_pull_read(uint8_t pin)
 {
     gpio_pin_t *x = (gpio_pin_t *)&pin;
     reg_lsgpio_t *gpiox = GPIO_GetPort(x->port);
-    io_pull_type_t pull = (gpiox->PUPD >> 2 * x->num ) & 0x3;
+    io_pull_type_t pull = (io_pull_type_t)((gpiox->PUPD >> 2 * x->num ) & 0x3);
     return pull;
 }
 

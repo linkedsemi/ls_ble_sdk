@@ -288,6 +288,7 @@ static void prf_hid_server_callback(enum hid_evt_type type, union hid_evt_u *evt
         break;
     case HID_NTF_CFG:
         LOG_I("ntf_cfg save 2:%08x",evt->ntf_cfg.value);
+        ntf_cfg = evt->ntf_cfg.value;
         ret = tinyfs_write(hid_dir, RECORD_KEY1, (uint8_t*)&ntf_cfg, sizeof(ntf_cfg));
         if(ret != TINYFS_NO_ERROR)
         {
@@ -362,6 +363,7 @@ static void prf_added_handler(struct profile_added_evt *evt)
     switch (evt->id)
     {
     case PRF_HID:
+    {
         prf_hid_server_callback_init(prf_hid_server_callback);
         uint8_t ret = tinyfs_mkdir(&hid_dir, ROOT_DIR, DIR_NAME);
         if(ret != TINYFS_NO_ERROR)
@@ -369,7 +371,7 @@ static void prf_added_handler(struct profile_added_evt *evt)
             LOG_I("hid tinyfs mkdir:%d",ret);
         }
         create_adv_obj();
-        break;
+    }break;
     case PRF_BASS:
     {
         struct hid_db_cfg db_cfg;   
