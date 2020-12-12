@@ -13,6 +13,9 @@ typedef uint8_t SIGMESH_NodeInfo_TypeDef;
 //#define MAX_MESH_MODEL_MSG_BUFFER      (380)
 #define MAX_MESH_MODEL_MSG_BUFFER (60)
 
+#define UPADTE_GLP_STOP_TYPE 0xfe
+#define UPADTE_GLP_STOP_TIMEOUT_TYPE 0xfd
+
 //mesh server model index
 #define GENERIC_ONOFF_SERVER             (0x1000)
 #define GENERIC_ONOFF_CLIENT             (0x1001)
@@ -120,6 +123,21 @@ enum mesh_timer_state
 {
     MESH_TIMER_DOING = 0x00,
     MESH_TIMER_DONE = 0x01,
+};
+
+enum tmall_glp_stop_reason
+{
+    NO_STOPPING_GLP_REQ = 0x00,
+    APPLICATION_USER_STOPPING_GLP_REQ,
+    PROVISIONING_INVITE_SWITCH_GLP_REQ,
+    PROVISIONING_COMP_SWITCH_GLP_REQ,
+};
+
+enum tmall_glp_state
+{
+    TMALL_GLP_STATE_IDLE =0x00,
+    TMALL_GLP_STATE_SLEEP,
+    TMALL_GLP_STATE_ACTIVE,
 };
 
 /// State identifier values
