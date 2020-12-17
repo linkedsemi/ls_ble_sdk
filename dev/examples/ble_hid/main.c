@@ -473,36 +473,36 @@ void io_exti_callback(uint8_t pin)
     {
         uint8_t key[8]= {0};
         key[2] =0x0B;
-        app_hid_send_keyboard_report(0,key,8);
+        app_hid_send_keyboard_report(0,key,8,0);
         key[2] =0x00;
-        app_hid_send_keyboard_report(0,key,8);
+        app_hid_send_keyboard_report(0,key,8,0);
     }
     break;
     case PA07:
     {
         uint8_t key[8]= {0};
         key[2] =0x04;
-        app_hid_send_keyboard_report(0,key,8);
+        app_hid_send_keyboard_report(0,key,8,0);
         key[2] =0x00;
-        app_hid_send_keyboard_report(0,key,8);
+        app_hid_send_keyboard_report(0,key,8,0);
     }
     break;
     case PB11:
     {
         uint8_t key[8]= {0};
         key[2] =0x05;
-        app_hid_send_keyboard_report(0,key,8);
+        app_hid_send_keyboard_report(0,key,8,0);
         key[2] =0x00;
-        app_hid_send_keyboard_report(0,key,8);
+        app_hid_send_keyboard_report(0,key,8,0);
     }
     break;
     case PB15:
     {
         uint8_t key[8]= {0};
         key[2] =0x06;
-        app_hid_send_keyboard_report(0,key,8);
+        app_hid_send_keyboard_report(0,key,8,0);
         key[2] =0x00;
-        app_hid_send_keyboard_report(0,key,8);
+        app_hid_send_keyboard_report(0,key,8,0);
     }
     break;
     default:
