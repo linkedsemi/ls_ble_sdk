@@ -8,7 +8,7 @@ src = [
     'cpu.c',
     'platform.c',
     'io_config.c',
-    'lsqspi_param.c',
+    'lsqspi_msp.c',
 ]
 inc = [
     '.',

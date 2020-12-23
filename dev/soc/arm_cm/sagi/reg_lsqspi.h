@@ -4,4 +4,6 @@
 
 #define LSQSPI ((reg_lsqspi_t *)0x50000000)
 
+#define LSQSPI_MEM_MAP_BASE_ADDR 0x00800000
+
 #endif

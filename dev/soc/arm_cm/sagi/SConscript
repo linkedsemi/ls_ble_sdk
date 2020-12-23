@@ -1,6 +1,6 @@
 Import("env")
 src = [
-    'lsqspi_param.c',
+    'lsqspi_msp.c',
     'uart_msp.c',
     'platform.c',
     'cpu.c',

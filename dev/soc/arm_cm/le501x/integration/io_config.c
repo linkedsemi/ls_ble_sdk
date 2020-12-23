@@ -119,6 +119,10 @@ static void uart_7816_io_cfg(uint8_t txd,uint8_t ck)
     io_cfg_output(ck);
 }
 
+void qspi_flash_io_init(void){}
+
+void qspi_flash_io_deinit(void){}
+
 static void spi_clk_io_cfg(uint8_t clk)
 {
     io_set_pin(clk);

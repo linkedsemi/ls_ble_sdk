@@ -218,7 +218,7 @@ void boot_ram_start(uint32_t exec_addr)
     spi_flash_init();
     spi_flash_qe_status_read_and_set();
     spi_flash_xip_start();
-    lscache_cache_ctrl(0,1);
+    lscache_cache_enable(0);
     swd_pull_down();
     trim_head_load();
     uint32_t image_base;

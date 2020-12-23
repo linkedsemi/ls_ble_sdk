@@ -2,14 +2,13 @@
 #include "lsqspi.h"
 #include "field_manipulate.h"
 #include "ls_dbg.h"
-#include "lsqspi_param.h"
+#include "lsqspi_msp.h"
 #include "compile_flag.h"
 #include "cpu.h"
 
 XIP_BANNED void lsqspi_init(struct lsqspi_instance *inst)
 {
-    lsqspi_sw_rst(inst);
-    lsqspi_clk_set(inst,true);
+    lsqspi_msp_init(inst);
     inst->reg->CSTIM = FIELD_BUILD(LSQSPI_AUTO_CS_HOLD,0);
     inst->reg->DLY = lsqspi_dly_get(inst);
     inst->reg->RDCAP = FIELD_BUILD(LSQSPI_DLY_RD_CAP, lsqspi_rd_cap_dly_get(inst));

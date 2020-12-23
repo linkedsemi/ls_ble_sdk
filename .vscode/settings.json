@@ -12,7 +12,7 @@
         "prf_diss.h": "c",
         "tinyfs_write_cache.h": "c",
         "platform.h": "c",
-        "lsqspi_param.h": "c",
+        "lsqspi_msp.h": "c",
         "lsqspi.h": "c",
         "reg_lsqspi.h": "c",
         "spi_flash_int.h": "c",

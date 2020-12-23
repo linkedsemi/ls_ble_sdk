@@ -23,11 +23,16 @@
  */
  
 #include "FlashOS.h"        // FlashOS Structures
-#include "lsqspi_param.h"
+#include "lsqspi_msp.h"
+#if defined(LE501X) 
+#define LS_FLASH_DEV_NAME "LE501X SPI NOR FLASH"
+#elif defined(SAGI)
+#define LS_FLASH_DEV_NAME "SAGI SPI NOR FLASH"
+#endif
 
 struct FlashDevice const FlashDevice  __attribute__ ((section ("DevDscr")))  =  {
    FLASH_DRV_VERS,             // Driver Version, do not modify!
-   "LE501X 512KB SPI NOR Flash",   // Device Name 
+   LS_FLASH_DEV_NAME,   // Device Name 
    EXTSPI,                     // Device Type
    LSQSPI_MEM_MAP_BASE_ADDR,                 // Device Start Address
    0x00080000,                 // Device Size in Bytes (512kB)

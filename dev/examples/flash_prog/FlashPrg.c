@@ -24,9 +24,10 @@
 #include <stdbool.h> 
 #include "FlashOS.h"        // FlashOS Structures
 #include "spi_flash.h"
-#include "lsqspi_param.h"
-#include "le501x.h"
+#include "lsqspi_msp.h"
+#include "cpu.h"
 #include "platform.h"
+#include "io_config.h"
 /* 
    Mandatory Flash Programming Functions (Called by FlashOS):
                 int Init        (unsigned long adr,   // Initialize Flash
@@ -62,7 +63,8 @@
  */
 
 int Init (unsigned long adr, unsigned long clk, unsigned long fnc) {
-    __disable_irq();
+    enter_critical();
+    qspi_flash_io_init();
     spi_flash_drv_var_init(false,false);
     spi_flash_init();
     spi_flash_software_reset();
@@ -92,7 +94,7 @@ int UnInit (unsigned long fnc) {
  */
 
 int EraseChip (void) {
-    __disable_irq();
+    enter_critical();
     spi_flash_chip_erase();
     return (0);                                  // Finished without Errors
 }
@@ -105,7 +107,7 @@ int EraseChip (void) {
  */
 
 int EraseSector (unsigned long adr) {
-    __disable_irq();
+    enter_critical();
     spi_flash_sector_erase(adr - LSQSPI_MEM_MAP_BASE_ADDR);
     return (0);                                  // Finished without Errors
 }
@@ -120,7 +122,7 @@ int EraseSector (unsigned long adr) {
  */
 
 int ProgramPage (unsigned long adr, unsigned long sz, unsigned char *buf) {
-    __disable_irq();
+    enter_critical();
     spi_flash_quad_page_program(adr - LSQSPI_MEM_MAP_BASE_ADDR, buf, sz);
     return (0);                                  // Finished without Errors
 }

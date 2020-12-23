@@ -9,7 +9,7 @@
 #include "sleep.h"
 #include "le501x.h"
 #include "log.h"
-#include "lsqspi_param.h"
+#include "lsqspi_msp.h"
 #include "spi_flash.h"
 #include "compile_flag.h"
 #include "lscache.h"

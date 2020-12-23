@@ -1,26 +1,14 @@
-#include "lsqspi_param.h"
+#include "lsqspi_msp.h"
 #include "field_manipulate.h"
 #include "compile_flag.h"
 #include "reg_sysc_cpu.h"
 #include "platform.h"
 
-XIP_BANNED void lsqspi_sw_rst(struct lsqspi_instance *inst)
+XIP_BANNED void lsqspi_msp_init(struct lsqspi_instance *inst)
 {
-    lsqspi_clk_set(inst,false);
-    SYSC_CPU->PD_CPU_SRST = SYSC_CPU_SRST_CLR_QSPI_N_MASK;
-    SYSC_CPU->PD_CPU_SRST = SYSC_CPU_SRST_SET_QSPI_N_MASK;
-}
-
-XIP_BANNED void lsqspi_clk_set(struct lsqspi_instance *inst,bool enable)
-{
-    if(enable)
-    {
-        SYSC_CPU->PD_CPU_CLKG = SYSC_CPU_CLKG_SET_QSPI_MASK;
-    }else
-    {
-        SYSC_CPU->PD_CPU_CLKG = SYSC_CPU_CLKG_CLR_QSPI_MASK;
-    }
-    DELAY_US(1);
+    SYSC_CPU->PD_CPU_CLKG = SYSC_CPU_CLKG_SET_QSPI_MASK;
+//    SYSC_AWO->PD_AWO_ANA0 |= SYSC_AWO_AWO_EN_QCLK_MASK|SYSC_AWO_AWO_EN_DPLL_MASK;
+//    MODIFY_REG(SYSC_AWO->PD_AWO_CLK_CTRL,SYSC_AWO_CLK_SEL_QSPI_MASK,4<<SYSC_AWO_CLK_SEL_QSPI_POS);
 }
 
 #if (defined(BOOT_ROM))
@@ -31,7 +19,7 @@ XIP_BANNED uint8_t lsqspi_rd_cap_dly_get(struct lsqspi_instance *inst)
 #else
 XIP_BANNED uint8_t lsqspi_rd_cap_dly_get(struct lsqspi_instance *inst)
 {
-    return 2;
+    return 1;
 }
 #endif
 
