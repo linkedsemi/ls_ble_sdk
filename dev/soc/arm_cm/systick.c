@@ -68,29 +68,33 @@ XIP_BANNED int32_t systick_time_diff(uint32_t a,uint32_t b)
     }
 }
 
-XIP_BANNED bool systick_poll_timeout(uint32_t start,uint32_t timeout,bool (*poll)(void *),void *param)
+XIP_BANNED bool systick_poll_timeout(uint32_t start_tick,uint32_t timeout,bool (*poll)(va_list),...)
 {
-    uint32_t end = start + timeout;
+    uint32_t end = 0xffffff - start_tick + timeout;
     uint8_t i = end>>24;
+    uint32_t end_tick = 0xffffff - (end & 0xffffff);
+    va_list ap;
     while(i)
     {
         if(poll)
         {
-            if(poll(param))
+            va_start(ap,poll);
+            if(poll(ap))
             {
                 return false;
             }
         }
-        if(systick_time_diff(systick_get_value(),start)<=0)
+        if(systick_time_diff(systick_get_value(),start_tick)<0)
         {
             i -= 1;
         }
     }
-    while(systick_time_diff(systick_get_value(),end&0xffffff)<0)
+    while(systick_time_diff(systick_get_value(),end_tick)<0)
     {
         if(poll)
         {
-            if(poll(param))
+            va_start(ap,poll);
+            if(poll(ap))
             {
                 return false;
             }
