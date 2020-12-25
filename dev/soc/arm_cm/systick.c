@@ -68,12 +68,40 @@ XIP_BANNED int32_t systick_time_diff(uint32_t a,uint32_t b)
     }
 }
 
+enum wrapping_status
+{
+    COUNTING_DOWN_TO_ZERO,
+    COUNTING_DOWN_FROM_MAX,
+};
+
+XIP_BANNED static bool wrapping_check(uint32_t start_tick,enum wrapping_status *stat)
+{
+    uint32_t current = systick_get_value();
+    bool wrap = false;
+    if(*stat==COUNTING_DOWN_TO_ZERO)
+    {
+        if(current > start_tick)
+        {
+            *stat = COUNTING_DOWN_FROM_MAX;
+        }
+    }else
+    {
+        if(current < start_tick)
+        {
+            *stat = COUNTING_DOWN_TO_ZERO;
+            wrap = true;
+        }
+    }
+    return wrap;
+}
+
 XIP_BANNED bool systick_poll_timeout(uint32_t start_tick,uint32_t timeout,bool (*poll)(va_list),...)
 {
     uint32_t end = 0xffffff - start_tick + timeout;
     uint8_t i = end>>24;
     uint32_t end_tick = 0xffffff - (end & 0xffffff);
     va_list ap;
+    enum wrapping_status wrap_stat = COUNTING_DOWN_TO_ZERO;
     while(i)
     {
         if(poll)
@@ -84,12 +112,12 @@ XIP_BANNED bool systick_poll_timeout(uint32_t start_tick,uint32_t timeout,bool (
                 return false;
             }
         }
-        if(systick_time_diff(systick_get_value(),start_tick)<0)
+        if(wrapping_check(start_tick,&wrap_stat))
         {
             i -= 1;
         }
     }
-    while(systick_time_diff(systick_get_value(),end_tick)<0)
+    while(systick_get_value()>end_tick)
     {
         if(poll)
         {
