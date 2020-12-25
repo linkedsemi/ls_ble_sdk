@@ -210,13 +210,16 @@ __attribute__((weak)) void ll_get_mac_addr(uint8_t *buf){}
 
 __attribute__((weak)) void (*ll_get_mac_addr_fn)(uint8_t *);
 
+__attribute__((weak)) uint32_t (*hci_rand_fn)();
+
 void ll_stack_var_ptr_init()
 {
     ll_get_mac_addr_fn = ll_get_mac_addr;
     stack_assert_asm_fn = stack_assert_asm;
     platform_reset_fn = platform_reset;
     ecc_calc_fn = ecc_calc_start;
-    rand_fn = (int(*)(void))lstrng_random;
+    rand_fn = rand;
+    hci_rand_fn = lstrng_random;
     idiv_acc_fn = idiv_acc;
     enter_critical_fn = enter_critical;
     exit_critical_fn = exit_critical;
