@@ -8,7 +8,7 @@
 #define ENV_BUF_SIZE 2048
 #if CONFIG_AOS
 #define DB_BUF_SIZE 0
-#define MSG_BUF_SIZE 2048
+#define MSG_BUF_SIZE 2304
 #define NON_RET_BUF_SIZE (12)
 #else
 #define DB_BUF_SIZE 8192
@@ -39,8 +39,7 @@ extern uint8_t max_profile_num;
 extern uint8_t max_ral_num;
 extern uint8_t max_user_task_num;
 
-uint32_t task_list_buf[10 + SDK_MAX_PROFILE_NUM + SDK_MAX_USER_TASK_NUM];
-
+#if !defined(CONFIG_AOS)
 struct {
     uint32_t env[5];
 }prf_buf[SDK_MAX_PROFILE_NUM];
@@ -52,6 +51,15 @@ void* gattc_env_buf[SDK_MAX_CONN_NUM];
 void *l2cc_env_buf[SDK_MAX_CONN_NUM];
 
 void *gapm_env_actvs_buf[SDK_MAX_ACT_NUM];
+
+uint8_t gapc_state_buf[SDK_MAX_CONN_NUM];
+
+uint8_t gattc_state_buf[SDK_MAX_CONN_NUM];
+
+uint8_t l2cc_state_buf[SDK_MAX_CONN_NUM];
+#endif
+
+uint32_t task_list_buf[10 + SDK_MAX_PROFILE_NUM + SDK_MAX_USER_TASK_NUM];
 
 void* llc_env_buf[SDK_MAX_ACT_NUM];
 
@@ -103,12 +111,6 @@ uint8_t per_adv_rep_chain_stat_buf[SDK_MAX_ACT_NUM];
 
 uint8_t llc_state_buf[SDK_MAX_ACT_NUM];
 
-uint8_t gapc_state_buf[SDK_MAX_CONN_NUM];
-
-uint8_t gattc_state_buf[SDK_MAX_CONN_NUM];
-
-uint8_t l2cc_state_buf[SDK_MAX_CONN_NUM];
-
 struct
 {
     uint8_t env[39];
@@ -127,7 +129,7 @@ void stack_var_ptr_init()
     stack_assert_asm_fn = stack_assert_asm;
     platform_reset_fn = platform_reset;
     ecc_calc_fn = ecc_calc_start;
-    rand_fn = (int(*)(void))lstrng_random;
+    rand_fn = rand;
     idiv_acc_fn = idiv_acc;
     enter_critical_fn = enter_critical;
     exit_critical_fn = exit_critical;
@@ -214,7 +216,7 @@ void ll_stack_var_ptr_init()
     stack_assert_asm_fn = stack_assert_asm;
     platform_reset_fn = platform_reset;
     ecc_calc_fn = ecc_calc_start;
-    rand_fn = rand;
+    rand_fn = (int(*)(void))lstrng_random;
     idiv_acc_fn = idiv_acc;
     enter_critical_fn = enter_critical;
     exit_critical_fn = exit_critical;
