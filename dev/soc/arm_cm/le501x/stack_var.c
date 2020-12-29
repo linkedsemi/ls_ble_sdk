@@ -32,6 +32,7 @@ extern void (*log_hex_output_fn)(const void * data_pointer , uint16_t data_lengt
 extern void (*aes_encrypt_fn)(void (*)(void),const uint8_t*,const uint8_t*);
 extern void (*aes_encrypt_comp_fn)(void (*)(uint32_t *),uint32_t*);
 extern void (*stack_reset_hook_fn)(void);
+extern bool em_fixed;
 
 extern uint8_t main_task;
 extern uint8_t max_activity_num;
@@ -138,6 +139,11 @@ void stack_var_ptr_init()
     aes_encrypt_fn = ls_ip_aes_encrypt_start;
     aes_encrypt_comp_fn = ls_ip_aes_encrypt_complete;
     stack_reset_hook_fn = NULL;
+    #if EM_FIX
+    em_fixed = true;
+    #else
+    em_fixed = false;
+    #endif
 
     max_activity_num = SDK_MAX_ACT_NUM;
     max_profile_num = SDK_MAX_PROFILE_NUM;
@@ -228,6 +234,11 @@ void ll_stack_var_ptr_init()
     aes_encrypt_fn = ls_ip_aes_encrypt_start;
     aes_encrypt_comp_fn = ls_ip_aes_encrypt_complete;
     stack_reset_hook_fn = ll_stack_reset_hook;
+    #if EM_FIX
+    em_fixed = true;
+    #else
+    em_fixed = false;
+    #endif
 
     max_activity_num = SDK_MAX_ACT_NUM;
     max_profile_num = SDK_MAX_PROFILE_NUM;
