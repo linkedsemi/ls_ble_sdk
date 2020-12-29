@@ -43,7 +43,7 @@ void main_task_itf_init(void);
 
 static void bb_mem_clr(void)
 {
-    memset((void *)BASEBAND_MEMORY_ADDR,0,16384);
+    //memset((void *)BASEBAND_MEMORY_ADDR,0,16384);
 }
 
 static void irq_priority()
