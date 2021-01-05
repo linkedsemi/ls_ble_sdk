@@ -722,8 +722,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\soc\arm_cm\le501x\integration\lscache_param.c</PathWithFileName>
-      <FilenameWithoutPath>lscache_param.c</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\soc\arm_cm\le501x\integration\lscache_msp.c</PathWithFileName>
+      <FilenameWithoutPath>lscache_msp.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -734,8 +734,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\soc\arm_cm\le501x\integration\lsqspi_param.c</PathWithFileName>
-      <FilenameWithoutPath>lsqspi_param.c</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\soc\arm_cm\le501x\integration\lsqspi_msp.c</PathWithFileName>
+      <FilenameWithoutPath>lsqspi_msp.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>

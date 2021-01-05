@@ -15,7 +15,7 @@
         <TargetCommonOption>
           <Device>ARMCM0</Device>
           <Vendor>ARM</Vendor>
-          <PackID>ARM.CMSIS.5.3.0</PackID>
+          <PackID>ARM.CMSIS.5.6.0</PackID>
           <PackURL>http://www.keil.com/pack/</PackURL>
           <Cpu>IRAM(0x20000000,0x00020000) IROM(0x00000000,0x00040000) CPUTYPE("Cortex-M0") CLOCK(12000000) ESEL ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
@@ -32,7 +32,7 @@
           <SLE66CMisc></SLE66CMisc>
           <SLE66AMisc></SLE66AMisc>
           <SLE66LinkerMisc></SLE66LinkerMisc>
-          <SFDFile>$$Device:ARMCM0$Device\ARM\SVD\ARMCM0.svd</SFDFile>
+          <SFDFile></SFDFile>
           <bCustSvd>0</bCustSvd>
           <UseEnv>0</UseEnv>
           <BinPath></BinPath>
@@ -183,6 +183,7 @@
             <hadXRAM>0</hadXRAM>
             <uocXRam>0</uocXRam>
             <RvdsVP>0</RvdsVP>
+            <RvdsMve>0</RvdsMve>
             <hadIRAM2>0</hadIRAM2>
             <hadIROM2>0</hadIROM2>
             <StupSel>8</StupSel>
@@ -606,14 +607,14 @@
               <FilePath>..\..\..\soc\arm_cm\le501x\bin\libfw.o</FilePath>
             </File>
             <File>
-              <FileName>lscache_param.c</FileName>
+              <FileName>lscache_msp.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\soc\arm_cm\le501x\integration\lscache_param.c</FilePath>
+              <FilePath>..\..\..\soc\arm_cm\le501x\integration\lscache_msp.c</FilePath>
             </File>
             <File>
-              <FileName>lsqspi_param.c</FileName>
+              <FileName>lsqspi_msp.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\soc\arm_cm\le501x\integration\lsqspi_param.c</FilePath>
+              <FilePath>..\..\..\soc\arm_cm\le501x\integration\lsqspi_msp.c</FilePath>
             </File>
             <File>
               <FileName>modem_rf_le501x.c</FileName>
