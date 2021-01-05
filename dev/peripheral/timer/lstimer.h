@@ -1935,6 +1935,8 @@ mode.
 
 
 #define __HAL_RCC_ADTIM_CLK_ENABLE()   do { \
+                                        REG_FIELD_WR(RCC->APB2RST, RCC_ADTIM1, 1);\
+                                        REG_FIELD_WR(RCC->APB2RST, RCC_ADTIM1, 0);\
                                         REG_FIELD_WR(RCC->APB2EN, RCC_ADTIM1, 1);\
                                       } while(0U)
 #define __HAL_RCC_ADTIM_CLK_DISABLE()   do { \
@@ -1942,6 +1944,8 @@ mode.
                                       } while(0U)                                      
 
 #define __HAL_RCC_TIM1_CLK_ENABLE()   do { \
+                                        REG_FIELD_WR(RCC->APB2RST, RCC_GPTIMC1, 1);\
+                                        REG_FIELD_WR(RCC->APB2RST, RCC_GPTIMC1, 0);\
                                         REG_FIELD_WR(RCC->APB2EN, RCC_GPTIMC1, 1);\
                                       } while(0U)
 #define __HAL_RCC_TIM1_CLK_DISABLE()   do { \
@@ -1949,6 +1953,8 @@ mode.
                                       } while(0U)
 
 #define __HAL_RCC_TIM2_CLK_ENABLE()   do { \
+                                        REG_FIELD_WR(RCC->APB1RST, RCC_GPTIMA1, 1);\
+                                        REG_FIELD_WR(RCC->APB1RST, RCC_GPTIMA1, 0);\
                                         REG_FIELD_WR(RCC->APB1EN, RCC_GPTIMA1, 1);\
                                       } while(0U)   
 #define __HAL_RCC_TIM2_CLK_DISABLE()   do { \
@@ -1956,6 +1962,8 @@ mode.
                                       } while(0U) 
 
 #define __HAL_RCC_TIM3_CLK_ENABLE()   do { \
+                                        REG_FIELD_WR(RCC->APB1RST, RCC_GPTIMB1, 1);\
+                                        REG_FIELD_WR(RCC->APB1RST, RCC_GPTIMB1, 0);\
                                         REG_FIELD_WR(RCC->APB1EN, RCC_GPTIMB1, 1);\
                                       } while(0U)
 #define __HAL_RCC_TIM3_CLK_DISABLE()   do { \
@@ -1963,6 +1971,8 @@ mode.
                                       } while(0U)
 
 #define __HAL_RCC_BTIM_CLK_ENABLE()   do { \
+                                        REG_FIELD_WR(RCC->APB1RST, RCC_BSTIM1, 1);\
+                                        REG_FIELD_WR(RCC->APB1RST, RCC_BSTIM1, 0);\
                                         REG_FIELD_WR(RCC->APB1EN, RCC_BSTIM1, 1);\
                                       } while(0U)
 #define __HAL_RCC_BTIM_CLK_DISABLE()   do { \
