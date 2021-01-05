@@ -274,6 +274,8 @@ HAL_StatusTypeDef HAL_TIM_Base_Start_IT(TIM_HandleTypeDef *htim)
   /* Check the parameters */
   LS_ASSERT(IS_TIM_INSTANCE(htim->Instance));
 
+  __HAL_TIM_DISABLE_IT(htim, TIM_IT_UPDATE);
+
   /* Enable the TIM Update interrupt */
   __HAL_TIM_ENABLE_IT(htim, TIM_IT_UPDATE);
 
@@ -5700,7 +5702,8 @@ void TIM_Base_SetConfig(reg_timer_t *TIMx, TIM_Base_InitTypeDef *Structure)
 
   /* Generate an update event to reload the Prescaler
      and the repetition counter (only for advanced timer) value immediately */
-  //TIMx->EGR = TIMER_EGR_UG;
+  TIMx->EGR = TIMER_EGR_UG;
+
 }
 
 /**
