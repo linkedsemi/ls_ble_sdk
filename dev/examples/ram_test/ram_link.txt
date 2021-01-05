@@ -16,14 +16,6 @@ SECTIONS
         PROVIDE(__vector__end__ = .);    
         KEEP(*(.isr_vector))
     }>REMAP AT>RAM 
-    
-    .reset_retain (NOLOAD) :
-    {
-        . = ALIGN(4);
-        PROVIDE(reset_retain_start = .);
-        . += 2*4;
-        PROVIDE(reset_retain_end = .);
-    }
 
     __data_lma__ = __vector_lma__ + SIZEOF(.vector);
     
@@ -78,6 +70,14 @@ SECTIONS
         __HeapLimit = .;
     }>REMAP
 
+    .reset_retain (NOLOAD) :
+    {
+        . = ALIGN(4);
+        PROVIDE(reset_retain_start = .);
+        . += 2*4;
+        PROVIDE(reset_retain_end = .);
+    }
+    
     /* .stack_dummy section doesn't contains any symbols. It is only
      * used for linker to calculate size of stack sections, and assign
      * values to stack symbols later */
