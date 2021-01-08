@@ -70,26 +70,26 @@ XIP_BANNED int32_t systick_time_diff(uint32_t a,uint32_t b)
 
 enum wrapping_status
 {
-    COUNTING_DOWN_TO_ZERO,
-    COUNTING_DOWN_FROM_MAX,
+    COUNTING_TOP_HALF,
+    COUNTING_BOTTOM_HALF,
 };
 
 XIP_BANNED static bool wrapping_check(uint32_t start_tick,enum wrapping_status *stat)
 {
     uint32_t current = systick_get_value();
     bool wrap = false;
-    if(*stat==COUNTING_DOWN_TO_ZERO)
+    if(systick_time_diff(current,start_tick)>=0)
     {
-        if(current > start_tick)
+        if(*stat == COUNTING_BOTTOM_HALF)
         {
-            *stat = COUNTING_DOWN_FROM_MAX;
+            *stat = COUNTING_TOP_HALF;
+            wrap = true;
         }
     }else
     {
-        if(current < start_tick)
+        if(*stat == COUNTING_TOP_HALF)
         {
-            *stat = COUNTING_DOWN_TO_ZERO;
-            wrap = true;
+            *stat = COUNTING_BOTTOM_HALF;
         }
     }
     return wrap;
