@@ -101,7 +101,7 @@ XIP_BANNED bool systick_poll_timeout(uint32_t start_tick,uint32_t timeout,bool (
     uint8_t i = end>>24;
     uint32_t end_tick = 0xffffff - (end & 0xffffff);
     va_list ap;
-    enum wrapping_status wrap_stat = COUNTING_DOWN_TO_ZERO;
+    enum wrapping_status wrap_stat = COUNTING_TOP_HALF;
     while(i)
     {
         if(poll)
