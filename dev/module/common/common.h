@@ -5,7 +5,7 @@
 
 extern const unsigned char one_bits[];
 /// Number of '1' bits in a byte
-#define NB_ONE_BITS(byte)   (one_bits[byte & 0x0F] + one_bits[byte >> 4])
+#define NB_ONE_BITS(byte)   (one_bits[(byte) & 0x0F] + one_bits[(byte) >> 4])
 
 /// Get the number of elements within an array, give also number of rows in a 2-D array
 #define ARRAY_LEN(array)   (sizeof((array))/sizeof((array)[0]))

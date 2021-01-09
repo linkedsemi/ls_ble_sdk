@@ -784,6 +784,8 @@ void gap_manager_delete_bonding(uint8_t peer_id);
 
 uint8_t gap_manager_get_bonding_peer_id(uint8_t link_id);
 
+uint8_t gap_manager_get_bonded_dev_num(void);
+
 void gatt_manager_init(void (*evt_cb)(enum gatt_evt_type,union gatt_evt_u *,uint8_t));
 
 void gatt_manager_svc_register(uint16_t start_hdl,uint8_t att_num,struct gatt_svc_env *svc);
