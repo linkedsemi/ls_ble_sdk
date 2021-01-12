@@ -241,7 +241,6 @@ void ll_stack_var_ptr_init()
     #endif
 
     max_activity_num = SDK_MAX_ACT_NUM;
-    max_profile_num = SDK_MAX_PROFILE_NUM;
     max_ral_num = SDK_MAX_RAL_NUM;
     max_user_task_num = SDK_MAX_USER_TASK_NUM;
 
