@@ -384,6 +384,7 @@ enum gap_evt_type
     MASTER_PAIR_REQ,
     SLAVE_SECURITY_REQ,
     PAIR_DONE,
+    ENCRYPT_FAIL,
     ENCRYPT_DONE,
     DISPLAY_PASSKEY,
     REQUEST_PASSKEY,
@@ -477,6 +478,11 @@ struct gap_pair_done
     }u;
 };
 
+struct gap_encrypt_fail
+{
+    uint8_t reason;
+};
+
 struct gap_encrypt_done
 {
     uint8_t auth;
@@ -526,6 +532,7 @@ union gap_evt_u
     struct gap_master_pair_req master_pair_req;
     struct gap_slave_security_req slave_security_req;
     struct gap_pair_done pair_done;
+    struct gap_encrypt_fail encrypt_fail;
     struct gap_encrypt_done encrypt_done;
     struct gap_display_passkey display_passkey;
     struct gap_numeric_compare numeric_compare;

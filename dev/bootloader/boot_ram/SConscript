@@ -2,7 +2,7 @@ Import('dev_env')
 
 bram_env = dev_env.Clone()
 bram_env.Append(CPPPATH = ['.'])
-bram_env.Append(CPPDEFINES = ['-DBOOT_RAM=1','-DGLOBAL_OUTPUT_LVL=0'])
+bram_env.Append(CPPDEFINES = ['-DBOOT_RAM=1','-DGLOBAL_OUTPUT_LVL=0','NDEBUG'])
 if dev_env['IC'] != 'le501x':
     src = [
         'boot_ram.c',
