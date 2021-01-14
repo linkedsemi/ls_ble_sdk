@@ -240,6 +240,11 @@ void IWDG_ClearITFlag(void)
     }
 }
 
+void IWDT_Handler(void)
+{
+    IWDG_ClearITFlag();
+}
+
 void lsiwdt_Init(void)
 {
     REG_FIELD_WR(SYSCFG->CFG, SYSCFG_IWDG_DEBUG, 1);
@@ -252,15 +257,10 @@ void lsiwdt_Init(void)
     IWDG_SetClockCmd(IWDG_lrc_select);
     IWDG_SetLoad(0x27100); //period time 5s  5000000/((1/32)*1000)us  //32khz
     IWDG_ClearITFlag();
+    arm_cm_set_int_isr(IWDT_IRQn,IWDT_Handler);
     NVIC_EnableIRQ(IWDT_IRQn);
     IWDG_ITConfig(ENABLE);
     IWDG_ResetEnable(ENABLE);
     IWDG_Enable(ENABLE);
 }
-
-void IWDT_Handler(void)
-{
-    IWDG_ClearITFlag();
-}
-
 /*****************************END OF FILE***************************/
