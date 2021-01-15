@@ -4,7 +4,7 @@
 #include "uart_msp.h" 
 #include "field_manipulate.h"
 #include "log.h"
-
+#include "systick.h"
 static void UART_EndTransmit_IT(UART_HandleTypeDef *huart);
 static void UART_Transmit_IT(UART_HandleTypeDef *huart);
 static void UART_Receive_IT(UART_HandleTypeDef *huart);
@@ -68,6 +68,24 @@ HAL_StatusTypeDef HAL_UART_DeInit(UART_HandleTypeDef *huart)
     huart->RxState = HAL_UART_STATE_RESET;
     return HAL_OK;
 }
+
+static bool uart_flag_poll(va_list va)
+{
+      UART_HandleTypeDef *huart = va_arg(va,UART_HandleTypeDef *);
+      uint32_t flag = va_arg(va,uint32_t);
+      if (huart->UARTX->SR & flag)
+      {
+        return true;
+      }
+      else
+      {
+        huart->gState = HAL_UART_STATE_RESET;
+        huart->RxState = HAL_UART_STATE_RESET;
+        return false;
+      }
+}
+
+
 /**
   * @brief  Tx Transfer completed callbacks.
   * @param  huart  Pointer to a UART_HandleTypeDef structure that contains
@@ -107,8 +125,8 @@ __attribute__((weak)) void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart,voi
   */
 HAL_StatusTypeDef HAL_UART_Transmit(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size, uint32_t Timeout)
 {
-    //   uint32_t tickstart = 0U;
-    //   uint32_t timeout = (Timeout*UART_CLOCK)/1000;
+    uint32_t timeout = Timeout * SDK_PCLK_MHZ * 1000;
+    uint32_t tickstart = systick_get_value();
     /* Check that a Tx process is not already ongoing */
     if (huart->gState == HAL_UART_STATE_READY)
     {
@@ -125,7 +143,11 @@ HAL_StatusTypeDef HAL_UART_Transmit(UART_HandleTypeDef *huart, uint8_t *pData, u
         
         while (huart->TxXferCount > 0U )
         {
-            if (huart->UARTX->SR & UART_SR_TFNF)
+            if(systick_poll_timeout(tickstart,timeout,uart_flag_poll,huart,UART_SR_TFNF))
+            {
+                return HAL_TIMEOUT;
+            }
+           else
             {
                 //Transmit FIFO Not Full
                 huart->TxXferCount--;
@@ -137,8 +159,10 @@ HAL_StatusTypeDef HAL_UART_Transmit(UART_HandleTypeDef *huart, uint8_t *pData, u
             }
         }
         // Wait until TX Finish
-        while (!(huart->UARTX->SR & UART_SR_TEMT))
-        ;
+        if(systick_poll_timeout(tickstart,timeout,uart_flag_poll,huart,UART_SR_TEMT))
+        {
+            return HAL_TIMEOUT;
+        }
         /* At end of Tx process, restore huart->gState to Ready */
         huart->gState = HAL_UART_STATE_READY;
         return HAL_OK;
@@ -161,8 +185,10 @@ HAL_StatusTypeDef HAL_UART_Transmit(UART_HandleTypeDef *huart, uint8_t *pData, u
   */
 HAL_StatusTypeDef HAL_UART_Receive(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size, uint32_t Timeout)
 {
-    // uint32_t tickstart = 0U;
-    // uint32_t Timeout_ms = Timeout*UART_CLOCK/1000;
+
+    uint32_t timeout = Timeout * SDK_PCLK_MHZ * 1000;
+    uint32_t tickstart = systick_get_value();
+
     /* Check that a Rx process is not already ongoing */
     if (huart->RxState == HAL_UART_STATE_READY)
     {
@@ -181,12 +207,16 @@ HAL_StatusTypeDef HAL_UART_Receive(UART_HandleTypeDef *huart, uint8_t *pData, ui
         /* Check the remain data to be received */
         while (huart->RxXferCount > 0U)
         {
-            while((huart->UARTX->SR & UART_SR_DR)==0)
-            ;
-            huart->RxXferCount--;
-            *pData++ = (uint8_t)(huart->UARTX->RBR & (uint8_t)0x00FF);
+            if(systick_poll_timeout(tickstart,timeout,uart_flag_poll,huart,UART_SR_TFNF))
+            {
+                return HAL_TIMEOUT;
+            }
+           else
+            {
+                huart->RxXferCount--;
+                *pData++ = (uint8_t)(huart->UARTX->RBR & (uint8_t)0x00FF);
+            }
         }
-
         /* At end of Rx process, restore huart->RxState to Ready */
         huart->RxState = HAL_UART_STATE_READY;
         return HAL_OK;
