@@ -5,8 +5,8 @@
 #include "lsgpio.h"
 #include <string.h>
 
-#define TIMx                           LSGPTIM3
-#define TIMx_CLK_ENABLE()              __HAL_RCC_TIM2_CLK_ENABLE()
+#define TIMx                           LSGPTIMB
+#define TIMx_CLK_ENABLE()              __HAL_RCC_GPTIMB_CLK_ENABLE()
 
 /* Definition for TIMx Channel Pins */
 #define TIMx_CHANNEL_GPIO_PORT()       __HAL_RCC_GPIOA_CLK_ENABLE()

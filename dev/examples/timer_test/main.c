@@ -25,7 +25,7 @@ static void Error_Handler(void);
 void HAL_TIM_PWM_MspInit(TIM_HandleTypeDef *htim)
 {
     /* TIMx Peripheral clock enable */
-    __HAL_RCC_TIM3_CLK_ENABLE();
+    TIMx_CLK_ENABLE();
 
     /* Configure PA00, PA01, PA07, PA08 for PWM output */
     gptimb1_ch1_io_init(PA00, true, 0);

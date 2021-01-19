@@ -13,7 +13,7 @@
 
 #include <string.h>
 
-#define TIMx   LSGPTIM3
+#define TIMx   LSGPTIMB
 #define LIGHT_LED_1                  (PA01)
 #define LIGHT_LED_2                  (PB08)
 #define LIGHT_LED_3                  (PB09)

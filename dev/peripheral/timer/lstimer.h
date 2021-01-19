@@ -1504,179 +1504,179 @@ mode.
   * @{
   */
 #define IS_TIM_INSTANCE(INSTANCE)\
-  (((INSTANCE) == LSADTIM1)    || \
-   ((INSTANCE) == LSGPTIM1)    || \
-   ((INSTANCE) == LSGPTIM2)    || \
-   ((INSTANCE) == LSGPTIM3)    || \
-   ((INSTANCE) == LSBSTIM1))
+  (((INSTANCE) == LSADTIM)    || \
+   ((INSTANCE) == LSGPTIMC)    || \
+   ((INSTANCE) == LSGPTIMA)    || \
+   ((INSTANCE) == LSGPTIMB)    || \
+   ((INSTANCE) == LSBSTIM))
 
-#define IS_TIM_ADVANCED_INSTANCE(INSTANCE) ((INSTANCE) == LSADTIM1)
+#define IS_TIM_ADVANCED_INSTANCE(INSTANCE) ((INSTANCE) == LSADTIM)
 
 #define IS_TIM_CC1_INSTANCE(INSTANCE)\
-  (((INSTANCE) == LSADTIM1)    || \
-   ((INSTANCE) == LSGPTIM1)    || \
-   ((INSTANCE) == LSGPTIM2)    || \
-   ((INSTANCE) == LSGPTIM3))
+  (((INSTANCE) == LSADTIM)    || \
+   ((INSTANCE) == LSGPTIMC)    || \
+   ((INSTANCE) == LSGPTIMA)    || \
+   ((INSTANCE) == LSGPTIMB))
 
 #define IS_TIM_CC2_INSTANCE(INSTANCE)\
-  (((INSTANCE) == LSADTIM1)    || \
-   ((INSTANCE) == LSGPTIM1)    || \
-   ((INSTANCE) == LSGPTIM2)    || \
-   ((INSTANCE) == LSGPTIM3))
+  (((INSTANCE) == LSADTIM)    || \
+   ((INSTANCE) == LSGPTIMC)    || \
+   ((INSTANCE) == LSGPTIMA)    || \
+   ((INSTANCE) == LSGPTIMB))
 
 #define IS_TIM_CC3_INSTANCE(INSTANCE)\
-  (((INSTANCE) == LSADTIM1)    || \
-   ((INSTANCE) == LSGPTIM2)    || \
-   ((INSTANCE) == LSGPTIM3))
+  (((INSTANCE) == LSADTIM)    || \
+   ((INSTANCE) == LSGPTIMA)    || \
+   ((INSTANCE) == LSGPTIMB))
 
 #define IS_TIM_CC4_INSTANCE(INSTANCE)\
-  (((INSTANCE) == LSADTIM1)    || \
-   ((INSTANCE) == LSGPTIM2)    || \
-   ((INSTANCE) == LSGPTIM3))
+  (((INSTANCE) == LSADTIM)    || \
+   ((INSTANCE) == LSGPTIMA)    || \
+   ((INSTANCE) == LSGPTIMB))
 
 #define  IS_TIM_CLOCKSOURCE_ETRMODE1_INSTANCE(INSTANCE)\
-  (((INSTANCE) == LSADTIM1)    || \
-   ((INSTANCE) == LSGPTIM2)    || \
-   ((INSTANCE) == LSGPTIM3))
+  (((INSTANCE) == LSADTIM)    || \
+   ((INSTANCE) == LSGPTIMA)    || \
+   ((INSTANCE) == LSGPTIMB))
 
 #define IS_TIM_CLOCKSOURCE_ETRMODE2_INSTANCE(INSTANCE)\
-  (((INSTANCE) == LSADTIM1)    || \
-   ((INSTANCE) == LSGPTIM2)    || \
-   ((INSTANCE) == LSGPTIM3))
+  (((INSTANCE) == LSADTIM)    || \
+   ((INSTANCE) == LSGPTIMA)    || \
+   ((INSTANCE) == LSGPTIMB))
 
 #define IS_TIM_CLOCKSOURCE_TIX_INSTANCE(INSTANCE)\
-  (((INSTANCE) == LSADTIM1)    || \
-   ((INSTANCE) == LSGPTIM1)    || \
-   ((INSTANCE) == LSGPTIM2)    || \
-   ((INSTANCE) == LSGPTIM3))
+  (((INSTANCE) == LSADTIM)    || \
+   ((INSTANCE) == LSGPTIMC)    || \
+   ((INSTANCE) == LSGPTIMA)    || \
+   ((INSTANCE) == LSGPTIMB))
 
 #define IS_TIM_CLOCKSOURCE_ITRX_INSTANCE(INSTANCE)\
-  (((INSTANCE) == LSADTIM1)    || \
-   ((INSTANCE) == LSGPTIM1)    || \
-   ((INSTANCE) == LSGPTIM2)    || \
-   ((INSTANCE) == LSGPTIM3))
+  (((INSTANCE) == LSADTIM)    || \
+   ((INSTANCE) == LSGPTIMC)    || \
+   ((INSTANCE) == LSGPTIMA)    || \
+   ((INSTANCE) == LSGPTIMB))
 
 #define IS_TIM_OCXREF_CLEAR_INSTANCE(INSTANCE)\
-  (((INSTANCE) == LSADTIM1)    || \
-   ((INSTANCE) == LSGPTIM2)    || \
-   ((INSTANCE) == LSGPTIM3))
+  (((INSTANCE) == LSADTIM)    || \
+   ((INSTANCE) == LSGPTIMA)    || \
+   ((INSTANCE) == LSGPTIMB))
 
 #define IS_TIM_ENCODER_INTERFACE_INSTANCE(INSTANCE)\
-  (((INSTANCE) == LSADTIM1)    || \
-   ((INSTANCE) == LSGPTIM2)    || \
-   ((INSTANCE) == LSGPTIM3))
+  (((INSTANCE) == LSADTIM)    || \
+   ((INSTANCE) == LSGPTIMA)    || \
+   ((INSTANCE) == LSGPTIMB))
 
 #define IS_TIM_XOR_INSTANCE(INSTANCE)\
-  (((INSTANCE) == LSADTIM1)    || \
-   ((INSTANCE) == LSGPTIM2)    || \
-   ((INSTANCE) == LSGPTIM3))
+  (((INSTANCE) == LSADTIM)    || \
+   ((INSTANCE) == LSGPTIMA)    || \
+   ((INSTANCE) == LSGPTIMB))
 
 #define IS_TIM_MASTER_INSTANCE(INSTANCE)\
-  (((INSTANCE) == LSADTIM1)    || \
-   ((INSTANCE) == LSGPTIM1)    || \
-   ((INSTANCE) == LSGPTIM2)    || \
-   ((INSTANCE) == LSGPTIM3)    || \
-   ((INSTANCE) == LSBSTIM1))
+  (((INSTANCE) == LSADTIM)    || \
+   ((INSTANCE) == LSGPTIMC)    || \
+   ((INSTANCE) == LSGPTIMA)    || \
+   ((INSTANCE) == LSGPTIMB)    || \
+   ((INSTANCE) == LSBSTIM))
 
 #define IS_TIM_SLAVE_INSTANCE(INSTANCE)\
-  (((INSTANCE) == LSADTIM1)    || \
-   ((INSTANCE) == LSGPTIM1)    || \
-   ((INSTANCE) == LSGPTIM2)    || \
-   ((INSTANCE) == LSGPTIM3))
+  (((INSTANCE) == LSADTIM)    || \
+   ((INSTANCE) == LSGPTIMC)    || \
+   ((INSTANCE) == LSGPTIMA)    || \
+   ((INSTANCE) == LSGPTIMB))
 
 #define IS_TIM_SYNCHRO_INSTANCE(INSTANCE)\
-  (((INSTANCE) == LSADTIM1)    || \
-   ((INSTANCE) == LSGPTIM1)    || \
-   ((INSTANCE) == LSGPTIM2)    || \
-   ((INSTANCE) == LSGPTIM3))
+  (((INSTANCE) == LSADTIM)    || \
+   ((INSTANCE) == LSGPTIMC)    || \
+   ((INSTANCE) == LSGPTIMA)    || \
+   ((INSTANCE) == LSGPTIMB))
 
 #define IS_TIM_DMABURST_INSTANCE(INSTANCE)\
-  (((INSTANCE) == LSADTIM1)    || \
-   ((INSTANCE) == LSGPTIM1)    || \
-   ((INSTANCE) == LSGPTIM2)    || \
-   ((INSTANCE) == LSGPTIM3)    || \
-   ((INSTANCE) == LSBSTIM1))
+  (((INSTANCE) == LSADTIM)    || \
+   ((INSTANCE) == LSGPTIMC)    || \
+   ((INSTANCE) == LSGPTIMA)    || \
+   ((INSTANCE) == LSGPTIMB)    || \
+   ((INSTANCE) == LSBSTIM))
 
 #define IS_TIM_BREAK_INSTANCE(INSTANCE)\
-  (((INSTANCE) == LSADTIM1)    || \
-   ((INSTANCE) == LSGPTIM1))
+  (((INSTANCE) == LSADTIM)    || \
+   ((INSTANCE) == LSGPTIMC))
 
 #define IS_TIM_CCX_INSTANCE(INSTANCE, CHANNEL) \
-   ((((INSTANCE) == LSADTIM1) &&                  \
+   ((((INSTANCE) == LSADTIM) &&                  \
      (((CHANNEL) == TIM_CHANNEL_1) ||          \
       ((CHANNEL) == TIM_CHANNEL_2) ||          \
       ((CHANNEL) == TIM_CHANNEL_3) ||          \
       ((CHANNEL) == TIM_CHANNEL_4)))           \
     ||                                         \
-    (((INSTANCE) == LSGPTIM1) &&                   \
+    (((INSTANCE) == LSGPTIMC) &&                   \
      (((CHANNEL) == TIM_CHANNEL_1) ||          \
       ((CHANNEL) == TIM_CHANNEL_2)))           \
     ||                                         \
-    (((INSTANCE) == LSGPTIM2) &&                   \
+    (((INSTANCE) == LSGPTIMA) &&                   \
      (((CHANNEL) == TIM_CHANNEL_1) ||          \
       ((CHANNEL) == TIM_CHANNEL_2) ||          \
       ((CHANNEL) == TIM_CHANNEL_3) ||          \
       ((CHANNEL) == TIM_CHANNEL_4)))           \
     ||                                         \
-    (((INSTANCE) == LSGPTIM3) &&                   \
+    (((INSTANCE) == LSGPTIMB) &&                   \
      (((CHANNEL) == TIM_CHANNEL_1) ||          \
       ((CHANNEL) == TIM_CHANNEL_2) ||          \
       ((CHANNEL) == TIM_CHANNEL_3) ||          \
       ((CHANNEL) == TIM_CHANNEL_4))))
 
 #define IS_TIM_CCXN_INSTANCE(INSTANCE, CHANNEL) \
-   ((((INSTANCE) == LSADTIM1) &&                    \
+   ((((INSTANCE) == LSADTIM) &&                    \
      (((CHANNEL) == TIM_CHANNEL_1) ||           \
       ((CHANNEL) == TIM_CHANNEL_2) ||           \
       ((CHANNEL) == TIM_CHANNEL_3)))            \
     ||                                          \
-    (((INSTANCE) == LSGPTIM1) &&                   \
+    (((INSTANCE) == LSGPTIMC) &&                   \
       ((CHANNEL) == TIM_CHANNEL_1)))
 
 #define IS_TIM_COUNTER_MODE_SELECT_INSTANCE(INSTANCE)\
-  (((INSTANCE) == LSADTIM1)    || \
-   ((INSTANCE) == LSGPTIM1)    || \
-   ((INSTANCE) == LSGPTIM2)    || \
-   ((INSTANCE) == LSGPTIM3))
+  (((INSTANCE) == LSADTIM)    || \
+   ((INSTANCE) == LSGPTIMC)    || \
+   ((INSTANCE) == LSGPTIMA)    || \
+   ((INSTANCE) == LSGPTIMB))
 
 #define IS_TIM_REPETITION_COUNTER_INSTANCE(INSTANCE)\
-  (((INSTANCE) == LSADTIM1)    || \
-   ((INSTANCE) == LSGPTIM1))
+  (((INSTANCE) == LSADTIM)    || \
+   ((INSTANCE) == LSGPTIMC))
 
 #define IS_TIM_CLOCK_DIVISION_INSTANCE(INSTANCE)\
-  (((INSTANCE) == LSADTIM1)    || \
-   ((INSTANCE) == LSGPTIM1)    || \
-   ((INSTANCE) == LSGPTIM2)    || \
-   ((INSTANCE) == LSGPTIM3))
+  (((INSTANCE) == LSADTIM)    || \
+   ((INSTANCE) == LSGPTIMC)    || \
+   ((INSTANCE) == LSGPTIMA)    || \
+   ((INSTANCE) == LSGPTIMB))
 
 #define IS_TIM_DMA_INSTANCE(INSTANCE)\
-  (((INSTANCE) == LSADTIM1)    || \
-   ((INSTANCE) == LSGPTIM1)    || \
-   ((INSTANCE) == LSGPTIM2)    || \
-   ((INSTANCE) == LSGPTIM3))
+  (((INSTANCE) == LSADTIM)    || \
+   ((INSTANCE) == LSGPTIMC)    || \
+   ((INSTANCE) == LSGPTIMA)    || \
+   ((INSTANCE) == LSGPTIMB))
     
 #define IS_TIM_DMA_CC_INSTANCE(INSTANCE)\
-  (((INSTANCE) == LSADTIM1)    || \
-   ((INSTANCE) == LSGPTIM1)    || \
-   ((INSTANCE) == LSGPTIM2)    || \
-   ((INSTANCE) == LSGPTIM3))
+  (((INSTANCE) == LSADTIM)    || \
+   ((INSTANCE) == LSGPTIMC)    || \
+   ((INSTANCE) == LSGPTIMA)    || \
+   ((INSTANCE) == LSGPTIMB))
     
 #define IS_TIM_COMMUTATION_EVENT_INSTANCE(INSTANCE)\
-  (((INSTANCE) == LSADTIM1)    || \
-   ((INSTANCE) == LSGPTIM1))
+  (((INSTANCE) == LSADTIM)    || \
+   ((INSTANCE) == LSGPTIMC))
 
 #define IS_TIM_ETR_INSTANCE(INSTANCE)\
-  (((INSTANCE) == LSADTIM1)    || \
-   ((INSTANCE) == LSGPTIM1)    || \
-   ((INSTANCE) == LSGPTIM2)    || \
-   ((INSTANCE) == LSGPTIM3))
+  (((INSTANCE) == LSADTIM)    || \
+   ((INSTANCE) == LSGPTIMC)    || \
+   ((INSTANCE) == LSGPTIMA)    || \
+   ((INSTANCE) == LSGPTIMB))
 
 #define IS_TIM_HALL_SENSOR_INTERFACE_INSTANCE(INSTANCE)\
-  (((INSTANCE) == LSADTIM1)    || \
-   ((INSTANCE) == LSGPTIM2)    || \
-   ((INSTANCE) == LSGPTIM3))
+  (((INSTANCE) == LSADTIM)    || \
+   ((INSTANCE) == LSGPTIMA)    || \
+   ((INSTANCE) == LSGPTIMB))
 
-#define IS_TIM_32B_COUNTER_INSTANCE(INSTANCE)    ((INSTANCE) == LSGPTIM2)
+#define IS_TIM_32B_COUNTER_INSTANCE(INSTANCE)    ((INSTANCE) == LSGPTIMA)
 
 
 
@@ -1943,30 +1943,30 @@ mode.
                                         REG_FIELD_WR(RCC->APB2EN, RCC_ADTIM1, 0);\
                                       } while(0U)                                      
 
-#define __HAL_RCC_TIM1_CLK_ENABLE()   do { \
+#define __HAL_RCC_GPTIMC_CLK_ENABLE()   do { \
                                         REG_FIELD_WR(RCC->APB2RST, RCC_GPTIMC1, 1);\
                                         REG_FIELD_WR(RCC->APB2RST, RCC_GPTIMC1, 0);\
                                         REG_FIELD_WR(RCC->APB2EN, RCC_GPTIMC1, 1);\
                                       } while(0U)
-#define __HAL_RCC_TIM1_CLK_DISABLE()   do { \
+#define __HAL_RCC_GPTIMC_CLK_DISABLE()   do { \
                                         REG_FIELD_WR(RCC->APB2EN, RCC_GPTIMC1, 0);\
                                       } while(0U)
 
-#define __HAL_RCC_TIM2_CLK_ENABLE()   do { \
+#define __HAL_RCC_GPTIMA_CLK_ENABLE()   do { \
                                         REG_FIELD_WR(RCC->APB1RST, RCC_GPTIMA1, 1);\
                                         REG_FIELD_WR(RCC->APB1RST, RCC_GPTIMA1, 0);\
                                         REG_FIELD_WR(RCC->APB1EN, RCC_GPTIMA1, 1);\
                                       } while(0U)   
-#define __HAL_RCC_TIM2_CLK_DISABLE()   do { \
+#define __HAL_RCC_GPTIMA_CLK_DISABLE()   do { \
                                         REG_FIELD_WR(RCC->APB1EN, RCC_GPTIMA1, 0);\
                                       } while(0U) 
 
-#define __HAL_RCC_TIM3_CLK_ENABLE()   do { \
+#define __HAL_RCC_GPTIMB_CLK_ENABLE()   do { \
                                         REG_FIELD_WR(RCC->APB1RST, RCC_GPTIMB1, 1);\
                                         REG_FIELD_WR(RCC->APB1RST, RCC_GPTIMB1, 0);\
                                         REG_FIELD_WR(RCC->APB1EN, RCC_GPTIMB1, 1);\
                                       } while(0U)
-#define __HAL_RCC_TIM3_CLK_DISABLE()   do { \
+#define __HAL_RCC_GPTIMB_CLK_DISABLE()   do { \
                                         REG_FIELD_WR(RCC->APB1EN, RCC_GPTIMB1, 0);\
                                       } while(0U)
 
