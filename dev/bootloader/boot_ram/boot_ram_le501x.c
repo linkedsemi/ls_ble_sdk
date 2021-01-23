@@ -321,7 +321,7 @@ void boot_ram_start(uint32_t exec_addr)
 
 void fault(void){}
 
-const uint32_t vector[4] = {
+const uint32_t vector[48] = {
     0xC000,
     (uint32_t)&boot_ram_start,
     (uint32_t)&fault,
