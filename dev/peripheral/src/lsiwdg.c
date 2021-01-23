@@ -16,9 +16,10 @@ HAL_StatusTypeDef HAL_IWDG_Init(uint32_t LoadValue)
 
 HAL_StatusTypeDef HAL_IWDG_Refresh(void)
 {
-    enter_critical();
-    REG_FIELD_WR(LSIWDG->IWDG_CON,IWDG_EN,0);
-    REG_FIELD_WR(LSIWDG->IWDG_CON,IWDG_EN,1);
-    exit_critical();
+    LSIWDG->IWDG_INTCLR = 1;
+    for (uint8_t i = 0; i < 200; i++)  //200 delay count
+    {
+        LSIWDG->IWDG_INTCLR;
+    }
     return HAL_OK;
 }
