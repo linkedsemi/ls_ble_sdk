@@ -16,6 +16,7 @@ src = [
     'integration/rtc_param.c',
     'integration/dmac_msp.c',
     'integration/lspdm_msp.c',
+    'integration/lsiwdg.c',
     'sleep.c',
     'sys_stat.c',
 ]

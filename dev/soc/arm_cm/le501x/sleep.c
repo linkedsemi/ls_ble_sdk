@@ -84,6 +84,10 @@ XIP_BANNED void after_wfi()
 {
     LS_RAM_ASSERT(__NVIC_GetPendingIRQ(LPWKUP_IRQn));
     wkup_stat = REG_FIELD_RD(SYSCFG->PMU_WKUP,SYSCFG_WKUP_STAT);
+    if(wkup_stat & WDT_WKUP)
+    {
+        while(1);
+    }
     REG_FIELD_WR(SYSCFG->PMU_WKUP, SYSCFG_LP_WKUP_CLR,1);
     DELAY_US(200);
     dcdc_on();
@@ -180,8 +184,8 @@ static void cpu_deep_sleep_bit_set()
 void low_power_mode_init()
 {
     SYSCFG->PMU_WKUP = FIELD_BUILD(SYSCFG_SLP_LVL,SLEEP_MODE0)
-                        | FIELD_BUILD(SYSCFG_WKUP_EN,BLE_WKUP)
-                        | FIELD_BUILD(SYSCFG_WKUP_EDGE,BLE_WKUP_EDGE_RISING);
+                        | FIELD_BUILD(SYSCFG_WKUP_EN,BLE_WKUP|WDT_WKUP)
+                        | FIELD_BUILD(SYSCFG_WKUP_EDGE,BLE_WKUP_EDGE_RISING|WDT_WKUP_EDGE_RISING);
 }
 
 #else
@@ -191,8 +195,8 @@ static void cpu_deep_sleep_bit_set(){}
 void low_power_mode_init()
 {
     SYSCFG->PMU_WKUP = FIELD_BUILD(SYSCFG_SLP_LVL,NORMAL_SLEEP)
-                        | FIELD_BUILD(SYSCFG_WKUP_EN,BLE_WKUP)
-                        | FIELD_BUILD(SYSCFG_WKUP_EDGE,BLE_WKUP_EDGE_RISING);
+                        | FIELD_BUILD(SYSCFG_WKUP_EN,BLE_WKUP|WDT_WKUP)
+                        | FIELD_BUILD(SYSCFG_WKUP_EDGE,BLE_WKUP_EDGE_RISING|WDT_WKUP_EDGE_RISING);
 }
 #endif
 
