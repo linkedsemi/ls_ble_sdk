@@ -78,6 +78,7 @@ SECTIONS
     ASSERT(reset_retain_end <= 0xb800, "Error end address for reset retain")
     .dmaram 0xa000 (NOLOAD):
     {
+        *(DMAC1)
         *(DMARAM)
     }
     /* .stack_dummy section doesn't contains any symbols. It is only

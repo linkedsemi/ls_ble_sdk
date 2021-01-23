@@ -274,7 +274,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart,void *rx_arg)
         if(uart_server_rx_buf[0] == UART_SYNC_BYTE)
         {
             uart_state = UART_SYNC;
-            HAL_UART_Receive_IT(&UART_Server_Config, &uart_server_rx_buf[UART_SYNC_BYTE_LEN], UART_LEN_LEN + UART_LINK_ID_LEN, NULL);
+            HAL_UART_Receive_IT(&UART_Server_Config, &uart_server_rx_buf[UART_SYNC_BYTE_LEN], UART_LEN_LEN + UART_LINK_ID_LEN);
             restart = false;
         }
         break;
@@ -286,7 +286,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart,void *rx_arg)
             if(len > 0 && len <= UART_RX_PAYLOAD_LEN_MAX && search_conidx(con_idx) != 0xff)
             {
                 uart_state = UART_RECEIVING;
-                HAL_UART_Receive_IT(&UART_Server_Config, &uart_server_rx_buf[UART_HEADER_LEN], len, NULL);
+                HAL_UART_Receive_IT(&UART_Server_Config, &uart_server_rx_buf[UART_HEADER_LEN], len);
                 restart = false;
             }
         }
@@ -295,7 +295,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart,void *rx_arg)
             if(len > 0 && len <= UART_RX_PAYLOAD_LEN_MAX && search_client_conidx(con_idx) != 0xff)
             {
                 uart_state = UART_RECEIVING;
-                HAL_UART_Receive_IT(&UART_Server_Config, &uart_server_rx_buf[UART_HEADER_LEN], len, NULL);
+                HAL_UART_Receive_IT(&UART_Server_Config, &uart_server_rx_buf[UART_HEADER_LEN], len);
                 restart = false;
             }
         }
@@ -329,7 +329,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart,void *rx_arg)
     if(restart)
     {
         uart_state = UART_IDLE;
-        HAL_UART_Receive_IT(&UART_Server_Config, &uart_server_rx_buf[0], UART_SYNC_BYTE_LEN, NULL);
+        HAL_UART_Receive_IT(&UART_Server_Config, &uart_server_rx_buf[0], UART_SYNC_BYTE_LEN);
     }
 }
 static void ls_uart_init(void)
@@ -373,7 +373,7 @@ static void ls_uart_server_write_req_ind(uint8_t att_idx, uint8_t con_idx, uint1
         {
             uart_tx_busy = true;
             current_uart_tx_idx = array_idx | (0 << 7);
-            HAL_UART_Transmit_IT(&UART_Server_Config, &uart_server_tx_buf[array_idx][0], length + UART_HEADER_LEN, NULL);
+            HAL_UART_Transmit_IT(&UART_Server_Config, &uart_server_tx_buf[array_idx][0], length + UART_HEADER_LEN);
         } 
         exit_critical();
     }
@@ -420,7 +420,7 @@ static void ls_uart_client_recv_ntf_ind(uint8_t handle, uint8_t con_idx, uint16_
         {
             uart_tx_busy = true;
             current_uart_tx_idx = array_idx | (1 << 7);
-            HAL_UART_Transmit_IT(&UART_Server_Config, &uart_client_tx_buf[array_idx][0], length + UART_HEADER_LEN, NULL);
+            HAL_UART_Transmit_IT(&UART_Server_Config, &uart_client_tx_buf[array_idx][0], length + UART_HEADER_LEN);
         } 
         exit_critical();
     }    
@@ -456,7 +456,7 @@ static void ls_uart_server_client_uart_tx(void)
                 uint16_t length = (uart_server_tx_buf[array_idx][2] << 8) | uart_server_tx_buf[array_idx][1];
                 uart_tx_busy = true;
                 current_uart_tx_idx = array_idx | (0 << 7);
-                HAL_UART_Transmit_IT(&UART_Server_Config, &uart_server_tx_buf[array_idx][0], length + UART_HEADER_LEN, NULL);
+                HAL_UART_Transmit_IT(&UART_Server_Config, &uart_server_tx_buf[array_idx][0], length + UART_HEADER_LEN);
             }
             exit_critical();
             break;
@@ -473,7 +473,7 @@ static void ls_uart_server_client_uart_tx(void)
                 uint16_t length = (uart_client_tx_buf[array_idx][2] << 8) | uart_client_tx_buf[array_idx][1];
                 uart_tx_busy = true;
                 current_uart_tx_idx = array_idx | (1 << 7);
-                HAL_UART_Transmit_IT(&UART_Server_Config, &uart_client_tx_buf[array_idx][0], length + UART_HEADER_LEN, NULL);
+                HAL_UART_Transmit_IT(&UART_Server_Config, &uart_client_tx_buf[array_idx][0], length + UART_HEADER_LEN);
             }
             exit_critical();
             break;
@@ -838,7 +838,7 @@ static void dev_manager_callback(enum dev_evt_type type,union dev_evt_u *evt)
         LOG_HEX(addr,sizeof(addr));
         dev_manager_add_service((struct svc_decl *)&ls_uart_server_svc);
         ls_uart_init(); 
-        HAL_UART_Receive_IT(&UART_Server_Config, &uart_server_rx_buf[0], UART_SYNC_BYTE_LEN, NULL);
+        HAL_UART_Receive_IT(&UART_Server_Config, &uart_server_rx_buf[0], UART_SYNC_BYTE_LEN);
         ls_uart_server_init();
         ls_uart_client_init();      
     }

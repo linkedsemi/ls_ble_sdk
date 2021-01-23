@@ -1,8 +1,10 @@
 #include "lscache.h"
 #include "lscache_msp.h"
-#include "reg_lscache.h"
+#include "reg_lscache_type.h"
 #include "field_manipulate.h"
+#include "reg_base_addr.h"
 #include "compile_flag.h"
+#define LSCACHE ((reg_lscache_t *)CACHE_BASE_ADDR)
 
 XIP_BANNED void lscache_cache_enable(uint8_t prefetch)
 {

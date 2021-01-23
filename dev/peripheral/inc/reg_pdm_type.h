@@ -1,14 +1,11 @@
-/**
-  ******************************************************************************
-  * @file    reg_pdm.c
-  * @author  Linkedsemi Application Team
-  * @brief   PDM register Header file
-  ******************************************************************************
-  */
-
 #ifndef REG_PDM_TYPE_H_
 #define REG_PDM_TYPE_H_
 #include <stdint.h>
+
+struct pdm_fir
+{
+    uint32_t COEF[64];
+};
 
 typedef struct
 {
@@ -22,14 +19,9 @@ typedef struct
     volatile uint32_t RIF; //0x1c
     volatile uint32_t IFM; //0x20
     volatile uint32_t ICR; //0x24
-    volatile uint32_t RESERVED0[6];
-    volatile uint32_t COEF0; //0x40
+    volatile uint32_t RESERVED0[54];
+    volatile struct pdm_fir FIR; //0x100 - 0x1fc
 } reg_pdm_t;
-
-typedef struct
-{
-    uint32_t pdm_fir_coef[64];
-} PDM_COEF_TypeDef;
 
 enum PDM_REG_CR_FIELD
 {
@@ -105,5 +97,3 @@ enum PDM_REG_ICR_FIELD
 };
 
 #endif
-
-/************************ (C) COPYRIGHT Linkedsemi *****END OF FILE****/

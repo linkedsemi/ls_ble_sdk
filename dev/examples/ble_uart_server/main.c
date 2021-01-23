@@ -158,7 +158,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart,void *rx_arg)
     {   
         LOG_I("uart server rx buffer overflow!");
     }
-    HAL_UART_Receive_IT(&UART_Server_Config, &uart_server_rx_byte, 1, NULL);
+    HAL_UART_Receive_IT(&UART_Server_Config, &uart_server_rx_byte, 1);
 }
 static void ls_uart_init(void)
 {
@@ -193,7 +193,7 @@ static void ls_uart_server_write_req_ind(uint8_t att_idx, uint8_t con_idx, uint1
             uart_server_tx_busy = true;
             LS_ASSERT(length <= UART_SVC_BUFFER_SIZE);
             memcpy(uart_server_tx_buf, (uint8_t*)value, length);
-            HAL_UART_Transmit_IT(&UART_Server_Config, (uint8_t*)uart_server_tx_buf, length, NULL);
+            HAL_UART_Transmit_IT(&UART_Server_Config, (uint8_t*)uart_server_tx_buf, length);
         } 
     }
     else if (att_idx == UART_SVC_IDX_TX_NTF_CFG)
@@ -347,7 +347,7 @@ static void dev_manager_callback(enum dev_evt_type type,union dev_evt_u *evt)
         LOG_HEX(addr,sizeof(addr));
         dev_manager_add_service((struct svc_decl *)&ls_uart_server_svc);
         ls_uart_init(); 
-        HAL_UART_Receive_IT(&UART_Server_Config, &uart_server_rx_byte, 1, NULL); 
+        HAL_UART_Receive_IT(&UART_Server_Config, &uart_server_rx_byte, 1); 
         ls_uart_server_init();      
     }
     break;

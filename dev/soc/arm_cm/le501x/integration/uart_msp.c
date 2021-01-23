@@ -6,19 +6,16 @@
 #include "HAL_def.h"
 #include "sys_stat.h"
 #include "platform.h"
+#include "dmac_config.h"
+#include "dmac_msp.h"
 #include <stddef.h>
 static UART_HandleTypeDef *uart_inst_env[3];
-static SMARTCARD_HandleTypeDef *smartcard_inst_env;
 
 void UART1_Handler(void)
 {
-    if(uart_inst_env[0] != NULL){
-        HAL_UARTx_IRQHandler( uart_inst_env[0]);
-    }
-    else{
-        HAL_SMARTCARD_IRQHandler( smartcard_inst_env);
-    }
+    HAL_UARTx_IRQHandler( uart_inst_env[0]);
 }
+
 void UART2_Handler(void)
 {
     HAL_UARTx_IRQHandler( uart_inst_env[1]);
@@ -108,35 +105,38 @@ void HAL_UART_MSP_Idle_Set(UART_HandleTypeDef *inst)
     uart_status_set(inst,0);
 }
 
-//smartcard 
-void HAL_SMARTCARD_MSP_Init(SMARTCARD_HandleTypeDef *inst)
+uint8_t HAL_UART_TX_DMA_Handshake_Get(UART_HandleTypeDef *inst)
 {
-    REG_FIELD_WR(RCC->APB2RST, RCC_UART1, 1);
-    REG_FIELD_WR(RCC->APB2RST, RCC_UART1, 0);
-    arm_cm_set_int_isr(UART1_IRQn,UART1_Handler);
-    smartcard_inst_env = inst;
-    __NVIC_ClearPendingIRQ(UART1_IRQn);
-    __NVIC_EnableIRQ(UART1_IRQn);
-    REG_FIELD_WR(RCC->APB2EN, RCC_UART1, 1);
+    uint8_t handshake = CH_NONE;
+    switch((uint32_t)inst->UARTX)
+    {
+    case (uint32_t)UART1:
+        handshake = CH_UART1_TX;
+    break;
+    case (uint32_t)UART2:
+        handshake = CH_UART2_TX;
+    break;
+    case (uint32_t)UART3:
+        handshake = CH_UART3_TX;
+    break;
+    }
+    return handshake;
 }
 
-void HAL_SMARTCARD_MSP_DeInit(SMARTCARD_HandleTypeDef *inst)
+uint8_t HAL_UART_RX_DMA_Handshake_Get(UART_HandleTypeDef *inst)
 {
-    REG_FIELD_WR(RCC->APB2EN, RCC_UART1, 0);
-    __NVIC_DisableIRQ(UART1_IRQn);
-}
-
-static void smartcard_status_set(uint8_t status)
-{
-    uart1_status_set(status);
-}
-
-void HAL_SMARTCARD_MSP_Busy_Set(void)
-{
-    smartcard_status_set(1);
-}
-
-void HAL_SMARTCARD_MSP_Idle_Set(void)
-{
-    smartcard_status_set(0);
+    uint8_t handshake = CH_NONE;
+    switch((uint32_t)inst->UARTX)
+    {
+    case (uint32_t)UART1:
+        handshake = CH_UART1_RX;
+    break;
+    case (uint32_t)UART2:
+        handshake = CH_UART2_RX;
+    break;
+    case (uint32_t)UART3:
+        handshake = CH_UART3_RX;
+    break;
+    }
+    return handshake;
 }

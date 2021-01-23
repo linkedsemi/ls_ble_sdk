@@ -1,5 +1,6 @@
 #include <stddef.h>
-#include "lsgpio.h"
+#include "gpio_mode.h"
+#include "reg_rcc.h"
 #include "reg_lsgpio.h"
 #include "io_config.h"
 #include "reg_syscfg.h"
@@ -7,42 +8,45 @@
 #include "ls_dbg.h"
 #include "platform.h"
 #include "le501x.h"
+#include "field_manipulate.h"
 
-gpio_pin_t spi2_clk;
-gpio_pin_t spi2_nss;
-gpio_pin_t spi2_mosi;
-gpio_pin_t spi2_miso;
-gpio_pin_t uart1_txd;
-gpio_pin_t uart1_rxd;
-gpio_pin_t uart1_ck;
-gpio_pin_t uart2_txd;
-gpio_pin_t uart2_rxd;
-gpio_pin_t uart3_txd;
-gpio_pin_t uart3_rxd;
-gpio_pin_t adtim1_ch1;
-gpio_pin_t adtim1_ch1n;
-gpio_pin_t adtim1_ch2;
-gpio_pin_t adtim1_ch2n;
-gpio_pin_t adtim1_ch3;
-gpio_pin_t adtim1_ch3n;
-gpio_pin_t adtim1_ch4;
-gpio_pin_t adtim1_etr;
-gpio_pin_t adtim1_bk;
-gpio_pin_t gptima1_ch1;
-gpio_pin_t gptima1_ch2;
-gpio_pin_t gptima1_ch3;
-gpio_pin_t gptima1_ch4;
-gpio_pin_t gptima1_etr;
-gpio_pin_t gptimb1_ch1;
-gpio_pin_t gptimb1_ch2;
-gpio_pin_t gptimb1_ch3;
-gpio_pin_t gptimb1_ch4;
-gpio_pin_t gptimb1_etr;
-gpio_pin_t gptimc1_ch1;
-gpio_pin_t gptimc1_ch1n;
-gpio_pin_t gptimc1_ch2;
-gpio_pin_t gptimc1_bk;
-
+static gpio_pin_t spi2_clk;
+static gpio_pin_t spi2_nss;
+static gpio_pin_t spi2_mosi;
+static gpio_pin_t spi2_miso;
+static gpio_pin_t uart1_txd;
+static gpio_pin_t uart1_rxd;
+static gpio_pin_t uart1_ck;
+static gpio_pin_t uart2_txd;
+static gpio_pin_t uart2_rxd;
+static gpio_pin_t uart3_txd;
+static gpio_pin_t uart3_rxd;
+static gpio_pin_t adtim1_ch1;
+static gpio_pin_t adtim1_ch1n;
+static gpio_pin_t adtim1_ch2;
+static gpio_pin_t adtim1_ch2n;
+static gpio_pin_t adtim1_ch3;
+static gpio_pin_t adtim1_ch3n;
+static gpio_pin_t adtim1_ch4;
+static gpio_pin_t adtim1_etr;
+static gpio_pin_t adtim1_bk;
+static gpio_pin_t gptima1_ch1;
+static gpio_pin_t gptima1_ch2;
+static gpio_pin_t gptima1_ch3;
+static gpio_pin_t gptima1_ch4;
+static gpio_pin_t gptima1_etr;
+static gpio_pin_t gptimb1_ch1;
+static gpio_pin_t gptimb1_ch2;
+static gpio_pin_t gptimb1_ch3;
+static gpio_pin_t gptimb1_ch4;
+static gpio_pin_t gptimb1_etr;
+static gpio_pin_t gptimc1_ch1;
+static gpio_pin_t gptimc1_ch1n;
+static gpio_pin_t gptimc1_ch2;
+static gpio_pin_t gptimc1_bk;
+static gpio_pin_t pdm_clk;
+static gpio_pin_t pdm_data0;
+static gpio_pin_t pdm_data1;
 
 
 reg_lsgpio_t* GPIO_GetPort(uint8_t Pin_port)
@@ -664,6 +668,42 @@ void adc12b_in8_io_init(void)
 void adc12b_in8_io_deinit(void)
 {
     ain_io_deinit(PA04);
+}
+
+void pdm_clk_io_init(uint8_t pin)
+{
+    *(uint8_t *)&pdm_clk = pin;
+    io_cfg_output(pin);
+    af_io_init((gpio_pin_t *)&pin,AF_PDM_CLK);
+}
+
+void pdm_clk_io_deinit(void)
+{
+    set_gpio_mode((gpio_pin_t *)&pdm_clk);
+}
+
+void pdm_data0_io_init(uint8_t pin)
+{
+    *(uint8_t *)&pdm_data0 = pin;
+    io_cfg_input(pin);
+    af_io_init((gpio_pin_t *)&pin,AF_PDM_DATA0);
+}
+
+void pdm_data0_io_deinit(void)
+{
+    set_gpio_mode((gpio_pin_t *)&pdm_data0);
+}
+
+void pdm_data1_io_init(uint8_t pin)
+{
+    *(uint8_t *)&pdm_data1 = pin;
+    io_cfg_input(pin);
+    af_io_init((gpio_pin_t *)&pin,AF_PDM_DATA1);
+}
+
+void pdm_data1_io_deinit(void)
+{
+    set_gpio_mode((gpio_pin_t *)&pdm_data1);
 }
 
 void EXTI_Handler(void);

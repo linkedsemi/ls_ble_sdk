@@ -9,12 +9,10 @@
 #include "builtin_timer.h"
 #include <string.h>
 #include "co_math.h"
-#include "lsgpio.h"
 #include "le501x.h"
 #include "core_cm0.h"
 #include "reg_syscfg.h"
 #include "compile_flag.h"
-#include "reg_lsqspi.h"
 #include "spi_flash.h"
 #include "sleep.h"
 #include "field_manipulate.h"
@@ -197,7 +195,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart,void *rx_arg)
     {   
         LOG_I("uart server rx buffer overflow!");
     }
-    HAL_UART_Receive_IT(&UART_Server_Config, &uart_server_rx_byte, 1, NULL);
+    HAL_UART_Receive_IT(&UART_Server_Config, &uart_server_rx_byte, 1);
 }
 
 static void ls_uart_server_read_req_ind(uint8_t att_idx, uint8_t con_idx)
@@ -221,7 +219,7 @@ static void ls_uart_server_write_req_ind(uint8_t att_idx, uint8_t con_idx, uint1
         else
         {
             uart_server_tx_busy = true;
-            HAL_UART_Transmit_IT(&UART_Server_Config, (uint8_t*)value, length, NULL);
+            HAL_UART_Transmit_IT(&UART_Server_Config, (uint8_t*)value, length);
         } 
     } 
 }
@@ -253,7 +251,7 @@ static void gap_manager_callback(enum gap_evt_type type,union gap_evt_u *evt,uin
         uart_server_mtu = UART_SERVER_MTU_DFT;
         dev_manager_start_adv(adv_obj_hdl,advertising_data,sizeof(advertising_data),scan_response_data,sizeof(scan_response_data));
         LOG_I("disconnected!");
-        HAL_UART_Receive_IT(&UART_Server_Config, &uart_server_rx_byte, 1, NULL); 
+        HAL_UART_Receive_IT(&UART_Server_Config, &uart_server_rx_byte, 1); 
         builtin_timer_start(deep_sleep_timer_inst, DEEP_SLEEP_TIMEOUT, NULL);
     break;
     case CONN_PARAM_REQ:
@@ -335,7 +333,7 @@ static void dev_manager_callback(enum dev_evt_type type,union dev_evt_u *evt)
         LOG_HEX(addr,sizeof(addr));
         dev_manager_add_service(&ls_uart_server_svc);
 //        ls_uart_init(); 
-//        HAL_UART_Receive_IT(&UART_Server_Config, &uart_server_rx_byte, 1, NULL); 
+//        HAL_UART_Receive_IT(&UART_Server_Config, &uart_server_rx_byte, 1); 
         ls_uart_server_init();
         ls_deep_sleep_timer_init();      
     }

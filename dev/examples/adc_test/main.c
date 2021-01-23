@@ -1,4 +1,3 @@
-#include "lsgpio.h"
 #include "lsadc.h"
 #include "le501x.h"
 #include "reg_lsadc.h"

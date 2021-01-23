@@ -6,7 +6,6 @@
 #include "ls_sig_mesh.h"
 #include "log.h"
 #include "ls_dbg.h"
-#include "lsgpio.h"
 #include "spi_flash.h"
 #include "tinyfs.h"
 #include "tinycrypt/sha256.h"

@@ -1,6 +1,9 @@
 #include "calc_div.h"
 #include "field_manipulate.h"
-#include "reg_calc.h"
+#include "reg_calc_type.h"
+#include "reg_base_addr.h"
+
+#define CALC ((reg_calc_t *)CALC_BASE_ADDR)
 
 void calc_div(uint32_t dividend,uint32_t divisor,bool signed_div,uint32_t *quotient,uint32_t *remainder)
 {

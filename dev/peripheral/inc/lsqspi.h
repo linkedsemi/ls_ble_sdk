@@ -1,7 +1,10 @@
 #ifndef LSQSPI_H_
 #define LSQSPI_H_
 #include <stdbool.h>
-#include "reg_lsqspi.h"
+#include "reg_lsqspi_type.h"
+#include "reg_base_addr.h"
+
+#define LSQSPI ((reg_lsqspi_t *)LSQSPI_BASE_ADDR)
 
 struct lsqspi_instance
 {

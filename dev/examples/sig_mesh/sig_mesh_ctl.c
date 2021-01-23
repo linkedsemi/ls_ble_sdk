@@ -4,7 +4,6 @@
 #include "cpu.h"
 #include "log.h"
 #include "le501x.h"
-#include "lsgpio.h"
 #include "sig_light_cfg.h"
 extern UART_HandleTypeDef UART_SIG_MESH_Config;
 extern struct mesh_model_info model_env;
@@ -53,7 +52,7 @@ void sig_mesh_mdl_state_upd_hdl(struct model_state_upd* msg)
                {
                  memcpy(&check_msg_state_data[0], &msg_state_data[0],4);
                  enter_critical();
-                 HAL_UART_Transmit_IT(&UART_SIG_MESH_Config, &msg_state_data[0], 4, NULL);
+                 HAL_UART_Transmit_IT(&UART_SIG_MESH_Config, &msg_state_data[0], 4);
                  exit_critical();
                }
             }

@@ -204,5 +204,12 @@ void adc12b_in7_io_deinit(void);
 void adc12b_in8_io_init(void);
 void adc12b_in8_io_deinit(void);
 
+void pdm_clk_io_init(uint8_t pin);
+void pdm_clk_io_deinit(void);
+void pdm_data0_io_init(uint8_t pin);
+void pdm_data0_io_deinit(void);
+void pdm_data1_io_init(uint8_t pin);
+void pdm_data1_io_deinit(void);
+
 #endif
 

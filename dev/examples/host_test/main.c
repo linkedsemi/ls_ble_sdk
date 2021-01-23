@@ -5,8 +5,9 @@
 UART_HandleTypeDef UART_Config; 
 static void (*eif_read_callback)(void *,uint8_t);
 static void (*eif_write_callback)(void *,uint8_t);
-
-void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart,void *tx_arg)
+static void *tx_arg;
+static void *rx_arg;
+void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
 {
     if(huart == &UART_Config)
     {
@@ -14,7 +15,7 @@ void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart,void *tx_arg)
     }
 }
 
-void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart,void *rx_arg)
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
     if(huart == &UART_Config)
     {
@@ -25,13 +26,15 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart,void *rx_arg)
 void uart_eif_read(uint8_t *bufptr, uint32_t size, void (*callback)(void *,uint8_t), void* dummy)
 {
     eif_read_callback = callback;
-    HAL_UART_Receive_IT(&UART_Config,bufptr,size,dummy);
+    rx_arg = dummy;
+    HAL_UART_Receive_IT(&UART_Config,bufptr,size);
 }
 
 void uart_eif_write(uint8_t *bufptr, uint32_t size, void (*callback)(void *,uint8_t), void* dummy)
 {
     eif_write_callback = callback;
-    HAL_UART_Transmit_IT(&UART_Config,bufptr,size,dummy);
+    tx_arg = dummy;
+    HAL_UART_Transmit_IT(&UART_Config,bufptr,size);
 }
 
 void uart_eif_flow_on(void)

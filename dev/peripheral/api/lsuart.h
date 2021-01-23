@@ -1,9 +1,20 @@
 #ifndef LSUART_H_
 #define LSUART_H_
 #include <stdbool.h>
-#include "reg_uart.h"
+#include "reg_uart_type.h"
 #include "HAL_def.h"
 #include "sdk_config.h"
+#include "reg_base_addr.h"
+
+#ifdef UART1_BASE_ADDR
+#define UART1 ((reg_uart_t *)UART1_BASE_ADDR)
+#endif
+#ifdef UART2_BASE_ADDR
+#define UART2 ((reg_uart_t *)UART2_BASE_ADDR)
+#endif
+#ifdef UART3_BASE_ADDR
+#define UART3 ((reg_uart_t *)UART3_BASE_ADDR)
+#endif
 
 #if FPGA 
 #define UART_CLOCK   16000000
@@ -64,8 +75,6 @@ typedef struct
                MSBEN:1,
                HwFlowCtl:1;                 /*!< Specifies whether the hardware flow control mode is enabled or disabled.
                                                  This parameter can be a value of @ref UART_Hardware_Flow_Control */
-    uint8_t    Tx_DMA: 1,                   /**< Default DMA Setting for TX. */
-               Rx_DMA: 1;                   /**< Default DMA Setting for RX . */
 } UART_InitTypeDef;
 
 /**
@@ -132,18 +141,28 @@ typedef enum
 /**
   * @brief  UART handle Structure definition
   */
+
+struct UartDMAEnv
+{
+    void                          (*Callback)();
+    uint8_t                       DMA_Channel;
+};
+
+struct UartInterruptEnv
+{
+    uint8_t                       *pBuffPtr;      /*!< Pointer to UART Tx transfer Buffer */
+    uint16_t                      XferCount;      /*!< UART Tx Transfer Counter           */
+};
+
 typedef struct __UART_HandleTypeDef
 {
     reg_uart_t                    *UARTX;           /*!< UART registers base address        */
     UART_InitTypeDef              Init;             /*!< UART communication parameters      */
-
-    uint8_t                       *pTxBuffPtr;      /*!< Pointer to UART Tx transfer Buffer */
-
-    uint8_t                       *pRxBuffPtr;      /*!< Pointer to UART Rx transfer Buffer */
-
-    uint16_t                      TxXferCount;      /*!< UART Tx Transfer Counter           */
-
-    uint16_t                      RxXferCount;      /*!< UART Rx Transfer Counter           */
+    void                          *DMAC_Instance;
+    union{
+        struct UartDMAEnv DMA;
+        struct UartInterruptEnv Interrupt;
+    }Tx_Env,Rx_Env;
 
     HAL_UART_StateTypeDef         gState;           /*!< UART state information related to global Handle management
                                                                 and also related to Tx operations.
@@ -153,8 +172,6 @@ typedef struct __UART_HandleTypeDef
         
     uint32_t                 ErrorCode;        /*!< UART Error code                    */
 
-    void *rx_arg;
-    void *tx_arg;
 } UART_HandleTypeDef;
 
 /** @defgroup UART_Interrupt_definition  UART Interrupt Definitions
@@ -219,7 +236,9 @@ typedef struct __UART_HandleTypeDef
 #define UART_RXFIFORST      0x2     // Receiver FIFO reset
 #define UART_TXFIFORST      0x4     // Transmit FIFO reset
 #define UART_FIFO_RL_1      0x0     // FIFO trigger level   
+#define UART_FIFO_RL_4      0x1
 #define UART_FIFO_RL_8      0x2
+#define UART_FIFO_RL_14     0x3
 #define UART_FIFO_TL_0      0x0     // FIFO trigger level 
 #define UART_FIFO_TL_2      0x1     // FIFO trigger level 
 #define UART_FIFO_TL_4      0x2     // FIFO trigger level 
@@ -233,8 +252,10 @@ HAL_StatusTypeDef HAL_UART_AutoBaudRate_Detect_IT(UART_HandleTypeDef * huart,uin
 /* IO operation functions *******************************************************/
 HAL_StatusTypeDef HAL_UART_Transmit(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size, uint32_t Timeout);
 HAL_StatusTypeDef HAL_UART_Receive(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size,uint32_t Timeout);
-HAL_StatusTypeDef HAL_UART_Transmit_IT(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size, void *tx_arg);
-HAL_StatusTypeDef HAL_UART_Receive_IT(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size,  void *rx_arg);
+HAL_StatusTypeDef HAL_UART_Transmit_IT(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size);
+HAL_StatusTypeDef HAL_UART_Receive_IT(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size);
+HAL_StatusTypeDef HAL_UART_Transmit_DMA(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size,void (*Callback)());
+HAL_StatusTypeDef HAL_UART_Receive_DMA(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size,void (*Callback)());
 
 HAL_StatusTypeDef HAL_UART_Init(UART_HandleTypeDef *huart);
 HAL_StatusTypeDef HAL_UART_DeInit(UART_HandleTypeDef *huart);

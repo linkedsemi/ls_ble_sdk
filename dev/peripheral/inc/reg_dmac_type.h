@@ -1,15 +1,14 @@
-#ifndef REG_DMA_TYPE_H_
-#define REG_DMA_TYPE_H_
+#ifndef REG_DMAC_TYPE_H_
+#define REG_DMAC_TYPE_H_
 #include <stdint.h>
 
-/* register definition */
 typedef struct
 {
-    volatile const uint32_t SR;      //0x0
+    volatile uint32_t SR;      //0x0
     volatile uint32_t CFG;           //0x4
     volatile uint32_t BPTR;          //0x8
-    volatile const uint32_t ALTBPTR; //0xc
-    volatile const uint32_t WREQSR;  //0x10
+    volatile uint32_t ALTBPTR; //0xc
+    volatile uint32_t WREQSR;  //0x10
     volatile uint32_t SWREQ;         //0x14
     volatile uint32_t BSTSET;        //0x18
     volatile uint32_t BSTCLR;        //0x1c
@@ -23,28 +22,17 @@ typedef struct
     volatile uint32_t PRIOCLR;       //0x3c
     volatile uint32_t RESERVED0[3];  //0x40, 0x44, 0x48
     volatile uint32_t ERRCLR;        //0x4c
-} reg_dma_t;
-
-// base address: 0x4001_2000
-typedef struct
-{
-    volatile const uint32_t DONERIF; // 0x00, done interrupt flag
-    volatile const uint32_t ERRRIF;  // 0x04, error interrupt flag
-    uint32_t RESERVED[2];
-    volatile uint32_t DONEICF; // 0x10, done interrupt clear
-    volatile uint32_t ERRICF;  // 0x14, error interrupt clear
-    volatile uint32_t DONEIEF; // 0x18, done interrupt enable
-    volatile uint32_t ERRIEF;  // 0x1c, error interrupt enable
-} reg_dma_int_t;
-
-// base address: 0x4001_2100
-typedef struct
-{
-    volatile uint32_t CHSEL0; // 0x00, channel selection configuration 0, channel 3-0 selection
-    volatile uint32_t CHSEL1; // 0x04, channel selection configuration 1, channel 7-4 selection
-} reg_dma_chsel_t;
-
-/* Register Bit Definition */
+    volatile uint32_t RESERVED1[1004];
+    volatile uint32_t DONERIF; // 0x1000, done interrupt flag
+    volatile uint32_t ERRRIF;  // 0x1004, error interrupt flag
+    volatile uint32_t RESERVED2[2];
+    volatile uint32_t DONEICF; // 0x1010, done interrupt clear
+    volatile uint32_t ERRICF;  // 0x1014, error interrupt clear
+    volatile uint32_t DONEIEF; // 0x1018, done interrupt enable
+    volatile uint32_t ERRIEF;  // 0x101c, error interrupt enable
+    volatile uint32_t RESERVED3[56];
+    volatile uint32_t CHSEL[2]; // 0x1100, 0x1104 channel selection configuration
+} reg_dmac_t;
 
 enum DMA_REG_SR_FIELD
 {
@@ -356,7 +344,6 @@ enum DMA_REG_CHMUX2_FIELD
     DMA_CHMUX2_CH7SEL_POS = 24,
     DMA_CHMUX2_CH7SEL = DMA_CHMUX2_CH7SEL_MASK
 };
-
 
 
 #endif

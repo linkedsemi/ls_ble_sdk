@@ -1,4 +1,3 @@
-#include "lsgpio.h"
 #include "le501x.h"
 #include "sys_stat.h"
 #include "io_config.h"

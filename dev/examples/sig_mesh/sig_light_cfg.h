@@ -6,7 +6,6 @@
 #include "le501x.h"
 #include "platform.h"
 #include "reg_rcc.h"
-#include "lsgpio.h"
 #include "lsuart.h"
 #include "field_manipulate.h"
 #include "io_config.h"

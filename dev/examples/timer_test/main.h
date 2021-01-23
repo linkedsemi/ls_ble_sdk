@@ -2,7 +2,6 @@
 #define __MAIN_H
 
 #include "lstimer.h"
-#include "lsgpio.h"
 #include <string.h>
 
 #define TIMx                           LSGPTIMB

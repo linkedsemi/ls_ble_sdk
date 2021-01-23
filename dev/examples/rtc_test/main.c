@@ -1,5 +1,4 @@
 #include "rtc.h"
-#include "lsgpio.h"
 #include "le501x.h"
 #include "rtc_param.h"
 #include "platform.h"

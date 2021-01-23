@@ -220,14 +220,14 @@ void at_recv(uint8_t c)
 _end:;
 }
 
-void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart, void *tx_arg)
+void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
 {
     uart_tx_busy = false;
 }
-void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart, void *rx_arg)
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
     at_recv(at_recv_char);
-    HAL_UART_Receive_IT(&UART_Server_Config, &at_recv_char, 1, NULL);
+    HAL_UART_Receive_IT(&UART_Server_Config, &at_recv_char, 1);
 }
 
 static void ls_uart_init(void)
@@ -257,7 +257,7 @@ void uart_tx_it(uint8_t *value, uint16_t length)
     else
     {
         uart_tx_busy = true;
-        HAL_UART_Transmit_IT(&UART_Server_Config, value, length, NULL);
+        HAL_UART_Transmit_IT(&UART_Server_Config, value, length);
     }
 }
 
@@ -286,7 +286,7 @@ void at_init(void)
     tinyfs_mkdir(&ble_at_dir, ROOT_DIR, 5);
     at_load_info_from_flash();
     ls_uart_init();
-    HAL_UART_Receive_IT(&UART_Server_Config, &at_recv_char, 1, NULL);
+    HAL_UART_Receive_IT(&UART_Server_Config, &at_recv_char, 1);
 
     uart_server_timer_inst = builtin_timer_create(transparent_timer_handler);
     exit_trans_mode_timer = builtin_timer_create(exit_trans_mode_timer_handler);
