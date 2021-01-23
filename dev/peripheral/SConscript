@@ -6,6 +6,7 @@ src = [
     'src/lscache.c',
     'src/lspdm.c',
     'src/lspdm_dma.c',
+    'src/lsiwdg.c',
     'trng/lstrng.c',
     'ecc/lsecc.c',
     'crypt/lscrypt.c',

@@ -1,5 +1,5 @@
-#ifndef REG_IWDG_TYPE_H_
-#define REG_IWDG_TYPE_H_
+#ifndef REG_LSIWDG_TYPE_H_
+#define REG_LSIWDG_TYPE_H_
 #include <stdint.h>
 
 typedef struct
