@@ -77,8 +77,6 @@ static bool uart_flag_poll(va_list va)
       }
       else
       {
-        huart->gState = HAL_UART_STATE_RESET;
-        huart->RxState = HAL_UART_STATE_RESET;
         return false;
       }
 }
@@ -115,6 +113,7 @@ HAL_StatusTypeDef HAL_UART_Transmit(UART_HandleTypeDef *huart, uint8_t *pData, u
         {
             if(systick_poll_timeout(tickstart,timeout,uart_flag_poll,huart,UART_SR_TFNF))
             {
+                huart->gState = HAL_UART_STATE_READY;
                 return HAL_TIMEOUT;
             }
            else
@@ -131,6 +130,7 @@ HAL_StatusTypeDef HAL_UART_Transmit(UART_HandleTypeDef *huart, uint8_t *pData, u
         // Wait until TX Finish
         if(systick_poll_timeout(tickstart,timeout,uart_flag_poll,huart,UART_SR_TEMT))
         {
+            huart->gState = HAL_UART_STATE_READY;
             return HAL_TIMEOUT;
         }
         /* At end of Tx process, restore huart->gState to Ready */
@@ -177,8 +177,9 @@ HAL_StatusTypeDef HAL_UART_Receive(UART_HandleTypeDef *huart, uint8_t *pData, ui
         /* Check the remain data to be received */
         while (huart->Rx_Env.Interrupt.XferCount > 0U)
         {
-            if(systick_poll_timeout(tickstart,timeout,uart_flag_poll,huart,UART_SR_TFNF))
+            if(systick_poll_timeout(tickstart,timeout,uart_flag_poll,huart,UART_SR_RFNE))
             {
+                huart->RxState = HAL_UART_STATE_READY;
                 return HAL_TIMEOUT;
             }
            else
