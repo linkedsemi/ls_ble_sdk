@@ -427,6 +427,7 @@ static uint16_t record_add_parse(uint16_t section,uint16_t offset,void *buf)
     if(ptr)
     {
         bool del = tinyfs_list_del(&tinyfs_list[ptr->addr.section],ptr);
+        (void)del;
         TINYFS_ASSERT(del);
     }else
     {
@@ -458,6 +459,7 @@ static uint16_t dir_add_parse(uint16_t section,uint16_t offset,void *buf)
     if(ptr)
     {
         bool del = tinyfs_list_del(&tinyfs_list[ptr->addr.section],ptr);
+        (void)del;
         TINYFS_ASSERT(del);
     }else
     {
@@ -981,6 +983,7 @@ static void garbage_collect_try(uint16_t size)
 {
     uint16_t num = 0;
     bool wipe = section_wipe_check(size, &num);
+    (void)wipe;
     TINYFS_ASSERT(wipe);
     uint16_t i=0;
     while(tinyfs_env.free_bytes <= size + tinyfs_list[tinyfs_env.head_section].size
@@ -1231,6 +1234,7 @@ static uint8_t do_tinyfs_write(tinyfs_node_t *parent, uint16_t record_name, uint
     if (record)
     {
         bool del = tinyfs_list_del(&tinyfs_list[record->addr.section],record);
+        (void)del;
         TINYFS_ASSERT(del);
         record_write(record,data,length,parent->u.id);
         return TINYFS_NO_ERROR;
