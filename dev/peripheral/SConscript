@@ -7,6 +7,11 @@ src = [
     'src/lspdm.c',
     'src/lspdm_dma.c',
     'src/lsiwdg.c',
+
+]
+
+if env['IC'] == 'le501x':
+    src += [
     'trng/lstrng.c',
     'ecc/lsecc.c',
     'crypt/lscrypt.c',

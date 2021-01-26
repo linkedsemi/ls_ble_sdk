@@ -69,6 +69,8 @@ def app_build(app_name,src,inc,linkscript = '',mesh = False):
         app_env.Append(LIBS = [target_ble_lib])
         app_env.Depends(app_target,[target_fw])
         stack_hex = target_fw
+    if app_env['IC'] != 'le501x':
+        return app_env,app_target
     if not 'mdk' in app_env['TOOLS']:
         app_hex = app_env.Command('#build/examples/'+app_name+'.hex',app_target,Action('$OBJCOPY -O ihex $SOURCES $TARGET'))
         app_env.Command('#build/examples/'+app_name+'_production.hex',['#build/examples/info_sbl.hex',app_hex,stack_hex],Action('python tools/hexmerge.py $SOURCES > $TARGET'))

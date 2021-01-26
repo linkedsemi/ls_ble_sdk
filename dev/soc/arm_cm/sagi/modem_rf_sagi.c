@@ -269,5 +269,6 @@ static void modem_reg_init()
 void modem_rf_init()
 {
     modem_reg_init();
-    rf_reg_init_fpga();
+    rf_reg_init();
+    //rf_reg_init_fpga();
 }
