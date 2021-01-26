@@ -96,7 +96,7 @@ XIP_BANNED void spi_flash_xip_start()
     {
         return;
     }
-    enter_critical();
+    uint32_t cpu_stat = enter_critical();
     quad_io_read_dummy(1,XIP_MODE_BITS);
     struct lsqspi_direct_read_config_param direct_read_param; //do not initialize this variable with a const struct
     direct_read_param.opcode = QUAD_IO_READ_OPCODE;
@@ -107,7 +107,7 @@ XIP_BANNED void spi_flash_xip_start()
     direct_read_param.mode_bits = XIP_MODE_BITS;
     lsqspi_direct_read_config(&lsqspi_inst,&direct_read_param);
     flash_xip_status = true;
-    exit_critical();
+    exit_critical(cpu_stat);
 }
 
 XIP_BANNED void spi_flash_xip_stop()
@@ -116,10 +116,10 @@ XIP_BANNED void spi_flash_xip_stop()
     {
         return;
     }
-    enter_critical();
+    uint32_t cpu_stat = enter_critical();
     quad_io_read_dummy(0,0);
     flash_xip_status = false;
-    exit_critical();
+    exit_critical(cpu_stat);
 }
 
 XIP_BANNED static void spi_flash_write_enable()
@@ -177,18 +177,18 @@ NOINLINE XIP_BANNED static void flash_reading_critical(void (*func)(void *),void
 static void do_spi_flash_prog_func(void *param);
 XIP_BANNED static void flash_writing_critical(void (*func)(void *),void *param)
 {
-    enter_critical();
+    uint32_t cpu_stat = enter_critical();
     spi_flash_xip_stop();
     spi_flash_write_enable();
     func(param);
     uint32_t writing_end_time = systick_get_value();
     DELAY_US(500);
     flash_writing = true;
-    exit_critical();
+    exit_critical(cpu_stat);
     systick_poll_timeout(writing_end_time,func == do_spi_flash_prog_func ? 1000*SDK_HCLK_MHZ : 6900*SDK_HCLK_MHZ,NULL);
-    enter_critical();
+    cpu_stat = enter_critical();
     spi_flash_write_status_check();
-    exit_critical();
+    exit_critical(cpu_stat);
     flash_writing = false;
     spi_flash_xip_start();
 }
@@ -198,12 +198,12 @@ XIP_BANNED static void flash_writing_critical(void (*func)(void *),void *param)
 
 XIP_BANNED static void flash_writing_critical(void (*func)(void *),void *param)
 {
-    enter_critical();
+    uint32_t cpu_stat = enter_critical();
     spi_flash_xip_stop();
     spi_flash_write_enable();
     func(param);
     flash_writing = true;
-    exit_critical();
+    exit_critical(cpu_stat);
     spi_flash_write_status_check();
     flash_writing = false;
     spi_flash_xip_start();

@@ -51,9 +51,9 @@ void sig_mesh_mdl_state_upd_hdl(struct model_state_upd* msg)
                if (memcmp(&msg_state_data[0],&check_msg_state_data[0],4))
                {
                  memcpy(&check_msg_state_data[0], &msg_state_data[0],4);
-                 enter_critical();
+                 uint32_t cpu_stat = enter_critical();
                  HAL_UART_Transmit_IT(&UART_SIG_MESH_Config, &msg_state_data[0], 4);
-                 exit_critical();
+                 exit_critical(cpu_stat);
                }
             }
         }

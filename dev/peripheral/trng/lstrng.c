@@ -52,12 +52,12 @@ static void lstrng_stop(void)
 uint32_t  lstrng_random(void)
 {
     uint32_t result_random=0;
-    enter_critical();
+    uint32_t cpu_stat = enter_critical();
     lstrng_start();
     result_random = REG_FIELD_RD(LSTRNG->DR, TRNG_DATA);
     lstrng_stop();
     lstrng_deinit();
-    exit_critical();
+    exit_critical(cpu_stat);
     return result_random;
 }
 

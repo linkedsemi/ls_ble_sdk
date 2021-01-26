@@ -298,9 +298,9 @@ uint64_t idiv_acc(uint32_t dividend,uint32_t divisor,bool signed_int)
         uint32_t r0;
         uint32_t r1;
     }*ret_ptr = (void *)&retval;
-    enter_critical();
+    uint32_t cpu_stat = enter_critical();
     calc_div(dividend, divisor, signed_int,&ret_ptr->r0,&ret_ptr->r1);
-    exit_critical();
+    exit_critical(cpu_stat);
     return retval;
 }
 

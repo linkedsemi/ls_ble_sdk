@@ -254,14 +254,14 @@ static void ls_uart_server_write_req_ind(uint8_t att_idx, uint8_t con_idx, uint1
         uart_server_tx_buf[2] = (length >> 8) & 0xff;
         uart_server_tx_buf[3] = con_idx; // what uart will receive should be the real connection index. array_idx is internal.
         memcpy((void*)&uart_server_tx_buf[UART_HEADER_LEN], value, length);
-        enter_critical();
+        uint32_t cpu_stat = enter_critical();
         if(!uart_tx_busy)
         {
             uart_tx_busy = true;
             current_uart_tx_idx = (0 << 7);
             HAL_UART_Transmit_IT(&UART_Config, &uart_server_tx_buf[0], length + UART_HEADER_LEN);
         } 
-        exit_critical();
+        exit_critical(cpu_stat);
     }
     else if (att_idx == UART_SVC_IDX_TX_NTF_CFG)
     {
@@ -271,7 +271,7 @@ static void ls_uart_server_write_req_ind(uint8_t att_idx, uint8_t con_idx, uint1
 }
 static void ls_uart_server_send_notification(void)
 {
-    enter_critical();
+    uint32_t cpu_stat = enter_critical();
     if(con_idx_server != CON_IDX_INVALID_VAL && uart_server_recv_data_length != 0 && uart_server_ntf_done)
     {
         uart_server_ntf_done = false;
@@ -282,7 +282,7 @@ static void ls_uart_server_send_notification(void)
         gatt_manager_server_send_notification(con_idx_server, handle, &uart_server_ble_buf[0], tx_len, NULL);         
         memcpy((void*)&uart_server_ble_buf[0], (void*)&uart_server_ble_buf[tx_len], uart_server_recv_data_length);
     }
-    exit_critical();
+    exit_critical(cpu_stat);
 }
 static void create_adv_obj()
 {
@@ -330,19 +330,19 @@ static void ls_uart_client_recv_ntf_ind(uint8_t handle, uint8_t con_idx, uint16_
         uart_client_tx_buf[2] = (length >> 8) & 0xff;
         uart_client_tx_buf[3] = con_idx; // what uart will receive should be the real connection index. array_idx is internal.
         memcpy((void*)&uart_client_tx_buf[UART_HEADER_LEN], value, length);
-        enter_critical();
+        uint32_t cpu_stat = enter_critical();
         if(!uart_tx_busy)
         {
             uart_tx_busy = true;
             current_uart_tx_idx = (1 << 7);
             HAL_UART_Transmit_IT(&UART_Config, &uart_client_tx_buf[0], length + UART_HEADER_LEN);
         } 
-        exit_critical();
+        exit_critical(cpu_stat);
     }    
 }
 static void ls_uart_client_send_write_req(void)
 {
-    enter_critical();
+    uint32_t cpu_stat = enter_critical();
     if(con_idx_client != CON_IDX_INVALID_VAL && uart_client_recv_data_length != 0 && uart_client_wr_cmd_done) 
     {
         uart_client_wr_cmd_done = false;
@@ -353,7 +353,7 @@ static void ls_uart_client_send_write_req(void)
         gatt_manager_client_write_no_rsp(con_idx_client, uart_client_rx_pointer_handle, &uart_client_ble_buf[0], tx_len);         
         memcpy((void*)&uart_client_ble_buf[0], (void*)&uart_client_ble_buf[tx_len], uart_client_recv_data_length);
     }
-    exit_critical();
+    exit_critical(cpu_stat);
 }
 static void ls_uart_client_service_dis(uint8_t con_idx)
 {
@@ -508,7 +508,7 @@ static void ls_uart_server_client_uart_tx(void)
 #if SLAVE_SERVER_ROLE == 1    
     if (uart_server_tx_buf[0] == UART_SYNC_BYTE)
     {
-        enter_critical();
+        uint32_t cpu_stat = enter_critical();
         if (!uart_tx_busy)
         {
             uint16_t length = (uart_server_tx_buf[2] << 8) | uart_server_tx_buf[1];
@@ -516,13 +516,13 @@ static void ls_uart_server_client_uart_tx(void)
             current_uart_tx_idx = (0 << 7);
             HAL_UART_Transmit_IT(&UART_Config, &uart_server_tx_buf[0], length + UART_HEADER_LEN);
         }
-        exit_critical();
+        exit_critical(cpu_stat);
     }
 #endif
 #if MASTER_CLIENT_ROLE == 1
     if (uart_client_tx_buf[0] == UART_SYNC_BYTE)
     {
-        enter_critical();
+        uint32_t cpu_stat = enter_critical();
         if (!uart_tx_busy)
         {
             uint16_t length = (uart_client_tx_buf[2] << 8) | uart_client_tx_buf[1];
@@ -530,7 +530,7 @@ static void ls_uart_server_client_uart_tx(void)
             current_uart_tx_idx = (1 << 7);
             HAL_UART_Transmit_IT(&UART_Config, &uart_client_tx_buf[0], length + UART_HEADER_LEN);
         }
-        exit_critical();
+        exit_critical(cpu_stat);
     }
 #endif    
 }

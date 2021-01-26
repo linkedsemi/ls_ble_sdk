@@ -368,14 +368,14 @@ static void ls_uart_server_write_req_ind(uint8_t att_idx, uint8_t con_idx, uint1
         uart_server_tx_buf[array_idx][2] = (length >> 8) & 0xff;
         uart_server_tx_buf[array_idx][3] = con_idx; // what uart will receive should be the real connection index. array_idx is internal.
         memcpy((void*)&uart_server_tx_buf[array_idx][UART_HEADER_LEN], value, length);
-        enter_critical();
+        uint32_t cpu_stat = enter_critical();
         if(!uart_tx_busy)
         {
             uart_tx_busy = true;
             current_uart_tx_idx = array_idx | (0 << 7);
             HAL_UART_Transmit_IT(&UART_Server_Config, &uart_server_tx_buf[array_idx][0], length + UART_HEADER_LEN);
         } 
-        exit_critical();
+        exit_critical(cpu_stat);
     }
     else if (att_idx == UART_SVC_IDX_TX_NTF_CFG)
     {
@@ -388,7 +388,7 @@ static void ls_uart_server_send_notification(void)
     for(uint8_t idx = 0; idx < UART_SERVER_MASTER_NUM; idx++)
     {
         uint8_t con_idx = con_idx_array[idx];
-        enter_critical();
+        uint32_t cpu_stat = enter_critical();
         if(con_idx != CON_IDX_INVALID_VAL && uart_server_recv_data_length_array[idx] != 0 && uart_server_ntf_done_array[idx])
         {
             uart_server_ntf_done_array[idx] = false;
@@ -399,7 +399,7 @@ static void ls_uart_server_send_notification(void)
             gatt_manager_server_send_notification(con_idx, handle, &uart_server_ble_buf_array[idx][0], tx_len, NULL);         
             memcpy((void*)&uart_server_ble_buf_array[idx][0], (void*)&uart_server_ble_buf_array[idx][tx_len], uart_server_recv_data_length_array[idx]);
         }
-        exit_critical();
+        exit_critical(cpu_stat);
     }
 }
 static void ls_uart_client_recv_ntf_ind(uint8_t handle, uint8_t con_idx, uint16_t length, uint8_t const *value) 
@@ -415,14 +415,14 @@ static void ls_uart_client_recv_ntf_ind(uint8_t handle, uint8_t con_idx, uint16_
         uart_client_tx_buf[array_idx][2] = (length >> 8) & 0xff;
         uart_client_tx_buf[array_idx][3] = con_idx; // what uart will receive should be the real connection index. array_idx is internal.
         memcpy((void*)&uart_client_tx_buf[array_idx][UART_HEADER_LEN], value, length);
-        enter_critical();
+        uint32_t cpu_stat = enter_critical();
         if(!uart_tx_busy)
         {
             uart_tx_busy = true;
             current_uart_tx_idx = array_idx | (1 << 7);
             HAL_UART_Transmit_IT(&UART_Server_Config, &uart_client_tx_buf[array_idx][0], length + UART_HEADER_LEN);
         } 
-        exit_critical();
+        exit_critical(cpu_stat);
     }    
 }
 static void ls_uart_client_send_write_req(void)
@@ -430,7 +430,7 @@ static void ls_uart_client_send_write_req(void)
     for(uint8_t idx = 0; idx < UART_CLIENT_NUM; idx++)
     {
         uint8_t con_idx = con_idx_client_array[idx];
-        enter_critical();
+        uint32_t cpu_stat = enter_critical();
         if(con_idx != CON_IDX_INVALID_VAL && uart_client_recv_data_length_array[idx] != 0 && uart_client_wr_cmd_done_array[idx]) 
         {
             uart_client_wr_cmd_done_array[idx] = false;
@@ -441,7 +441,7 @@ static void ls_uart_client_send_write_req(void)
             gatt_manager_client_write_no_rsp(con_idx, uart_client_rx_pointer_handle[idx], &uart_client_ble_buf_array[idx][0], tx_len);         
             memcpy((void*)&uart_client_ble_buf_array[idx][0], (void*)&uart_client_ble_buf_array[idx][tx_len], uart_client_recv_data_length_array[idx]);
         }
-        exit_critical();
+        exit_critical(cpu_stat);
     }
 }
 static void ls_uart_server_client_uart_tx(void)
@@ -450,7 +450,7 @@ static void ls_uart_server_client_uart_tx(void)
     {
         if (uart_server_tx_buf[array_idx][0] == UART_SYNC_BYTE)
         {
-            enter_critical();
+            uint32_t cpu_stat = enter_critical();
             if (!uart_tx_busy)
             {
                 uint16_t length = (uart_server_tx_buf[array_idx][2] << 8) | uart_server_tx_buf[array_idx][1];
@@ -458,7 +458,7 @@ static void ls_uart_server_client_uart_tx(void)
                 current_uart_tx_idx = array_idx | (0 << 7);
                 HAL_UART_Transmit_IT(&UART_Server_Config, &uart_server_tx_buf[array_idx][0], length + UART_HEADER_LEN);
             }
-            exit_critical();
+            exit_critical(cpu_stat);
             break;
         }
     }
@@ -467,7 +467,7 @@ static void ls_uart_server_client_uart_tx(void)
     {
         if (uart_client_tx_buf[array_idx][0] == UART_SYNC_BYTE)
         {
-            enter_critical();
+            uint32_t cpu_stat = enter_critical();
             if (!uart_tx_busy)
             {
                 uint16_t length = (uart_client_tx_buf[array_idx][2] << 8) | uart_client_tx_buf[array_idx][1];
@@ -475,7 +475,7 @@ static void ls_uart_server_client_uart_tx(void)
                 current_uart_tx_idx = array_idx | (1 << 7);
                 HAL_UART_Transmit_IT(&UART_Server_Config, &uart_client_tx_buf[array_idx][0], length + UART_HEADER_LEN);
             }
-            exit_critical();
+            exit_critical(cpu_stat);
             break;
         }
     }

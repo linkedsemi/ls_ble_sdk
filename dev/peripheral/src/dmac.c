@@ -32,9 +32,9 @@ void HAL_DMA_Channel_Start_IT(DMA_Controller_HandleTypeDef *hdma,uint8_t ch_idx,
     struct DMA_Channel_Config *altbptr = (struct DMA_Channel_Config *)hdma->Instance->ALTBPTR;
     if(alt) altbptr[ch_idx] = *alt;
     hdma->Instance->DONEICF = 1<<ch_idx;
-    enter_critical();
+    uint32_t cpu_stat = enter_critical();
     hdma->Instance->DONEIEF |= 1<<ch_idx;
-    exit_critical();
+    exit_critical(cpu_stat);
     hdma->Instance->ENSET = 1<<ch_idx;
 }
 
@@ -47,9 +47,9 @@ void HAL_DMA_Controller_IRQHandler(DMA_Controller_HandleTypeDef *hdma)
     {
         if(irq&1<<i)
         {
-            enter_critical();
+            uint32_t cpu_stat = enter_critical();
             hdma->Instance->DONEIEF &= ~(1<<i);
-            exit_critical();
+            exit_critical(cpu_stat);
             struct DMA_Channel_Config *ptr;
             if(hdma->Instance->PRIALTSET)
             {

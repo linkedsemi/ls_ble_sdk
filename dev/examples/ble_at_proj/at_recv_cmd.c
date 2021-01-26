@@ -52,7 +52,7 @@ void at_cmd_recv_cb(void *arg)
         builtin_timer_stop(uart_server_timer_inst);
         if (get_con_status(ls_at_ctl_env.transparent_conidx))
         {
-            enter_critical();
+            uint32_t cpu_stat = enter_critical();
             if (gap_manager_get_role(ls_at_ctl_env.transparent_conidx) == LS_BLE_ROLE_SLAVE) //slave send
             {
                 ble_slave_send_data(ls_at_ctl_env.transparent_conidx, ls_at_env.at_recv_buffer, ls_at_env.at_recv_index);
@@ -63,7 +63,7 @@ void at_cmd_recv_cb(void *arg)
             }
             ls_at_env.at_recv_index = 0;
             ls_at_env.data_sending = 0;
-            exit_critical();
+            exit_critical(cpu_stat);
             if (ls_at_ctl_env.one_slot_send_start && ls_at_ctl_env.one_slot_send_len == 0)
             {
                 ls_at_ctl_env.one_slot_send_start = false;

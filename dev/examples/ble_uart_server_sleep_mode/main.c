@@ -169,10 +169,10 @@ static void ls_uart_server_timer_cb(void *param)
 {
      if(connect_id != 0xff)
     {
-        enter_critical();
+        uint32_t cpu_stat = enter_critical();
         // LOG_I("uart timer out, length=%d", uart_server_rx_index);
         ls_uart_server_send_notification();
-        exit_critical();
+        exit_critical(cpu_stat);
     }
 
     if(uart_server_timer_inst)

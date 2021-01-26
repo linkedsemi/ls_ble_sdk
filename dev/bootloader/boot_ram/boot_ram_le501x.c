@@ -289,12 +289,10 @@ static void fw_copy(struct fota_image_info *ptr,uint32_t image_base)
 
 void boot_ram_start(uint32_t exec_addr)
 {
-    extern uint32_t critical_nested_cnt;
-    critical_nested_cnt = 0;
+    disable_global_irq();
     switch_to_rc32k();
     clk_switch();
     SYSCFG->PMU_PWR = 0;
-    enter_critical();
     systick_start();
     spi_flash_drv_var_init(false,false);
     spi_flash_init();

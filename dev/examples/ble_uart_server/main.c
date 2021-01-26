@@ -129,10 +129,10 @@ static void ls_uart_server_timer_cb(void *param)
 {
     if(connect_id != 0xff)
     {
-        enter_critical();
+        uint32_t cpu_stat = enter_critical();
         // LOG_I("uart timer out, length=%d", uart_server_rx_index);
         ls_uart_server_send_notification();
-        exit_critical();
+        exit_critical(cpu_stat);
     }
     uint8_t input_char = (uint8_t)SEGGER_RTT_GetKey();
     if(connect_id == 0xff && input_char != 0xff && input_char > '0' && input_char <= '9')

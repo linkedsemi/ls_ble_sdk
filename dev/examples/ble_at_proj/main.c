@@ -239,9 +239,9 @@ void ble_slave_send_data(uint8_t con_idx, uint8_t *value, uint16_t len)
         uart_server_ntf_done_array[idx] = false;
         uint16_t handle = gatt_manager_get_svc_att_handle(&ls_uart_server_svc_env, UART_SVC_IDX_TX_VAL);
         uint16_t tx_len = co_min(len, gattc_get_mtu(con_idx)-3);
-        enter_critical();
+        uint32_t cpu_stat = enter_critical();
         gatt_manager_server_send_notification(con_idx, handle, value, tx_len, NULL);
-        exit_critical();
+        exit_critical(cpu_stat);
     }
 }
 
@@ -252,9 +252,9 @@ void ble_master_send_data(uint8_t con_idx, uint8_t *value, uint16_t len)
     {
         uart_client_wr_cmd_done_array[idx] = false;
         uint16_t tx_len = co_min(len, gattc_get_mtu(con_idx)-3);
-        enter_critical();
+        uint32_t cpu_stat = enter_critical();
         gatt_manager_client_write_no_rsp(con_idx, uart_client_rx_pointer_handle[idx], value, tx_len);
-        exit_critical();
+        exit_critical(cpu_stat);
     }
     
 }
@@ -373,9 +373,9 @@ static void ls_uart_client_recv_ntf_ind(uint8_t handle, uint8_t con_idx, uint16_
 {
     uint8_t array_idx = search_client_conidx(con_idx);
     LS_ASSERT(array_idx != 0xff);
-    enter_critical();
+    uint32_t cpu_stat = enter_critical();
     ble_master_recv_data_ind(con_idx, value, length);
-    exit_critical();
+    exit_critical(cpu_stat);
 }
 
 static void gap_manager_callback(enum gap_evt_type type, union gap_evt_u *evt, uint8_t con_idx)

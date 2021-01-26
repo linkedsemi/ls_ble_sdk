@@ -1,10 +1,11 @@
 #ifndef CPU_H_
 #define CPU_H_
 #include <stdbool.h>
+#include <stdint.h>
 
-void enter_critical(void);
+uint32_t enter_critical(void);
 
-void exit_critical(void);
+void exit_critical(uint32_t);
 
 bool in_interrupt(void);
 
