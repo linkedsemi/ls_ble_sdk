@@ -157,11 +157,11 @@ static void flash_reading_critical(void (*func)(void *),void *param)
 
 static void flash_writing_critical(void (*func)(void *),void *param)
 {
-    enter_critical();
+    uint32_t cpu_stat = enter_critical();
     spi_flash_write_enable();
     func(param);
     flash_writing = true;
-    exit_critical();
+    exit_critical(cpu_stat);
     spi_flash_write_status_check();
     flash_writing = false;
 }

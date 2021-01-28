@@ -2,19 +2,16 @@
 #include "cpu.h"
 #include "compile_flag.h"
 
-static uint32_t critical_nested_cnt;
-XIP_BANNED void enter_critical()
+XIP_BANNED uint32_t enter_critical()
 {
+    uint32_t basepri = __get_BASEPRI();
     __set_BASEPRI((1 << (8U - __NVIC_PRIO_BITS)));
-    ++critical_nested_cnt;
+    return basepri;
 }
 
-XIP_BANNED void exit_critical()
+XIP_BANNED void exit_critical(uint32_t cpu_stat)
 {
-    if(--critical_nested_cnt==0)
-    {
-        __set_BASEPRI(0);
-    }
+    __set_BASEPRI(cpu_stat);
 }
 
 bool in_interrupt()
