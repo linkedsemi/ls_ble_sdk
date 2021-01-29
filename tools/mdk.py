@@ -37,7 +37,7 @@ def mdk_builder(target,source,env):
     prj.ScatterFile = scat_file_str
     
     prj.CDefines = "" 
-    prj.COptions = "--c99 -O2 --wchar32" 
+    prj.COptions = "--c99 -O2 " 
     prj.LinkOptions = "--datacompressor=off"
     beforecompile1 = mdk_xml_schema.UserAction('')
     beforecompile2 = mdk_xml_schema.UserAction('')

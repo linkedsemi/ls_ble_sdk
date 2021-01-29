@@ -32,7 +32,8 @@ if env['BASE_ARCH'] == 'rv32':
     env['ARCH_FLAGS'] = ' -mabi=$ABI -march=$ARCH -mstrict-align -msave-restore -msmall-data-limit=0'
     env['AS_ARCH_FLAGS'] = ' -mabi=$ABI -march=$ARCH '
 else:
-    env['ARCH_FLAGS'] = ' -mabi=aapcs -mthumb -mcpu=$CPU -mno-unaligned-access '
+    env['ARCH_FLAGS'] = ' -mabi=aapcs -mthumb -mcpu=$CPU -mno-unaligned-access -fshort-enums -fshort-wchar '
+    env['LD_ARCH_FLAGS'] = ' -Wl,--no-wchar-size-warning -Wl,--no-enum-size-warning '
 
 if 'mdk' in env['TOOLS']:
     env['COMPILER'] = 'armcc'
@@ -41,7 +42,7 @@ else:
     env['COMPILER'] = 'gnu'
     env['CFLAGS'] = '${ARCH_FLAGS} -O2 -Os -std=c11 -g -g3 -ffunction-sections -fdata-sections -fstrict-volatile-bitfields -fno-common -fno-optimize-sibling-calls -Wall'
     env['ASFLAGS'] = '${AS_ARCH_FLAGS} -g '
-    env['LINKFLAGS'] = '${ARCH_FLAGS} -O2 -Os -std=c11 -g -g3 -specs=nano.specs -specs=nosys.specs -T ${LINKSCRIPT} -Wl,-Map=${TARGET.base}.map -Wl,--cref'
+    env['LINKFLAGS'] = '${ARCH_FLAGS} -O2 -Os -std=c11 -g -g3 -specs=nano.specs -specs=nosys.specs -T ${LINKSCRIPT} -Wl,-Map=${TARGET.base}.map -Wl,--cref ${LD_ARCH_FLAGS} '
     env['GC_OPTION'] = ' -Wl,--gc-sections '
 
 env['CPPDEFINES'] = '-D{}'.format(env['IC'].upper())
