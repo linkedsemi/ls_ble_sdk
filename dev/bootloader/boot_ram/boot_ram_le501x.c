@@ -292,6 +292,8 @@ void boot_ram_start(uint32_t exec_addr)
     disable_global_irq();
     switch_to_rc32k();
     clk_switch();
+    REG_FIELD_WR(SYSCFG->PMU_WKUP, SYSCFG_LP_WKUP_CLR,1);
+    DELAY_US(200);
     SYSCFG->PMU_PWR = 0;
     systick_start();
     spi_flash_drv_var_init(false,false);
