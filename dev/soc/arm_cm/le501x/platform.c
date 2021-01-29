@@ -212,7 +212,6 @@ static void module_init()
     rco_calib_mode_set(0);
     rco_calibration_start();
     modem_rf_init();
-    low_power_mode_init();
     irq_init();
     systick_start();
 }
@@ -277,7 +276,6 @@ void sys_init_ll()
     rco_calib_mode_set(0);
     rco_calibration_start();
     modem_rf_init();
-    low_power_mode_init();
     irq_init();
     systick_start();
 }

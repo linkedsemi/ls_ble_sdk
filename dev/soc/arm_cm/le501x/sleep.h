@@ -63,8 +63,6 @@ void dcdc_on(void);
 
 void dcdc_off(void);
 
-void low_power_mode_init(void);
-
 void deep_sleep(void);
 
 void ble_sleep(void);

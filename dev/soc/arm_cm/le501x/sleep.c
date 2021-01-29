@@ -45,8 +45,31 @@ XIP_BANNED static void ble_hclk_clr()
     REG_FIELD_WR(RCC->BLECFG, RCC_BLE_AHBEN, 0);
 }
 
+XIP_BANNED static void normal_sleep_set()
+{
+    SYSCFG->PMU_WKUP = FIELD_BUILD(SYSCFG_SLP_LVL,NORMAL_SLEEP)
+                        | FIELD_BUILD(SYSCFG_WKUP_EN,BLE_WKUP|WDT_WKUP|RTC_WKUP)
+                        | FIELD_BUILD(SYSCFG_WKUP_EDGE,BLE_WKUP_EDGE_RISING|WDT_WKUP_EDGE_RISING|RTC_WKUP_EDGE_RISING);
+}
+
+#if DEBUG_MODE == 0
+XIP_BANNED static void sleep_mode_set()
+{
+    SCB->SCR |= (1<<2);
+    SYSCFG->PMU_WKUP = FIELD_BUILD(SYSCFG_SLP_LVL,SLEEP_MODE0)
+                        | FIELD_BUILD(SYSCFG_WKUP_EN,BLE_WKUP|WDT_WKUP|RTC_WKUP)
+                        | FIELD_BUILD(SYSCFG_WKUP_EDGE,BLE_WKUP_EDGE_RISING|WDT_WKUP_EDGE_RISING|RTC_WKUP_EDGE_RISING);
+}
+#else
+XIP_BANNED static void sleep_mode_set()
+{
+    normal_sleep_set();
+}
+#endif
+
 XIP_BANNED void before_wfi()
 {
+    sleep_mode_set();
     while(REG_FIELD_RD(SYSCFG->PMU_PWR, SYSCFG_BLE_PWR3_ST));
     ble_hclk_clr();
     switch_to_xo16m();
@@ -84,11 +107,12 @@ XIP_BANNED void after_wfi()
 {
     LS_RAM_ASSERT(__NVIC_GetPendingIRQ(LPWKUP_IRQn));
     wkup_stat = REG_FIELD_RD(SYSCFG->PMU_WKUP,SYSCFG_WKUP_STAT);
+    REG_FIELD_WR(SYSCFG->PMU_WKUP, SYSCFG_LP_WKUP_CLR,1);
+    normal_sleep_set();
     if(wkup_stat & WDT_WKUP)
     {
         while(1);
     }
-    REG_FIELD_WR(SYSCFG->PMU_WKUP, SYSCFG_LP_WKUP_CLR,1);
     DELAY_US(200);
     dcdc_on();
     MODIFY_REG(SYSCFG->ANACFG1,SYSCFG_XO16M_ADJ_MASK | SYSCFG_XO16M_LP_MASK,
@@ -174,32 +198,6 @@ static void lvl2_lvl3_io_retention(reg_lsgpio_t *gpiox)
     gpiox->PUPD = pull;
 }
 
-#if DEBUG_MODE == 0
-
-static void cpu_deep_sleep_bit_set()
-{
-    SCB->SCR |= (1<<2);
-}
-
-void low_power_mode_init()
-{
-    SYSCFG->PMU_WKUP = FIELD_BUILD(SYSCFG_SLP_LVL,SLEEP_MODE0)
-                        | FIELD_BUILD(SYSCFG_WKUP_EN,BLE_WKUP|WDT_WKUP)
-                        | FIELD_BUILD(SYSCFG_WKUP_EDGE,BLE_WKUP_EDGE_RISING|WDT_WKUP_EDGE_RISING);
-}
-
-#else
-
-static void cpu_deep_sleep_bit_set(){}
-
-void low_power_mode_init()
-{
-    SYSCFG->PMU_WKUP = FIELD_BUILD(SYSCFG_SLP_LVL,NORMAL_SLEEP)
-                        | FIELD_BUILD(SYSCFG_WKUP_EN,BLE_WKUP|WDT_WKUP)
-                        | FIELD_BUILD(SYSCFG_WKUP_EDGE,BLE_WKUP_EDGE_RISING|WDT_WKUP_EDGE_RISING);
-}
-#endif
-
 static void power_down_hardware_modules()
 {
     if(em_fixed)
@@ -279,7 +277,6 @@ XIP_BANNED void enter_deep_sleep_mode_lvl2_lvl3(struct deep_sleep_wakeup *wakeup
 void deep_sleep()
 {
     power_down_hardware_modules();
-    cpu_deep_sleep_bit_set();
     NVIC->ICER[0] = ~(1<<LPWKUP_IRQn);
     cpu_flash_deep_sleep_and_recover();
     wkup_ble();
