@@ -4,15 +4,17 @@
 #include "field_manipulate.h"
 #include "io_config.h"
 #include "swint_call_asm.h"
+#include "reg_sysc_ble.h"
 void modem_rf_init(void);
 #define ISR_VECTOR_ADDR ((uint32_t *)(0x400000))
 
-void MAC1_Handler(void);
-void MAC2_Handler(void);
-void SWINT1_Handler(void);
-void SWINT2_Handler(void);
+void ble_pkt_isr(void);
+void ble_util_isr(void);
+void SWINT_Handler_ASM(void);
+void swint2_process(void);
 
 __attribute__((weak)) void SystemInit(){
+    SCB->CCR |= SCB_CCR_UNALIGN_TRP_Msk;
     SCB->VTOR = (uint32_t)ISR_VECTOR_ADDR;
 }
 
@@ -79,16 +81,19 @@ void pll_enable()
 void sys_init_itf()
 {
     pll_enable();
-    REG_FIELD_WR(SYSC_AWO->PD_AWO_CLK_CTRL,SYSC_AWO_CLK_SEL_HBUS_L0,4);
-    *(volatile uint32_t *)0x50089020 = 3<<8 | 4 <<0; //uart pin_sel
-    *(volatile uint32_t *)0x5000d044 = 3<<16; // uart pin_sel
+    REG_FIELD_WR(SYSC_AWO->PD_AWO_CLK_CTRL,SYSC_AWO_CLK_SEL_HBUS_L0,2);//16M
+    REG_FIELD_WR(SYSC_AWO->PD_AWO_ANA0,SYSC_AWO_AWO_BG_RES_TRIM,0x33);
+    REG_FIELD_WR(SYSC_AWO->PD_AWO_ANA2,SYSC_AWO_AWO_BG_RBIAS_TRIM,0xf);
+    MODIFY_REG(SYSC_AWO->PD_AWO_ANA1,SYSC_AWO_AWO_XO16M_LP_MASK|SYSC_AWO_AWO_XO16M_CAP_TRIM_MASK,1<<SYSC_AWO_AWO_XO16M_LP_POS | 7<<SYSC_AWO_AWO_XO16M_CAP_TRIM_POS);
     SYSC_AWO->PIN_SEL3 = FIELD_BUILD(SYSC_AWO_MAC_DBG_EN, 0xFFFF);
-    SCB->CCR |= SCB_CCR_UNALIGN_TRP_Msk;
+    //SYSC_AWO->PIN_SEL3 = FIELD_BUILD(SYSC_AWO_MDM_DBG_EN, 0xFFFF);
+
+    SYSC_BLE->PD_BLE_CLKG = SYSC_BLE_CLKG_SET_MAC_MASK | SYSC_BLE_CLKG_SET_MDM_MASK | SYSC_BLE_CLKG_SET_RF_MASK;
     irq_priority();
-    arm_cm_set_int_isr(MAC1_IRQn,MAC1_Handler);
-    arm_cm_set_int_isr(MAC2_IRQn,MAC2_Handler);
-    arm_cm_set_int_isr(SWINT1_IRQn,SWINT1_Handler);
-    arm_cm_set_int_isr(SWINT2_IRQn,SWINT2_Handler);
+    arm_cm_set_int_isr(MAC1_IRQn,ble_pkt_isr);
+    arm_cm_set_int_isr(MAC2_IRQn,ble_util_isr);
+    arm_cm_set_int_isr(SWINT1_IRQn,SWINT_Handler_ASM);
+    arm_cm_set_int_isr(SWINT2_IRQn,swint2_process);
     __NVIC_EnableIRQ(MAC1_IRQn);
     __NVIC_EnableIRQ(MAC2_IRQn);
     __NVIC_EnableIRQ(SWINT1_IRQn);

@@ -20,4 +20,9 @@
 
 #define LSIWDG_BASE_ADDR (0x5000f0080)
 
+#define SYSC_BLE_BASE_ADDR (0x5001a000)
+
+#define MAC_BASE_ADDR (0x50020000)
+
+#define RF_BASE_ADDR (0x50018000)
 #endif

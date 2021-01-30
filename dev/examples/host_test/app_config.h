@@ -4,5 +4,5 @@
 
 #define SDK_DCDC_BYPASS 1
 #define SDK_DEEP_SLEEP_ENABLE 0
-
+#define SDK_HCLK_MHZ 16
 #endif
