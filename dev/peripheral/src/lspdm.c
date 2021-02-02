@@ -58,14 +58,26 @@ HAL_StatusTypeDef HAL_PDM_DeInit(PDM_HandleTypeDef *hpdm)
     return HAL_OK;
 }
 
-HAL_StatusTypeDef HAL_PDM_Start_IT(PDM_HandleTypeDef *hpdm,uint16_t *pFrameBuffer0,uint16_t *pFrameBuffer1,uint16_t FrameNum)
+HAL_StatusTypeDef HAL_PDM_Transfer_Config_IT(PDM_HandleTypeDef *hpdm,uint16_t *pFrameBuffer0,uint16_t *pFrameBuffer1,uint16_t FrameNum)
 {
     hpdm->Env.Interrupt.pFrameBuffer[0] = pFrameBuffer0;
     hpdm->Env.Interrupt.pFrameBuffer[1] = pFrameBuffer1;
     hpdm->Env.Interrupt.FrameNum = FrameNum;
     PDM_INT_CLR(hpdm);
     hpdm->Instance->IER = 1;
-    MODIFY_REG(hpdm->Instance->CR,PDM_CR_DMAEN_MASK | PDM_CR_EN_MASK,1<<PDM_CR_EN_POS);
+    REG_FIELD_WR(hpdm->Instance->CR,PDM_CR_DMAEN,0);
+    return HAL_OK;
+}
+
+HAL_StatusTypeDef HAL_PDM_Start(PDM_HandleTypeDef *hpdm)
+{
+    REG_FIELD_WR(hpdm->Instance->CR,PDM_CR_EN,1);
+    return HAL_OK;
+}
+
+HAL_StatusTypeDef HAL_PDM_Stop(PDM_HandleTypeDef *hpdm)
+{
+    REG_FIELD_WR(hpdm->Instance->CR,PDM_CR_EN,0);
     return HAL_OK;
 }
 

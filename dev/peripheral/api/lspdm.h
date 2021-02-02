@@ -63,9 +63,13 @@ HAL_StatusTypeDef HAL_PDM_Init(PDM_HandleTypeDef *hpdm,PDM_Init_TypeDef *Init);
 
 HAL_StatusTypeDef HAL_PDM_DeInit(PDM_HandleTypeDef *hpdm);
 
-HAL_StatusTypeDef HAL_PDM_Start_IT(PDM_HandleTypeDef *hpdm,uint16_t *pFrameBuffer0,uint16_t *pFrameBuffer1,uint16_t FrameNum);
+HAL_StatusTypeDef HAL_PDM_Transfer_Config_IT(PDM_HandleTypeDef *hpdm,uint16_t *pFrameBuffer0,uint16_t *pFrameBuffer1,uint16_t FrameNum);
 
-HAL_StatusTypeDef HAL_PDM_Start_DMA(PDM_HandleTypeDef *hpdm,uint16_t *pFrameBuffer0,uint16_t *pFrameBuffer1,uint16_t FrameNum,void (*Callback)());
+HAL_StatusTypeDef HAL_PDM_Transfer_Config_DMA(PDM_HandleTypeDef *hpdm,uint16_t *pFrameBuffer0,uint16_t *pFrameBuffer1,uint16_t FrameNum,void (*Callback)());
+
+HAL_StatusTypeDef HAL_PDM_Start(PDM_HandleTypeDef *hpdm);
+
+HAL_StatusTypeDef HAL_PDM_Stop(PDM_HandleTypeDef *hpdm);
 
 void HAL_PDM_IRQHandler(PDM_HandleTypeDef *hpdm);
 

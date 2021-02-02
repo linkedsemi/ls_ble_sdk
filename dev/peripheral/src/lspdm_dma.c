@@ -24,7 +24,7 @@ static void PDM_DMA_CH1_Callback(void *hdma,uint32_t param)
     }
 }
 
-HAL_StatusTypeDef HAL_PDM_Start_DMA(PDM_HandleTypeDef *hpdm,uint16_t *pFrameBuffer0,uint16_t *pFrameBuffer1,uint16_t FrameNum,void (*Callback)())
+HAL_StatusTypeDef HAL_PDM_Transfer_Config_DMA(PDM_HandleTypeDef *hpdm,uint16_t *pFrameBuffer0,uint16_t *pFrameBuffer1,uint16_t FrameNum,void (*Callback)())
 {
     hpdm->Env.DMA.Callback = Callback;
     struct DMA_Channel_Config prim = {
@@ -57,6 +57,6 @@ HAL_StatusTypeDef HAL_PDM_Start_DMA(PDM_HandleTypeDef *hpdm,uint16_t *pFrameBuff
     {
         hpdm->Env.DMA.Channel_Done[1] = true;
     }
-    MODIFY_REG(hpdm->Instance->CR,PDM_CR_DMAEN_MASK | PDM_CR_EN_MASK,3<<PDM_CR_DMAEN_POS | 1<<PDM_CR_EN_POS);
+    REG_FIELD_WR(hpdm->Instance->CR,PDM_CR_DMAEN,1);
     return HAL_OK;
 }
