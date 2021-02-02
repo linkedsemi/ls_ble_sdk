@@ -23,19 +23,45 @@ void HAL_DMA_Controller_DeInit(DMA_Controller_HandleTypeDef *hdma)
     HAL_DMA_Controller_MSP_DeInit(hdma);
 }
 
-void HAL_DMA_Channel_Start_IT(DMA_Controller_HandleTypeDef *hdma,uint8_t ch_idx,uint8_t handshake,struct DMA_Channel_Config *prim,struct DMA_Channel_Config *alt,uint32_t param)
+void HAL_DMA_Channel_Start_IT(DMA_Controller_HandleTypeDef *hdma,uint8_t ch_idx,uint8_t handshake,uint32_t param)
 {
     hdma->channel_param[ch_idx] = param;
     DMA_Handshake_Config(hdma,ch_idx,handshake);
-    struct DMA_Channel_Config *bptr = (struct DMA_Channel_Config *)hdma->Instance->BPTR;
-    if(prim) bptr[ch_idx] = *prim;
-    struct DMA_Channel_Config *altbptr = (struct DMA_Channel_Config *)hdma->Instance->ALTBPTR;
-    if(alt) altbptr[ch_idx] = *alt;
     hdma->Instance->DONEICF = 1<<ch_idx;
     uint32_t cpu_stat = enter_critical();
     hdma->Instance->DONEIEF |= 1<<ch_idx;
     exit_critical(cpu_stat);
     hdma->Instance->ENSET = 1<<ch_idx;
+}
+
+static struct DMA_Channel_Config *Get_DMA_CS_Base(DMA_Controller_HandleTypeDef *hdma,bool alt)
+{
+    struct DMA_Channel_Config *ptr;
+    if(alt)
+    {
+        ptr = (struct DMA_Channel_Config *)hdma->Instance->BPTR;
+    }else
+    {
+        ptr = (struct DMA_Channel_Config *)hdma->Instance->ALTBPTR;
+    }
+    return ptr;
+}
+
+void HAL_DMA_Channel_Config_Set(DMA_Controller_HandleTypeDef *hdma,uint8_t ch_idx,bool alt,struct DMA_Channel_Config *cfg)
+{
+    struct DMA_Channel_Config *ptr = Get_DMA_CS_Base(hdma,alt);
+    ptr[ch_idx] = *cfg;
+}
+
+void HAL_DMA_Channel_Config_Get(DMA_Controller_HandleTypeDef *hdma,uint8_t ch_idx,bool alt,struct DMA_Channel_Config *cfg)
+{
+    struct DMA_Channel_Config *ptr = Get_DMA_CS_Base(hdma,alt);
+    *cfg = ptr[ch_idx];
+}
+
+void HAL_DMA_Channel_Abort(DMA_Controller_HandleTypeDef *hdma,uint8_t ch_idx)
+{
+    hdma->Instance->ENCLR = 1<<ch_idx;
 }
 
 void HAL_DMA_Controller_IRQHandler(DMA_Controller_HandleTypeDef *hdma)
@@ -51,15 +77,18 @@ void HAL_DMA_Controller_IRQHandler(DMA_Controller_HandleTypeDef *hdma)
             hdma->Instance->DONEIEF &= ~(1<<i);
             exit_critical(cpu_stat);
             struct DMA_Channel_Config *ptr;
-            if(hdma->Instance->PRIALTSET)
+            bool alt;
+            if(hdma->Instance->PRIALTSET & 1<<i)
             {
                 ptr = (struct DMA_Channel_Config *)hdma->Instance->ALTBPTR;
+                alt = true;
             }else
             {
                 ptr = (struct DMA_Channel_Config *)hdma->Instance->BPTR;
+                alt = false;
             }
-            void (*cb)(DMA_Controller_HandleTypeDef *,uint32_t) = (void (*)(DMA_Controller_HandleTypeDef *,uint32_t))ptr[i].dummy;
-            cb(hdma,hdma->channel_param[i]);
+            void (*cb)(DMA_Controller_HandleTypeDef *,uint32_t,uint8_t,bool) = (void (*)(DMA_Controller_HandleTypeDef *,uint32_t,uint8_t,bool))ptr[i].dummy;
+            cb(hdma,hdma->channel_param[i],i,alt);
         }
     }
 }

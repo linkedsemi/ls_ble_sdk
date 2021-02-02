@@ -1,5 +1,6 @@
 #ifndef LSDMAC_H_
 #define LSDMAC_H_
+#include <stdbool.h>
 #include "reg_dmac_type.h"
 #include "reg_base_addr.h"
 #include "dmac_config.h"
@@ -65,7 +66,13 @@ void HAL_DMA_Controller_Init(DMA_Controller_HandleTypeDef *hdma,void *cs_ptr);
 
 void HAL_DMA_Controller_DeInit(DMA_Controller_HandleTypeDef *hdma);
 
-void HAL_DMA_Channel_Start_IT(DMA_Controller_HandleTypeDef *hdma,uint8_t ch_idx,uint8_t handshake,struct DMA_Channel_Config *prim,struct DMA_Channel_Config *alt,uint32_t param);
+void HAL_DMA_Channel_Start_IT(DMA_Controller_HandleTypeDef *hdma,uint8_t ch_idx,uint8_t handshake,uint32_t param);
+
+void HAL_DMA_Channel_Config_Set(DMA_Controller_HandleTypeDef *hdma,uint8_t ch_idx,bool alt,struct DMA_Channel_Config *cfg);
+
+void HAL_DMA_Channel_Config_Get(DMA_Controller_HandleTypeDef *hdma,uint8_t ch_idx,bool alt,struct DMA_Channel_Config *cfg);
+
+void HAL_DMA_Channel_Abort(DMA_Controller_HandleTypeDef *hdma,uint8_t ch_idx);
 
 void HAL_DMA_Controller_IRQHandler(DMA_Controller_HandleTypeDef *hdma);
 

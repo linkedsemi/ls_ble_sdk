@@ -75,9 +75,18 @@ HAL_StatusTypeDef HAL_PDM_Start(PDM_HandleTypeDef *hpdm)
     return HAL_OK;
 }
 
+__attribute__((weak)) void HAL_PDM_PingPong_Transfer_Abort(PDM_HandleTypeDef *hpdm,bool stereo){}
+
 HAL_StatusTypeDef HAL_PDM_Stop(PDM_HandleTypeDef *hpdm)
 {
-    REG_FIELD_WR(hpdm->Instance->CR,PDM_CR_EN,0);
+    uint32_t CR = hpdm->Instance->CR;
+    hpdm->Instance->CR = 0;
+    bool dma_en = CR & PDM_CR_DMAEN_MASK ? true : false;
+    bool steoro = CR & PDM_CR_CHN_MASK ? true : false;
+    if(dma_en)
+    {
+        HAL_PDM_PingPong_Transfer_Abort(hpdm,steoro);
+    }
     return HAL_OK;
 }
 

@@ -33,7 +33,8 @@ HAL_StatusTypeDef HAL_UART_Transmit_DMA(UART_HandleTypeDef *huart, uint8_t *pDat
         },
         .dummy = (uint32_t)UART_Transmit_DMA_Callback,
     };
-    HAL_DMA_Channel_Start_IT(huart->DMAC_Instance,huart->Tx_Env.DMA.DMA_Channel,HAL_UART_TX_DMA_Handshake_Get(huart),&prim,NULL,(uint32_t)huart);
+    HAL_DMA_Channel_Config_Set(huart->DMAC_Instance,huart->Tx_Env.DMA.DMA_Channel,false,&prim);
+    HAL_DMA_Channel_Start_IT(huart->DMAC_Instance,huart->Tx_Env.DMA.DMA_Channel,HAL_UART_TX_DMA_Handshake_Get(huart),(uint32_t)huart);
     return HAL_OK;
 }
 
@@ -65,7 +66,8 @@ HAL_StatusTypeDef HAL_UART_Receive_DMA(UART_HandleTypeDef *huart, uint8_t *pData
         },
         .dummy = (uint32_t)UART_Recevie_DMA_Callback,
     };
-    HAL_DMA_Channel_Start_IT(huart->DMAC_Instance,huart->Rx_Env.DMA.DMA_Channel,HAL_UART_RX_DMA_Handshake_Get(huart),&prim,NULL,(uint32_t)huart);
+    HAL_DMA_Channel_Config_Set(huart->DMAC_Instance,huart->Rx_Env.DMA.DMA_Channel,false,&prim);
+    HAL_DMA_Channel_Start_IT(huart->DMAC_Instance,huart->Rx_Env.DMA.DMA_Channel,HAL_UART_RX_DMA_Handshake_Get(huart),(uint32_t)huart);
     return HAL_OK;
 }
 

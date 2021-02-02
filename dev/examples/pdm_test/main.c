@@ -22,7 +22,7 @@ void pdm_interrupt_test()
     HAL_PDM_Transfer_Config_IT(&pdm,Buf0,Buf1,FRAME_BUF_SIZE);
 }
 
-static void pdm_dma_callback()
+static void pdm_dma_callback(uint8_t idx)
 {
     LOG_I("%s",__FUNCTION__);
     HAL_PDM_Transfer_Config_DMA(&pdm,Buf0,Buf1,FRAME_BUF_SIZE,pdm_dma_callback);

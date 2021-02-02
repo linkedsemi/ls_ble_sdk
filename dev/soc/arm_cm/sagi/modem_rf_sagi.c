@@ -230,7 +230,7 @@ static void rf_reg_init()
                | FIELD_BUILD(RF_PPF_RC_BP,1)
                | FIELD_BUILD(RF_LDO_TEST_EN,0)
                | FIELD_BUILD(RF_RD_CLK_EN,1)
-               | FIELD_BUILD(RF_PLL_TEST_EN,1)
+               | FIELD_BUILD(RF_PLL_TEST_EN,0)
                | FIELD_BUILD(RF_CH_SEL,1)
                | FIELD_BUILD(RF_PA_VB_SEL,0)  //  0-rf_ctl      1-cs_ctl
                | FIELD_BUILD(RF_PA_VB_TARGET,0x4)
