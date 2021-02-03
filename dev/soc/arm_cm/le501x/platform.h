@@ -20,7 +20,6 @@ enum OTA_settings_type
 struct reset_retain_struct
 {
     uint32_t reset_reason;
-    uint8_t wakeup_source;
 };
 
 void switch_to_rc32k(void);
@@ -32,6 +31,8 @@ bool clk_check(void);
 void clk_switch(void);
 
 uint8_t get_reset_source(void);
+
+void set_wakeup_source(uint8_t wkup_src);
 
 uint8_t get_wakeup_source(void);
 

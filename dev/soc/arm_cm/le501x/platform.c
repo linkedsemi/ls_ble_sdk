@@ -155,17 +155,6 @@ void rco_calibration_start()
     REG_FIELD_WR(SYSCFG->ANACFG1, SYSCFG_EN_RCO_DIG_PWR, 0);
 }
 
-static void check_wkup_state(void)
-{
-    struct reset_retain_struct *reset_retain_ptr = (struct reset_retain_struct*)RESET_RETAIN_BASE;
-    uint8_t wkup_stat = REG_FIELD_RD(SYSCFG->PMU_WKUP,SYSCFG_WKUP_STAT);
-    if (wkup_stat)
-    {
-        REG_FIELD_WR(SYSCFG->PMU_WKUP, SYSCFG_LP_WKUP_CLR,1);
-        reset_retain_ptr->wakeup_source = wkup_stat;
-    }
-}
-
 uint8_t get_reset_source()
 {
     uint8_t rst_stat = SYSCFG->RSTST;
@@ -173,10 +162,14 @@ uint8_t get_reset_source()
     return rst_stat;
 }
 
+void set_wakeup_source(uint8_t wkup_src)
+{
+    SYSCFG->BKD[6] = wkup_src;
+}
+
 uint8_t get_wakeup_source()
 {
-    struct reset_retain_struct *reset_retain_ptr = (struct reset_retain_struct*)RESET_RETAIN_BASE;
-    return reset_retain_ptr->wakeup_source;
+    return SYSCFG->BKD[6];
 }
 
 void arm_cm_set_int_isr(uint8_t type,void (*isr)())
@@ -194,7 +187,6 @@ void cpu_sleep_recover_init()
 
 static void module_init()
 {
-    check_wkup_state();
     io_init();
     LOG_INIT();
     LOG_I("sys init");
