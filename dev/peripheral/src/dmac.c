@@ -23,14 +23,19 @@ void HAL_DMA_Controller_DeInit(DMA_Controller_HandleTypeDef *hdma)
     HAL_DMA_Controller_MSP_DeInit(hdma);
 }
 
+static void DMA_Enable_IT(reg_dmac_t *reg,uint8_t ch_idx)
+{
+    uint32_t cpu_stat = enter_critical();
+    reg->DONEIEF |= 1<<ch_idx;
+    exit_critical(cpu_stat);
+}
+
 void HAL_DMA_Channel_Start_IT(DMA_Controller_HandleTypeDef *hdma,uint8_t ch_idx,uint8_t handshake,uint32_t param)
 {
     hdma->channel_param[ch_idx] = param;
     DMA_Handshake_Config(hdma,ch_idx,handshake);
     hdma->Instance->DONEICF = 1<<ch_idx;
-    uint32_t cpu_stat = enter_critical();
-    hdma->Instance->DONEIEF |= 1<<ch_idx;
-    exit_critical(cpu_stat);
+    DMA_Enable_IT(hdma->Instance,ch_idx);
     hdma->Instance->ENSET = 1<<ch_idx;
 }
 
@@ -59,9 +64,17 @@ void HAL_DMA_Channel_Config_Get(DMA_Controller_HandleTypeDef *hdma,uint8_t ch_id
     *cfg = ptr[ch_idx];
 }
 
+static void DMA_Disable_IT(reg_dmac_t *reg,uint8_t ch_idx)
+{
+    uint32_t cpu_stat = enter_critical();
+    reg->DONEIEF &= ~(1<<ch_idx);
+    exit_critical(cpu_stat);
+}
+
 void HAL_DMA_Channel_Abort(DMA_Controller_HandleTypeDef *hdma,uint8_t ch_idx)
 {
     hdma->Instance->ENCLR = 1<<ch_idx;
+    DMA_Disable_IT(hdma->Instance,ch_idx);
 }
 
 void HAL_DMA_Controller_IRQHandler(DMA_Controller_HandleTypeDef *hdma)
@@ -73,9 +86,6 @@ void HAL_DMA_Controller_IRQHandler(DMA_Controller_HandleTypeDef *hdma)
     {
         if(irq&1<<i)
         {
-            uint32_t cpu_stat = enter_critical();
-            hdma->Instance->DONEIEF &= ~(1<<i);
-            exit_critical(cpu_stat);
             struct DMA_Channel_Config *ptr;
             bool alt;
             if(hdma->Instance->PRIALTSET & 1<<i)
@@ -86,6 +96,15 @@ void HAL_DMA_Controller_IRQHandler(DMA_Controller_HandleTypeDef *hdma)
             {
                 ptr = (struct DMA_Channel_Config *)hdma->Instance->BPTR;
                 alt = false;
+            }
+            switch(ptr[i].ctrl_data.cycle_ctrl)
+            {
+            case DMA_Cycle_Stop:
+            case DMA_Cycle_Basic:
+                DMA_Disable_IT(hdma->Instance,i);
+            break;
+            default:
+            break;
             }
             void (*cb)(DMA_Controller_HandleTypeDef *,uint32_t,uint8_t,bool) = (void (*)(DMA_Controller_HandleTypeDef *,uint32_t,uint8_t,bool))ptr[i].dummy;
             cb(hdma,hdma->channel_param[i],i,alt);
