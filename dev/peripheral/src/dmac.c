@@ -44,10 +44,10 @@ static struct DMA_Channel_Config *Get_DMA_CS_Base(DMA_Controller_HandleTypeDef *
     struct DMA_Channel_Config *ptr;
     if(alt)
     {
-        ptr = (struct DMA_Channel_Config *)hdma->Instance->BPTR;
+        ptr = (struct DMA_Channel_Config *)hdma->Instance->ALTBPTR;
     }else
     {
-        ptr = (struct DMA_Channel_Config *)hdma->Instance->ALTBPTR;
+        ptr = (struct DMA_Channel_Config *)hdma->Instance->BPTR;
     }
     return ptr;
 }
