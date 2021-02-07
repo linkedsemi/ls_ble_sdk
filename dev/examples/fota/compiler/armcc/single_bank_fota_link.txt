@@ -26,7 +26,7 @@ LR_FLASH FLASH_BASE_USER FLASH_SIZE{
         *(InRoot$$Sections)
         *(+RO)
     }
-    ScatterAssert(ImageLimit(FLASH_CODE) <= FLASH_END)
+    ;ScatterAssert(ImageLimit(FLASH_CODE) <= FLASH_END)
     
     BSS ImageLimit(RAM_DATA_CODE) ALIGN 0x4
     {
