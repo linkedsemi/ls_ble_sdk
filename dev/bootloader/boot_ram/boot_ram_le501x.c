@@ -268,6 +268,7 @@ static void boot_app(uint32_t base)
     uint32_t *msp = (void *)base;
     void (**reset_handler)(void) = (void *)(base + 4);
     __set_MSP(*msp);
+    __enable_irq();
     (*reset_handler)();
 }
 
