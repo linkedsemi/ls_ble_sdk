@@ -39,6 +39,5 @@
         "m_config.h": "c"
     },
     "editor.detectIndentation": false,
-    "python.pythonPath": "C:\\Program Files\\Python38\\python.exe",
     "restructuredtext.confPath": "${workspaceFolder}\\doc",
 }
