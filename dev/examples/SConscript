@@ -14,7 +14,7 @@ if dev_env['IC'] == 'le501x':
     SConscript(dirs = 'ble_at_proj',exports=['app_build'])
     SConscript(dirs = 'ble_hid',exports=['app_build'])
     SConscript(dirs = 'uart_test',exports=['app_build'])
-    #SConscript(dirs = 'adc_test',exports=['app_build'])
+    SConscript(dirs = 'adc_test',exports=['app_build'])
     SConscript(dirs = 'gpio_test',exports=['app_build'])
     SConscript(dirs = 'mesh_app',exports=['app_build'])
     SConscript(dirs = 'ble_uart_server_sleep_mode',exports=['app_build'])

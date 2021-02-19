@@ -9,6 +9,7 @@ src = [
     'integration/lsqspi_msp.c',
     'integration/uart_msp.c',
     'integration/spi_msp.c',
+    'integration/adc_msp.c',
     'integration/modem_rf_le501x.c',
     'integration/calc_acc.c',
     'integration/lscache_msp.c',

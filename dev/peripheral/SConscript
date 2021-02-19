@@ -7,7 +7,8 @@ src = [
     'src/lspdm.c',
     'src/lspdm_dma.c',
     'src/lsiwdg.c',
-
+    'src/lsadc.c',
+    'src/lsadc_ex.c',
 ]
 
 if env['IC'] == 'le501x':
@@ -15,7 +16,6 @@ if env['IC'] == 'le501x':
     'trng/lstrng.c',
     'ecc/lsecc.c',
     'crypt/lscrypt.c',
-    'adc/lsadc.c',
     'timer/lstimer.c',
     'rtc/rtc.c',
     'spi/lsspi.c',
@@ -25,6 +25,7 @@ if env['IC'] == 'le501x':
 if env['IC'] != 'taurus':
     src += ['src/calc_div.c',
             'src/uart_dma.c',
+            'src/adc_dma.c',
             'src/dmac.c',
     ]
 
@@ -32,7 +33,6 @@ inc = [
     'trng',
     'ecc',
     'crypt',
-    'adc',
     'timer',
     'rtc',
     'spi',

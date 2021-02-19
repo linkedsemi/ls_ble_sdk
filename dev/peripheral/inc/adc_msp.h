@@ -1,0 +1,11 @@
+#ifndef ADC_MSP_H_
+#define ADC_MSP_H_
+
+#include "lsadc.h"
+
+void HAL_ADC_MSP_Init(ADC_HandleTypeDef *inst);
+void HAL_ADC_MSP_DeInit(ADC_HandleTypeDef *inst);
+void HAL_ADC_MSP_Busy_Set(ADC_HandleTypeDef *inst);
+void HAL_ADC_MSP_Idle_Set(ADC_HandleTypeDef *inst);
+
+#endif
