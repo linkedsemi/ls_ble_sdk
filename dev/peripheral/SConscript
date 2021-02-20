@@ -9,6 +9,7 @@ src = [
     'src/lsiwdg.c',
     'src/lsadc.c',
     'src/lsadc_ex.c',
+    'src/lsi2c.c',
 ]
 
 if env['IC'] == 'le501x':

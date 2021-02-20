@@ -21,6 +21,10 @@ static gpio_pin_t uart2_txd;
 static gpio_pin_t uart2_rxd;
 static gpio_pin_t uart3_txd;
 static gpio_pin_t uart3_rxd;
+static gpio_pin_t i2c1_scl;
+static gpio_pin_t i2c1_sda;
+static gpio_pin_t i2c2_scl;
+static gpio_pin_t i2c2_sda;
 static gpio_pin_t adtim1_ch1;
 static gpio_pin_t adtim1_ch1n;
 static gpio_pin_t adtim1_ch2;
@@ -248,6 +252,39 @@ void uart1_7816_io_deinit()
 {
     set_gpio_mode((gpio_pin_t *)&uart1_txd);
     set_gpio_mode((gpio_pin_t *)&uart1_ck);
+}
+static void i2c_io_cfg(uint8_t scl,uint8_t sda)
+{
+    io_set_pin(scl);
+    io_set_pin(sda);
+    io_cfg_output(scl);
+	io_cfg_output(sda);
+}
+void iic1_io_init(uint8_t scl,uint8_t sda)
+{
+    *(uint8_t *)&i2c1_scl = scl;
+    *(uint8_t *)&i2c1_sda = sda;
+    i2c_io_cfg( scl, sda);
+    af_io_init((gpio_pin_t *)&scl,AF_I2C1_SCL);
+    af_io_init((gpio_pin_t *)&sda,AF_I2C1_SDA);    
+}
+void iic1_io_deinit()
+{
+    set_gpio_mode((gpio_pin_t *)&i2c1_scl);
+    set_gpio_mode((gpio_pin_t *)&i2c1_sda);
+}
+void iic2_io_init(uint8_t scl,uint8_t sda)
+{
+    *(uint8_t *)&i2c2_scl = scl;
+    *(uint8_t *)&i2c2_sda = sda;
+    i2c_io_cfg( scl, sda);
+    af_io_init((gpio_pin_t *)&scl,AF_I2C2_SCL);
+    af_io_init((gpio_pin_t *)&sda,AF_I2C2_SDA);    
+}
+void iic2_io_deinit()
+{
+    set_gpio_mode((gpio_pin_t *)&i2c2_scl);
+    set_gpio_mode((gpio_pin_t *)&i2c2_sda);
 }
 
 void io_cfg_opendrain(uint8_t pin)

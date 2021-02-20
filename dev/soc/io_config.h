@@ -121,6 +121,8 @@ void spi2_miso_io_deinit(void);
 
 void iic1_io_init(uint8_t scl,uint8_t sda);
 void iic1_io_deinit(void);
+void iic2_io_init(uint8_t scl,uint8_t sda);
+void iic2_io_deinit(void);
 
 void uart1_io_init(uint8_t txd,uint8_t rxd);
 void uart1_io_deinit(void);

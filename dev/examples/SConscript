@@ -24,3 +24,4 @@ if dev_env['IC'] == 'le501x':
     #SConscript(dirs = 'smartcard_test',exports=['app_build'])
     SConscript(dirs = 'spi_test',exports=['app_build'])
     SConscript(dirs = 'pdm_test',exports=['app_build'])
+    SConscript(dirs = 'i2c_test',exports=['app_build'])
