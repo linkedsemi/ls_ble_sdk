@@ -1,13 +1,12 @@
-#include "rtc.h"
+#include "lsrtc.h"
 #include "le501x.h"
-#include "rtc_param.h"
 #include "platform.h"
 #include "io_config.h"
 #include <string.h>
 #include "log.h"
 
-_calendar_time calendar_time;
-_calendar_cal calendar_cal;
+static calendar_time_t calendar_time;
+static calendar_cal_t calendar_cal;
 
 static void rtc_test()
 {
@@ -24,16 +23,19 @@ static void rtc_test()
 int main()
 {
     sys_init_app();
-    // io_init();
-    // io_cfg_output(PB08);
-    // rco_calib_mode_set(0);
-    // rco_calibration_start();
-    RTC_Init();
+    HAL_RTC_Init(RTC_CKSEL_LSI);
     rtc_test();
     while(1)
     {
-        RTC_CalendarGet(&calendar_cal,&calendar_time);
-        LOG_I("%d : %d : %d  %d/%d/%d week = %d",calendar_time.hour,calendar_time.min,calendar_time.sec,calendar_cal.year,calendar_cal.mon,calendar_cal.date,calendar_time.week);
+        uint8_t status = RTC_CalendarGet(&calendar_cal,&calendar_time);
+        if (HAL_OK == status)
+        {
+            LOG_I("%d : %d : %d  %d/%d/%d week = %d",calendar_time.hour,calendar_time.min,calendar_time.sec,calendar_cal.year,calendar_cal.mon,calendar_cal.date,calendar_time.week);
+        }
+        else
+        {
+            LOG_I("Get calendar error!");
+        }
         DELAY_US(1000000);
     }
 

@@ -15,10 +15,10 @@ src = [
     'integration/calc_acc.c',
     'integration/lscache_msp.c',
     'integration/io_config.c',
-    'integration/rtc_param.c',
     'integration/dmac_msp.c',
     'integration/lspdm_msp.c',
     'integration/lsiwdg_msp.c',
+    'integration/rtc_msp.c',
     'sleep.c',
     'sys_stat.c',
 ]

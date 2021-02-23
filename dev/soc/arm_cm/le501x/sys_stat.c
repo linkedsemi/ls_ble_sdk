@@ -3,7 +3,6 @@
 
 struct peri_stat_env
 {
-    bool rtc;
     bool uart1;
     bool uart2;
     bool uart3;
@@ -62,11 +61,6 @@ void i2c1_status_set(bool stat)
 void i2c2_status_set(bool stat)
 {
     peri_stat.i2c2 = stat;
-}
-
-void rtc_status_set(bool stat)
-{
-    peri_stat.rtc = stat;
 }
 
 void adtimer1_status_set(bool stat)

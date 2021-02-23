@@ -25,4 +25,6 @@
 
 #define LSIWDG_BASE_ADDR (0x40021C00)
 
+#define LSRTC_BASE_ADDR (0x40021800)
+
 #endif

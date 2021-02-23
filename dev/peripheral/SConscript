@@ -10,6 +10,7 @@ src = [
     'src/lsadc.c',
     'src/lsadc_ex.c',
     'src/lsi2c.c',
+    'src/lsrtc.c',
 ]
 
 if env['IC'] == 'le501x':
@@ -18,7 +19,6 @@ if env['IC'] == 'le501x':
     'ecc/lsecc.c',
     'crypt/lscrypt.c',
     'timer/lstimer.c',
-    'rtc/rtc.c',
     'spi/lsspi.c',
     'spi/lsi2s.c',
 ]
@@ -35,7 +35,6 @@ inc = [
     'ecc',
     'crypt',
     'timer',
-    'rtc',
     'spi',
     'api',
     'inc',
