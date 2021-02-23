@@ -89,6 +89,7 @@ void HAL_DMA_Controller_IRQHandler(DMA_Controller_HandleTypeDef *hdma)
         {
             struct DMA_Channel_Config *ptr;
             bool alt;
+            hdma->Instance->DONEICF = 1<<i;
             if(current_cs & 1<<i)
             {
                 ptr = (struct DMA_Channel_Config *)hdma->Instance->ALTBPTR;
