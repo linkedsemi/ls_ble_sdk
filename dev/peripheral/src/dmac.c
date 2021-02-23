@@ -80,6 +80,7 @@ void HAL_DMA_Channel_Abort(DMA_Controller_HandleTypeDef *hdma,uint8_t ch_idx)
 void HAL_DMA_Controller_IRQHandler(DMA_Controller_HandleTypeDef *hdma)
 {
     uint8_t i;
+    uint32_t current_cs = hdma->Instance->PRIALTSET;
     uint32_t irq = hdma->Instance->DONERIF & hdma->Instance->DONEIEF;
     uint8_t dma_ch_num = hdma->Instance->SR >> 16 & 0x1f;
     for(i=0;i<dma_ch_num;++i)
@@ -88,7 +89,7 @@ void HAL_DMA_Controller_IRQHandler(DMA_Controller_HandleTypeDef *hdma)
         {
             struct DMA_Channel_Config *ptr;
             bool alt;
-            if(hdma->Instance->PRIALTSET & 1<<i)
+            if(current_cs & 1<<i)
             {
                 ptr = (struct DMA_Channel_Config *)hdma->Instance->ALTBPTR;
                 alt = true;

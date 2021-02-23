@@ -12,25 +12,25 @@ static void DMA_Channel_PingPong_Update(DMA_Controller_HandleTypeDef *hdma,uint8
     HAL_DMA_Channel_Config_Set(hdma,ch_idx,alt,&cfg);
 }
 
-static void PDM_DMA_CH0_Callback(void *hdma,uint32_t param,uint8_t ch_idx,bool alt)
+static void PDM_DMA_CH0_Callback(void *hdma,uint32_t param,uint8_t ch_idx,bool current_alt)
 {
     PDM_HandleTypeDef *hpdm = (PDM_HandleTypeDef *)param;
-    DMA_Channel_PingPong_Update(hdma,ch_idx,alt,&hpdm->Env.DMA.PingPong_Ctrl_Data);
+    DMA_Channel_PingPong_Update(hdma,ch_idx,!current_alt,&hpdm->Env.DMA.PingPong_Ctrl_Data);
     hpdm->Env.DMA.Channel_Done[0] = true;
     if(hpdm->Env.DMA.Channel_Done[1])
     {
-        hpdm->Env.DMA.Callback(alt?1:0);
+        hpdm->Env.DMA.Callback(current_alt?0:1);
     }
 }
 
-static void PDM_DMA_CH1_Callback(void *hdma,uint32_t param,uint8_t ch_idx,bool alt)
+static void PDM_DMA_CH1_Callback(void *hdma,uint32_t param,uint8_t ch_idx,bool current_alt)
 {
     PDM_HandleTypeDef *hpdm = (PDM_HandleTypeDef *)param;
-    DMA_Channel_PingPong_Update(hdma,ch_idx,alt,&hpdm->Env.DMA.PingPong_Ctrl_Data);
+    DMA_Channel_PingPong_Update(hdma,ch_idx,!current_alt,&hpdm->Env.DMA.PingPong_Ctrl_Data);
     hpdm->Env.DMA.Channel_Done[1] = true;
     if(hpdm->Env.DMA.Channel_Done[0])
     {
-        hpdm->Env.DMA.Callback(alt?1:0);
+        hpdm->Env.DMA.Callback(current_alt?0:1);
     }
 }
 
