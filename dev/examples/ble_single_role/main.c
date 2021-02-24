@@ -417,7 +417,7 @@ static void start_scan(void)
     LOG_I("start scan");
 }
 #endif
-void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart,void *tx_arg)
+void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
 {
     LOG_I("tx cplt, current_uart_tx_idx = %d", current_uart_tx_idx);
     uart_tx_busy = false;
@@ -434,7 +434,7 @@ void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart,void *tx_arg)
     }
 #endif    
 }
-void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart,void *rx_arg)
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
     uint16_t len;
     uint8_t con_idx;

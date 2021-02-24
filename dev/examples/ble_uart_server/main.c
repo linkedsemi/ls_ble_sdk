@@ -144,11 +144,11 @@ static void ls_uart_server_timer_cb(void *param)
         builtin_timer_start(uart_server_timer_inst, UART_SERVER_TIMEOUT, NULL); 
     }
 }
-void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart,void *tx_arg)
+void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
 {
     uart_server_tx_busy = false;
 }
-void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart,void *rx_arg)
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
     if(uart_server_rx_index < UART_SVC_BUFFER_SIZE)
     {

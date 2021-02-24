@@ -48,8 +48,6 @@ UART（Universal Asynchronous Receiver/Transmitter）通用异步收发传输器
                     MSBEN:1,
                     HwFlowCtl:1;                 /*!< Specifies whether the hardware flow control mode is enabled or disabled.
                                                      This parameter can be a value of @ref UART_Hardware_Flow_Control */
-        uint8_t     Tx_DMA: 1,                   /**< Default DMA Setting for TX. */
-                    Rx_DMA: 1;                   /**< Default DMA Setting for RX . */
     } UART_InitTypeDef;
 
 提供的配置参数可取值的为如下宏定义：
@@ -132,6 +130,16 @@ UART（Universal Asynchronous Receiver/Transmitter）通用异步收发传输器
 
 串口数据接收和发送数据的模式分为 3 种：非阻塞（中断）模式、阻塞模式、DMA 模式。在使用的时候，这 3 种模式只能选其一，若串口的打开参数 oflags 没有指定使用中断模式或者 DMA 模式，则默认使用轮询模式。
 
+数据收发——阻塞方式
+---------------------------
+
+以阻塞方式接收发送模式使用串口设备的接口如下所示：
+
+.. code ::
+
+    HAL_StatusTypeDef HAL_UART_Transmit(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size, uint32_t Timeout);
+    HAL_StatusTypeDef HAL_UART_Receive(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size,uint32_t Timeout);
+
 数据收发——非阻塞（中断）方式
 -----------------------------
 
@@ -139,20 +147,15 @@ UART（Universal Asynchronous Receiver/Transmitter）通用异步收发传输器
 
 .. code ::
 
-    HAL_StatusTypeDef HAL_UART_Transmit_IT(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size, void *tx_arg);
-    HAL_StatusTypeDef HAL_UART_Receive_IT(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size,  void *rx_arg);
+    HAL_StatusTypeDef HAL_UART_Transmit_IT(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size);
+    HAL_StatusTypeDef HAL_UART_Receive_IT(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size);
 
-
-数据收发——阻塞方式
----------------------------
-
-以非阻塞（中断）方式接收发送模式使用串口设备的接口如下所示：
+以DMA方式接收发送模式使用串口设备的接口如下所示：
 
 .. code ::
 
-    HAL_StatusTypeDef HAL_UART_Transmit(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size, uint32_t Timeout);
-    HAL_StatusTypeDef HAL_UART_Receive(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size,uint32_t Timeout);
-
+    HAL_StatusTypeDef HAL_UART_Transmit_DMA(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size);
+    HAL_StatusTypeDef HAL_UART_Receive_DMA(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size);
 
 初始化以及非阻塞（中断）模式收发的示例如下：
 
@@ -161,31 +164,20 @@ UART（Universal Asynchronous Receiver/Transmitter）通用异步收发传输器
     #include "io_config.h"
     #include "lsuart.h"
     #define TEST_ZONE_SIZE 512
-    uint8_t uart_rx_buf[TEST_ZONE_SIZE * 2] ;
-    uint8_t uart_tx_buf[TEST_ZONE_SIZE * 2] ;
+    uint8_t uart_rx_buf[TEST_ZONE_SIZE] ;
+    uint8_t uart_tx_buf[TEST_ZONE_SIZE] ;
 
     UART_HandleTypeDef UART_Config; 
 
     // UART Transmit complete callback 
-    void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart,void *tx_arg)
-    {
-        //UART disable
-        // HAL_UART_DeInit(huart);
-        // uart1_io_deinit();
-        /*code */
-    
-        /* user code end */
-    
+    void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
+    {    
+        /*note:When entering this function, it means that UART TX is complete*/
     }
     //UART Receive Complete Callback
-    void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart,void *rx_arg)
+    void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
     {
-         //UART disable
-        // HAL_UART_DeInit(huart);
-        // uart1_io_deinit();
-        /*code */
-    
-        /* user code end */
+        /*note:When entering this function, it means that UART RX is complete*/
     }
 
     void uart1_init()

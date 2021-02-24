@@ -250,7 +250,7 @@ static void ls_uart_server_timer_cb(void *param)
         builtin_timer_start(uart_server_timer_inst, UART_SERVER_TIMEOUT, NULL); 
     }
 }
-void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart,void *tx_arg)
+void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
 {
     LOG_I("tx cplt, current_uart_tx_idx = %d", current_uart_tx_idx);
     uart_tx_busy = false;
@@ -263,7 +263,7 @@ void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart,void *tx_arg)
         uart_server_tx_buf[current_uart_tx_idx & 0x7f][0] = 0; // clear server buffer sync byte
     }
 }
-void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart,void *rx_arg)
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
     uint16_t len;
     uint8_t con_idx, array_idx;

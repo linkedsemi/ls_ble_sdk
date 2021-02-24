@@ -2,17 +2,32 @@
 #include "lsuart.h"
 #include "lsdmac.h"
 #include "uart_msp.h"
+#include "uart_misc.h"
 #include "field_manipulate.h"
 
-static void UART_Transmit_DMA_Callback(void *hdma,uint32_t param)
+
+__attribute__((weak)) void HAL_UART_DMA_TxCpltCallback(UART_HandleTypeDef *huart)
+{
+  /* NOTE: This function should not be modified, when the callback is needed,
+           the HAL_UART_DMA_TxCpltCallback could be implemented in the user file
+   */
+}
+
+__attribute__((weak)) void HAL_UART_DMA_RxCpltCallback(UART_HandleTypeDef *huart)
+{
+  /* NOTE: This function should not be modified, when the callback is needed,
+           the HAL_UART_DMA_RxCpltCallback could be implemented in the user file
+   */
+}
+
+static void UART_Transmit_DMA_Callback(void *hdma,uint32_t param,uint8_t DMA_channel,bool alt)
 {
     UART_HandleTypeDef *huart = (UART_HandleTypeDef *)param;
     huart->UARTX->IER = UART_IT_TXS;
 }
 
-HAL_StatusTypeDef HAL_UART_Transmit_DMA(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size,void (*Callback)())
+HAL_StatusTypeDef HAL_UART_Transmit_DMA(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size)
 {
-    huart->Tx_Env.DMA.Callback = Callback;
     huart->UARTX->ICR = UART_IT_TC| UART_IT_TXS;
     REG_FIELD_WR(huart->UARTX->FCR,UART_FCR_TXFL,UART_FIFO_TL_0);
     REG_FIELD_WR(huart->UARTX->MCR,UART_MCR_DMAEN,1);
@@ -38,15 +53,13 @@ HAL_StatusTypeDef HAL_UART_Transmit_DMA(UART_HandleTypeDef *huart, uint8_t *pDat
     return HAL_OK;
 }
 
-static void UART_Recevie_DMA_Callback(void *hdma,uint32_t param)
+static void UART_Recevie_DMA_Callback(void *hdma,uint32_t param,uint8_t DMA_channel,bool alt)
 {
-    UART_HandleTypeDef *huart = (UART_HandleTypeDef *)param;
-    huart->Rx_Env.DMA.Callback();
+    HAL_UART_DMA_RxCpltCallback((UART_HandleTypeDef *)param);
 }
 
-HAL_StatusTypeDef HAL_UART_Receive_DMA(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size,void (*Callback)())
+HAL_StatusTypeDef HAL_UART_Receive_DMA(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size)
 {
-    huart->Rx_Env.DMA.Callback = Callback;
     REG_FIELD_WR(huart->UARTX->FCR,UART_FCR_RXFL,UART_FIFO_RL_14);
     REG_FIELD_WR(huart->UARTX->MCR,UART_MCR_DMAEN,1);
     struct DMA_Channel_Config prim = {
@@ -80,5 +93,5 @@ void UART_Transmit_IT_DMA(UART_HandleTypeDef *huart)
 void UART_EndTransmit_IT_DMA(UART_HandleTypeDef *huart)
 {
     huart->UARTX->IDR = UART_IT_TC;
-    huart->Tx_Env.DMA.Callback();
+    HAL_UART_DMA_TxCpltCallback(huart);
 }

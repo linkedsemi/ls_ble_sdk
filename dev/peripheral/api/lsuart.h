@@ -137,14 +137,8 @@ typedef enum
                                                     Value is allowed for gState only */
 } HAL_UART_StateTypeDef;
 
-
-/**
-  * @brief  UART handle Structure definition
-  */
-
 struct UartDMAEnv
 {
-    void                          (*Callback)();
     uint8_t                       DMA_Channel;
 };
 
@@ -153,6 +147,10 @@ struct UartInterruptEnv
     uint8_t                       *pBuffPtr;      /*!< Pointer to UART Tx transfer Buffer */
     uint16_t                      XferCount;      /*!< UART Tx Transfer Counter           */
 };
+
+/**
+  * @brief  UART handle Structure definition
+  */
 
 typedef struct __UART_HandleTypeDef
 {
@@ -174,52 +172,6 @@ typedef struct __UART_HandleTypeDef
 
 } UART_HandleTypeDef;
 
-/** @defgroup UART_Interrupt_definition  UART Interrupt Definitions
-  *        Elements values convention: 0xY000XXXX
-  *           - XXXX  : Interrupt mask (16 bits) in the Y register
-  *           - Y  : Interrupt source register (2bits)
-  *                   - 0001: CR1 register
-  *                   - 0010: CR2 register
-  *                   - 0011: CR3 register
-  * @{
-  */
-#define HAL_UART_ERROR_NONE              0x00000000U   /*!< No error            */
-#define HAL_UART_ERROR_OE                0x00000002U   /*!< Overrun error       */
-#define HAL_UART_ERROR_PE                0x00000004U   /*!< Parity error        */
-#define HAL_UART_ERROR_FE                0x00000008U   /*!< Frame error         */
-#define HAL_UART_ERROR_DMA               0x00000010U   /*!< DMA transfer error  */
-
-#define UART_IT_RXRD                     (0X0001)
-#define UART_IT_TXS                      (0x0002)
-#define UART_IT_RXS                      (0x0004)
-#define UART_IT_MDDS                     (0x0008)
-#define UART_IT_RTO                      (0x0010)
-#define UART_IT_BUSY                     (0x0020)
-#define UART_IT_ABE                      (0x0040)
-#define UART_IT_ABTO                     (0x0080)
-#define UART_ITLINBK                     (0x0100)
-#define UART_IT_TC                       (0x0200)
-#define UART_IT_EOB                      (0x0400)
-#define UART_IT_CM                       (0x0800)
-
-#define UART_SR_DR                       (0X0001)
-#define UART_SR_OE                       (0X0002)
-#define UART_SR_PE                       (0X0004)
-#define UART_SR_FE                       (0X0008)
-#define UART_SR_BI                       (0X0010)
-#define UART_SR_TBEM                     (0X0020)
-#define UART_SR_TEMT                     (0X0040)
-#define UART_SR_RFE                      (0X0080)
-#define UART_SR_BUSY                     (0X0100)
-#define UART_SR_TFNF                     (0X0200)
-#define UART_SR_TFEN                     (0X0400)
-#define UART_SR_RFNE                     (0X0800)
-#define UART_SR_RFF                      (0X1000)
-#define UART_SR_DCTS                     (0X2000)
-#define UART_SR_CTS                      (0X4000)
-
-#define UART_FCR_RX_DEPTH                (0X0)
-
 #define UART_NOPARITY       0x0     // Parity diable
 #define UART_ODDPARITY      0x1     // Parity Odd
 #define UART_EVENPARITY     0x3     // Parity Even
@@ -232,36 +184,147 @@ typedef struct __UART_HandleTypeDef
 #define UART_STOPBITS1      0x0     // Stop 1 bits
 #define UART_STOPBITS2      0x1     // Stop 2 bits
 
-// UART FIFO Control - FCR
-#define UART_RXFIFORST      0x2     // Receiver FIFO reset
-#define UART_TXFIFORST      0x4     // Transmit FIFO reset
-#define UART_FIFO_RL_1      0x0     // FIFO trigger level   
-#define UART_FIFO_RL_4      0x1
-#define UART_FIFO_RL_8      0x2
-#define UART_FIFO_RL_14     0x3
-#define UART_FIFO_TL_0      0x0     // FIFO trigger level 
-#define UART_FIFO_TL_2      0x1     // FIFO trigger level 
-#define UART_FIFO_TL_4      0x2     // FIFO trigger level 
-#define UART_FIFO_TL_8      0x3
-
 
 HAL_StatusTypeDef HAL_UART_AutoBaudRate_Detect(UART_HandleTypeDef *huart,uint8_t mode);
 HAL_StatusTypeDef HAL_UART_AutoBaudRate_Detect_IT(UART_HandleTypeDef * huart,uint8_t mode);
 
-
-/* IO operation functions *******************************************************/
+/* operation functions *******************************************************/
+/**
+  * @brief  Sends an amount of data in blocking mode.
+  * @note   
+  * @param  huart Pointer to a UART_HandleTypeDef structure that contains
+  *               the configuration information for the specified UART module.
+  * @param  pData Pointer to data buffer (uint8_t data elements).
+  * @param  Size  Amount of data elements (uint8_t) to be sent
+  * @param  Timeout Timeout duration
+  * @retval HAL status
+  */
 HAL_StatusTypeDef HAL_UART_Transmit(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size, uint32_t Timeout);
-HAL_StatusTypeDef HAL_UART_Receive(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size,uint32_t Timeout);
-HAL_StatusTypeDef HAL_UART_Transmit_IT(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size);
-HAL_StatusTypeDef HAL_UART_Receive_IT(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size);
-HAL_StatusTypeDef HAL_UART_Transmit_DMA(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size,void (*Callback)());
-HAL_StatusTypeDef HAL_UART_Receive_DMA(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size,void (*Callback)());
 
+/**
+  * @brief  Receives an amount of data in blocking mode.
+  * @note   
+  * @param  huart Pointer to a UART_HandleTypeDef structure that contains
+  *               the configuration information for the specified UART module.
+  * @param  pData Pointer to data buffer (uint8_t data elements).
+  * @param  Size  Amount of data elements (uint8_t) to be received.
+  * @param  Timeout Timeout duration
+  * @retval HAL status
+  */
+HAL_StatusTypeDef HAL_UART_Receive(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size,uint32_t Timeout);
+
+/**
+  * @brief  Sends an amount of data in non blocking mode.
+  * @note   When UART parity is not enabled (PCE = 0), and Word Length is configured to 9 bits (M1-M0 = 01),
+  *         the sent data is handled as a set of uint16_t. In this case, Size must indicate the number
+  *         of u16 provided through pData.
+  * @param  huart Pointer to a UART_HandleTypeDef structure that contains
+  *               the configuration information for the specified UART module.int_t
+  * @param  pData Pointer to data buffer (uint8_t  data elements).
+  * @param  Size  Amount of data elements (uint8_t) to be sent
+  * @retval HAL status
+  */
+HAL_StatusTypeDef HAL_UART_Transmit_IT(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size);
+
+/**
+  * @brief  Receives an amount of data in non blocking mode.
+  * @note   When UART parity is not enabled (PCE = 0), and Word Length is configured to 9 bits (M1-M0 = 01),
+  *         the received data is handled as a set of u16. In this case, Size must indicate the number
+  *         of u16 available through pData.
+  * @param  huart Pointer to a UART_HandleTypeDef structure that contains
+  *               the configuration information for the specified UART module.
+  * @param  pData Pointer to data buffer (uint8_t data elements).
+  * @param  Size  Amount of data elements (uint8_t) to be received.
+  * @retval HAL status
+  */
+HAL_StatusTypeDef HAL_UART_Receive_IT(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size);
+
+/**
+  * @brief  Sends an amount of data in DMA mode.
+  * @param  huart  Pointer to a UART_HandleTypeDef structure that contains
+  *                the configuration information for the specified UART module.
+  * @param  pData Pointer to data buffer (uint_8 data elements).
+  * @param  Size  Amount of data elements (uint_8) to be sent.
+  * @retval HAL status
+  */
+HAL_StatusTypeDef HAL_UART_Transmit_DMA(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size);
+
+/**
+  * @brief  Receives an amount of data in DMA mode.
+  * @param  huart Pointer to a UART_HandleTypeDef structure that contains
+  *               the configuration information for the specified UART module.
+  * @param  pData Pointer to data buffer (uint_8  data elements).
+  * @param  Size  Amount of data elements (uint_8 ) to be received.
+  * @note   When the UART parity is enabled (PCE = 1) the received data contains the parity bit.
+  * @retval HAL status
+  */
+HAL_StatusTypeDef HAL_UART_Receive_DMA(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size);
+
+/**
+  * @brief  Initializes the UART mode according to the specified parameters in
+  *         the UART_InitTypeDef and create the associated handle.
+  * @param  huart  Pointer to a UART_HandleTypeDef structure that contains
+  *                the configuration information for the specified UART module.
+  * @retval HAL status
+  */
 HAL_StatusTypeDef HAL_UART_Init(UART_HandleTypeDef *huart);
+
+/**
+  * @brief  DeInitializes the UART peripheral.
+  * @param  huart  Pointer to a UART_HandleTypeDef structure that contains
+  *                the configuration information for the specified UART module.
+  * @retval HAL status
+  */
 HAL_StatusTypeDef HAL_UART_DeInit(UART_HandleTypeDef *huart);
+
+/**
+  * @brief  This function handles UARTx interrupt request.
+  * @param  huart  Pointer to a UARTx_HandleTypeDef structure that contains
+  *                the configuration information for the specified UART module.
+  * @retval None
+  */
 void HAL_UARTx_IRQHandler(UART_HandleTypeDef *huart);
 
+/**
+  * @brief  Tx Transfer completed callbacks.
+  * @note  This function needs to be implemented when the callback is needed,
+           the HAL_UART_TxCpltCallback could be implemented in the user file     
+  * @param  huart  Pointer to a UARTx_HandleTypeDef structure that contains
+  *                the configuration information for the specified UART module.
+  * @retval None
+  */
+void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart);
+
+/**
+  * @brief  Rx Transfer completed callbacks.
+  * @note  This function needs to be implemented when the callback is needed,
+           the HAL_UART_RxCpltCallback could be implemented in the user file
+  * @param  huart  Pointer to a UARTx_HandleTypeDef structure that contains
+  *                the configuration information for the specified UART module.
+  * @retval None
+  */
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart);
+
+/**
+  * @brief  DMA UART Tx Transfer completed callbacks.
+  * @note   This function needs to be implemented when the callback is needed,
+           the HAL_UART_DMA_TxCpltCallback could be implemented in the user file
+  * @param  huart  Pointer to a UARTx_HandleTypeDef structure that contains
+  *                the configuration information for the specified UART module.
+  * @retval None
+  */
+void HAL_UART_DMA_TxCpltCallback(UART_HandleTypeDef *huart);
+
+/**
+  * @brief  DMA UART Rx Transfer completed callbacks.
+  * @note  This function needs to be implemented when the callback is needed,
+           the HAL_UART_DMA_RxCpltCallback could be implemented in the user file
+  * @param  huart  Pointer to a UARTx_HandleTypeDef structure that contains
+  *                the configuration information for the specified UART module.
+  * @retval None
+  */
+void HAL_UART_DMA_RxCpltCallback(UART_HandleTypeDef *huart);
 
 
-#endif // _UART_BASE_H_
+#endif // _LSUART_H_
 

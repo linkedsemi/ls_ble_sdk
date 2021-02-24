@@ -2,19 +2,13 @@
 #include <stdio.h>
 #include "lsuart.h"
 #include "uart_msp.h" 
+#include "uart_misc.h"
 #include "field_manipulate.h"
 #include "log.h"
 #include "systick.h"
 
 static void UART_SetConfig(UART_HandleTypeDef *huart);
 
-/**
-  * @brief  Initializes the UART mode according to the specified parameters in
-  *         the UART_InitTypeDef and create the associated handle.
-  * @param  huart  Pointer to a UART_HandleTypeDef structure that contains
-  *                the configuration information for the specified UART module.
-  * @retval HAL status
-  */
 HAL_StatusTypeDef HAL_UART_Init(UART_HandleTypeDef *huart)
 {
     /* Check the UART handle allocation */
@@ -42,12 +36,7 @@ HAL_StatusTypeDef HAL_UART_Init(UART_HandleTypeDef *huart)
 //HAL_StatusTypeDef HAL_LIN_Init(UART_HandleTypeDef *huart, uint32_t BreakDetectLength)
 //HAL_StatusTypeDef HAL_Smartcard_Init(UART_HandleTypeDef *huart, uint8_t Address, uint32_t WakeUpMethod)
 //TODO
-/**
-  * @brief  DeInitializes the UART peripheral.
-  * @param  huart  Pointer to a UART_HandleTypeDef structure that contains
-  *                the configuration information for the specified UART module.
-  * @retval HAL status
-  */
+
 HAL_StatusTypeDef HAL_UART_DeInit(UART_HandleTypeDef *huart)
 {
     /* Check the UART handle allocation */
@@ -81,16 +70,6 @@ static bool uart_flag_poll(va_list va)
       }
 }
 
-/**
-  * @brief  Sends an amount of data in blocking mode.
-  * @note   
-  * @param  huart Pointer to a UART_HandleTypeDef structure that contains
-  *               the configuration information for the specified UART module.
-  * @param  pData Pointer to data buffer (uint8_t data elements).
-  * @param  Size  Amount of data elements (uint8_t) to be sent
-  * @param  Timeout Timeout duration
-  * @retval HAL status
-  */
 HAL_StatusTypeDef HAL_UART_Transmit(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size, uint32_t Timeout)
 {
     uint32_t timeout = Timeout * SDK_PCLK_MHZ * 1000;
@@ -143,16 +122,6 @@ HAL_StatusTypeDef HAL_UART_Transmit(UART_HandleTypeDef *huart, uint8_t *pData, u
     }
 }
 
-/**
-  * @brief  Receives an amount of data in blocking mode.
-  * @note   
-  * @param  huart Pointer to a UART_HandleTypeDef structure that contains
-  *               the configuration information for the specified UART module.
-  * @param  pData Pointer to data buffer (uint8_t data elements).
-  * @param  Size  Amount of data elements (uint8_t) to be received.
-  * @param  Timeout Timeout duration
-  * @retval HAL status
-  */
 HAL_StatusTypeDef HAL_UART_Receive(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size, uint32_t Timeout)
 {
 
@@ -198,17 +167,6 @@ HAL_StatusTypeDef HAL_UART_Receive(UART_HandleTypeDef *huart, uint8_t *pData, ui
     }
 }
 
-/**
-  * @brief  Sends an amount of data in non blocking mode.
-  * @note   When UART parity is not enabled (PCE = 0), and Word Length is configured to 9 bits (M1-M0 = 01),
-  *         the sent data is handled as a set of uint16_t. In this case, Size must indicate the number
-  *         of u16 provided through pData.
-  * @param  huart Pointer to a UART_HandleTypeDef structure that contains
-  *               the configuration information for the specified UART module.int_t
-  * @param  pData Pointer to data buffer (uint8_t  data elements).
-  * @param  Size  Amount of data elements (uint8_t) to be sent
-  * @retval HAL status
-  */
 HAL_StatusTypeDef HAL_UART_Transmit_IT(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size)
 
 {
@@ -243,17 +201,6 @@ HAL_StatusTypeDef HAL_UART_Transmit_IT(UART_HandleTypeDef *huart, uint8_t *pData
     }
 }
 
-/**
-  * @brief  Receives an amount of data in non blocking mode.
-  * @note   When UART parity is not enabled (PCE = 0), and Word Length is configured to 9 bits (M1-M0 = 01),
-  *         the received data is handled as a set of u16. In this case, Size must indicate the number
-  *         of u16 available through pData.
-  * @param  huart Pointer to a UART_HandleTypeDef structure that contains
-  *               the configuration information for the specified UART module.
-  * @param  pData Pointer to data buffer (uint8_t data elements).
-  * @param  Size  Amount of data elements (uint8_t) to be received.
-  * @retval HAL status
-  */
 HAL_StatusTypeDef HAL_UART_Receive_IT(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size)
 {
     /* Check that a Rx process is not already ongoing */
@@ -286,12 +233,7 @@ HAL_StatusTypeDef HAL_UART_Receive_IT(UART_HandleTypeDef *huart, uint8_t *pData,
     }
 }
 
-/**
-  * @brief  Configures the UART peripheral.
-  * @param  huart  Pointer to a UART_HandleTypeDef structure that contains
-  *                the configuration information for the specified UART module.
-  * @retval None
-  */
+
 static void UART_SetConfig(UART_HandleTypeDef *huart)
 {
     /* Check the parameters */
@@ -320,25 +262,13 @@ __attribute__((weak)) void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
    */
 }
 
-/**
-  * @brief  Rx Transfer completed callbacks.
-  * @param  huart  Pointer to a UART_HandleTypeDef structure that contains
-  *                the configuration information for the specified UART module.
-  * @retval None
-  */
 __attribute__((weak)) void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
   /* NOTE: This function should not be modified, when the callback is needed,
-           the HAL_UART_TxCpltCallback could be implemented in the user file
+           the HAL_UART_RxCpltCallback could be implemented in the user file
    */
 }
 
-/**
-  * @brief  Sends an amount of data in non blocking mode.
-  * @param  huart  Pointer to a UART_HandleTypeDef structure that contains
-  *                the configuration information for the specified UART module.
-  * @retval HAL status
-  */
 static void UART_Transmit_IT(UART_HandleTypeDef *huart)
 {
     /* Check that a Tx process is ongoing */
@@ -367,12 +297,6 @@ static void UART_Transmit_IT(UART_HandleTypeDef *huart)
     }
 }
 
-/**
-  * @brief  Wraps up transmission in non blocking mode.
-  * @param  huart  Pointer to a UART_HandleTypeDef structure that contains
-  *                the configuration information for the specified UART module.
-  * @retval HAL status
-  */
 static void UART_EndTransmit_IT(UART_HandleTypeDef *huart)
 {
     /* Disable the UART Transmit Complete Interrupt */
@@ -384,12 +308,6 @@ static void UART_EndTransmit_IT(UART_HandleTypeDef *huart)
     
 }
 
-/**
-  * @brief  Receives an amount of data in non blocking mode
-  * @param  huart  Pointer to a UART_HandleTypeDef structure that contains
-  *                the configuration information for the specified UART module.
-  * @retval HAL status
-  */
 static void UART_Receive_IT(UART_HandleTypeDef *huart)
 {
     uint8_t fifo_level;
@@ -423,13 +341,6 @@ static void UART_Receive_IT(UART_HandleTypeDef *huart)
 __attribute__((weak)) void UART_EndTransmit_IT_DMA(UART_HandleTypeDef *huart){}
 
 __attribute__((weak)) void UART_Transmit_IT_DMA(UART_HandleTypeDef *huart){}
-
-/**
-  * @brief  This function handles UARTx interrupt request.
-  * @param  huart  Pointer to a UARTx_HandleTypeDef structure that contains
-  *                the configuration information for the specified UART module.
-  * @retval None
-  */
 
 void HAL_UARTx_IRQHandler(UART_HandleTypeDef *huart)
 {
