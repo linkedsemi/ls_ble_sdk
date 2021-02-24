@@ -7,4 +7,4 @@
    
    ble_mc
    at_cmd
-   uart_test
+   uart_example

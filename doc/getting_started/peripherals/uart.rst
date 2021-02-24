@@ -3,12 +3,15 @@
 UART
 ======
 
-UART（Universal Asynchronous Receiver/Transmitter）通用异步收发传输器，UART 作为异步串口通信协议的一种，工作原理是将传输数据的每个字符一位接一位地传输。是在应用程序开发过程中使用频率最高的数据总线。
+UART（Universal Asynchronous Receiver/Transmitter）通用异步收发传输器，UART 作为异步串口通信协议的一种，工作原理是将传输数据的每个字符一位接一位地传输。
+
+UART 是在应用程序开发过程中使用次数最多的数据总线。
 
 初始化
 -------
 
-#. 为UART模块配置IO
+设置UART模块的IO
+..................
 
     调用IO 的初始化接口，可以将任意IO配置UART的TX或者RX，与其他设备进行通信。
 
@@ -21,9 +24,10 @@ UART（Universal Asynchronous Receiver/Transmitter）通用异步收发传输器
 .. note ::
 
     芯片的IO 一共有34个，具体情况需根据封装图来定义。
-    | 为了避免不必要的bug，在使用UART通信的时候，请先初始化IO，再进行下诉参数的配置。
+    为了避免不必要的bug，在使用UART通信的时候，请先初始化IO，再进行其余参数的配置。
 
-#. 设置UART模块参数变量
+设置UART模块参数变量
+.....................
 
     设置UART模块的参数变量，其结构体的参数原型如下：
 
@@ -93,7 +97,8 @@ UART（Universal Asynchronous Receiver/Transmitter）通用异步收发传输器
     #define UART_LSB      0x0     // LSBEN
     #define UART_MSB      0x1     // MSBEN
 
-#. 初始化UART模块
+初始化UART模块
+..................
 
     通过初始化接口，应用程序可以对串口设备进行参数配置。
 
@@ -104,7 +109,8 @@ UART（Universal Asynchronous Receiver/Transmitter）通用异步收发传输器
 反初始化
 ---------
 
-#. 反初始化UART模块
+反初始化UART模块
+......................
 
     通过反初始化接口，应用程序可以关闭UART 外设，从而在运行BLE的程序的时候，降低系统的功耗。
 
@@ -112,7 +118,8 @@ UART（Universal Asynchronous Receiver/Transmitter）通用异步收发传输器
 
     HAL_StatusTypeDef HAL_UART_DeInit(UART_HandleTypeDef *huart);
 
-#. 反初始化UART IO
+反初始化UART IO
+...................
 
     反初始化IO接口的主要目的是为了避免在进入低功耗模式时，IO上产生漏电，或者给对接设备发送不必要的数据。
     |调用此接口后,会默认的将UART的TX IO 配置成高电平（但是无输出能力），RX配置成浮空输入模式。
@@ -128,7 +135,7 @@ UART（Universal Asynchronous Receiver/Transmitter）通用异步收发传输器
     UART初始化动作会向系统注册UART进入工作状态，当系统检测到有任一外设处于工作状态时，都不会进入低功耗休眠。
     因此，UART使用完毕，需要进入低功耗状态之前，必须反初始化UART。
 
-串口数据接收和发送数据的模式分为 3 种：非阻塞（中断）模式、阻塞模式、DMA 模式。在使用的时候，这 3 种模式只能选其一，若串口的打开参数 oflags 没有指定使用中断模式或者 DMA 模式，则默认使用轮询模式。
+串口数据接收和发送数据的模式分为 3 种：非阻塞（中断）模式、阻塞模式、DMA 模式。在使用的时候，这 3 种模式只能选其一。
 
 数据收发——阻塞方式
 ---------------------------
@@ -149,6 +156,9 @@ UART（Universal Asynchronous Receiver/Transmitter）通用异步收发传输器
 
     HAL_StatusTypeDef HAL_UART_Transmit_IT(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size);
     HAL_StatusTypeDef HAL_UART_Receive_IT(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size);
+
+数据收发——DMA方式
+-----------------------------
 
 以DMA方式接收发送模式使用串口设备的接口如下所示：
 
@@ -212,3 +222,5 @@ UART（Universal Asynchronous Receiver/Transmitter）通用异步收发传输器
         {
         }
     }
+
+
