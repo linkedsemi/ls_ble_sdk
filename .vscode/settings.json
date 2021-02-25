@@ -36,7 +36,8 @@
         "reg_rcc.h": "c",
         "m_tb_mio.h": "c",
         "m_tb_key.h": "c",
-        "m_config.h": "c"
+        "m_config.h": "c",
+        "lsi2c.h": "c"
     },
     "editor.detectIndentation": false,
     "restructuredtext.confPath": "${workspaceFolder}\\doc",

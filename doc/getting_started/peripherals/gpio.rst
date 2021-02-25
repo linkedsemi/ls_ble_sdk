@@ -75,6 +75,6 @@ GPIO
 
 :ref:`uart_ref` 
 
-
+:ref:`i2c_ref` 
 
 

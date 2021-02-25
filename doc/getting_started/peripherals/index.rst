@@ -6,4 +6,5 @@
 
     gpio
     uart
+    i2c
     
