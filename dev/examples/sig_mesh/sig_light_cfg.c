@@ -160,7 +160,7 @@ void ls_mesh_pwm_init(void)
     light_tim_hdl.Init.ClockDivision = 0;
     light_tim_hdl.Init.CounterMode = TIM_COUNTERMODE_UP;
     light_tim_hdl.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
-    HAL_TIM_PWM_Init(&light_tim_hdl);
+    HAL_TIM_Init(&light_tim_hdl);
 
     light_tim_cfg.OCMode = TIM_OCMODE_PWM1;
     light_tim_cfg.OCPolarity = TIM_OCPOLARITY_HIGH;

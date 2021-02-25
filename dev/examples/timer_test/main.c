@@ -1,302 +1,235 @@
-#include "main.h"
+#include "lstimer.h"
+#include <string.h>
 #include "io_config.h"
-#if 1
-#define PERIOD_VALUE (666 - 1) /* Period Value  */
-#define PULSE1_VALUE 333       /* Capture Compare 1 Value  */
-#define PULSE2_VALUE 249       /* Capture Compare 2 Value  */
-#define PULSE3_VALUE 166       /* Capture Compare 3 Value  */
-#define PULSE4_VALUE 83        /* Capture Compare 4 Value  */
+#include "platform.h"
+#include "log.h"
+
+#define TEST_CASE  0
+
+#if(TEST_CASE==0)
+#define PWM_TEST
+#elif(TEST_CASE==1)
+#define BASIC_TIM_TEST
+#elif(TEST_CASE==2)
+#define DTC_PWM_TEST
+#elif(TEST_CASE==3)
+#define IC_TEST
+#endif
+
+#define TIM_PRESCALER     (SDK_HCLK_MHZ-1)
+#define TIM_PERIOD        (250 - 1) /* Period Value  */
+#define TIM_PULSE1        125       /* Capture Compare 1 Value  */
+#define TIM_PULSE2        200       /* Capture Compare 2 Value  */
+#define TIM_PULSE3        100       /* Capture Compare 3 Value  */
+#define TIM_PULSE4        50        /* Capture Compare 4 Value  */
 
 TIM_HandleTypeDef TimHandle;
-
-/* Timer Output Compare Configuration Structure declaration */
-TIM_OC_InitTypeDef sConfig;
-
-static void Error_Handler(void);
-
-/* Counter Prescaler value */
-uint32_t uhPrescalerValue = 0;
-
-/* Private function prototypes -----------------------------------------------*/
-static void SystemClock_Config(void);
-static void Error_Handler(void);
-
-/* Private functions ---------------------------------------------------------*/
-void HAL_TIM_PWM_MspInit(TIM_HandleTypeDef *htim)
+typedef struct
 {
-    /* TIMx Peripheral clock enable */
-    TIMx_CLK_ENABLE();
+    uint8_t ucStartFlag; // Capture start flag bit
+    uint16_t usCtr;      // Capture reg value
+    uint16_t usPeriod;   // Automatically reload register update flags
+}capture_t;
+capture_t TIM_ICUserValueStructure = {0};
 
-    /* Configure PA00, PA01, PA07, PA08 for PWM output */
+static void Basic_PWM_Output_Cfg(void)
+{
+#ifdef PWM_TEST
+    TIM_OC_InitTypeDef sConfig;
+
     gptimb1_ch1_io_init(PA00, true, 0);
     gptimb1_ch2_io_init(PA01, true, 0);
-    gptimb1_ch3_io_init(PA07, true, 0);
-    gptimb1_ch4_io_init(PA08, true, 0);
-}
-/**
-  * @brief  Main program
-  * @param  None
-  * @retval None
-  */
-int main(void)
-{
-    /* Configure the system clock to 16 MHz */
-    SystemClock_Config();
-
+    gptimb1_ch3_io_init(PB14, true, 0);
+    gptimb1_ch4_io_init(PB15, true, 0);
     /*##-1- Configure the TIM peripheral #######################################*/
-    TimHandle.Instance = TIMx;
-    TimHandle.Init.Prescaler = 0; // 16MHz
-    TimHandle.Init.Period = PERIOD_VALUE;
+    TimHandle.Instance = LSGPTIMB;
+    TimHandle.Init.Prescaler = TIM_PRESCALER; 
+    TimHandle.Init.Period = TIM_PERIOD;
     TimHandle.Init.ClockDivision = 0;
     TimHandle.Init.CounterMode = TIM_COUNTERMODE_UP;
     TimHandle.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
-    if (HAL_TIM_PWM_Init(&TimHandle) != HAL_OK)
-    {
-        /* Initialization Error */
-        Error_Handler();
-    }
+    HAL_TIM_Init(&TimHandle);
 
     /*##-2- Configure the PWM channels #########################################*/
-    /* Common configuration for all channels */
     sConfig.OCMode = TIM_OCMODE_PWM1;
     sConfig.OCPolarity = TIM_OCPOLARITY_HIGH;
     sConfig.OCFastMode = TIM_OCFAST_DISABLE;
 
-    /* Set the pulse value for channel 1 */
-    sConfig.Pulse = PULSE1_VALUE;
-    if (HAL_TIM_PWM_ConfigChannel(&TimHandle, &sConfig, TIM_CHANNEL_1) != HAL_OK)
-    {
-        /* Configuration Error */
-        Error_Handler();
-    }
+    sConfig.Pulse = TIM_PULSE1;
+    HAL_TIM_PWM_ConfigChannel(&TimHandle, &sConfig, TIM_CHANNEL_1);
 
-    /* Set the pulse value for channel 2 */
-    sConfig.OCPolarity = TIM_OCPOLARITY_LOW;
-    sConfig.Pulse = PULSE2_VALUE;
-    if (HAL_TIM_PWM_ConfigChannel(&TimHandle, &sConfig, TIM_CHANNEL_2) != HAL_OK)
-    {
-        /* Configuration Error */
-        Error_Handler();
-    }
-
-    /* Set the pulse value for channel 3 */
     sConfig.OCPolarity = TIM_OCPOLARITY_HIGH;
-    sConfig.Pulse = PULSE3_VALUE;
-    if (HAL_TIM_PWM_ConfigChannel(&TimHandle, &sConfig, TIM_CHANNEL_3) != HAL_OK)
-    {
-        /* Configuration Error */
-        Error_Handler();
-    }
+    sConfig.Pulse = TIM_PULSE2;
+    HAL_TIM_PWM_ConfigChannel(&TimHandle, &sConfig, TIM_CHANNEL_2);
 
-    /* Set the pulse value for channel 4 */
-    sConfig.OCPolarity = TIM_OCPOLARITY_LOW;
-    sConfig.Pulse = PULSE4_VALUE;
-    if (HAL_TIM_PWM_ConfigChannel(&TimHandle, &sConfig, TIM_CHANNEL_4) != HAL_OK)
-    {
-        /* Configuration Error */
-        Error_Handler();
-    }
+    sConfig.OCPolarity = TIM_OCPOLARITY_HIGH;
+    sConfig.Pulse = TIM_PULSE3;
+    HAL_TIM_PWM_ConfigChannel(&TimHandle, &sConfig, TIM_CHANNEL_3);
+
+    sConfig.OCPolarity = TIM_OCPOLARITY_HIGH;
+    sConfig.Pulse = TIM_PULSE4;
+    HAL_TIM_PWM_ConfigChannel(&TimHandle, &sConfig, TIM_CHANNEL_4);
 
     /*##-3- Start PWM signals generation #######################################*/
-    /* Start channel 1 */
-    if (HAL_TIM_PWM_Start(&TimHandle, TIM_CHANNEL_1) != HAL_OK)
-    {
-        /* PWM Generation Error */
-        Error_Handler();
-    }
-    /* Start channel 2 */
-    if (HAL_TIM_PWM_Start(&TimHandle, TIM_CHANNEL_2) != HAL_OK)
-    {
-        /* PWM Generation Error */
-        Error_Handler();
-    }
-    /* Start channel 3 */
-    if (HAL_TIM_PWM_Start(&TimHandle, TIM_CHANNEL_3) != HAL_OK)
-    {
-        /* PWM Generation Error */
-        Error_Handler();
-    }
-    /* Start channel 4 */
-    if (HAL_TIM_PWM_Start(&TimHandle, TIM_CHANNEL_4) != HAL_OK)
-    {
-        /* PWM Generation Error */
-        Error_Handler();
-    }
-
-    /* Infinite loop */
-    while (1)
-    {
-    }
-}
-
-/**
-  * @brief  This function is executed in case of error occurrence.
-  * @param  None
-  * @retval None
-  */
-static void Error_Handler(void)
-{
-    /* Turn LED3 on */
-    //BSP_LED_On(LED3);
-    while (1)
-    {
-    }
-}
+    HAL_TIM_PWM_Start(&TimHandle, TIM_CHANNEL_1);
+    HAL_TIM_PWM_Start(&TimHandle, TIM_CHANNEL_2);
+    HAL_TIM_PWM_Start(&TimHandle, TIM_CHANNEL_3);
+    HAL_TIM_PWM_Start(&TimHandle, TIM_CHANNEL_4);
 #endif
-/**
-  * @brief  System Clock Configuration
-  * @param  None
-  * @retval None
-  */
-static void SystemClock_Config(void)
-{
-    /* switch to 16MHz system clock */
-    REG_FIELD_WR(RCC->CFG, RCC_SYSCLK_SW, 1);
-    REG_FIELD_WR(RCC->CFG, RCC_CKCFG, 1);
 }
 
-#if 0 //带死区互补的PWM输出
-TIM_HandleTypeDef light_tim_hdl;
-TIM_OC_InitTypeDef light_tim_cfg;
-void HAL_TIM_PWM_MspInit(TIM_HandleTypeDef *htim)
+void Basic_Timer_Cfg(void)
 {
-    GPIO_InitTypeDef   GPIO_InitStruct;
-    /*##-1- Enable peripherals and GPIO Clocks #################################*/
-    /* TIMx Peripheral clock enable */
-    __HAL_RCC_ADTIM_CLK_ENABLE();
-    /* Enable all GPIO Channels Clock requested */
-    /* Configure PA00, PA01 for PWM output*/
-    gptimb1_ch1_io_init(PA00,true,0);
-	gptimb1_ch1n_io_init(PA01,true,0);
-}
-
-void main(void)
-{
-    SystemClock_Config();
-    TIM_BreakDeadTimeConfigTypeDef light_tim_bdt;
-
-    light_tim_hdl.Instance = LSADTIM1;
-
-    light_tim_hdl.Init.Prescaler = 63;
-    light_tim_hdl.Init.Period = 249;
-    light_tim_hdl.Init.ClockDivision = 0;
-    light_tim_hdl.Init.CounterMode = TIM_COUNTERMODE_UP;
-    light_tim_hdl.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
-    HAL_TIM_PWM_Init(&light_tim_hdl);
-
-    light_tim_bdt.OffStateRunMode = TIM_OSSR_DISABLE;
-    light_tim_bdt.OffStateIDLEMode = TIM_OSSI_DISABLE;
-    light_tim_bdt.DeadTime = 0x3f;//0~0xFF
-    light_tim_bdt.BreakState = TIM_BREAK_DISABLE;
-    light_tim_bdt.BreakPolarity = TIM_BREAKPOLARITY_HIGH;
-    light_tim_bdt.AutomaticOutput = TIM_AUTOMATICOUTPUT_DISABLE;
-    HAL_TIMEx_ConfigBreakDeadTime(&light_tim_hdl,&light_tim_bdt);
-
-    light_tim_cfg.OCMode = TIM_OCMODE_PWM1;
-    light_tim_cfg.OCPolarity = TIM_OCPOLARITY_HIGH;
-    light_tim_cfg.OCNPolarity = TIM_OCNPOLARITY_HIGH;
-    light_tim_cfg.OCFastMode = TIM_OCFAST_DISABLE;
-
-    light_tim_cfg.Pulse = 25;
-        
-    HAL_TIM_PWM_ConfigChannel(&light_tim_hdl, &light_tim_cfg, TIM_CHANNEL_1); 
-    HAL_TIM_PWM_Start(&light_tim_hdl, TIM_CHANNEL_1);
-    HAL_TIMEx_PWMN_Start(&light_tim_hdl, TIM_CHANNEL_1);
-
-    while(1);
-}
-#endif
-
-#if 0 //不同频率的PWM输出
-TIM_HandleTypeDef light_tim_hdl;
-TIM_HandleTypeDef light_tim_hdl_t;
-TIM_OC_InitTypeDef light_tim_cfg;
-void HAL_TIM_PWM_MspInit(TIM_HandleTypeDef *htim)
-{
-    /*##-1- Enable peripherals and GPIO Clocks #################################*/
-    /* TIMx Peripheral clock enable */
-    __HAL_RCC_ADTIM_CLK_ENABLE();
-    __HAL_RCC_TIM3_CLK_ENABLE();
-    
-    adtim1_ch1_io_init(PA00,true,0);
-    gptimb1_ch1_io_init(PA01,true,0);
-}
-
-void main(void)
-{
-    SystemClock_Config();
-
-    light_tim_hdl.Instance = LSADTIM1;
-    light_tim_hdl.Init.Prescaler = 63;
-    light_tim_hdl.Init.Period = 249;
-    light_tim_hdl.Init.ClockDivision = 0;
-    light_tim_hdl.Init.CounterMode = TIM_COUNTERMODE_UP;
-    light_tim_hdl.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
-    HAL_TIM_PWM_Init(&light_tim_hdl);
-
-    light_tim_hdl_t.Instance = LSGPTIM3;
-    light_tim_hdl_t.Init.Prescaler = 63;
-    light_tim_hdl_t.Init.Period = 499;
-    light_tim_hdl_t.Init.ClockDivision = 0;
-    light_tim_hdl_t.Init.CounterMode = TIM_COUNTERMODE_UP;
-    light_tim_hdl_t.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
-    HAL_TIM_PWM_Init(&light_tim_hdl_t);
-
-    light_tim_cfg.OCMode = TIM_OCMODE_PWM1;
-    light_tim_cfg.OCPolarity = TIM_OCPOLARITY_HIGH;
-    // light_tim_cfg.OCNPolarity = TIM_OCNPOLARITY_HIGH;
-    light_tim_cfg.OCFastMode = TIM_OCFAST_DISABLE;
-    light_tim_cfg.Pulse = 125;
-       
-    HAL_TIM_PWM_ConfigChannel(&light_tim_hdl, &light_tim_cfg, TIM_CHANNEL_1); 
-    HAL_TIM_PWM_Start(&light_tim_hdl, TIM_CHANNEL_1);
-
-    light_tim_cfg.OCPolarity = TIM_OCPOLARITY_HIGH;
-    light_tim_cfg.Pulse = 250;
-    HAL_TIM_PWM_ConfigChannel(&light_tim_hdl_t, &light_tim_cfg, TIM_CHANNEL_1); 
-    HAL_TIM_PWM_Start(&light_tim_hdl_t, TIM_CHANNEL_1);
-
-    while(1);
-}
-#endif
-
-#if 0 //10ms timer 
-TIM_HandleTypeDef light_tim_hdl;
-TIM_OC_InitTypeDef light_tim_cfg;
-void gpio_test_init(void)
-{
+#ifdef BASIC_TIM_TEST  
     io_cfg_output(PA00);
     io_write_pin(PA00,0);
-}
-uint16_t time;
-void main(void)
-{
-    SystemClock_Config();
-    gpio_test_init();
 
-    __HAL_RCC_BTIM_CLK_ENABLE();
-    light_tim_hdl.Instance = LSBSTIM1;
-    light_tim_hdl.Init.Prescaler = 15;
-    light_tim_hdl.Init.Period = 9999;
-    light_tim_hdl.Init.ClockDivision = 0;
-    light_tim_hdl.Init.CounterMode = TIM_COUNTERMODE_UP;
-    //light_tim_hdl.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
-    HAL_TIM_PWM_Init(&light_tim_hdl);
-
-    NVIC_SetPriority(BSTIM1_IRQn, 1);
-    NVIC_EnableIRQ(BSTIM1_IRQn);
-
-    HAL_TIM_Base_Start_IT(&light_tim_hdl);
-    while(1);
+    TimHandle.Instance           = LSBSTIM;
+    TimHandle.Init.Prescaler     = TIM_PRESCALER;
+    TimHandle.Init.Period        = TIM_PERIOD;
+    TimHandle.Init.ClockDivision = 0;
+    TimHandle.Init.CounterMode   = TIM_COUNTERMODE_UP;
+    HAL_TIM_Init(&TimHandle);
+    HAL_TIM_Base_Start_IT(&TimHandle);
+#endif
 }
 
-void BSTIM1_Handler(void)
+static void DeadTime_Complementary_PWM_Cfg(void)
 {
-    HAL_TIM_IRQHandler(&light_tim_hdl);
+#ifdef DTC_PWM_TEST
+    adtim1_ch1_io_init(PA00,true,0);
+    adtim1_ch1n_io_init(PA01);
+    TIM_BreakDeadTimeConfigTypeDef BDT_Config;
+    TIM_OC_InitTypeDef sConfig;
+    TimHandle.Instance = LSADTIM;
+    TimHandle.Init.Prescaler = TIM_PRESCALER;
+    TimHandle.Init.Period = TIM_PERIOD;
+    TimHandle.Init.ClockDivision = 0;
+    TimHandle.Init.CounterMode = TIM_COUNTERMODE_UP;
+    TimHandle.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+    HAL_TIM_Init(&TimHandle);
+
+    BDT_Config.OffStateRunMode = TIM_OSSR_DISABLE;
+    BDT_Config.OffStateIDLEMode = TIM_OSSI_DISABLE;
+    BDT_Config.LockLevel = TIM_LOCKLEVEL_OFF;
+    BDT_Config.DeadTime = 0x3f;//0~0xFF
+    BDT_Config.BreakState = TIM_BREAK_DISABLE;
+    BDT_Config.BreakPolarity = TIM_BREAKPOLARITY_HIGH;
+    BDT_Config.AutomaticOutput = TIM_AUTOMATICOUTPUT_DISABLE;
+    HAL_TIMEx_ConfigBreakDeadTime(&TimHandle,&BDT_Config);
+
+    sConfig.OCMode = TIM_OCMODE_PWM1;
+    sConfig.OCPolarity = TIM_OCPOLARITY_HIGH;
+    sConfig.OCNPolarity = TIM_OCNPOLARITY_HIGH;
+    sConfig.OCFastMode = TIM_OCFAST_DISABLE;
+    sConfig.Pulse = TIM_PULSE3;
+        
+    HAL_TIM_PWM_ConfigChannel(&TimHandle, &sConfig, TIM_CHANNEL_1);
+    HAL_TIM_PWM_Start(&TimHandle, TIM_CHANNEL_1);
+    HAL_TIMEx_PWMN_Start(&TimHandle, TIM_CHANNEL_1);
+#endif
+}
+
+static void Input_Capture_Measurement_Cfg(void)
+{
+#ifdef IC_TEST
+    TIM_IC_InitTypeDef ICConfig;
+    //Toggle IO Cfg
+    io_cfg_output(PA01);
+    io_write_pin(PA01,0);
+    //Input Capture IO Cfg 
+    gptimc1_ch1_io_init(PA00,false,0);
+    io_pull_write(PA00,IO_PULL_DOWN);
+
+    TimHandle.Instance = LSGPTIMC;
+    TimHandle.Init.Prescaler = TIM_PRESCALER;
+    TimHandle.Init.Period = 0xFFFF;
+    TimHandle.Init.ClockDivision = 0;
+    TimHandle.Init.CounterMode = TIM_COUNTERMODE_UP;
+    TimHandle.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+    HAL_TIM_Init(&TimHandle);
+
+    ICConfig.ICPolarity = TIM_INPUTCHANNELPOLARITY_RISING;
+    ICConfig.ICSelection = TIM_ICSELECTION_DIRECTTI;
+    ICConfig.ICPrescaler = TIM_ICPSC_DIV1;
+    ICConfig.ICFilter = 0;
+    HAL_TIM_IC_ConfigChannel(&TimHandle, &ICConfig, TIM_CHANNEL_1);
+
+    HAL_TIM_Base_Start_IT(&TimHandle);  
+    HAL_TIM_IC_Start_IT(&TimHandle,TIM_CHANNEL_1);
+#endif
 }
 
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
-    io_toggle_pin(PA00);
+    if(htim->Instance == LSBSTIM)
+    {
+        #ifdef BASIC_TIM_TEST 
+        io_toggle_pin(PA00);
+        #endif
+    }
+    else if(htim->Instance == LSGPTIMC)
+    {
+        #ifdef IC_TEST
+        TIM_ICUserValueStructure.usPeriod++;
+        #endif
+    }
 }
+
+void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
+{
+#ifdef IC_TEST
+    TIM_IC_InitTypeDef IC_Config;
+    if (TIM_ICUserValueStructure.ucStartFlag == 0)
+    {
+        io_toggle_pin(PA01);
+        // clear timer counts
+        __HAL_TIM_SET_COUNTER(htim, 0); 
+        TIM_ICUserValueStructure.usPeriod = 0;
+        TIM_ICUserValueStructure.usCtr = 0;
+
+        // Configure the input capture parameters, modify the trigger level
+        IC_Config.ICPolarity = TIM_INPUTCHANNELPOLARITY_FALLING;
+        IC_Config.ICSelection = TIM_ICSELECTION_DIRECTTI;
+        IC_Config.ICPrescaler = TIM_ICPSC_DIV1;
+        IC_Config.ICFilter = 0;
+        HAL_TIM_IC_ConfigChannel(&TimHandle, &IC_Config, TIM_CHANNEL_1);
+        // Clear interrupt flag bits
+        __HAL_TIM_CLEAR_IT(htim, TIM_IT_CC1);
+        // Start input capture and enable interrupts
+        HAL_TIM_IC_Start_IT(&TimHandle, TIM_CHANNEL_1);
+        TIM_ICUserValueStructure.ucStartFlag = 1;
+    }
+    else
+    {
+        io_toggle_pin(PA01);
+        // get timer counter
+        TIM_ICUserValueStructure.usCtr = HAL_TIM_ReadCapturedValue(&TimHandle, TIM_CHANNEL_1);
+        // Configure the input capture parameters, modify the trigger level
+        IC_Config.ICPolarity = TIM_INPUTCHANNELPOLARITY_RISING;
+        IC_Config.ICSelection = TIM_ICSELECTION_DIRECTTI;
+        IC_Config.ICPrescaler = TIM_ICPSC_DIV1;
+        IC_Config.ICFilter = 0;
+        HAL_TIM_IC_ConfigChannel(&TimHandle, &IC_Config, TIM_CHANNEL_1);
+
+        // Clear interrupt flag bits
+        __HAL_TIM_CLEAR_IT(htim, TIM_IT_CC1);
+        // Start input capture and enable interrupts
+        HAL_TIM_IC_Start_IT(&TimHandle, TIM_CHANNEL_1);
+        TIM_ICUserValueStructure.ucStartFlag = 0;
+
+        LOG_I("IC Time:%d us",TIM_ICUserValueStructure .usPeriod*65535+TIM_ICUserValueStructure.usCtr);
+    }
 #endif
+}
+
+int main(void)
+{
+    sys_init_app();
+    Basic_PWM_Output_Cfg();
+    Basic_Timer_Cfg();
+    DeadTime_Complementary_PWM_Cfg();
+    Input_Capture_Measurement_Cfg();
+    while (1);
+}
+

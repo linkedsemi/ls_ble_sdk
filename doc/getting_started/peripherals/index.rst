@@ -7,4 +7,5 @@
     gpio
     uart
     i2c
+    timer
     

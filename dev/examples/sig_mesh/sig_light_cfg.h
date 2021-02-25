@@ -1,7 +1,6 @@
 #ifndef TMALL_LIGHT_CFG_H_
 #define TMALL_LIGHT_CFG_H_
 
-#include "reg_timer.h"
 #include "lstimer.h"
 #include "le501x.h"
 #include "platform.h"
