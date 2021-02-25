@@ -14,7 +14,7 @@
 #include "cpu.h"
 #include "io_config.h"
 #include "systick.h"
-
+#include "reg_lsgpio.h"
 bool waiting_ble_wkup_irq;
 static uint8_t wkup_stat;
 void cpu_sleep_asm(void);
@@ -158,17 +158,46 @@ XIP_BANNED void remove_hw_isolation()
     SYSCFG->PMU_PWR = 0;
 }
 
+XIP_BANNED static void power_down_hardware_modules()
+{
+    if(em_fixed)
+    {
+        SYSCFG->PMU_PWR = FIELD_BUILD(SYSCFG_PERI_PWR2_PD, 1) 
+                    | FIELD_BUILD(SYSCFG_PERI_ISO2_EN,1)
+                    | FIELD_BUILD(SYSCFG_SEC_PWR4_PD, 1)
+                    | FIELD_BUILD(SYSCFG_SEC_ISO4_EN ,1);
+    }else
+    {
+        SYSCFG->PMU_PWR = FIELD_BUILD(SYSCFG_PERI_PWR2_PD, 1) 
+                    | FIELD_BUILD(SYSCFG_PERI_ISO2_EN,1)
+                    | FIELD_BUILD(SYSCFG_ERAM_ISO7_EN,2)
+                    | FIELD_BUILD(SYSCFG_ERAM_PWR7_PD,2);
+    }
+}
+
 NOINLINE XIP_BANNED static void cpu_flash_deep_sleep_and_recover()
 {
     spi_flash_xip_stop();
     spi_flash_deep_power_down();
+    uint32_t exti_reg[5];
+    exti_reg[0] = EXTI->EICFG0;
+    exti_reg[1] = EXTI->EICFG1;
+    exti_reg[2] = EXTI->ERTS;
+    exti_reg[3] = EXTI->EFTS;
+    exti_reg[4] = EXTI->EIVS;
+    power_down_hardware_modules();
     cpu_sleep_asm();
+    power_up_hardware_modules();
+    remove_hw_isolation();
+    EXTI->EICFG0 = exti_reg[0];
+    EXTI->EICFG1 = exti_reg[1];
+    EXTI->ERTS = exti_reg[2];
+    EXTI->EFTS = exti_reg[3];
+    EXTI->EIER = exti_reg[4];
     __disable_irq();
     spi_flash_init();
     spi_flash_release_from_deep_power_down();
-    power_up_hardware_modules();
     DELAY_US(8);
-    remove_hw_isolation();
     spi_flash_xip_start();
 }
 
@@ -196,23 +225,6 @@ static void lvl2_lvl3_io_retention(reg_lsgpio_t *gpiox)
         }
     }
     gpiox->PUPD = pull;
-}
-
-static void power_down_hardware_modules()
-{
-    if(em_fixed)
-    {
-        SYSCFG->PMU_PWR = FIELD_BUILD(SYSCFG_PERI_PWR2_PD, 1) 
-                    | FIELD_BUILD(SYSCFG_PERI_ISO2_EN,1)
-                    | FIELD_BUILD(SYSCFG_SEC_PWR4_PD, 1)
-                    | FIELD_BUILD(SYSCFG_SEC_ISO4_EN ,1);
-    }else
-    {
-        SYSCFG->PMU_PWR = FIELD_BUILD(SYSCFG_PERI_PWR2_PD, 1) 
-                    | FIELD_BUILD(SYSCFG_PERI_ISO2_EN,1)
-                    | FIELD_BUILD(SYSCFG_ERAM_ISO7_EN,2)
-                    | FIELD_BUILD(SYSCFG_ERAM_PWR7_PD,2);
-    }
 }
 
 void ble_wkup_status_set(bool status)
@@ -276,7 +288,6 @@ XIP_BANNED void enter_deep_sleep_mode_lvl2_lvl3(struct deep_sleep_wakeup *wakeup
 
 void deep_sleep()
 {
-    power_down_hardware_modules();
     NVIC->ICER[0] = ~(1<<LPWKUP_IRQn);
     cpu_flash_deep_sleep_and_recover();
     wkup_ble();
