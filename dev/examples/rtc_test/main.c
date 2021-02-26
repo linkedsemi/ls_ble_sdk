@@ -3,8 +3,18 @@
 #include "platform.h"
 #include "io_config.h"
 #include <string.h>
+#include "ls_ble.h"
+#include "sleep.h"
+#include "io_config.h"
 #include "log.h"
 
+#define RTC_CALENDAR_TEST 1
+#define RTC_WAKEUP_LP0_TEST 2
+#define RTC_WAKEUP_LP2_TEST 3
+
+#define RTC_TEST_CASE 1
+
+#if RTC_TEST_CASE == RTC_CALENDAR_TEST
 static calendar_time_t calendar_time;
 static calendar_cal_t calendar_cal;
 
@@ -41,4 +51,121 @@ int main()
 
 }
 
+#elif RTC_TEST_CASE == RTC_WAKEUP_LP0_TEST
+
+#define WAKEUP_SECOND 2
+#define LED_IO PA01
+
+static void dev_manager_callback(enum dev_evt_type type,union dev_evt_u *evt)
+{
+    switch(type)
+    {
+    case STACK_INIT:
+    {
+        struct ble_stack_cfg cfg = {
+            .private_addr = false,
+            .controller_privacy = false,
+        };
+        dev_manager_stack_init(&cfg);
+    }
+    break;
+    case STACK_READY:
+    {
+        uint8_t addr[6];
+        bool type;
+        dev_manager_get_identity_bdaddr(addr,&type);
+        LOG_I("type:%d,addr:",type);
+        LOG_HEX(addr,sizeof(addr));
+    }
+    break;
+    default:
+
+    break;
+    }
+}
+
+void rtc_wkup_callback(void)
+{
+    LOG_I("RTC wakeup!");
+    io_cfg_output(LED_IO);
+    io_set_pin(LED_IO);
+    DELAY_US(200*1000);
+    io_clr_pin(LED_IO);
+    io_cfg_input(LED_IO);
+    io_cfg_disable(LED_IO);
+}
+
+int main(void)
+{
+    sys_init_app();
+    ble_init();
+    dev_manager_init(dev_manager_callback);
+    HAL_RTC_Init(RTC_CKSEL_LSI);
+    RTC_wkuptime_set(WAKEUP_SECOND);
+    ble_loop();
+}
+#elif RTC_TEST_CASE == RTC_WAKEUP_LP2_TEST
+#define WAKEUP_SECOND 2
+#define LED_IO PA01
+
+static void rtc_wakeup_handle(void)
+{
+    uint8_t wkup_source = get_wakeup_source();
+    if ((RTC_WKUP & wkup_source) != 0)
+    {
+        io_cfg_output(LED_IO);
+        io_set_pin(LED_IO);
+        DELAY_US(200*1000);
+        io_clr_pin(LED_IO);
+        io_cfg_input(LED_IO);
+        io_cfg_disable(LED_IO);
+    }
+}
+
+static void dev_manager_callback(enum dev_evt_type type,union dev_evt_u *evt)
+{
+    switch(type)
+    {
+    case STACK_INIT:
+    {
+        struct ble_stack_cfg cfg = {
+            .private_addr = false,
+            .controller_privacy = false,
+        };
+        dev_manager_stack_init(&cfg);
+    }
+    break;
+    case STACK_READY:
+    {
+        uint8_t addr[6];
+        bool type;
+        dev_manager_get_identity_bdaddr(addr,&type);
+        LOG_I("type:%d,addr:",type);
+        LOG_HEX(addr,sizeof(addr));
+
+        rtc_wakeup_handle();
+
+        struct deep_sleep_wakeup wakeup;
+        memset(&wakeup,0,sizeof(wakeup));
+        wakeup.rtc = 1;
+        enter_deep_sleep_mode_lvl2_lvl3(&wakeup);
+    }
+    break;
+    default:
+
+    break;
+    }
+}
+
+int main(void)
+{
+    sys_init_app();
+    ble_init();
+    dev_manager_init(dev_manager_callback);
+
+    HAL_RTC_Init(RTC_CKSEL_LSI);
+    RTC_wkuptime_set(WAKEUP_SECOND);
+    ble_loop();
+}
+#endif
 

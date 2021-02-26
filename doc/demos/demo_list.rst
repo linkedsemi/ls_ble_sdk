@@ -10,3 +10,4 @@
    uart_example
    i2c_example
    timer_test
+   rtc_example

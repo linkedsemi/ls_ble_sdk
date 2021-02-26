@@ -13,6 +13,7 @@
 #include "ls_dbg.h"
 #include "cpu.h"
 #include "io_config.h"
+#include "lsrtc.h"
 #include "systick.h"
 #include "reg_lsgpio.h"
 bool waiting_ble_wkup_irq;
@@ -321,6 +322,10 @@ void LPWKUP_Handler(void)
     if(wkup_stat&PB11_IO_WKUP)
     {
         io_exti_callback(PB11);
+    }
+    if (wkup_stat & RTC_WKUP)
+    {
+        rtc_wkup_callback();
     }
 }
 

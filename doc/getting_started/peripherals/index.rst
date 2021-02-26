@@ -8,4 +8,5 @@
     uart
     i2c
     timer
+    rtc
     

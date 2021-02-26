@@ -6,6 +6,13 @@
 #include "cpu.h"
 #include "ls_dbg.h"
 
+enum
+{
+    WKSEL_CLOSE = 0,      // close RTC wakeup function
+    WKSEL_START_NORMAL,   // set RTC wakeup function as normal timer
+    WKSEL_START_WAKEUP,   // start RTC wakeup function when enter sleep
+};
+
 void HAL_RTC_Init(uint8_t cksel)
 {
     LS_ASSERT(cksel == RTC_CKSEL_LSE || cksel == RTC_CKSEL_LSI);
@@ -62,3 +69,13 @@ HAL_StatusTypeDef RTC_CalendarGet(calendar_cal_t *calendar_cal, calendar_time_t 
     
     return result;
 }
+
+void RTC_wkuptime_set(uint16_t second)
+{
+    LS_ASSERT(second > 0);
+    REG_FIELD_WR(RTC->WKUP, RTC_WKUP_WKCAL, second);
+    REG_FIELD_WR(RTC->WKUP, RTC_WKUP_WKSEL, WKSEL_START_WAKEUP);
+    REG_FIELD_WR(RTC->CTRL, RTC_CTRL_RTCEN, 1);
+}
+
+__attribute__((weak)) void rtc_wkup_callback(void){}

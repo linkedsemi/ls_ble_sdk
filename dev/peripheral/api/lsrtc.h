@@ -81,4 +81,23 @@ void RTC_CalendarSet(calendar_cal_t *calendar_cal, calendar_time_t *calendar_tim
  */
 HAL_StatusTypeDef RTC_CalendarGet(calendar_cal_t *calendar_cal, calendar_time_t *calendar_time);
 
+/**
+ ****************************************************************************************
+ * @brief RTC wakeup time set function
+ *
+ * @param[in]  second         wakeup time(the unit is second)
+ *
+ ****************************************************************************************
+ */
+void RTC_wkuptime_set(uint16_t second);
+
+/**
+ ****************************************************************************************
+ * @brief RTC wakeup callback function(in LP0 mode)
+ *
+ ****************************************************************************************
+ */
+void rtc_wkup_callback(void);
+
 #endif 
+
