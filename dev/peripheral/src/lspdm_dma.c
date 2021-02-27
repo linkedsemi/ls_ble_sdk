@@ -12,6 +12,8 @@ static void DMA_Channel_PingPong_Update(DMA_Controller_HandleTypeDef *hdma,uint8
     HAL_DMA_Channel_Config_Set(hdma,ch_idx,alt,&cfg);
 }
 
+__attribute__((weak)) void HAL_PDM_DMA_CpltCallback(PDM_HandleTypeDef *hpdm,uint8_t buf_idx){}
+
 static void PDM_DMA_CH0_Callback(void *hdma,uint32_t param,uint8_t ch_idx,bool current_alt)
 {
     PDM_HandleTypeDef *hpdm = (PDM_HandleTypeDef *)param;
@@ -19,7 +21,7 @@ static void PDM_DMA_CH0_Callback(void *hdma,uint32_t param,uint8_t ch_idx,bool c
     hpdm->Env.DMA.Channel_Done[0] = true;
     if(hpdm->Env.DMA.Channel_Done[1])
     {
-        hpdm->Env.DMA.Callback(current_alt?0:1);
+        HAL_PDM_DMA_CpltCallback(hpdm,current_alt?0:1);
     }
 }
 
@@ -30,13 +32,12 @@ static void PDM_DMA_CH1_Callback(void *hdma,uint32_t param,uint8_t ch_idx,bool c
     hpdm->Env.DMA.Channel_Done[1] = true;
     if(hpdm->Env.DMA.Channel_Done[0])
     {
-        hpdm->Env.DMA.Callback(current_alt?0:1);
+        HAL_PDM_DMA_CpltCallback(hpdm,current_alt?0:1);
     }
 }
 
-HAL_StatusTypeDef HAL_PDM_Transfer_Config_DMA(PDM_HandleTypeDef *hpdm,uint16_t *pFrameBuffer0,uint16_t *pFrameBuffer1,uint16_t FrameNum,void (*Callback)(uint8_t))
+HAL_StatusTypeDef HAL_PDM_Transfer_Config_DMA(PDM_HandleTypeDef *hpdm,uint16_t *pFrameBuffer0,uint16_t *pFrameBuffer1,uint16_t FrameNum)
 {
-    hpdm->Env.DMA.Callback = Callback;
     struct DMA_Channel_Config prim = {
         .ctrl_data = {
             .cycle_ctrl = DMA_Cycle_Basic,
@@ -73,9 +74,8 @@ HAL_StatusTypeDef HAL_PDM_Transfer_Config_DMA(PDM_HandleTypeDef *hpdm,uint16_t *
     return HAL_OK;
 }
 
-HAL_StatusTypeDef HAL_PDM_PingPong_Transfer_Config_DMA(PDM_HandleTypeDef *hpdm,struct PDM_PingPong_Bufptr *CH0_Buf,struct PDM_PingPong_Bufptr *CH1_Buf,uint16_t FrameNum,void (*Callback)(uint8_t))
+HAL_StatusTypeDef HAL_PDM_PingPong_Transfer_Config_DMA(PDM_HandleTypeDef *hpdm,struct PDM_PingPong_Bufptr *CH0_Buf,struct PDM_PingPong_Bufptr *CH1_Buf,uint16_t FrameNum)
 {
-    hpdm->Env.DMA.Callback = Callback;
     struct ctrl_data_config *ctrl = (struct ctrl_data_config *)&hpdm->Env.DMA.PingPong_Ctrl_Data;
     ctrl->cycle_ctrl = DMA_Cycle_PingPong;
     ctrl->next_useburst = 0;

@@ -38,7 +38,6 @@ typedef struct __PDM_Init_TypeDef
 
 struct PDM_DMA_Env
 {
-    void (*Callback)(uint8_t);
     uint32_t PingPong_Ctrl_Data;
     uint8_t Channel[2];
     bool Channel_Done[2];
@@ -71,9 +70,13 @@ HAL_StatusTypeDef HAL_PDM_DeInit(PDM_HandleTypeDef *hpdm);
 
 HAL_StatusTypeDef HAL_PDM_Transfer_Config_IT(PDM_HandleTypeDef *hpdm,uint16_t *pFrameBuffer0,uint16_t *pFrameBuffer1,uint16_t FrameNum);
 
-HAL_StatusTypeDef HAL_PDM_Transfer_Config_DMA(PDM_HandleTypeDef *hpdm,uint16_t *pFrameBuffer0,uint16_t *pFrameBuffer1,uint16_t FrameNum,void (*Callback)(uint8_t));
+void HAL_PDM_CpltCallback(PDM_HandleTypeDef *hpdm);
 
-HAL_StatusTypeDef HAL_PDM_PingPong_Transfer_Config_DMA(PDM_HandleTypeDef *hpdm,struct PDM_PingPong_Bufptr *CH0_Buf,struct PDM_PingPong_Bufptr *CH1_Buf,uint16_t FrameNum,void (*Callback)(uint8_t));
+HAL_StatusTypeDef HAL_PDM_Transfer_Config_DMA(PDM_HandleTypeDef *hpdm,uint16_t *pFrameBuffer0,uint16_t *pFrameBuffer1,uint16_t FrameNum);
+
+HAL_StatusTypeDef HAL_PDM_PingPong_Transfer_Config_DMA(PDM_HandleTypeDef *hpdm,struct PDM_PingPong_Bufptr *CH0_Buf,struct PDM_PingPong_Bufptr *CH1_Buf,uint16_t FrameNum);
+
+void HAL_PDM_DMA_CpltCallback(PDM_HandleTypeDef *hpdm,uint8_t buf_idx);
 
 HAL_StatusTypeDef HAL_PDM_Start(PDM_HandleTypeDef *hpdm);
 

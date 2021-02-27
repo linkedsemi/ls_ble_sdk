@@ -22,10 +22,10 @@ void pdm_interrupt_test()
     HAL_PDM_Transfer_Config_IT(&pdm,Buf0,Buf1,FRAME_BUF_SIZE);
 }
 
-static void pdm_dma_callback(uint8_t idx)
+void HAL_PDM_DMA_CpltCallback(PDM_HandleTypeDef *hpdm,uint8_t idx)
 {
     LOG_I("%s",__FUNCTION__);
-    HAL_PDM_Transfer_Config_DMA(&pdm,Buf0,Buf1,FRAME_BUF_SIZE,pdm_dma_callback);
+    HAL_PDM_Transfer_Config_DMA(&pdm,Buf0,Buf1,FRAME_BUF_SIZE);
 }
 
 void pdm_dma_test()
@@ -34,7 +34,7 @@ void pdm_dma_test()
     pdm.DMAC_Instance = &dmac1_inst;
     pdm.Env.DMA.Channel[0] = 2;
     pdm.Env.DMA.Channel[1] = 3;
-    HAL_PDM_Transfer_Config_DMA(&pdm,Buf0,Buf1,FRAME_BUF_SIZE,pdm_dma_callback);
+    HAL_PDM_Transfer_Config_DMA(&pdm,Buf0,Buf1,FRAME_BUF_SIZE);
     HAL_PDM_Start(&pdm);
 }
 
