@@ -12,3 +12,4 @@
    timer_test
    rtc_example
    gpio_example
+   pdm_example

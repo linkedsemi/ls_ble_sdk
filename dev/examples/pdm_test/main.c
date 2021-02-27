@@ -3,6 +3,8 @@
 #include "lsdmac.h"
 #include "log.h"
 #include "io_config.h"
+#include "lsuart.h"
+#include "cpu.h"
 #define PDM_CLK_KHZ 1024
 #define PDM_SAMPLE_RATE_HZ 16000
 #define FRAME_BUF_SIZE 256
@@ -11,6 +13,12 @@ PDM_HandleTypeDef pdm;
 DMA_RAM_ATTR uint16_t Buf0[FRAME_BUF_SIZE];
 DMA_RAM_ATTR uint16_t Buf1[FRAME_BUF_SIZE];
 
+static struct PDM_PingPong_Bufptr pdm_data_receive;
+static UART_HandleTypeDef UART_PDM_Config; 
+static bool buf0_flag = false;
+static bool buf1_flag = false;
+
+///中断模式下收pdm数据完成回调函数
 void HAL_PDM_CpltCallback(PDM_HandleTypeDef *hpdm)
 {
     LOG_I("%s",__FUNCTION__);
@@ -22,26 +30,55 @@ void pdm_interrupt_test()
     HAL_PDM_Transfer_Config_IT(&pdm,Buf0,Buf1,FRAME_BUF_SIZE);
 }
 
-void HAL_PDM_DMA_CpltCallback(PDM_HandleTypeDef *hpdm,uint8_t idx)
+static void ls_pdm_uart_init(void)
 {
-    LOG_I("%s",__FUNCTION__);
-    HAL_PDM_Transfer_Config_DMA(&pdm,Buf0,Buf1,FRAME_BUF_SIZE);
+
+    uart1_io_init(PB00, PB01);
+    UART_PDM_Config.UARTX = UART1;
+    UART_PDM_Config.DMAC_Instance = &dmac1_inst;
+    UART_PDM_Config.Tx_Env.DMA.DMA_Channel = 3;
+    UART_PDM_Config.Init.BaudRate = UART_BAUDRATE_1000000;
+    UART_PDM_Config.Init.MSBEN = 0;
+    UART_PDM_Config.Init.Parity = UART_NOPARITY;
+    UART_PDM_Config.Init.StopBits = UART_STOPBITS1;
+    UART_PDM_Config.Init.WordLength = UART_BYTESIZE8;
+    HAL_UART_Init(&UART_PDM_Config);
 }
 
+///用户重定义的uart发送完成回调函数
+void HAL_UART_DMA_TxCpltCallback(UART_HandleTypeDef *huart)
+{
+    LOG_I("uart send Done");
+}
+
+void HAL_PDM_DMA_CpltCallback(PDM_HandleTypeDef *hpdm,uint8_t buf_idx)
+{
+    if(buf_idx)
+    {
+        buf1_flag = true;
+    }
+    else
+    {
+        buf0_flag = true;
+    }
+}
+   
 void pdm_dma_test()
 {
-    DMA_CONTROLLER_INIT(dmac1_inst);
-    pdm.DMAC_Instance = &dmac1_inst;
-    pdm.Env.DMA.Channel[0] = 2;
-    pdm.Env.DMA.Channel[1] = 3;
-    HAL_PDM_Transfer_Config_DMA(&pdm,Buf0,Buf1,FRAME_BUF_SIZE);
+    
+    pdm.DMAC_Instance = &dmac1_inst; //pdm的dma实例选择
+    pdm.Env.DMA.Channel[0] = 1; //dma通道选择
+    // pdm.Env.DMA.Channel[1] = 2; //dma通道选择,只有在配置立体声通道模式的时候才打开
+    pdm_data_receive.Bufptr[0] = Buf0;
+    pdm_data_receive.Bufptr[1] = Buf1;
+    HAL_PDM_PingPong_Transfer_Config_DMA(&pdm,&pdm_data_receive,NULL,FRAME_BUF_SIZE);//dma配置，并把pdm的dma使能
     HAL_PDM_Start(&pdm);
 }
 
 void pdm_init()
 {
-    pdm_clk_io_init(PB09);
-    pdm_data0_io_init(PB08);
+    pdm_clk_io_init(PB10);
+    pdm_data0_io_init(PB09);
     pdm.Instance = LSPDM;
     PDM_Init_TypeDef Init = 
     {
@@ -59,9 +96,25 @@ void pdm_init()
 
 int main()
 {
-    sys_init_app();
+    sys_init_app();   
+    DMA_CONTROLLER_INIT(dmac1_inst); //dma对象初始化
+    ls_pdm_uart_init();
     pdm_init();
-    pdm_interrupt_test();
-//    pdm_dma_test();
-    while(1);
+    // pdm_interrupt_test(); //在中断方式收pdm数据
+    pdm_dma_test(); //在dma模式下收pdm数据
+    while(1)
+    {
+        if(buf0_flag)
+        {
+            buf0_flag = false;
+            HAL_UART_Transmit_DMA(&UART_PDM_Config,(uint8_t *)&Buf0,FRAME_BUF_SIZE*2);   
+        }
+
+        if (buf1_flag)
+        {  
+            buf1_flag = false;
+            HAL_UART_Transmit_DMA(&UART_PDM_Config, (uint8_t *)&Buf1,FRAME_BUF_SIZE*2);
+        }
+    }
 }
+

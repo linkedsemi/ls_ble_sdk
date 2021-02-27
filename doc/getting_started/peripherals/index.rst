@@ -9,4 +9,5 @@
     i2c
     timer
     rtc
+    pdm
     
