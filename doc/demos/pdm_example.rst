@@ -8,18 +8,21 @@ PDM使用示例
 一、串口配置
 ----------------
 
- | 1. 定义UART句柄，并调用HAL_UART_Init初始化函数。通过DMA搬运数据到串口助手上时，需要在uart初始化的时候同时配置uart所使用的dma对象和dma通道。
- | 2. 默认使用UART1并把PB00、PB01作为通讯串口，其中PB00为模块的TX，PB01为模块的RX，默认的uart口的配置参数为： 波特率 1000000、无校验、8位数据位、1位停止位。
+ | 1. 包含io_config和lsuart头文件。
+ | 2. 定义UART句柄，并调用HAL_UART_Init初始化函数。通过DMA搬运数据到串口助手上时，需要在uart初始化的时候同时配置uart所使用的dma对象和dma通道。
+ | 3. 默认使用UART1并把PB00、PB01作为通讯串口，其中PB00为模块的TX，PB01为模块的RX，默认的uart口的配置参数为： 波特率 1000000、无校验、8位数据位、1位停止位。
 
 .. code ::
 
-	static UART_HandleTypeDef UART_PDM_Config; 
+    #include "io_config.h"
+    #include "lsuart.h"
+    static UART_HandleTypeDef UART_PDM_Config; 
 	static void ls_pdm_uart_init(void)
 	{
-		uart1_io_init(PB00, PB01);
+		uart1_io_init(PB00, PB01); //uart io 初始化函数
 		UART_PDM_Config.UARTX = UART1;
-		UART_PDM_Config.DMAC_Instance = &dmac1_inst;//uart选择的dma对象
-		UART_PDM_Config.Tx_Env.DMA.DMA_Channel = 3;//uart选择的dma通道号
+		UART_PDM_Config.DMAC_Instance = &dmac1_inst; //uart选择的dma对象
+		UART_PDM_Config.Tx_Env.DMA.DMA_Channel = 3; //uart选择的dma通道号
 		UART_PDM_Config.Init.BaudRate = UART_BAUDRATE_1000000;
 		UART_PDM_Config.Init.MSBEN = 0;
 		UART_PDM_Config.Init.Parity = UART_NOPARITY;
@@ -31,39 +34,40 @@ PDM使用示例
 二、PDM配置
 ----------------
 
- | 1. 定义PDM句柄，并调用HAL_PDM_Init初始化函数。
- | 2. 通过GPIO复用模式把PB10复用为数字麦克风的CLOCK引脚，PB09复用为数字麦克风的DATA引脚。
- | 3. 把PDM句柄中的实例对象映射到PDM寄存器的基址中，并对PDM寄存器进行赋值。
- | 4. 把PDM时钟速率设为1.024MHZ，采样率设为16KHZ，延时捕捉为30个周期，数据增益设为5，采用单声道模式。
- | 5. 选择PDM的DMA对象、PDM的DMA通道选择、配置DMA乒乓模式下接收到PDM数据需要存放到的两个数组。
+ | 1. 包含lspdm头文件。注意：io_config文件在UART配置的时候已经包含。
+ | 2. 定义PDM句柄，并调用HAL_PDM_Init初始化函数。
+ | 3. 通过GPIO复用模式把PB10复用为数字麦克风的CLOCK引脚，PB09复用为数字麦克风的DATA引脚。
+ | 4. 把PDM句柄中的实例对象映射到PDM寄存器的基址中，并对PDM寄存器进行赋值。
+ | 5. 把PDM时钟速率设为1.024MHZ，采样率设为16KHZ，延时捕捉为30个周期，数据增益设为5，采用单声道模式。
+ | 6. 选择PDM的DMA对象、PDM的DMA通道选择、配置DMA乒乓模式下交替存放FRAME_BUF_SIZE大小PDM数据的两个数组。
 
 .. code ::
 
-	#define LSPDM ((reg_pdm_t *)LSPDM_BASE_ADDR)
-	#define PDM_CLK_KHZ 1024
+    #include "lspdm.h"
+	#define PDM_CLK_KHZ 1024    //默认使用1.024MHZ的时钟速率
 	#define PDM_SAMPLE_RATE_HZ 16000    //默认使用16KHZ采样
 	#define FRAME_BUF_SIZE 256
 	PDM_HandleTypeDef pdm;//pdm句柄定义
-	DMA_RAM_ATTR uint16_t Buf0[FRAME_BUF_SIZE];//dma乒乓模式下交替接受pam数据buf0的定义
-	DMA_RAM_ATTR uint16_t Buf1[FRAME_BUF_SIZE];//dma乒乓模式下交替接受pam数据buf1的定义
+	DMA_RAM_ATTR uint16_t Buf0[FRAME_BUF_SIZE]; //dma乒乓模式下交替接受pdm数据buf0的定义
+	DMA_RAM_ATTR uint16_t Buf1[FRAME_BUF_SIZE]; //dma乒乓模式下交替接受pdm数据buf1的定义
 	static struct PDM_PingPong_Bufptr pdm_data_receive;
 	void pdm_init()
 	{
 		pdm_clk_io_init(PB10);
 		pdm_data0_io_init(PB09);
-		pdm.Instance = LSPDM;
+		pdm.Instance = LSPDM; //LSPDM表示pdm外设的基址，在lspdm.h中已经定义
 		PDM_Init_TypeDef Init = 
 		{
 			.fir = PDM_FIR_COEF_16KHZ,
 			.cfg = {
-				.clk_ratio = PDM_CLK_RATIO(PDM_CLK_KHZ),
-				.sample_rate = PDM_SAMPLE_RATE(PDM_CLK_KHZ,PDM_SAMPLE_RATE_HZ),
+				.clk_ratio = PDM_CLK_RATIO(PDM_CLK_KHZ), //pdm时钟配置
+				.sample_rate = PDM_SAMPLE_RATE(PDM_CLK_KHZ,PDM_SAMPLE_RATE_HZ), //pdm采样速率配置
 				.cap_delay = 30, //延时捕捉
 				.data_gain = 5, //数据增益
 			},
 			.mode = PDM_MODE_Mono, //单声道模式
 		};
-		pdm.DMAC_Instance = &dmac1_inst;
+		pdm.DMAC_Instance = &dmac1_inst; //pdm选择的dma对象
 		pdm.Env.DMA.Channel[0] = 1; //dma通道选择
 		pdm_data_receive.Bufptr[0] = Buf0;
 		pdm_data_receive.Bufptr[1] = Buf1;

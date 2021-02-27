@@ -145,7 +145,7 @@ PDM（Pulse Density Modulation）是一种用数字信号表示模拟信号的�
 
     void HAL_PDM_CpltCallback(PDM_HandleTypeDef *hpdm);
 
-3.5 在DMA模式下接受完FrameNum大小pdm数据的回调函数
+3.7 在DMA模式下接受完FrameNum大小pdm数据的回调函数
 
 .. code ::
 
