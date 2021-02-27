@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "main.h"
+#include "lsuart.h"
 
 enum
 {
@@ -22,6 +23,7 @@ typedef struct _at_recv_data
     uint16_t param_len;
     uint8_t evt_id;
 } at_recv_t;
+extern UART_HandleTypeDef UART_Server_Config;
 
 void at_init(void);
 void at_store_info_to_flash(void);
@@ -29,5 +31,7 @@ void at_load_info_from_flash(void);
 void at_clr_uart_buff(void);
 void uart_write(uint8_t *value, uint16_t length);
 void uart_tx_it(uint8_t *value, uint16_t length);
+
+void wkup_io_init(void);
 
 #endif //_APP_AT_H

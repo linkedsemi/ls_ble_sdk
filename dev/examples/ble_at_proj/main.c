@@ -2,7 +2,6 @@
 #include "ls_ble.h"
 #include "platform.h"
 #include "prf_diss.h"
-//#include "ls_mesh.h"
 #include "log.h"
 #include "ls_dbg.h"
 #include "cpu.h"
@@ -22,7 +21,7 @@
 
 #define CON_IDX_INVALID_VAL 0xff
 
-uint8_t ble_device_name[DEV_NAME_MAX_LEN] = "LS501X_AT_DEMO";
+uint8_t ble_device_name[DEV_NAME_MAX_LEN] = "AT_DEMO";
 static const uint8_t ls_uart_svc_uuid_128[] = {0x9e, 0xca, 0xdc, 0x24, 0x0e, 0xe5, 0xa9, 0xe0, 0x93, 0xf3, 0xa3, 0xb5, 0x01, 0x00, 0x40, 0x6e};
 static const uint8_t ls_uart_rx_char_uuid_128[] = {0x9e, 0xca, 0xdc, 0x24, 0x0e, 0xe5, 0xa9, 0xe0, 0x93, 0xf3, 0xa3, 0xb5, 0x02, 0x00, 0x40, 0x6e};
 static const uint8_t ls_uart_tx_char_uuid_128[] = {0x9e, 0xca, 0xdc, 0x24, 0x0e, 0xe5, 0xa9, 0xe0, 0x93, 0xf3, 0xa3, 0xb5, 0x03, 0x00, 0x40, 0x6e};
@@ -134,6 +133,7 @@ static uint16_t uart_client_cccd_handle[UART_CLIENT_NUM];
 /********************************************************************************************************************/
 
 static uint8_t adv_obj_hdl;
+static uint8_t advertising_data[28];
 static uint8_t scan_response_data[31];
 static uint8_t scan_obj_hdl = 0xff;
 static uint8_t init_obj_hdl = 0xff;
@@ -147,7 +147,7 @@ static void ls_uart_server_read_req_ind(uint8_t att_idx, uint8_t con_idx);
 static void ls_uart_server_write_req_ind(uint8_t att_idx, uint8_t con_idx, uint16_t length, uint8_t const *value);
 
 static void ls_uart_client_init(void);
-static void start_scan(void);
+void start_scan(uint16_t scan_duration);
 
 static void ls_uart_client_service_dis(uint8_t con_idx);
 static void ls_uart_client_char_tx_dis(uint8_t con_idx);
@@ -549,54 +549,28 @@ void at_stop_adv(void)
 
 void at_start_adv(void)
 {
-    uint8_t *pos;
-    uint8_t adv_data_len = 0;
-    uint8_t adv_data[28];
+    uint8_t adv_data_length = 0;
+    uint8_t type_bdaddr[7];
+    bool random_type;
 
+    LS_ASSERT(adv_obj_hdl != 0xff);
+
+    dev_manager_get_identity_bdaddr(&type_bdaddr[1], &random_type);
+    type_bdaddr[0] = (uint8_t)random_type;
+
+    adv_data_length = ADV_DATA_PACK(advertising_data, 2, GAP_ADV_TYPE_SHORTENED_NAME, ble_device_name, strlen((const char *)ble_device_name),
+                                                         GAP_ADV_TYPE_LE_BT_ADDR, type_bdaddr, sizeof(type_bdaddr));
+
+    LS_ASSERT(adv_data_length < 29);
     if(adv_status != ADV_IDLE)
     {
-        return ;
+        dev_manager_update_adv_data(adv_obj_hdl, advertising_data, adv_data_length, scan_response_data, 0);
     }
+    else
+    {
+        dev_manager_start_adv(adv_obj_hdl, advertising_data, adv_data_length, scan_response_data, 0);
+    } 
     adv_status = ADV_BUSY;
-
-    pos = &adv_data[0];
-    *pos++ = strlen((const char *)ble_device_name) + 1;
-    *pos++ = '\x08';
-    memcpy(pos, ble_device_name, strlen((const char *)ble_device_name));
-    pos += strlen((const char *)ble_device_name);
-
-    uint8_t manufacturer_value[] = {0x08, 0xB8};
-    *pos++ = sizeof(manufacturer_value) + 1;
-    *pos++ = '\xff';
-    memcpy(pos, manufacturer_value, sizeof(manufacturer_value));
-    pos += sizeof(manufacturer_value);
-
-    adv_data_len = ((uint32_t)pos - (uint32_t)(&adv_data[0]));
-
-    dev_manager_start_adv(adv_obj_hdl, adv_data, adv_data_len, scan_response_data, sizeof(scan_response_data));
-}
-
-void at_update_adv_data(void)
-{
-    uint8_t *pos;
-    uint8_t adv_data_len = 0;
-    uint8_t adv_data[28];
-
-    pos = &adv_data[0];
-    *pos++ = strlen((const char *)ble_device_name) + 1;
-    *pos++ = '\x08';
-    memcpy(pos, ble_device_name, strlen((const char *)ble_device_name));
-    pos += strlen((const char *)ble_device_name);
-
-    uint8_t manufacturer_value[] = {0x08, 0xB8};
-    *pos++ = sizeof(manufacturer_value) + 1;
-    *pos++ = '\xff';
-    memcpy(pos, manufacturer_value, sizeof(manufacturer_value));
-    pos += sizeof(manufacturer_value);
-
-    adv_data_len = ((uint32_t)pos - (uint32_t)(&adv_data[0]));
-
-    dev_manager_update_adv_data(adv_obj_hdl, adv_data, adv_data_len, scan_response_data, sizeof(scan_response_data));
 }
 
 void update_conn_param(uint8_t conidx,uint16_t latency)
@@ -644,37 +618,48 @@ static void create_init_obj(void)
 {
     dev_manager_create_init_object(PUBLIC_OR_RANDOM_STATIC_ADDR);
 }
-void start_init(uint8_t *peer_addr)
+void start_init(uint8_t *peer_addr,uint8_t addr_type)
 {
     struct dev_addr peer_dev_addr_str;
     memcpy(peer_dev_addr_str.addr, peer_addr, BLE_ADDR_LEN);
     struct start_init_param init_param = {
         .scan_intv = 64,
         .scan_window = 48,
-        .conn_to = 0,
+        .conn_to = 400,
         .conn_intv_min = 16,
         .conn_intv_max = 16,
         .conn_latency = 0,
         .supervision_to = 200,
 
         .peer_addr = &peer_dev_addr_str,
-        .peer_addr_type = 0,
+        .peer_addr_type = addr_type,        // Address type of the device 0=public/1=private random
         .type = DIRECT_CONNECTION,
     };
     dev_manager_start_init(init_obj_hdl, &init_param);
 }
-static void start_scan(void)
+
+static void create_scan_obj(void)
 {
+    dev_manager_create_scan_object(PUBLIC_OR_RANDOM_STATIC_ADDR);
+}
+
+void start_scan(uint16_t scan_duration)
+{
+    if(scan_status!=SCAN_IDLE)
+    {
+        return;
+    }
     struct start_scan_param scan_param = {
-        .scan_intv = 0x4000,
-        .scan_window = 0x4000,
-        .duration = 0,
+        .scan_intv = 64,
+        .scan_window = 48,
+        .duration = scan_duration,
         .period = 0,
         .type = OBSERVER,
         .active = 0,
         .filter_duplicates = 0,
     };
     dev_manager_start_scan(scan_obj_hdl, &scan_param);
+    scan_status = SCAN_BUSY;
     LOG_I("start scan");
 }
 
@@ -729,19 +714,20 @@ static void dev_manager_callback(enum dev_evt_type type, union dev_evt_u *evt)
         LS_ASSERT(evt->obj_created.status == 0);
         scan_obj_hdl = evt->obj_created.handle;
         LOG_I("scan obj hdl:%d", scan_obj_hdl);
-        start_scan();
-        scan_status = SCAN_BUSY;
         break;
     case SCAN_STOPPED:
-
+        LOG_I("scan stop");
+        scan_status = SCAN_IDLE;
+        gap_scaning_cmp_ind();
         break;
     case ADV_REPORT:
-
+        gap_adv_report_ind(&evt->adv_report);
         break;
     case INIT_OBJ_CREATED:
         LS_ASSERT(evt->obj_created.status == 0);
         init_obj_hdl = evt->obj_created.handle;
         LOG_I("init obj hdl:%d", init_obj_hdl);
+        create_scan_obj();
         break;
     case INIT_STOPPED:
         init_status = INIT_IDLE;

@@ -4,7 +4,6 @@
 #include "at_cmd_parse.h"
 #include "builtin_timer.h"
 #include "ls_sys.h"
-#include "lsuart.h"
 #include "cpu.h"
 #include "io_config.h"
 #include "tinyfs.h"
@@ -15,16 +14,15 @@
 #define AT_TRANSPARENT_DOWN_LEVEL (AT_RECV_MAX_LEN - 40)
 
 tinyfs_dir_t ble_at_dir;
-static UART_HandleTypeDef UART_Server_Config;
+UART_HandleTypeDef UART_Server_Config;
 static struct builtin_timer *uart_server_timer_inst = NULL;
 static struct builtin_timer *exit_trans_mode_timer = NULL;
 
 uint8_t at_recv_char;
 static bool uart_tx_busy = false;
-struct at_buff_env ls_at_buff_env;
+struct at_buff_env ls_at_buff_env = {0};
 struct at_ctrl ls_at_ctl_env = {0};
- at_recv_cmd_t recv_cmd;
-
+at_recv_cmd_t recv_cmd;
 at_recv_t at_cmd_event;
 
 struct at_env
@@ -99,8 +97,8 @@ void exit_trans_mode_timer_handler(void *arg)
     ls_at_ctl_env.transparent_start = 0;
     ls_at_env.at_recv_index = 0;
 
-    uint8_t at_rsp[] = "\r\nOK\r\n";
-    uart_write(at_rsp, sizeof(at_rsp));;
+    uint8_t at_rsp[] = "\r\nExit OK\r\n";
+    uart_write(at_rsp, sizeof(at_rsp));
 }
 
 void at_recv(uint8_t c)
@@ -240,12 +238,12 @@ static void ls_uart_init(void)
     UART_Server_Config.Init.StopBits = UART_STOPBITS1;
     UART_Server_Config.Init.WordLength = UART_BYTESIZE8;
     HAL_UART_Init(&UART_Server_Config);
-    
+    HAL_UART_Receive_IT(&UART_Server_Config, &at_recv_char, 1);  
 }
 
 void uart_write(uint8_t *value, uint16_t length)
 {
-    HAL_UART_Transmit(&UART_Server_Config, value, length, 0);
+    HAL_UART_Transmit(&UART_Server_Config, value, length, 1000);
 }
 
 void uart_tx_it(uint8_t *value, uint16_t length)
@@ -263,22 +261,68 @@ void uart_tx_it(uint8_t *value, uint16_t length)
 
 void at_load_info_from_flash(void)
 {
+    uint8_t ret;
     struct at_buff_env buff;
     uint16_t len = sizeof(buff);
     uint16_t name_len = sizeof(ble_device_name);
 
-    tinyfs_read(ble_at_dir, RECORD_BLENAME, ble_device_name, &name_len);
-    tinyfs_read(ble_at_dir, RECORD_BLEAT, (uint8_t*)&buff, &len);
-    memcpy(&ls_at_buff_env, &buff, len);
-
-    rf_set_power(tx_power_arr[ls_at_buff_env.default_info.rfpower]);
+    ret = tinyfs_read(ble_at_dir, RECORD_BLENAME, ble_device_name, &name_len);
+    if(ret != TINYFS_NO_ERROR)
+    {
+        LOG_I("ble device name read:%d",ret);
+    }
+    ret = tinyfs_read(ble_at_dir, RECORD_BLEAT, (uint8_t*)&buff, &len);
+    if(ret != TINYFS_NO_ERROR)
+    {
+        LOG_I("at read:%d",ret);
+    }
+    else
+    {
+        memcpy(&ls_at_buff_env, &buff, len);
+        if(ls_at_buff_env.default_info.rfpower>5) {
+            ls_at_buff_env.default_info.rfpower = 0;
+        }
+        if(ls_at_buff_env.default_info.advint>5) {
+            ls_at_buff_env.default_info.advint = 0;
+        }
+        rf_set_power(tx_power_arr[ls_at_buff_env.default_info.rfpower]);
+    }
 }
 
 void at_store_info_to_flash(void)
 {
-    tinyfs_write(ble_at_dir, RECORD_BLENAME, ble_device_name, sizeof(ble_device_name));
-    tinyfs_write(ble_at_dir, RECORD_BLEAT, (uint8_t*)&ls_at_buff_env, sizeof(ls_at_buff_env));
+    uint8_t ret;
+    ret = tinyfs_write(ble_at_dir, RECORD_BLENAME, ble_device_name, sizeof(ble_device_name));
+    if(ret != TINYFS_NO_ERROR)
+    {
+        LOG_I("name write:%d",ret);
+    }
+    ret = tinyfs_write(ble_at_dir, RECORD_BLEAT, (uint8_t*)&ls_at_buff_env, sizeof(ls_at_buff_env));
+    if(ret != TINYFS_NO_ERROR)
+    {
+        LOG_I("ble write:%d",ret);
+    }
     tinyfs_write_through();
+}
+
+void wkup_io_init(void)
+{
+    io_cfg_input(PB15);
+    io_pull_write(PB15,IO_PULL_DOWN);
+    io_exti_config(PB15,INT_EDGE_RISING); 
+    io_exti_enable(PB15,true); 
+}
+
+void io_exti_callback(uint8_t pin)
+{
+    switch(pin)
+    {
+    case PB15:
+        ls_uart_init();
+    break;
+    default:
+    break;    
+    }
 }
 
 void at_init(void)
@@ -286,7 +330,6 @@ void at_init(void)
     tinyfs_mkdir(&ble_at_dir, ROOT_DIR, 5);
     at_load_info_from_flash();
     ls_uart_init();
-    HAL_UART_Receive_IT(&UART_Server_Config, &at_recv_char, 1);
 
     uart_server_timer_inst = builtin_timer_create(transparent_timer_handler);
     exit_trans_mode_timer = builtin_timer_create(exit_trans_mode_timer_handler);
