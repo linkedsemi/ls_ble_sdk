@@ -50,12 +50,12 @@ typedef struct
 #define PB07 ((uint8_t)0X17)   /* Pin B7 selected    */
 #define PB08 ((uint8_t)0X18)   /* Pin B8 selected    */
 #define PB09 ((uint8_t)0X19)   /* Pin B9 selected    */
-#define PB10 ((uint8_t)0X1A)  /* Pin B10 selected   */
-#define PB11 ((uint8_t)0X1B)  /* Pin B11 selected   */
-#define PB12 ((uint8_t)0X1C)  /* Pin B12 selected   */
-#define PB13 ((uint8_t)0X1D)  /* Pin B13 selected   */
-#define PB14 ((uint8_t)0X1E)  /* Pin B14 selected   */
-#define PB15 ((uint8_t)0X1F)  /* Pin B15 selected   */
+#define PB10 ((uint8_t)0X1A)   /* Pin B10 selected   */
+#define PB11 ((uint8_t)0X1B)   /* Pin B11 selected   */
+#define PB12 ((uint8_t)0X1C)   /* Pin B12 selected   */
+#define PB13 ((uint8_t)0X1D)   /* Pin B13 selected   */
+#define PB14 ((uint8_t)0X1E)   /* Pin B14 selected   */
+#define PB15 ((uint8_t)0X1F)   /* Pin B15 selected   */
 //lsgpioc
 #define PC00 ((uint8_t)0X20)   /* Pin C0 selected    */
 #define PC01 ((uint8_t)0X21)   /* Pin C1 selected    */
@@ -67,45 +67,133 @@ typedef struct
 #define PC07 ((uint8_t)0X27)   /* Pin C7 selected    */
 #define PC08 ((uint8_t)0X28)   /* Pin C8 selected    */
 #define PC09 ((uint8_t)0X29)   /* Pin C9 selected    */
-#define PC10 ((uint8_t)0X2A)  /* Pin C10 selected   */
-
+#define PC10 ((uint8_t)0X2A)   /* Pin C10 selected   */
+/**
+  * @brief GPIO Init
+  */
 void io_init(void);
 
+/**
+  * @brief GPIO config output
+  * @param pin Specific GPIO pin
+  */
 void io_cfg_output(uint8_t pin);
 
+/**
+  * @brief GPIO config open drain output mode
+  * @param  pin  Specific GPIO pin
+  */
 void io_cfg_opendrain(uint8_t pin);
 
+/**
+  * @brief GPIO config pushpull output mode
+  * @param  pin  Specific GPIO pin
+  */
 void io_cfg_pushpull(uint8_t pin);
 
+/**
+  * @brief GPIO config input
+  * @param  pin  Specific GPIO pin
+  */
 void io_cfg_input(uint8_t pin);
 
+/**
+  * @brief GPIO input disable
+  * @param  pin  Specific GPIO pin
+  */
 void io_cfg_disable(uint8_t pin);
 
+/**
+  * @brief GPIO config output
+  * @param  pin  Specific GPIO pin
+  * @param  val  GPIO level status
+  *              0 means low level
+  *              1 means high level
+  */
 void io_write_pin(uint8_t pin,uint8_t val);
 
+/**
+  * @brief set GPIO high level
+  * @param  pin  Specific GPIO pin
+  */
 void io_set_pin(uint8_t pin);
 
+/**
+  * @brief set GPIO low level
+  * @param  pin  Specific GPIO pin
+  */
 void io_clr_pin(uint8_t pin);
 
+/**
+  * @brief toggle GPIO 
+  * @param  pin  Specific GPIO pin
+  */
 void io_toggle_pin(uint8_t pin);
 
+/**
+  * @brief get GPIO output level
+  * @param  pin  Specific GPIO pin
+  * @retval GPIO output level
+  *              0 means low level
+  *              1 means high level
+  */
 uint8_t io_get_output_val(uint8_t pin);
 
+/**
+  * @brief get GPIO input level
+  * @param  pin  Specific GPIO pin
+  * @retval GPIO output level
+  *              0 means low level
+  *              1 means high level
+  */
 uint8_t io_read_pin(uint8_t pin);
 
+/**
+  * @brief set GPIO pullup or pulldwon or nullpull
+  * @param  pin  Specific GPIO pin
+  * @param pull Configure the GPIO pull up and down     
+  */
 void io_pull_write(uint8_t pin,io_pull_type_t pull);
 
+/**
+  * @brief read GPIO pull states
+  * @param  pin  Specific GPIO pin 
+  * @retval GPIO pullup and pulldown state    
+  */
 io_pull_type_t io_pull_read(uint8_t pin);
 
-void io_exti_config(uint8_t pin,exti_edge_t edge);
-
+/**
+  * @brief GPIO external interrupt enable 
+  * @param  pin  Specific GPIO pin
+  */
 void io_ext_intrp_enable(uint8_t pin);
 
+/**
+  * @brief GPIO external interrupt disable
+  * @param  pin  Specific GPIO pin
+  */
 void io_ext_intrp_disable(uint8_t pin);
 
+/**
+  * @brief Sets the trigger edge for IO interrupt 
+  * @param  pin  Specific GPIO pin 
+  * @param  edge edge for IO interrupts 
+  */
+void io_exti_config(uint8_t pin,exti_edge_t edge);
+
+/**
+  * @brief GPIO external interrupt enable or disable
+  * @param  pin  Specific GPIO pin
+  * @param  enable
+  */
 void io_exti_enable(uint8_t pin,bool enable);
 
+/**
+  * @brief GPIO external interrupt callback
+  * @param pin specific GPIO pin
+  */
 void io_exti_callback(uint8_t pin);
+
 
 void qspi_flash_io_init(void);
 void qspi_flash_io_deinit(void);

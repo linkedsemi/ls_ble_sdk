@@ -11,3 +11,4 @@
    i2c_example
    timer_test
    rtc_example
+   gpio_example
