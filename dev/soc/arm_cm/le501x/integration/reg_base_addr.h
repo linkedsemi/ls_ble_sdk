@@ -33,4 +33,6 @@
 
 #define LSRTC_BASE_ADDR (0x40021800)
 
+#define LSSSI_BASE_ADDR (0x40013000)
+
 #endif

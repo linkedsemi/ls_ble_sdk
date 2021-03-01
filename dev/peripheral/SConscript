@@ -12,6 +12,7 @@ src = [
     'src/lsi2c.c',
     'src/lsrtc.c',
     'src/lstimer.c',
+    'src/lsssi.c',
 ]
 
 if env['IC'] == 'le501x':
@@ -28,6 +29,7 @@ if env['IC'] != 'taurus':
             'src/uart_dma.c',
             'src/adc_dma.c',
             'src/dmac.c',
+            'src/lsssi_dma.c'
     ]
 
 inc = [
