@@ -3,7 +3,6 @@
 #include <stdbool.h>
 #include "reg_rtc_type.h"
 #include "HAL_def.h"
-#include "le501x.h"
 #include "field_manipulate.h"
 #include "reg_base_addr.h"
 
