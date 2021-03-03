@@ -38,7 +38,9 @@
         "m_tb_key.h": "c",
         "m_config.h": "c",
         "lsi2c.h": "c",
-        "lstimer.h": "c"
+        "lstimer.h": "c",
+        "reg_sysc_awo.h": "c",
+        "reg_sysc_awo_type.h": "c"
     },
     "editor.detectIndentation": false,
     "restructuredtext.confPath": "${workspaceFolder}\\doc",

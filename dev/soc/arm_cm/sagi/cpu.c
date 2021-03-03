@@ -1,7 +1,22 @@
 #include "ARMCM3.h"
 #include "cpu.h"
 #include "compile_flag.h"
+#ifdef FLASH_PROG_ALGO
+XIP_BANNED uint32_t enter_critical()
+{
+    uint32_t stat = __get_PRIMASK();
+    __disable_irq();
+    return stat;
+}
 
+XIP_BANNED void exit_critical(uint32_t prev_stat)
+{
+    if(prev_stat==0)
+    {
+        __enable_irq();
+    }
+}
+#else
 XIP_BANNED uint32_t enter_critical()
 {
     uint32_t basepri = __get_BASEPRI();
@@ -13,6 +28,7 @@ XIP_BANNED void exit_critical(uint32_t cpu_stat)
 {
     __set_BASEPRI(cpu_stat);
 }
+#endif
 
 bool in_interrupt()
 {

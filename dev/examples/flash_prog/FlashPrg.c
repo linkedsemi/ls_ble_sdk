@@ -28,6 +28,7 @@
 #include "cpu.h"
 #include "platform.h"
 #include "io_config.h"
+#include "platform.h"
 /* 
    Mandatory Flash Programming Functions (Called by FlashOS):
                 int Init        (unsigned long adr,   // Initialize Flash
@@ -64,6 +65,7 @@
 
 int Init (unsigned long adr, unsigned long clk, unsigned long fnc) {
     disable_global_irq();
+    clk_switch();
     qspi_flash_io_init();
     spi_flash_drv_var_init(false,false);
     spi_flash_init();

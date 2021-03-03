@@ -3,6 +3,8 @@
 #include <stdint.h>
 #include "sdk_config.h"
 
+void clk_switch(void);
+
 void sys_init_itf(void);
 
 void arm_cm_set_int_isr(uint8_t type,void (*isr)());
