@@ -37,12 +37,7 @@ if env['IC']== 'le501x':
 else:
     env['FW_LIB'] = ble_lib['FW_LIB']
     env['LL_LIB'] = ble_lib['LL_LIB']
-        
-
-env['SDK_SRC'] = sdk_src
-env['SDK_STARTUP_SRC'] = startup_src
-
-    
+ 
 def image_build(name,src,inc,linkscript = ''):
     global env
     img_env = env.Clone()
@@ -53,7 +48,6 @@ def image_build(name,src,inc,linkscript = ''):
     if linkscript != '':
         img_env['LINKSCRIPT'] = File(linkscript)
     img_env.Append(CPPPATH = list(map(lambda x:'#/'+x.srcnode().path,inc_dirs)))
-    img_env.Append(LINKFLAGS = ' $GC_OPTION ')
     target_name = '#build/examples/'+name
     img_target = img_env.Program(target_name, img_env['SDK_SRC'] + img_env['SDK_STARTUP_SRC'] + src_files,OBJPREFIX = name+'-')
     img_env.Depends(img_target,[img_env['LINKSCRIPT']])
@@ -87,5 +81,8 @@ def app_build(app_name,src,inc,linkscript = '',mesh = False):
     app_env.Append(LIBS = [fw_lib])
     return app_env,app_target
 
+env['SDK_SRC'] = sdk_src
+env['SDK_STARTUP_SRC'] = startup_src
+env.Append(LINKFLAGS = ' $GC_OPTION ')
 SConscript(dirs = 'examples',exports=['app_build','image_build','env'])
-#SConscript(dirs = 'bootloader',exports=['env'])
+SConscript(dirs = 'bootloader',exports=['env'])
