@@ -23,7 +23,7 @@
  */
  
 #include "FlashOS.h"        // FlashOS Structures
-#include "lsqspi_msp.h"
+#include "reg_base_addr.h"
 #if defined(LE501X) 
 #define LS_FLASH_DEV_NAME "LE501X SPI NOR FLASH"
 #elif defined(SAGI)
@@ -31,18 +31,19 @@
 #endif
 
 struct FlashDevice const FlashDevice  __attribute__ ((section ("DevDscr")))  =  {
-   FLASH_DRV_VERS,             // Driver Version, do not modify!
-   LS_FLASH_DEV_NAME,   // Device Name 
-   EXTSPI,                     // Device Type
-   LSQSPI_MEM_MAP_BASE_ADDR,                 // Device Start Address
-   0x00080000,                 // Device Size in Bytes (512kB)
-   256,                       // Programming Page Size
-   0,                          // Reserved, must be 0
-   0xFF,                       // Initial Content of Erased Memory
-   500,                        // Program Page Timeout 500 mSec
-   3000,                       // Erase Sector Timeout 3000 mSec
-
+   .Vers = FLASH_DRV_VERS,             // Driver Version, do not modify!
+   .DevName = LS_FLASH_DEV_NAME,   // Device Name 
+   .DevType = EXTSPI,                     // Device Type
+   .DevAdr = LSQSPI_MEM_MAP_BASE_ADDR,                 // Device Start Address
+   .szDev = 0x00080000,                 // Device Size in Bytes (512kB)
+   .szPage = 256,                       // Programming Page Size
+   .Res = 0,                          // Reserved, must be 0
+   .valEmpty = 0xFF,                       // Initial Content of Erased Memory
+   .toProg = 500,                        // Program Page Timeout 500 mSec
+   .toErase = 3000,                       // Erase Sector Timeout 3000 mSec
 // Specify Size and Address of Sectors
-    0x001000, 0,                // sectors are 4 KB
-    SECTOR_END
+    .sectors = {
+        {0x001000, 0},                // sectors are 4 KB
+        {SECTOR_END}
+    }
 };
