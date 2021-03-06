@@ -1,6 +1,7 @@
 #ifndef PRF_FOTAS_H_
 #define PRF_FOTAS_H_
 #include <stdint.h>
+#include <stdbool.h>
 
 enum fotas_evt_type
 {

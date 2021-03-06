@@ -5,6 +5,11 @@
 #include "io_config.h"
 #include "swint_call_asm.h"
 #include "reg_sysc_ble.h"
+
+#include "spi_flash.h"
+#include "compile_flag.h"
+
+
 void modem_rf_init(void);
 #define ISR_VECTOR_ADDR ((uint32_t *)(0x400000))
 
@@ -193,3 +198,21 @@ void mac_reg_sync()
 {
     __NOP();__NOP();__NOP();__NOP();__NOP();
 }
+
+
+#define APP_IMAGE_BASE_OFFSET (0x1C)
+#define FOTA_IMAGE_BASE_OFFSET (0x28)
+#define DATA_STORAGE_BASE_OFFSET (0x2c)
+
+uint32_t config_word_get(uint32_t offset)
+{
+    uint32_t data;
+    spi_flash_quad_io_read(offset,(uint8_t *)&data,sizeof(data));
+    return data;
+}
+
+uint32_t get_app_image_base()
+{
+    return config_word_get(APP_IMAGE_BASE_OFFSET);
+}
+

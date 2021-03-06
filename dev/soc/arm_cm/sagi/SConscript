@@ -12,6 +12,7 @@ src = [
     'int_call_asm.S',
     'rom_patch.c',
     'stack_var.c',
+    'lscache_msp.c',
 ]
 inc = [
     '.',

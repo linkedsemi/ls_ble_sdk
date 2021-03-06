@@ -1,11 +1,22 @@
 MEMORY
 {
   RAM (rwx) : ORIGIN = 0x400000, LENGTH = 0x20000
+  FLASH (rx) : ORIGIN = 0x805000, LENGTH = 0x40000
 }
 
 SECTIONS
 {
-	__data_lma__ = ORIGIN(RAM);
+	__vector_lma__ = ORIGIN(FLASH);
+
+    .vector :
+    {
+        . = ALIGN(4);
+        __vector__start__ = .;
+        KEEP(*(.isr_vector))
+        __vector__end__ = .;
+    }>RAM AT>FLASH
+
+    __data_lma__ = __vector_lma__ + SIZEOF(.vector);
 
 	.data :
 	{
@@ -15,7 +26,7 @@ SECTIONS
 		*(.data*)
 		*(.xip_banned)
 		__data_end__ = ALIGN(4);
-	}>RAM
+	}>RAM AT>FLASH
 
 	.text :
 	{
@@ -38,7 +49,7 @@ SECTIONS
 
 		*(.eh_frame*)
 		*(.text* .rodata*)
-	}>RAM
+	}>FLASH
 	
 	.bss (NOLOAD):
 	{
@@ -49,18 +60,29 @@ SECTIONS
 		__bss_end__ = ALIGN(4);
 	}>RAM
 
-	.reset_retain (COPY) :
+    .heap (NOLOAD):
+    {
+        __end__ = .;
+        PROVIDE(end = .);
+        *(.heap*)
+    } > RAM
+
+    .heap (NOLOAD):
+    {
+        __end__ = .;
+        PROVIDE(end = .);
+        *(.heap*)
+    } > RAM
+
+    .reset_retain (COPY) :
 	{
 		*(.reset_retain)
 	}
-
-	.heap (COPY):
-	{
-		__end__ = .;
-		PROVIDE(end = .);
-		*(.heap*)
-		__HeapLimit = .;
-	} > RAM
+    .dmaram 0xa000 (NOLOAD):
+    {
+        *(DMAC1)
+        *(DMARAM)
+    }
 
 	/* .stack_dummy section doesn't contains any symbols. It is only
 	 * used for linker to calculate size of stack sections, and assign

@@ -7,15 +7,17 @@
 #include "lsdmac.h"
 
 #define BUF_SIZE 256
-#define DMA_UART
+// #define DMA_UART
 
 UART_HandleTypeDef UART_Config; 
-#ifdef DMA_UART
 DMA_RAM_ATTR uint8_t test_zone_a[BUF_SIZE];
+#ifdef DMA_UART
 DEF_DMA_CONTROLLER(dmac1_inst,DMAC1);
 
 static void uart_dma_channel_init(void)
 {
+    DMA_CONTROLLER_INIT(dmac1_inst);
+    UART_Config.DMAC_Instance = &dmac1_inst;
     UART_Config.Tx_Env.DMA.DMA_Channel = 0;
     UART_Config.Rx_Env.DMA.DMA_Channel = 1;
 }
@@ -53,9 +55,7 @@ static void uart_rx_test()
 #endif   //END DMA_UART
 static void uart_init(void)
 {
-    DMA_CONTROLLER_INIT(dmac1_inst);
     UART_Config.UARTX = UART1;
-    UART_Config.DMAC_Instance = &dmac1_inst;
     UART_Config.Init.BaudRate = UART_BAUDRATE_115200;
     UART_Config.Init.MSBEN = 0;
     UART_Config.Init.Parity = UART_NOPARITY;

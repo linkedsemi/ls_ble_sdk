@@ -17,6 +17,8 @@ void arm_cm_set_int_isr(uint8_t type,void (*isr)());
 
 void arm_cm_delay_asm(uint32_t);
 
+uint32_t get_app_image_base();
+
 #define DELAY_US(a) arm_cm_delay_asm((a)*(SDK_HCLK_MHZ/4))
 
 #endif
