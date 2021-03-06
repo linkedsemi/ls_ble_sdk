@@ -10,6 +10,8 @@ src = [
     'sleep_asm.S',
     'sleep.c',
     'int_call_asm.S',
+    'rom_patch.c',
+    'stack_var.c',
 ]
 inc = [
     '.',

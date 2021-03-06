@@ -1,5 +1,5 @@
 
-Import('image_build','dev_env')
+Import('image_build','env')
 
 src = [
     'FlashPrg.c',
@@ -8,7 +8,7 @@ src = [
 inc = [
     '.'
 ]
-if not 'mdk' in dev_env['TOOLS']:
+if not 'mdk' in env['TOOLS']:
     flash_prog_env,flash_prog_target = image_build('flash_prog',src,inc,'flash_prog_link.txt')
     flash_prog_env.Append(CPPDEFINES = ['GLOBAL_OUTPUT_LVL=0', 'FLASH_PROG_ALGO']) 
     flash_prog_env.Append(CFLAGS = ' -fPIE ')

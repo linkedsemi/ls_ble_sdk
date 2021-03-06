@@ -24,6 +24,7 @@ if env['IC'] == 'le501x':
     env['STACK_BIN_OUTPUT_DIR'] = Dir('#dev/soc/arm_cm/le501x/bin/')
 elif env['IC'] == 'sagi':
     env['CPU'] = 'cortex-m3'
+    env['STACK_BIN_OUTPUT_DIR'] = Dir('#dev/soc/arm_cm/sagi/bin/')
 elif env['IC'] == 'taurus':
     env['ARCH'] = 'rv32emac'
     env['ABI'] = 'ilp32e'

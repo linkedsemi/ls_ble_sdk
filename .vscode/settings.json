@@ -40,7 +40,13 @@
         "lsi2c.h": "c",
         "lstimer.h": "c",
         "reg_sysc_awo.h": "c",
-        "reg_sysc_awo_type.h": "c"
+        "reg_sysc_awo_type.h": "c",
+        "timer_wrapper.h": "c",
+        "ke_msg.h": "c",
+        "rwip.h": "c",
+        "sleep.h": "c",
+        "diss_task.h": "c",
+        "rom_patch.h": "c"
     },
     "editor.detectIndentation": false,
     "restructuredtext.confPath": "${workspaceFolder}\\doc",

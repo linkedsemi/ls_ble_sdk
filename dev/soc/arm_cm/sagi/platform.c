@@ -12,6 +12,7 @@ void ble_pkt_isr(void);
 void ble_util_isr(void);
 void SWINT_Handler_ASM(void);
 void swint2_process(void);
+void main_task_app_init(void);
 
 __attribute__((weak)) void SystemInit(){
     SCB->CCR |= SCB_CCR_UNALIGN_TRP_Msk;
@@ -103,6 +104,24 @@ void clk_switch(void)
     pll_enable();
 }
 
+static void ble_irq_config()
+{
+    arm_cm_set_int_isr(MAC1_IRQn,ble_pkt_isr);
+    arm_cm_set_int_isr(MAC2_IRQn,ble_util_isr);
+    arm_cm_set_int_isr(SWINT1_IRQn,SWINT_Handler_ASM);
+    arm_cm_set_int_isr(SWINT2_IRQn,swint2_process);
+    __NVIC_EnableIRQ(MAC1_IRQn);
+    __NVIC_EnableIRQ(MAC2_IRQn);
+    __NVIC_EnableIRQ(SWINT1_IRQn);
+    __NVIC_EnableIRQ(SWINT2_IRQn);
+}
+
+static void module_init()
+{
+    irq_priority();
+    ble_irq_config();
+    modem_rf_init();
+}
 
 void sys_init_itf()
 {
@@ -115,22 +134,24 @@ void sys_init_itf()
     //SYSC_AWO->PIN_SEL3 = FIELD_BUILD(SYSC_AWO_MDM_DBG_EN, 0xFFFF);
 
     SYSC_BLE->PD_BLE_CLKG = SYSC_BLE_CLKG_SET_MAC_MASK | SYSC_BLE_CLKG_SET_MDM_MASK | SYSC_BLE_CLKG_SET_RF_MASK;
-    irq_priority();
-    arm_cm_set_int_isr(MAC1_IRQn,ble_pkt_isr);
-    arm_cm_set_int_isr(MAC2_IRQn,ble_util_isr);
-    arm_cm_set_int_isr(SWINT1_IRQn,SWINT_Handler_ASM);
-    arm_cm_set_int_isr(SWINT2_IRQn,swint2_process);
-    __NVIC_EnableIRQ(MAC1_IRQn);
-    __NVIC_EnableIRQ(MAC2_IRQn);
-    __NVIC_EnableIRQ(SWINT1_IRQn);
-    __NVIC_EnableIRQ(SWINT2_IRQn);
-    modem_rf_init();
+    module_init();
     io_cfg_output(PB02);
     io_cfg_output(PB03);
     io_cfg_output(PB04);
     iob_output_enable(2);
     iob_output_enable(3);
     iob_output_enable(4);
+}
+
+void sys_init_app()
+{
+    main_task_app_init();
+    module_init();
+}
+
+void platform_reset(uint32_t error)
+{
+
 }
 
 void ble_pkt_irq_mask()
@@ -166,4 +187,9 @@ void iob_output_set(uint8_t i)
 void iob_output_clr(uint8_t i)
 {
     SYSC_AWO->IO[1].OE_DOT &= ~(1<<i);
+}
+
+void mac_reg_sync()
+{
+    __NOP();__NOP();__NOP();__NOP();__NOP();
 }

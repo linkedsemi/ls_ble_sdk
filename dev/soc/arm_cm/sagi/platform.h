@@ -7,6 +7,12 @@ void clk_switch(void);
 
 void sys_init_itf(void);
 
+void sys_init_app(void);
+
+void stack_assert_asm(uint32_t,uint32_t,uint32_t);
+
+void platform_reset(uint32_t error);
+
 void arm_cm_set_int_isr(uint8_t type,void (*isr)());
 
 void arm_cm_delay_asm(uint32_t);

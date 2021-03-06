@@ -25,4 +25,6 @@
 #define MAC_BASE_ADDR (0x50020000)
 
 #define RF_BASE_ADDR (0x50018000)
+
+#define LSPATCH_BASE_ADDR (0x5000b000)
 #endif

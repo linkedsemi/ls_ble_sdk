@@ -1,4 +1,4 @@
-Import('dev_env')
-if not 'mdk' in dev_env['TOOLS']:
-    SConscript(dirs = 'boot_rom',exports=['dev_env'])
-    SConscript(dirs = 'boot_ram',exports=['dev_env'])
+Import('env')
+if not 'mdk' in env['TOOLS']:
+    SConscript(dirs = 'boot_rom',exports=['env'])
+    SConscript(dirs = 'boot_ram',exports=['env'])

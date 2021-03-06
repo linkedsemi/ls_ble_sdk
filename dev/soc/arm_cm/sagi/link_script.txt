@@ -1,6 +1,6 @@
 MEMORY
 {
-  RAM (rwx) : ORIGIN = 0x400000, LENGTH = 0x10000
+  RAM (rwx) : ORIGIN = 0x400000, LENGTH = 0x20000
 }
 
 SECTIONS
@@ -14,7 +14,6 @@ SECTIONS
 		KEEP(*(.vectors))
 		*(.data*)
 		*(.xip_banned)
-		*(.text.memcpy)
 		__data_end__ = ALIGN(4);
 	}>RAM
 

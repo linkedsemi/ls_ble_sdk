@@ -11,7 +11,7 @@ inc = [
 ]
 if env['IC']!= 'le501x':
     sagi_src,sagi_inc,sagi_start_src = SConscript(dirs='sagi',exports = ['env'])
-    src_files = File(src) + sagi_src
+    src_files = File(src + ['instructions.c']) + sagi_src
     inc_dirs = Dir(inc) + sagi_inc
     start_files = sagi_start_src
 else:

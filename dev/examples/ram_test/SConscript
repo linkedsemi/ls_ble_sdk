@@ -1,6 +1,6 @@
 
 
-Import('image_build', 'dev_env')
+Import('image_build', 'env')
 
 src = [
     'main.c'
@@ -9,5 +9,5 @@ inc = [
     '.'
 ]
 
-if not 'mdk' in dev_env['TOOLS']:
+if not 'mdk' in env['TOOLS']:
     app_env,app_target = image_build('ram_test',src,inc,'ram_link.txt')

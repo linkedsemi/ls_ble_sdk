@@ -1,6 +1,6 @@
 
     
-Import('app_build','dev_env')
+Import('app_build','env')
 
 src = [
     'main.c',
@@ -10,4 +10,4 @@ inc = [
     '.'
 ]
 
-app_build('fota',src,inc, dev_env.subst("./compiler/$COMPILER/single_bank_fota_link.txt"))
+app_build('fota',src,inc, env.subst("./compiler/$COMPILER/single_bank_fota_link.txt"))
