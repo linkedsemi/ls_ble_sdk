@@ -1,7 +1,7 @@
 #include "ARMCM3.h"
 #include "cpu.h"
 #include "compile_flag.h"
-#ifdef FLASH_PROG_ALGO
+#if defined(FLASH_PROG_ALGO) || BOOT_RAM==1
 XIP_BANNED uint32_t enter_critical()
 {
     uint32_t stat = __get_PRIMASK();
