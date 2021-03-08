@@ -88,6 +88,8 @@ void ssi_rx_done(SSI_HandleTypeDef *hssi,void (*rx_callback)(SSI_HandleTypeDef *
     }
 }
 
+__attribute__((weak)) void HAL_SSI_TxRxCpltCallback(SSI_HandleTypeDef *hssi){}
+
 static void ssi_rx_full_isr(SSI_HandleTypeDef *hssi)
 {
     while(REG_FIELD_RD(hssi->REG->SR,SSI_RFNE))
