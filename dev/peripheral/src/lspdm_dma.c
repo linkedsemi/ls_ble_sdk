@@ -131,3 +131,4 @@ void HAL_PDM_PingPong_Transfer_Abort(PDM_HandleTypeDef *hpdm,bool stereo)
         HAL_DMA_Channel_Abort(hpdm->DMAC_Instance,hpdm->Env.DMA.Channel[1]);
     }
 }
+

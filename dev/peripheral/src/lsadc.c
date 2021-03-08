@@ -1288,3 +1288,4 @@ HAL_StatusTypeDef ADC_ConversionStop_Disable(ADC_HandleTypeDef* hadc)
   */
 
  /************************ (C) COPYRIGHT Linkedsemi ***********END OF FILE****/
+

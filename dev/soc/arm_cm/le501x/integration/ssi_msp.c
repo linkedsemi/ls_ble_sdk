@@ -48,3 +48,4 @@ uint8_t HAL_SSI_RX_DMA_Handshake_Get(SSI_HandleTypeDef *hssi)
 {
     return CH_SPI1_RX;
 }
+
