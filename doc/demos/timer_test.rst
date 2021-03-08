@@ -1,4 +1,4 @@
-Timer 使用实例
+TIMER 使用实例
 ==================
 例程路径：<install_file>/dev/eixamples/timer_test
 

@@ -77,4 +77,6 @@ GPIO
 
 :ref:`i2c_ref` 
 
+:ref:`timer_ref` 
 
+:ref:`pdm_ref` 

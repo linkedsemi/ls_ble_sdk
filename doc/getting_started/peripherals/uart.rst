@@ -7,11 +7,11 @@ UART（Universal Asynchronous Receiver/Transmitter）通用异步收发传输器
 
 UART 是在应用程序开发过程中使用次数最多的数据总线。
 
-初始化
--------
+一、初始化
+--------------
 
-设置UART模块的IO
-..................
+1.1 设置UART模块的IO
+........................
 
     调用IO 的初始化接口，可以将任意IO配置UART的TX或者RX，与其他设备进行通信。
 
@@ -26,8 +26,8 @@ UART 是在应用程序开发过程中使用次数最多的数据总线。
     芯片的IO 一共有34个，具体情况需根据封装图来定义。
     为了避免不必要的bug，在使用UART通信的时候，请先初始化IO，再进行其余参数的配置。
 
-设置UART模块参数变量
-.....................
+1.2 设置UART模块参数变量
+.........................
 
     设置UART模块的参数变量，其结构体的参数原型如下：
 
@@ -97,7 +97,7 @@ UART 是在应用程序开发过程中使用次数最多的数据总线。
     #define UART_LSB      0x0     // LSBEN
     #define UART_MSB      0x1     // MSBEN
 
-初始化UART模块
+1.3 初始化UART模块
 ..................
 
     通过初始化接口，应用程序可以对串口设备进行参数配置。
@@ -106,10 +106,10 @@ UART 是在应用程序开发过程中使用次数最多的数据总线。
 
     HAL_StatusTypeDef HAL_UART_Init(UART_HandleTypeDef *huart);
 
-反初始化
----------
+二、反初始化
+--------------
 
-反初始化UART模块
+2.1 反初始化UART模块
 ......................
 
     通过反初始化接口，应用程序可以关闭UART 外设，从而在运行BLE的程序的时候，降低系统的功耗。
@@ -118,7 +118,7 @@ UART 是在应用程序开发过程中使用次数最多的数据总线。
 
     HAL_StatusTypeDef HAL_UART_DeInit(UART_HandleTypeDef *huart);
 
-反初始化UART IO
+2.2 反初始化UART IO
 ...................
 
     反初始化IO接口的主要目的是为了避免在进入低功耗模式时，IO上产生漏电，或者给对接设备发送不必要的数据。
@@ -135,10 +135,13 @@ UART 是在应用程序开发过程中使用次数最多的数据总线。
     UART初始化动作会向系统注册UART进入工作状态，当系统检测到有任一外设处于工作状态时，都不会进入低功耗休眠。
     因此，UART使用完毕，需要进入低功耗状态之前，必须反初始化UART。
 
+三、UART设备数据的收发
+------------------------
+
 串口数据接收和发送数据的模式分为 3 种：非阻塞（中断）模式、阻塞模式、DMA 模式。在使用的时候，这 3 种模式只能选其一。
 
-数据收发——阻塞方式
----------------------------
+3.1 数据收发——阻塞方式
+..........................
 
 以阻塞方式接收发送模式使用串口设备的接口如下所示：
 
@@ -147,8 +150,8 @@ UART 是在应用程序开发过程中使用次数最多的数据总线。
     HAL_StatusTypeDef HAL_UART_Transmit(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size, uint32_t Timeout);
     HAL_StatusTypeDef HAL_UART_Receive(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size,uint32_t Timeout);
 
-数据收发——非阻塞（中断）方式
------------------------------
+3.2 数据收发——非阻塞（中断）方式
+....................................
 
 以非阻塞（中断）方式接收发送模式使用串口设备的接口如下所示：
 
@@ -157,8 +160,8 @@ UART 是在应用程序开发过程中使用次数最多的数据总线。
     HAL_StatusTypeDef HAL_UART_Transmit_IT(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size);
     HAL_StatusTypeDef HAL_UART_Receive_IT(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size);
 
-数据收发——DMA方式
------------------------------
+3.3 数据收发——DMA方式
+...........................
 
 以DMA方式接收发送模式使用串口设备的接口如下所示：
 
@@ -166,6 +169,9 @@ UART 是在应用程序开发过程中使用次数最多的数据总线。
 
     HAL_StatusTypeDef HAL_UART_Transmit_DMA(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size);
     HAL_StatusTypeDef HAL_UART_Receive_DMA(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size);
+
+四、代码示例
+----------------
 
 初始化以及非阻塞（中断）模式收发的示例如下：
 

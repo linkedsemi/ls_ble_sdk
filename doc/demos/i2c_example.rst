@@ -1,4 +1,4 @@
-iic设备使用示例
+IIC设备使用示例
 =================
 
 例程路径：<install_file>/dev/eixamples/i2c_test

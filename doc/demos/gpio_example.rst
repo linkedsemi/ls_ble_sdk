@@ -1,7 +1,7 @@
-gpio设备使用示例
+GPIO设备使用示例
 ==================
 
-例程路径：<install_file>/dev/examples/gpio_example
+例程路径：<install_file>/dev/examples/gpio_test
 
 一、使用说明
 ---------------

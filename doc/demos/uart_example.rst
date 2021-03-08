@@ -1,4 +1,4 @@
-uart设备使用示例
+UART设备使用示例
 ==================
 
 例程路径：<install_file>/dev/examples/uart_test
