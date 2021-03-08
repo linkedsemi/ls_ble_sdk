@@ -8,7 +8,8 @@ PDM（Pulse Density Modulation）是一种用数字信号表示模拟信号的�
 一、初始化
 ------------
 
-1. 为PDM模块配置IO
+1. PDM模块的IO配置
+++++++++++++++++++++++++
 
     | 调用IO 的初始化接口，可以将任意IO复用为pdm的colck data0或data1引脚。
 
@@ -24,6 +25,7 @@ PDM（Pulse Density Modulation）是一种用数字信号表示模拟信号的�
  | 2. 为了避免不必要的bug，在使用pdm通信的时候，请先初始化IO，再进行下列参数的配置。
 
 2. 初始化PDM模块
+++++++++++++++++++++++++
 
 2.1 PDM结构体参数原型如下：
 
@@ -31,38 +33,45 @@ PDM（Pulse Density Modulation）是一种用数字信号表示模拟信号的�
 
     typedef struct __PDM_Init_TypeDef
     {
-        onst struct pdm_fir *fir;  /*!< pdm filter controller configure */
+        const struct pdm_fir *fir;  /*!< pdm filter controller configure */
         PDM_CFG_TypeDef cfg;        /*!< pdm clock rate, capture delay, sampling rate, and data gain configure */
         PDM_MODE_TypeDef mode;      /*!< pdm channel mode configure */
     }PDM_Init_TypeDef;
 
-
-2.2 配置参数的赋值如下定义：
-
-.. code ::
-
-    //pdm filter controller configure
-        #define PDM_FIR_COEF_8KHZ ((const struct pdm_fir *)fir_coef_8khz)
-        #define PDM_FIR_COEF_16KHZ ((const struct pdm_fir *)fir_coef_16khz)
-    //pdm clock rate
-        #define PDM_CLK_RATIO(kHz) (128000/(kHz) - 1)
-    //capture delay
-        default 30
-    //sampling rate
-        #define PDM_SAMPLE_RATE(Clk_kHz,Sample_Rate_Hz) ((Clk_kHz)*1000/(Sample_Rate_Hz) - 1)
-    //data gain configure
-        defualt 5
-    //pdm channel mode
-        PDM_MODE_Mono or PDM_MODE_Stereo
-
-
-| 2.3 调用初始化PDM模块函数接口
+2.2 调用初始化PDM模块函数接口
 
     通过初始化接口，应用程序可以对PDM进行参数配置。
 
 .. code ::
 
     HAL_StatusTypeDef HAL_PDM_Init(PDM_HandleTypeDef *hpdm,PDM_Init_TypeDef *Init);
+
+3.PDM初始化参考代码如下：
+++++++++++++++++++++++++++
+
+.. code ::
+
+    #define PDM_CLK_KHZ 1024
+    #define PDM_SAMPLE_RATE_HZ 16000
+    void pdm_init()
+    {
+        pdm_clk_io_init(PB10);  /*!< PB10复用为pdm clk引脚 */
+        pdm_data0_io_init(PB09);    /*!< PB09复用为pdm data0引脚 */  
+        pdm.Instance = LSPDM;   /*!< PDM外设的基址 */
+        PDM_Init_TypeDef Init = 
+        {
+            .fir = PDM_FIR_COEF_16KHZ,  /*!< 配置PDM的滤波控制器 */
+            .cfg = {
+                .clk_ratio = PDM_CLK_RATIO(PDM_CLK_KHZ),    /*!< 配置PDM的时钟频率为1.024MHZ */
+                .sample_rate = PDM_SAMPLE_RATE(PDM_CLK_KHZ,PDM_SAMPLE_RATE_HZ), /*!< 配置PDM采样频率为16KHZ */
+                .cap_delay = 30,    /*!< 配置捕获延迟为30 */
+                .data_gain = 5,     /*!< 配置数据增益为5 */
+            },
+            .mode = PDM_MODE_Mono,  /*!< 配置PDM为单通道模式 */
+        };
+        HAL_PDM_Init(&pdm,&Init);   /*!< 调用PDM初始化函数 */
+    }
+
 
 
 
@@ -112,7 +121,7 @@ PDM（Pulse Density Modulation）是一种用数字信号表示模拟信号的�
 
 3.2 收PDM数据——DMA方式
 
-     | 以DMA方式(基本模式和乒乓模式)收PDM数据如下所示：
+    | 以DMA方式(基本模式和乒乓模式)收PDM数据如下所示：
 
 .. code ::
 
@@ -140,13 +149,13 @@ PDM（Pulse Density Modulation）是一种用数字信号表示模拟信号的�
 
     void HAL_PDM_IRQHandler(PDM_HandleTypeDef *hpdm);
 
-3.6 在PDM中断处理函数中接受完FrameNum大小数据的回调函数
+3.6 在PDM中断处理函数中接收完FrameNum大小数据的回调函数
 
 .. code ::
 
     void HAL_PDM_CpltCallback(PDM_HandleTypeDef *hpdm);
 
-3.7 在DMA模式下接受完FrameNum大小pdm数据的回调函数
+3.7 在DMA模式下接收完FrameNum大小pdm数据的回调函数
 
 .. code ::
 
