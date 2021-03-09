@@ -35,4 +35,5 @@
 
 #define LSSSI_BASE_ADDR (0x40013000)
 
+#define LSTRNG_BASE_ADDR (0x40001c00)
 #endif

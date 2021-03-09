@@ -17,7 +17,7 @@ if env['IC'] == 'le501x':
     'src/lsrtc.c',
     'src/lstimer.c',
     'src/lsssi.c',
-    'trng/lstrng.c',
+    'src/lstrng.c',
     'ecc/lsecc.c',
     'crypt/lscrypt.c',
     'spi/lsspi.c',
@@ -37,7 +37,6 @@ if env['IC'] != 'taurus' and env['IC'] == 'le501x':
     ]
 
 inc = [
-    'trng',
     'ecc',
     'crypt',
     'spi',

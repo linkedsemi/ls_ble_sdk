@@ -185,6 +185,15 @@ void cpu_sleep_recover_init()
     arm_cm_set_int_isr(LPWKUP_IRQn,LPWKUP_Handler);
 }
 
+uint32_t get_trng_value()
+{
+    uint32_t random32bit;
+    HAL_TRNG_Init();
+    HAL_TRNG_GenerateRandomNumber(&random32bit);
+    HAL_TRNG_DeInit();
+    return random32bit;
+}
+
 static void module_init()
 {
     io_init();
@@ -192,9 +201,8 @@ static void module_init()
     LOG_I("sys init");
     INIT_BUILTIN_TIMER_ENV();
     lsecc_init();
-    lstrng_init();
     lscrypt_init();
-    srand(lstrng_random());
+    srand(get_trng_value());
     calc_acc_init();
     cpu_sleep_recover_init();
     uint32_t base_offset = flash_data_storage_base_offset();

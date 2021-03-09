@@ -19,6 +19,8 @@ struct peri_stat_env
     bool dma;
     bool crypt;
     bool adc12b;
+    bool trng;
+    bool ecc;
 }peri_stat;
 
 bool app_event_status;
@@ -100,7 +102,7 @@ void dma_status_set(bool stat)
 
 void crypt_status_set(bool stat)
 {
-     peri_stat.crypt = stat;
+    peri_stat.crypt = stat;
 }
 
 void adc12b_status_set(bool stat)
@@ -108,6 +110,15 @@ void adc12b_status_set(bool stat)
     peri_stat.adc12b = stat;
 }
 
+void ecc_status_set(bool stat)
+{
+    peri_stat.ecc = stat;
+}
+
+void trng_status_set(bool stat)
+{
+    peri_stat.trng = stat;
+}
 
 bool peri_status_busy()
 {

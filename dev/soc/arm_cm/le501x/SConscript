@@ -21,6 +21,7 @@ src = [
     'integration/rtc_msp.c',
     'integration/lstimer_msp.c',
     'integration/ssi_msp.c',
+    'integration/trng_msp.c',
     'sleep.c',
     'sys_stat.c',
 ]

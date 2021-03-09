@@ -47,7 +47,11 @@
         "sleep.h": "c",
         "diss_task.h": "c",
         "rom_patch.h": "c",
-        "reg_base_addr.h": "c"
+        "reg_base_addr.h": "c",
+        "lsiwdg.h": "c",
+        "lstrng.h": "c",
+        "sys_stat.h": "c",
+        "stdint.h": "c"
     },
     "editor.detectIndentation": false,
     "restructuredtext.confPath": "${workspaceFolder}\\doc",

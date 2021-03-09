@@ -1,10 +1,7 @@
 #include "lsiwdg.h"
-#include "reg_lsiwdg_type.h"
-#include "reg_base_addr.h"
 #include "field_manipulate.h"
 #include "cpu.h"
 #include "lsiwdg_msp.h"
-#define LSIWDG ((reg_iwdg_t *)LSIWDG_BASE_ADDR)
 
 HAL_StatusTypeDef HAL_IWDG_Init(uint32_t LoadValue)
 {
