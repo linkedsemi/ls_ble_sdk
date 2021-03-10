@@ -36,27 +36,51 @@ I2c初始化，首先需要定义好I2c的SDA与SCL的io口。
 
 .. code ::
 
- iic1_io_init( PB13, PB12);
+    void iic1_io_init(uint8_t scl,uint8_t sda);
+    void iic2_io_init(uint8_t scl,uint8_t sda);
 
 然后开始初始化I2c设备。在初始化时需要先把设备一些配置信息先填写完成，如下代码所示：
-
-如果初始化成功后便可以返回值为HAL_OK，否则为HAL_ERROR。
-
 .. code ::
 
-  I2cHandle.Instance             = I2C1;/*设置i2c接口*/
-  I2cHandle.Init.ClockSpeed      = 100000;  /*设置时钟频率 <400kHz*/
-  I2cHandle.Init.OwnAddress1     = I2C_ADDRESS;  /*从设备一地址*/
-  I2cHandle.Init.AddressingMode  = I2C_ADDRESSINGMODE_7BIT;  /*7位寻址模式*/
-  I2cHandle.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;  /*设置双地址模式*/
-  I2cHandle.Init.OwnAddress2     = 0xFE;  /*从设备二地址，关闭双寻址模式此参数不生效*/
-  I2cHandle.Init.GeneralCallMode = I2C_GENERALCALL_DISABLE;  /*指定广播呼叫模式*/
-  I2cHandle.Init.NoStretchMode   = I2C_NOSTRETCH_DISABLE;  /*指定禁止时钟延长模式*/
+    HAL_I2C_Init(I2C_HandleTypeDef *hi2c);
 
-  if(HAL_I2C_Init(&I2cHandle) != HAL_OK)
-  {
-    Error_Handler();  /* Initialization Error */
-  }
+如果初始化成功后便可以返回值为HAL_OK，否则为HAL_ERROR。
+.. code ::
+
+    typedef struct __I2C_HandleTypeDef
+    {
+    reg_i2c_t                	*Instance;      /*!< I2C registers base address               */
+
+    I2C_InitTypeDef            Init;           /*!< I2C communication parameters             */
+
+    uint8_t                    *pBuffPtr;      /*!< Pointer to I2C transfer buffer           */
+
+    uint16_t                   XferSize;       /*!< I2C transfer size                        */
+
+    uint16_t                  XferCount;       /*!< I2C transfer counter                     */
+
+    uint32_t                  XferOptions;     /*!< I2C transfer options                     */
+
+    uint32_t                  PreviousState;  /*!< I2C communication Previous state and mode
+                                                    context for internal usage               */
+    void                          *DMAC_Instance;
+    union{
+            struct I2cDMAEnv DMA;
+            struct I2cInterruptEnv Interrupt;
+    }Tx_Env,Rx_Env;                           /*!< I2C Tx/Rx DMA handle parameters             */
+
+    HAL_LockTypeDef            Lock;           /*!< I2C locking object                       */
+
+    HAL_I2C_StateTypeDef  State;          /*!< I2C communication state                  */
+
+    HAL_I2C_ModeTypeDef   Mode;           /*!< I2C communication mode                   */
+
+    uint32_t              ErrorCode;      /*!< I2C Error code                           */
+
+    uint32_t              Devaddress;     /*!< I2C Target device address                */
+
+    uint32_t              EventCount;     /*!< I2C Event counter                        */
+    } I2C_HandleTypeDef;
 
 .. note ::
 
@@ -68,32 +92,49 @@ i2c收发函数：
 **参数描述**
 
 .. note ::
- 
- #. hi2c：配置i2c参数 (Pointer to a I2C_HandleTypeDef structure that contains the configuration information for the specified I2C.)
- #. DevAddress：从设备地址(Target device address: The device 7 bits address value in datasheet must be shifted to the left before calling the interface)
- #. pData：保存数据位置指针(Pointer to data buffer)
- #. Size：发送或接收的数据量
- #. Timeout:  设置超时时间
+
+    #. hi2c：配置i2c参数 (Pointer to a I2C_HandleTypeDef structure that contains the configuration information for the specified I2C.)
+    #. DevAddress：从设备地址(Target device address: The device 7 bits address value in datasheet must be shifted to the left before calling the interface)
+    #. pData：保存数据位置指针(Pointer to data buffer)
+    #. Size：发送或接收的数据量
+    #. Timeout:  设置超时时间
 
 轮询模式
---------------
+......................
 
 .. code ::
 
-  HAL_I2C_Master_Transmit(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint8_t *pData, uint16_t Size, uint32_t Timeout)
-  /*主设备以轮询模式向从设备发送数据*/
-  HAL_I2C_Master_Receive(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint8_t *pData, uint16_t Size, uint32_t Timeout)
-  /*主设备以轮询模式读取从设备的数据*/
+    HAL_I2C_Master_Transmit(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint8_t *pData, uint16_t Size, uint32_t Timeout)
+    /*主设备以轮询模式向从设备发送数据*/
+    HAL_I2C_Master_Receive(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint8_t *pData, uint16_t Size, uint32_t Timeout)
+    /*主设备以轮询模式读取从设备的数据*/
 
 中断模式
---------------
+......................
 
 .. code ::
 
-  HAL_I2C_Master_Transmit_IT(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint8_t *pData, uint16_t Size)
-  /*主设备以中断的模式向从设备发送数据*/
-  HAL_I2C_Master_Receive_IT(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint8_t *pData, uint16_t Size)
-  /*主设备以中断的模式读取从设备的数据*/
+    HAL_I2C_Master_Transmit_IT(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint8_t *pData, uint16_t Size)
+    /*主设备以中断的模式向从设备发送数据*/
+    HAL_I2C_Master_Receive_IT(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint8_t *pData, uint16_t Size)
+    /*主设备以中断的模式读取从设备的数据*/
+
+回调函数 
+......................
+.. code ::
+
+    void HAL_I2C_MasterTxCpltCallback(I2C_HandleTypeDef *hi2c)
+    {
+
+    }
+    void HAL_I2C_MasterRxCpltCallback(I2C_HandleTypeDef *hi2c)
+    {	
+
+    }
+.. note ::
+    
+    | 在使用中断模式的时候，在执行发送与接受动作完成时会进相应的回调函数，这时候我们表示我们的数据已经发送或接收完成，现在可以进行下一步操作。
+    | 这个函数属于弱定义，用户可以自行定义，并完成相应的逻辑处理。
 
 反初始化函数
 ---------------
@@ -102,5 +143,30 @@ i2c收发函数：
 
 .. code ::
 
- HAL_I2C_DeInit(I2C_HandleTypeDef *hi2c)
- /*如果初始化成功后便可以返回值为HAL_OK，否则为HAL_ERROR*/
+    HAL_I2C_DeInit(I2C_HandleTypeDef *hi2c)
+    /*如果初始化成功后便可以返回值为HAL_OK，否则为HAL_ERROR*/
+
+反初始化UART模块
+......................
+
+    通过反初始化接口，应用程序可以关闭UART 外设，从而在运行BLE的程序的时候，降低系统的功耗。
+
+.. code ::
+
+    HAL_StatusTypeDef HAL_UART_DeInit(UART_HandleTypeDef *huart);
+
+反初始化UART IO
+...................
+
+    反初始化IO接口的主要目的是为了避免在进入低功耗模式时，IO上产生漏电，或者给对接设备发送不必要的数据。
+    调用此接口后,会默认的将i2c的SDA与SCL配置成输入模式（IO浮空）。
+
+.. code ::
+
+    void iic1_io_deinit(void);
+    void iic2_io_deinit(void);
+
+.. note ::
+
+    I2C初始化动作会向系统注册I2C进入工作状态，当系统检测到有任一外设处于工作状态时，都不会进入低功耗休眠。
+    因此，I2C使用完毕，需要进入低功耗状态之前，必须反初始化I2C。
