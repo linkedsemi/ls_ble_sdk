@@ -22,6 +22,7 @@
 #define MAX_NB_ADDR_REPLAY 5
 #define PROV_AUTH_ACCEPT 1
 #define PROV_AUTH_NOACCEPT 0
+#define DEV_NAME_MAX_LEN 0x20
 static bool sent_adv_ready=true;
 static bool ls_sig_mesh_auto_prov=false;
 uint8_t vendor_tid = 0;

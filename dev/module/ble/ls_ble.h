@@ -9,8 +9,6 @@
 #define BLE_ADDR_LEN 6
 #define BLE_KEY_LEN 16
 
-#define DEV_NAME_MAX_LEN 0x20
-
 /**defgroup BLE_GAP_IO_CAPS GAP IO Capabilities**/
 #define BLE_GAP_IO_CAPS_DISPLAY_ONLY      0x0   /**< Display Only. */
 #define BLE_GAP_IO_CAPS_DISPLAY_YESNO     0x1   /**< Display and Yes/No entry. */

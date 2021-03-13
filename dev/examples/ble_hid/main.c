@@ -24,6 +24,7 @@
 
 #define DIR_NAME    7
 #define RECORD_KEY1 1
+#define DEV_NAME_MAX_LEN 0x20
 tinyfs_dir_t hid_dir;
 uint8_t ble_device_name[DEV_NAME_MAX_LEN] = "LS_HID_Demo";
 
