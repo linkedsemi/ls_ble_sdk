@@ -2,9 +2,10 @@
 #include <string.h>
 #include "linked_buffer.h"
 #include "ls_dbg.h"
+#include "compile_flag.h"
 #define LINKED_BUF_ASSERT(...) LS_ASSERT(__VA_ARGS__)
 
-void linked_buf_init(linked_buffer_t *ptr,uint16_t element_size,uint16_t buf_length,uint8_t *buf,uint8_t *ref_cnt)
+ROM_SYMBOL void linked_buf_init(linked_buffer_t *ptr,uint16_t element_size,uint16_t buf_length,uint8_t *buf,uint8_t *ref_cnt)
 {
     memset(ref_cnt,0,buf_length);
     co_list_init(&ptr->allocatable);
@@ -19,7 +20,7 @@ void linked_buf_init(linked_buffer_t *ptr,uint16_t element_size,uint16_t buf_len
     }
 }
 
-struct co_list_hdr * linked_buf_alloc(linked_buffer_t *ptr)
+ROM_SYMBOL struct co_list_hdr * linked_buf_alloc(linked_buffer_t *ptr)
 {
     struct co_list_hdr *hdr = co_list_pop_front(&ptr->allocatable);
     if(hdr)
@@ -44,7 +45,7 @@ static bool linked_buf_hdl_sanity_check(linked_buffer_t *buf_hdl,uint8_t *ptr)
 
 }
 
-uint8_t linked_buf_release(linked_buffer_t *ptr,struct co_list_hdr * hdr)
+ROM_SYMBOL uint8_t linked_buf_release(linked_buffer_t *ptr,struct co_list_hdr * hdr)
 {
     LINKED_BUF_ASSERT(linked_buf_hdl_sanity_check(ptr,(uint8_t *)hdr));
     uint16_t idx = linked_buf_get_elem_idx(ptr,hdr);
@@ -53,41 +54,41 @@ uint8_t linked_buf_release(linked_buffer_t *ptr,struct co_list_hdr * hdr)
     return --ptr->ref_cnt[idx];
 }
 
-uint16_t linked_buf_get_elem_idx(linked_buffer_t *ptr,struct co_list_hdr *hdr)
+ROM_SYMBOL uint16_t linked_buf_get_elem_idx(linked_buffer_t *ptr,struct co_list_hdr *hdr)
 {
     uint8_t *elem = (uint8_t *)hdr;
     LINKED_BUF_ASSERT((elem-(uint8_t *)ptr->buf)%ptr->element_size==0);
     return (elem-(uint8_t *)ptr->buf)/ptr->element_size;
 }
 
-struct co_list_hdr *linked_buf_get_elem_by_idx(linked_buffer_t *ptr,uint16_t idx)
+ROM_SYMBOL struct co_list_hdr *linked_buf_get_elem_by_idx(linked_buffer_t *ptr,uint16_t idx)
 {
     return (struct co_list_hdr *)&ptr->buf[ptr->element_size*idx];
 }
 
-uint16_t linked_buf_available_size(linked_buffer_t *ptr)
+ROM_SYMBOL uint16_t linked_buf_available_size(linked_buffer_t *ptr)
 {
     return co_list_size(&ptr->allocatable);
 }
 
-bool linked_buf_is_allocatable(linked_buffer_t *ptr)
+ROM_SYMBOL bool linked_buf_is_allocatable(linked_buffer_t *ptr)
 {
     return co_list_pick(&ptr->allocatable)? true : false;
 }
 
-uint8_t linked_buf_get_ref_cnt_by_idx(linked_buffer_t *ptr,uint16_t idx)
+ROM_SYMBOL uint8_t linked_buf_get_ref_cnt_by_idx(linked_buffer_t *ptr,uint16_t idx)
 {
     return ptr->ref_cnt[idx];
 }
 
-uint8_t linked_buf_retain(linked_buffer_t *ptr,struct co_list_hdr *hdr)
+ROM_SYMBOL uint8_t linked_buf_retain(linked_buffer_t *ptr,struct co_list_hdr *hdr)
 {
     LINKED_BUF_ASSERT(linked_buf_hdl_sanity_check(ptr,(uint8_t *)hdr));
     uint16_t idx = linked_buf_get_elem_idx(ptr,hdr);
     return ++ptr->ref_cnt[idx];
 }
 
-bool linked_buf_contain_element(linked_buffer_t *ptr,struct co_list_hdr *hdr)
+ROM_SYMBOL bool linked_buf_contain_element(linked_buffer_t *ptr,struct co_list_hdr *hdr)
 {
     bool contain = false;
     if(linked_buf_hdl_sanity_check(ptr,(uint8_t *)hdr))
@@ -98,7 +99,7 @@ bool linked_buf_contain_element(linked_buffer_t *ptr,struct co_list_hdr *hdr)
     return contain;
 }
 
-uint16_t linked_buf_element_size(linked_buffer_t *ptr)
+ROM_SYMBOL uint16_t linked_buf_element_size(linked_buffer_t *ptr)
 {
     return ptr->element_size;
 }

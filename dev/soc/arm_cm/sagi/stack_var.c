@@ -1,10 +1,12 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <stdlib.h>
+#include <stddef.h>
 #include "sdk_config.h"
 #include "platform.h"
 #include "cpu.h"
 #include "log.h"
+#include "io_config.h"
 
 uint8_t peer_id_buf[SDK_MAX_CONN_NUM];
 
@@ -39,34 +41,64 @@ extern void (*eif_read) (uint8_t *bufptr, uint32_t size, void (*callback)(void *
 extern void (*eif_write)(uint8_t *bufptr, uint32_t size, void (*callback)(void *,uint8_t), void* dummy);
 extern void (*eif_flow_on)(void);
 extern bool (*eif_flow_off)(void);
-extern void (*hci_read)(uint8_t *buf,uint16_t length,void (*cb)());
-extern void (*hci_write)(uint8_t *buf,uint16_t length,void (*cb)());
+extern void *(*ll_malloc_fn)(size_t);
+extern void (*ll_free_fn)(void *);
+extern uint32_t (*ble_hclk2lpclk_fn)(uint32_t);
+extern uint32_t (*ble_lpclk2hclk_fn)(uint32_t);
+extern void (*io_set_pin_fn)(uint8_t);
+extern void (*io_clr_pin_fn)(uint8_t);
 
+__attribute__((weak)) void uart_eif_read(uint8_t *bufptr, uint32_t size, void (*callback)(void *,uint8_t), void* dummy){}
+__attribute__((weak)) void uart_eif_write(uint8_t *bufptr, uint32_t size, void (*callback)(void *,uint8_t), void* dummy){}
+__attribute__((weak)) void uart_eif_flow_on(void){}
+__attribute__((weak)) bool uart_eif_flow_off(void){return false;}
 void main_task_app_init()
 {
     main_task = 0;
     app_init_fn = app_init;
-    eif_read = host_read;
-    eif_write = host_write;
-    eif_flow_on = host_flow_on;
-    eif_flow_off = host_flow_off;
-    hci_write = controller_write;
-    hci_read = controller_read;
+    eif_read = uart_eif_read;
+    eif_write = uart_eif_write;
+    eif_flow_on = uart_eif_flow_on;
+    eif_flow_off = uart_eif_flow_off;
 }
 
-__attribute__((weak)) void uart_eif_read(uint8_t *bufptr, uint32_t size, void (*callback)(void *,uint8_t), void* dummy){}
-__attribute__((weak)) void uart_eif_write(uint8_t *bufptr, uint32_t size, void (*callback)(void *,uint8_t), void* dummy){}
+
 
 
 void main_task_itf_init()
 {
-    hci_write = (void *)uart_eif_write;
-    hci_read = (void *)uart_eif_read;
+
 }
 
+struct {
+    uint32_t env[5];
+}prf_buf[SDK_MAX_PROFILE_NUM];
+
+void* gapc_env_buf[SDK_MAX_CONN_NUM];
+
+void* gattc_env_buf[SDK_MAX_CONN_NUM];
+
+void *l2cc_env_buf[SDK_MAX_CONN_NUM];
+
+void *gapm_env_actvs_buf[SDK_MAX_ACT_NUM];
+
+uint8_t gapc_state_buf[SDK_MAX_CONN_NUM];
+
+uint8_t gattc_state_buf[SDK_MAX_CONN_NUM];
+
+uint8_t l2cc_state_buf[SDK_MAX_CONN_NUM];
+
+uint32_t task_list_buf[10 + SDK_MAX_PROFILE_NUM + SDK_MAX_USER_TASK_NUM];
+
+uint8_t per_adv_rep_chain_stat_buf[SDK_MAX_ACT_NUM];
+
+void ke_mem_func_init();
 void host_buffer_init();
 void prf_fn_init(void);
 void ble_storage_max_num_init(uint8_t num);
+uint32_t ble_hclk2lpclk(uint32_t cycles);
+uint32_t ble_lpclk2hclk(uint32_t cycles);
+
 void stack_var_ptr_init()
 {
     stack_assert_asm_fn = stack_assert_asm;
@@ -76,8 +108,21 @@ void stack_var_ptr_init()
     exit_critical_fn = exit_critical;
     log_output_fn = log_output;
     log_hex_output_fn = log_hex_output;
+    ll_malloc_fn = malloc;
+    ll_free_fn = free;
+    io_set_pin_fn = io_set_pin;
+    io_clr_pin_fn = io_clr_pin;
+    ble_hclk2lpclk_fn = ble_hclk2lpclk;
+    ble_lpclk2hclk_fn = ble_lpclk2hclk;
 
+    
+    max_activity_num = SDK_MAX_ACT_NUM;
+    max_profile_num = SDK_MAX_PROFILE_NUM;
+    max_ral_num = SDK_MAX_RAL_NUM;
+    max_user_task_num = SDK_MAX_USER_TASK_NUM;
+    
     host_buffer_init();
+    ke_mem_func_init();
     prf_fn_init();
     ble_storage_max_num_init(SDK_BLE_STORAGE_PEER_MAX);
 }

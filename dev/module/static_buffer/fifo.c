@@ -1,9 +1,10 @@
 #include <stdlib.h>
 #include "fifo.h"
+#include "compile_flag.h"
 #define GET_WR_IDX(fifo) ((fifo)->wr_idx>=(fifo)->length?(fifo)->wr_idx - (fifo)->length:(fifo)->wr_idx)
 #define GET_RD_IDX(fifo) ((fifo)->rd_idx>=(fifo)->length?(fifo)->rd_idx - (fifo)->length:(fifo)->rd_idx)
 
-void fifo_init(struct fifo_env *ptr,void *buf,uint16_t length)
+ROM_SYMBOL void fifo_init(struct fifo_env *ptr,void *buf,uint16_t length)
 {
     ptr->buf = buf;
     ptr->rd_idx = 0;
@@ -11,27 +12,27 @@ void fifo_init(struct fifo_env *ptr,void *buf,uint16_t length)
     ptr->length = length;
 }
 
-bool fifo_full(struct fifo_env *ptr)
+ROM_SYMBOL bool fifo_full(struct fifo_env *ptr)
 {
     return abs(ptr->wr_idx - ptr->rd_idx) == ptr->length;
 }
 
-bool fifo_empty(struct fifo_env *ptr)
+ROM_SYMBOL bool fifo_empty(struct fifo_env *ptr)
 {
     return ptr->wr_idx == ptr->rd_idx;
 }
 
-void fifo_flush(struct fifo_env *ptr)
+ROM_SYMBOL void fifo_flush(struct fifo_env *ptr)
 {
     ptr->wr_idx = ptr->rd_idx; 
 }
 
-uint16_t fifo_element_amount(struct fifo_env *ptr)
+ROM_SYMBOL uint16_t fifo_element_amount(struct fifo_env *ptr)
 {
     return ptr->wr_idx-ptr->rd_idx;
 }
 
-bool dword_fifo_put(struct fifo_env *ptr,void *data)
+ROM_SYMBOL bool dword_fifo_put(struct fifo_env *ptr,void *data)
 {
     if(fifo_full(ptr))
     {
@@ -45,7 +46,7 @@ bool dword_fifo_put(struct fifo_env *ptr,void *data)
     }
 }
 
-bool dword_fifo_get(struct fifo_env *ptr,void *data)
+ROM_SYMBOL bool dword_fifo_get(struct fifo_env *ptr,void *data)
 {
     if(fifo_empty(ptr))
     {

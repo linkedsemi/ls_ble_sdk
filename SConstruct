@@ -1,6 +1,5 @@
 import os
 SetOption('warn', ['no-duplicate-environment'] + GetOption('warn'))
-VariantDir('build', '.',duplicate=0)
 plf ={
     'le501x': ('arm_cm','cortex-m0'),
     'sagi': ('arm_cm','cortex-m3'),
@@ -18,6 +17,7 @@ print(env['TOOLS'])
 env['IC'] = ic
 env['CPU'] = cpu
 env['BASE_ARCH'] = base_arch
+env.VariantDir('build/$IC', '.',duplicate=0)
 
 if env['IC'] == 'le501x':
     env['CPU'] = 'cortex-m0'
@@ -46,6 +46,6 @@ else:
     env['LINKFLAGS'] = '${ARCH_FLAGS} -O2 -Os -std=c11 -g -g3 -specs=nano.specs -specs=nosys.specs -T ${LINKSCRIPT} -Wl,-Map=${TARGET.base}.map -Wl,--cref ${LD_ARCH_FLAGS} '
     env['GC_OPTION'] = ' -Wl,--gc-sections '
 
-env['CPPDEFINES'] = '-D{}'.format(env['IC'].upper())
+env['CPPDEFINES'] = ['-D{}'.format(env['IC'].upper())]
 
-SConscript('build/dev/SConscript',exports=['env'])
+env.SConscript('build/$IC/dev/SConscript',exports=['env'])

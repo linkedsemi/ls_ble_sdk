@@ -2,8 +2,10 @@
 #define COMPILE_FLAG_H_
 #include <stdint.h>
 #if (ROM_CODE==1 || BOOT_RAM==1)
+#define ROM_SYMBOL
 #define XIP_BANNED 
 #else
+#define ROM_SYMBOL __attribute__((weak))
 #define XIP_BANNED __attribute__((section(".xip_banned")))
 #endif
 #define RESET_RETAIN __attribute__((section(".reset_retain")))

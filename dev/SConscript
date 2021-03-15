@@ -7,6 +7,8 @@ sdk_src = module_src + peripheral_src + soc_src
 sdk_inc = module_inc + peripheral_inc + soc_inc
 sdk_inc += Dir(['.'])
 env.Append(CPPPATH = list(map(lambda x:'#/'+x.srcnode().path,sdk_inc)))
+env['SDK_SRC'] = sdk_src
+env['SDK_STARTUP_SRC'] = startup_src
 
 ble_lib = {}
 mesh_lib = {}
@@ -36,7 +38,7 @@ if env['IC']== 'le501x':
         env['MESH_LIB'] = mesh_lib['MESH_LIB']
 else:
     env['FW_LIB'] = ble_lib['FW_LIB']
-    env['LL_LIB'] = ble_lib['LL_LIB']
+    env['ROM_SYM'] = ble_lib['ROM_SYM']
  
 def image_build(name,src,inc,linkscript = ''):
     global env
@@ -48,7 +50,7 @@ def image_build(name,src,inc,linkscript = ''):
     if linkscript != '':
         img_env['LINKSCRIPT'] = File(linkscript)
     img_env.Append(CPPPATH = list(map(lambda x:'#/'+x.srcnode().path,inc_dirs)))
-    target_name = '#build/examples/'+name
+    target_name = '#build/$IC/examples/'+name
     img_target = img_env.Program(target_name, img_env['SDK_SRC'] + img_env['SDK_STARTUP_SRC'] + src_files,OBJPREFIX = name+'-')
     img_env.Depends(img_target,[img_env['LINKSCRIPT']])
     if not 'mdk' in img_env['TOOLS']:
@@ -71,18 +73,17 @@ def app_build(app_name,src,inc,linkscript = '',mesh = False):
         app_env.Depends(app_target,[stack_hex])
         if not 'mdk' in app_env['TOOLS']:
             app_env.AddPostAction(app_target,Action('$OBJCOPY -O binary $TARGET ${TARGET.base}.ota.bin'))
-            app_hex = app_env.Command('#build/examples/'+app_name+'.hex',app_target,Action('$OBJCOPY -O ihex $SOURCES $TARGET'))
-            app_env.Command('#build/examples/'+app_name+'_production.hex',['#build/examples/info_sbl.hex',app_hex,stack_hex],Action('python tools/hexmerge.py $SOURCES > $TARGET'))
+            app_hex = app_env.Command('#build/$IC/examples/'+app_name+'.hex',app_target,Action('$OBJCOPY -O ihex $SOURCES $TARGET'))
+            app_env.Command('#build/$IC/examples/'+app_name+'_production.hex',['#build/$IC/examples/info_sbl.hex',app_hex,stack_hex],Action('python tools/hexmerge.py $SOURCES > $TARGET'))
         else:
             print(stack_hex.srcnode().path)
             app_env['STACK_HEX_PATH'] = stack_hex.srcnode().path
     else:
-        app_env.Append(LIBS = [app_env['LL_LIB']])
+        app_env.Append(LINKFLAGS = ' -Wl,-R,' + File(app_env['ROM_SYM'][0]).path)
+        app_env.Depends(app_target,app_env['ROM_SYM'])
     app_env.Append(LIBS = [fw_lib])
     return app_env,app_target
 
-env['SDK_SRC'] = sdk_src
-env['SDK_STARTUP_SRC'] = startup_src
 env.Append(LINKFLAGS = ' $GC_OPTION ')
 SConscript(dirs = 'examples',exports=['app_build','image_build','env'])
 SConscript(dirs = 'bootloader',exports=['env'])

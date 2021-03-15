@@ -1,3 +1,4 @@
+#include <string.h>
 #include "platform.h"
 #include "ARMCM3.h"
 #include "reg_sysc_awo.h"
@@ -5,9 +6,10 @@
 #include "io_config.h"
 #include "swint_call_asm.h"
 #include "reg_sysc_ble.h"
-
+#include "tinyfs.h"
 #include "spi_flash.h"
 #include "compile_flag.h"
+
 
 
 void modem_rf_init(void);
@@ -18,6 +20,7 @@ void ble_util_isr(void);
 void SWINT_Handler_ASM(void);
 void swint2_process(void);
 void main_task_app_init(void);
+void stack_var_ptr_init(void);
 
 __attribute__((weak)) void SystemInit(){
     SCB->CCR |= SCB_CCR_UNALIGN_TRP_Msk;
@@ -125,10 +128,11 @@ static void module_init()
 {
     irq_priority();
     ble_irq_config();
+    tinyfs_init(0x802000);
     modem_rf_init();
 }
 
-void sys_init_itf()
+static void clk_init()
 {
     clk_switch();
     REG_FIELD_WR(SYSC_AWO->PD_AWO_CLK_CTRL,SYSC_AWO_CLK_SEL_HBUS_L0,2);//16M
@@ -139,6 +143,11 @@ void sys_init_itf()
     //SYSC_AWO->PIN_SEL3 = FIELD_BUILD(SYSC_AWO_MDM_DBG_EN, 0xFFFF);
 
     SYSC_BLE->PD_BLE_CLKG = SYSC_BLE_CLKG_SET_MAC_MASK | SYSC_BLE_CLKG_SET_MDM_MASK | SYSC_BLE_CLKG_SET_RF_MASK;
+}
+
+void sys_init_itf()
+{
+    clk_init();
     module_init();
     io_cfg_output(PB02);
     io_cfg_output(PB03);
@@ -148,8 +157,18 @@ void sys_init_itf()
     iob_output_enable(4);
 }
 
+static void host_bss_init()
+{
+    extern uint32_t __stack_bss_start__;
+    extern uint32_t __stack_bss_end__;
+    memset(&__stack_bss_start__,0,(uint32_t)&__stack_bss_end__-(uint32_t)&__stack_bss_start__);
+}
+
 void sys_init_app()
 {
+    //clk_init();
+    host_bss_init();
+    stack_var_ptr_init();
     main_task_app_init();
     module_init();
 }
@@ -158,47 +177,6 @@ void platform_reset(uint32_t error)
 {
 
 }
-
-void ble_pkt_irq_mask()
-{
-    __NVIC_DisableIRQ(MAC1_IRQn);
-}
-
-void ble_pkt_irq_unmask()
-{
-    __NVIC_EnableIRQ(MAC1_IRQn);
-}
-
-void ble_pkt_irq_clr()
-{
-    __NVIC_ClearPendingIRQ(MAC1_IRQn);
-}
-
-void swint2_set()
-{
-    __NVIC_SetPendingIRQ(SWINT2_IRQn);
-}
-
-void ll_swint_set()
-{
-    SWINT_SET_INLINE_ASM(SWINT1_IRQn);
-}
-
-void iob_output_set(uint8_t i)
-{
-    SYSC_AWO->IO[1].OE_DOT |= 1<<i;
-}
-
-void iob_output_clr(uint8_t i)
-{
-    SYSC_AWO->IO[1].OE_DOT &= ~(1<<i);
-}
-
-void mac_reg_sync()
-{
-    __NOP();__NOP();__NOP();__NOP();__NOP();
-}
-
 
 #define APP_IMAGE_BASE_OFFSET (0x1C)
 #define FOTA_IMAGE_BASE_OFFSET (0x28)
