@@ -152,7 +152,7 @@
             "servertype": "jlink",
             "cwd": "${workspaceRoot}",
             "executable": "./build/sagi/examples/ble_dis.elf",
-            "name": "SGAI Debug BLE_DIS",
+            "name": "Debug SAGI BLE_DIS",
             "device": "SAGI",
             "interface": "swd",
             "runToMain": false,
@@ -163,10 +163,6 @@
                 "load build/sagi/stack.elf",
                 "add-symbol-file build/sagi/stack.elf",
             ],
-            "postLaunchCommands" :[
-                "monitor reg sp = (0x400000)",
-                "monitor reg pc = (0x400004)",
-            ]
         },
         {
             "type": "cortex-debug",

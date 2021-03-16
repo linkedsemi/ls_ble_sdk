@@ -222,7 +222,7 @@ static void dev_manager_callback(enum dev_evt_type type,union dev_evt_u *evt)
     case STACK_INIT:
     {
         struct ble_stack_cfg cfg = {
-            .private_addr = false,
+            .private_addr = true,
             .controller_privacy = false,
         };
         dev_manager_stack_init(&cfg);

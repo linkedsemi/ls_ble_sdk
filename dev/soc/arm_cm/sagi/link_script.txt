@@ -6,17 +6,7 @@ MEMORY
 
 SECTIONS
 {
-	__vector_lma__ = ORIGIN(FLASH);
-
-    .vector :
-    {
-        . = ALIGN(4);
-        __vector__start__ = .;
-        KEEP(*(.isr_vector))
-        __vector__end__ = .;
-    }>RAM AT>FLASH
-
-    __data_lma__ = __vector_lma__ + SIZEOF(.vector);
+    __data_lma__ = ORIGIN(FLASH);
 
 	.data :
 	{
@@ -50,7 +40,12 @@ SECTIONS
 		*(.eh_frame*)
 		*(.text* .rodata*)
 	}>FLASH
-	
+
+	.ARM.exidx :
+	{
+		*(.ARM.exidx* .gnu.linkonce.armexidx.*)
+	} > FLASH
+
 	.bss (NOLOAD):
 	{
 		__bss_start__ = .;

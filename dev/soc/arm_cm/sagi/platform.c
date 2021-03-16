@@ -72,11 +72,6 @@ static void irq_priority()
 
 }
 
-void iob_output_enable(uint8_t i)
-{
-    SYSC_AWO->IO[1].OE_DOT |= 1<<(i+16);
-}
-
 void arm_cm_set_int_isr(uint8_t type,void (*isr)())
 {
     ISR_VECTOR_ADDR[type + 16] = (uint32_t)isr;
@@ -126,6 +121,9 @@ static void ble_irq_config()
 
 static void module_init()
 {
+    io_cfg_output(PB02);
+    io_cfg_output(PB03);
+    io_cfg_output(PB04);
     irq_priority();
     ble_irq_config();
     tinyfs_init(0x802000);
@@ -149,12 +147,6 @@ void sys_init_itf()
 {
     clk_init();
     module_init();
-    io_cfg_output(PB02);
-    io_cfg_output(PB03);
-    io_cfg_output(PB04);
-    iob_output_enable(2);
-    iob_output_enable(3);
-    iob_output_enable(4);
 }
 
 static void host_bss_init()
@@ -166,10 +158,11 @@ static void host_bss_init()
 
 void sys_init_app()
 {
-    //clk_init();
+    clk_init();
     host_bss_init();
     stack_var_ptr_init();
     main_task_app_init();
+    spi_flash_drv_var_init(true,false);
     module_init();
 }
 

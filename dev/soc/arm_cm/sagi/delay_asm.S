@@ -1,7 +1,7 @@
     .syntax unified
     .arch armv7-m
 
-    .section .text
+    .section .xip_banned,"x"
     .thumb
     .thumb_func
     .align 1
