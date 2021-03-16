@@ -1,5 +1,4 @@
 #include "lsadc.h"
-#include "lsadc_ex.h"
 #include "le501x.h"
 #include "platform.h"
 #include "io_config.h"
@@ -51,6 +50,7 @@ void lsadc_init(void)
     hadc.Init.DiscontinuousConvMode = DISABLE;                       /* Parameter discarded because sequencer is disabled */
     hadc.Init.NbrOfDiscConversion   = 1;                             /* Parameter discarded because sequencer is disabled */
     hadc.Init.TrigType      = ADC_REGULAR_SOFTWARE_TRIGT;            /* Trig of conversion start done by which event */
+    hadc.Init.Vref          = ADC_VREF_INSIDE;                       /* The reference voltage uses an internal reference */
 #else
     /** Common config  */
     hadc.Instance = LSADC;
@@ -64,7 +64,8 @@ void lsadc_init(void)
     hadc.Init.TrigType      = ADC_REGULAR_SOFTWARE_TRIGT;            /* Trig of conversion start done by which event */
     #else
     hadc.Init.ContinuousConvMode    = DISABLE;                        /* Continuous mode to have maximum conversion speed (no delay between conversions) */
-    hadc.Init.TrigType      = ADC_INJECTED_SOFTWARE_TRIGT;            /* Trig of conversion start done by which event */
+    hadc.Init.TrigType      = ADC_INJECTED_SOFTWARE_TRIGT;            /* The reference voltage uses an internal reference */
+    hadc.Init.Vref          = ADC_VREF_INSIDE;
     #endif    
 
 #endif

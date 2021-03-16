@@ -63,7 +63,31 @@ typedef struct
                                                   If set to ADC_SOFTWARE_START, external triggers are disabled.
                                                   If set to external trigger source, triggering is on event rising edge.
                                                   This parameter can be a value of @ref ADC_External_trigger_source_Regular */
+    uint32_t Vref;                                              
 } ADC_InitTypeDef;
+
+
+typedef struct 
+{
+  uint32_t InjectedChannel;                       /*!< Selection of ADC channel to configure
+                                                       This parameter can be a value of @ref ADC_channels */
+  uint32_t InjectedRank;                          /*!< Rank in the injected group sequencer
+                                                       This parameter must be a value of @ref ADCEx_injected_rank*/
+  uint32_t InjectedSamplingTime;                  /*!< Sampling time value to be set for the selected channel. */
+  uint32_t InjectedOffset;                        /*!< Defines the offset to be subtracted from the raw converted data (for channels set on injected group only).
+                                                       Offset value must be a positive number.
+                                                       Depending of ADC resolution selected (12, 10, 8 or 6 bits),
+                                                       this parameter must be a number between Min_Data = 0x000 and Max_Data = 0xFFF, 0x3FF, 0xFF or 0x3F respectively. */
+  uint32_t InjectedNbrOfConversion;               /*!< Specifies the number of ranks that will be converted within the injected group sequencer.
+                                                       To use the injected group sequencer and convert several ranks, parameter 'ScanConvMode' must be enabled.
+                                                       This parameter must be a number between Min_Data = 1 and Max_Data = 4. */
+  FunctionalState InjectedDiscontinuousConvMode;  /*!< Specifies whether the conversions sequence of injected group is performed in Complete-sequence/Discontinuous-sequence (main sequence subdivided in successive parts).
+                                                       Discontinuous mode is used only if sequencer is enabled (parameter 'ScanConvMode'). If sequencer is disabled, this parameter is discarded.
+                                                       Discontinuous mode can be enabled only if continuous mode is disabled. If continuous mode is enabled, this parameter setting is discarded.
+                                                       This parameter can be set to ENABLE or DISABLE. */
+  FunctionalState AutoInjectedConv;               /*!< Enables or disables the selected ADC automatic injected group conversion after regular one
+                                                       This parameter can be set to ENABLE or DISABLE.*/
+}ADC_InjectionConfTypeDef;
 
 /** 
   * @brief  Structure definition of ADC channel for regular group   
@@ -241,6 +265,15 @@ typedef enum
 /**
   * @}
   */
+/** @defgroup ADC_Vref
+  * @{
+  */
+#define ADC_VREF_VCC        0x00000001U                  /*!< system power*/
+#define ADC_VREF_EXPOWER    0x00000002U                 /*!< External power */
+#define ADC_VREF_INSIDE     0x00000004U                 /*!< inside power */
+/**
+  * @}
+  */
 /* ADC conversion cycles (unit: ADC clock cycles)                           */
 /* (selected sampling time + conversion time of 12.5 ADC clock cycles, with */
 /* resolution 12 bits)                                                      */
@@ -265,8 +298,8 @@ typedef enum
 #define ADC_CHANNEL_7               0x00000007U
 #define ADC_CHANNEL_8               0x00000008U
 #define ADC_CHANNEL_TEMPSENSOR      0x00000009U  /* ADC internal channel (no connection on device pin) */
-#define ADC_CHANNEL_VREFINT         0x0000000AU  /* ADC internal channel (no connection on device pin) */
 #define ADC_CHANNEL_VBAT            0x0000000BU  /* ADC internal channel (no connection on device pin) */
+#define ADC_CHANNEL_VREFINT         0x0000000AU  /* ADC internal channel (no connection on device pin) */
 /**
   * @}
   */
@@ -288,7 +321,16 @@ typedef enum
 /**
   * @}
   */
-
+/** @defgroup ADCEx_injected_rank ADCEx rank into injected group
+  * @{
+  */
+#define ADC_INJECTED_RANK_1                           0x00000001U
+#define ADC_INJECTED_RANK_2                           0x00000002U
+#define ADC_INJECTED_RANK_3                           0x00000003U
+#define ADC_INJECTED_RANK_4                           0x00000004U
+/**
+  * @}
+  */
 /** @defgroup ADC_analog_watchdog_mode ADC analog watchdog mode
   * @{
   */
@@ -607,6 +649,10 @@ typedef enum
                                    ((EDGE) == ADC_TRIGType_SOFTWARE)  )
 
 #define IS_ADC_EVENT_TYPE(EVENT) ((EVENT) == ADC_AWD_EVENT)
+
+#define IS_VREF_SWITCH(VREF)    (((VREF) == ADC_VREF_VCC)     || \
+                                ((VREF) == ADC_VREF_EXPOWER)  || \
+                                ((VREF) == ADC_VREF_INSIDE)  )
 /**
   * @}
   */
@@ -673,19 +719,23 @@ typedef enum
                                                ((WATCHDOG) == ADC_ANALOGWATCHDOG_ALL_INJEC)        || \
                                                ((WATCHDOG) == ADC_ANALOGWATCHDOG_ALL_REGINJEC)       )
 
-/* Exported functions --------------------------------------------------------*/
 
-/* Include DAC HAL Extended module */
-//#include "lsadc_ex.h"
+#define ADC_MULTIMODE_AUTO_INJECTED(__HANDLE__)         (ADC1->CR1 & ADC_CR1_JAUTO)                                                \
 
 
-/** @addtogroup ADC_Exported_Functions
+#define IS_ADC_INJECTED_RANK(CHANNEL) (((CHANNEL) == ADC_INJECTED_RANK_1) || \
+                                       ((CHANNEL) == ADC_INJECTED_RANK_2) || \
+                                       ((CHANNEL) == ADC_INJECTED_RANK_3) || \
+                                       ((CHANNEL) == ADC_INJECTED_RANK_4))
+
+/** @defgroup ADCEx_injected_nb_conv_verification ADCEx injected nb conv verification
   * @{
   */
+#define IS_ADC_INJECTED_NB_CONV(LENGTH)  (((LENGTH) >= 1U) && ((LENGTH) <= 4U))
+/**
+  * @}
+  */    
 
-/** @addtogroup ADC_Exported_Functions_Group1
-  * @{
-  */
 
 /* Initialization and de-initialization functions  **********************************/
 HAL_StatusTypeDef HAL_ADC_Init(ADC_HandleTypeDef *hadc);
@@ -710,16 +760,26 @@ HAL_StatusTypeDef HAL_ADC_Stop(ADC_HandleTypeDef *hadc);
 HAL_StatusTypeDef HAL_ADC_PollForConversion(ADC_HandleTypeDef *hadc, uint32_t Timeout);
 HAL_StatusTypeDef HAL_ADC_PollForEvent(ADC_HandleTypeDef *hadc, uint32_t EventType, uint32_t Timeout);
 
+/* Blocking mode: Polling */
+HAL_StatusTypeDef HAL_ADCEx_InjectedStart(ADC_HandleTypeDef* hadc);
+HAL_StatusTypeDef HAL_ADCEx_InjectedStop(ADC_HandleTypeDef* hadc);
+HAL_StatusTypeDef HAL_ADCEx_InjectedPollForConversion(ADC_HandleTypeDef* hadc, uint32_t Timeout);
+
 /* Non-blocking mode: Interruption */
 HAL_StatusTypeDef HAL_ADC_Start_IT(ADC_HandleTypeDef *hadc);
 HAL_StatusTypeDef HAL_ADC_Stop_IT(ADC_HandleTypeDef *hadc);
-
+HAL_StatusTypeDef HAL_ADCEx_InjectedStart_IT(ADC_HandleTypeDef* hadc);
+HAL_StatusTypeDef HAL_ADCEx_InjectedStop_IT(ADC_HandleTypeDef* hadc);
 /* Non-blocking mode: DMA */
- HAL_StatusTypeDef       HAL_ADC_Start_DMA(ADC_HandleTypeDef* hadc, uint16_t* pData, uint32_t Length,void (*Callback)());
- HAL_StatusTypeDef       HAL_ADC_Stop_DMA(ADC_HandleTypeDef* hadc);
+ HAL_StatusTypeDef HAL_ADC_Start_DMA(ADC_HandleTypeDef* hadc, uint16_t* pData, uint32_t Length,void (*Callback)());
+ HAL_StatusTypeDef HAL_ADC_Stop_DMA(ADC_HandleTypeDef* hadc);
+
+HAL_StatusTypeDef HAL_ADCEx_MultiModeStart_DMA(ADC_HandleTypeDef *hadc, uint32_t *pData, uint32_t Length);
+HAL_StatusTypeDef HAL_ADCEx_MultiModeStop_DMA(ADC_HandleTypeDef *hadc); 
 
 /* ADC retrieve conversion value intended to be used with polling or interruption */
 uint32_t HAL_ADC_GetValue(ADC_HandleTypeDef *hadc);
+uint32_t HAL_ADCEx_InjectedGetValue(ADC_HandleTypeDef* hadc, uint32_t InjectedRank);
 
 /* ADC IRQHandler and Callbacks used in non-blocking modes (Interruption and DMA) */
 void HAL_ADC_IRQHandler(ADC_HandleTypeDef *hadc);
@@ -735,6 +795,7 @@ void HAL_ADC_ErrorCallback(ADC_HandleTypeDef *hadc);
   * @{
   */
 HAL_StatusTypeDef HAL_ADC_ConfigChannel(ADC_HandleTypeDef *hadc, ADC_ChannelConfTypeDef *sConfig);
+HAL_StatusTypeDef HAL_ADCEx_InjectedConfigChannel(ADC_HandleTypeDef* hadc,ADC_InjectionConfTypeDef* sConfigInjected);
 /**
   * @}
   */
@@ -745,14 +806,13 @@ HAL_StatusTypeDef HAL_ADC_ConfigChannel(ADC_HandleTypeDef *hadc, ADC_ChannelConf
   */
 uint32_t HAL_ADC_GetState(ADC_HandleTypeDef *hadc);
 uint32_t HAL_ADC_GetError(ADC_HandleTypeDef *hadc);
+
+/* ADC IRQHandler and Callbacks used in non-blocking modes (Interruption) */
+void  HAL_ADCEx_InjectedConvCpltCallback(ADC_HandleTypeDef* hadc);
 /**
   * @}
   */
 
-// /** @defgroup ADC_Exported_Functions ADC Exported Functions
-//   * @{
-//   */
-// void              ADC_DMAConvCplt(DMA_HandleTypeDef *hdma);
-// void              ADC_DMAError(DMA_HandleTypeDef *hdma);
+
 
 #endif //(_LSADC_H_)

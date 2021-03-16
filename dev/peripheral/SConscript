@@ -12,7 +12,6 @@ if env['IC'] == 'le501x':
     'src/lspdm_dma.c',
     'src/lsiwdg.c',
     'src/lsadc.c',
-    'src/lsadc_ex.c',
     'src/lsi2c.c',
     'src/lsrtc.c',
     'src/lstimer.c',
