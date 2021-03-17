@@ -337,7 +337,7 @@
               <MiscControls>--c99 -O2</MiscControls>
               <Define></Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\..\module\crc;..\..\..\module\debug;..\..\..\module\debug\RTT;..\..\..\module\static_buffer;..\..\..\module\tinyfs;..\..\..\module\tinycrypt\lib\include;..\..\..\module\ble;..\..\..\module\ble\prf;..\..\..\module\common;..\..\..\module\adpcm;..\..\..\peripheral\trng;..\..\..\peripheral\ecc;..\..\..\peripheral\crypt;..\..\..\peripheral\spi;..\..\..\peripheral\api;..\..\..\peripheral\inc;..\..\..\soc\arm_cm;..\..\..\soc\arm_cm\cmsis;..\..\..\soc\arm_cm\le501x;..\..\..\soc\arm_cm\le501x\integration;..\..\..\soc;..\..\..;..;</IncludePath>
+              <IncludePath>..\..\..\module\crc;..\..\..\module\debug;..\..\..\module\debug\RTT;..\..\..\module\static_buffer;..\..\..\module\tinyfs;..\..\..\module\tinycrypt\lib\include;..\..\..\module\ble;..\..\..\module\ble\prf;..\..\..\module\common;..\..\..\module\adpcm;..\..\..\peripheral\ecc;..\..\..\peripheral\crypt;..\..\..\peripheral\spi;..\..\..\peripheral\api;..\..\..\peripheral\inc;..\..\..\soc\arm_cm;..\..\..\soc\arm_cm\cmsis;..\..\..\soc\arm_cm\le501x;..\..\..\soc\arm_cm\le501x\integration;..\..\..\soc;..\..\..;..;</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -355,7 +355,7 @@
               <MiscControls></MiscControls>
               <Define></Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\..\module\crc;..\..\..\module\debug;..\..\..\module\debug\RTT;..\..\..\module\static_buffer;..\..\..\module\tinyfs;..\..\..\module\tinycrypt\lib\include;..\..\..\module\ble;..\..\..\module\ble\prf;..\..\..\module\common;..\..\..\module\adpcm;..\..\..\peripheral\trng;..\..\..\peripheral\ecc;..\..\..\peripheral\crypt;..\..\..\peripheral\spi;..\..\..\peripheral\api;..\..\..\peripheral\inc;..\..\..\soc\arm_cm;..\..\..\soc\arm_cm\cmsis;..\..\..\soc\arm_cm\le501x;..\..\..\soc\arm_cm\le501x\integration;..\..\..\soc;..\..\..;..;</IncludePath>
+              <IncludePath>..\..\..\module\crc;..\..\..\module\debug;..\..\..\module\debug\RTT;..\..\..\module\static_buffer;..\..\..\module\tinyfs;..\..\..\module\tinycrypt\lib\include;..\..\..\module\ble;..\..\..\module\ble\prf;..\..\..\module\common;..\..\..\module\adpcm;..\..\..\peripheral\ecc;..\..\..\peripheral\crypt;..\..\..\peripheral\spi;..\..\..\peripheral\api;..\..\..\peripheral\inc;..\..\..\soc\arm_cm;..\..\..\soc\arm_cm\cmsis;..\..\..\soc\arm_cm\le501x;..\..\..\soc\arm_cm\le501x\integration;..\..\..\soc;..\..\..;..;</IncludePath>
             </VariousControls>
           </Aads>
           <LDads>
@@ -517,11 +517,6 @@
               <FilePath>..\..\..\peripheral\src\lsadc.c</FilePath>
             </File>
             <File>
-              <FileName>lsadc_ex.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\peripheral\src\lsadc_ex.c</FilePath>
-            </File>
-            <File>
               <FileName>lscache.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\peripheral\src\lscache.c</FilePath>
@@ -594,7 +589,7 @@
             <File>
               <FileName>lstrng.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\peripheral\trng\lstrng.c</FilePath>
+              <FilePath>..\..\..\peripheral\src\lstrng.c</FilePath>
             </File>
             <File>
               <FileName>spi_flash.c</FileName>
@@ -755,6 +750,11 @@
               <FileName>systick.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\soc\arm_cm\systick.c</FilePath>
+            </File>
+            <File>
+              <FileName>trng_msp.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\soc\arm_cm\le501x\integration\trng_msp.c</FilePath>
             </File>
             <File>
               <FileName>uart_msp.c</FileName>
