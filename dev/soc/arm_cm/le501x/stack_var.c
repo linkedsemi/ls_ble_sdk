@@ -218,6 +218,8 @@ __attribute__((weak)) void (*ll_get_mac_addr_fn)(uint8_t *);
 
 __attribute__((weak)) uint32_t (*hci_rand_fn)();
 
+uint32_t get_trng_value(void);
+
 void ll_stack_var_ptr_init()
 {
     ll_get_mac_addr_fn = ll_get_mac_addr;
@@ -225,7 +227,7 @@ void ll_stack_var_ptr_init()
     platform_reset_fn = platform_reset;
     ecc_calc_fn = ecc_calc_start;
     rand_fn = rand;
-    hci_rand_fn = lstrng_random;
+    hci_rand_fn = get_trng_value;
     idiv_acc_fn = idiv_acc;
     enter_critical_fn = enter_critical;
     exit_critical_fn = exit_critical;
