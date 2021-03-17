@@ -52,15 +52,10 @@ SECTIONS
 		*(.bss*)
 		*(COMMON)
 		*(SECTION_RTT)
+		*(DMAC1)
+		*(DMARAM)
 		__bss_end__ = ALIGN(4);
 	}>RAM
-
-    .heap (NOLOAD):
-    {
-        __end__ = .;
-        PROVIDE(end = .);
-        *(.heap*)
-    } > RAM
 
     .heap (NOLOAD):
     {
@@ -73,11 +68,6 @@ SECTIONS
 	{
 		*(.reset_retain)
 	}
-    .dmaram 0xa000 (NOLOAD):
-    {
-        *(DMAC1)
-        *(DMARAM)
-    }
 
 	/* .stack_dummy section doesn't contains any symbols. It is only
 	 * used for linker to calculate size of stack sections, and assign

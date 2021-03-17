@@ -81,6 +81,7 @@ def app_build(app_name,src,inc,linkscript = '',mesh = False):
     else:
         app_env.Append(LINKFLAGS = ' -Wl,-R,' + File(app_env['ROM_SYM'][0]).path)
         app_env.Depends(app_target,app_env['ROM_SYM'])
+        app_hex = app_env.Command('#build/$IC/examples/'+app_name+'.hex',app_target,Action('$OBJCOPY -O ihex $SOURCES $TARGET'))
     app_env.Append(LIBS = [fw_lib])
     return app_env,app_target
 
