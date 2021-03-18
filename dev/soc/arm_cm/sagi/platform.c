@@ -102,13 +102,12 @@ void pll_enable()
         DELAY_US(100);
     }
 }
-
+XIP_BANNED bool clk_check();
+#if (SDK_HCLK_MHZ==16)
 XIP_BANNED void switch_to_xo16m()
 {
     REG_FIELD_WR(SYSC_AWO->PD_AWO_CLK_CTRL,SYSC_AWO_CLK_SEL_HBUS_L0,2);//16M
 }
-
-#if (SDK_HCLK_MHZ==16)
 XIP_BANNED bool clk_check()
 {
     return REG_FIELD_RD(SYSC_AWO->PD_AWO_CLK_CTRL,SYSC_AWO_CLK_SEL_HBUS_L0) == 2 ;
@@ -120,51 +119,50 @@ XIP_BANNED void clk_switch()
 }
 
 #else
-XIP_BANNED static void switch_to_pll(uint8_t hclk_scal)
+
+XIP_BANNED  void switch_to_pll()
 {
     REG_FIELD_WR(SYSC_AWO->PD_AWO_CLK_CTRL,SYSC_AWO_CLK_SEL_HBUS_L0,4);//dpll enable
-    REG_FIELD_WR(SYSC_AWO->PD_AWO_CLKG_SRST,SYSC_AWO_CLKG_CLR_DIV_HBUS,1);
-    DELAY_US(2);
-    REG_FIELD_WR(SYSC_AWO->PD_AWO_CLK_CTRL,SYSC_AWO_CLK_DIV_PARA_HBUS_M1,hclk_scal-1);
-    REG_FIELD_WR(SYSC_AWO->PD_AWO_CLKG_SRST,SYSC_AWO_CLKG_SET_DIV_HBUS,1);
-    REG_FIELD_WR(SYSC_AWO->PD_AWO_CLK_CTRL,SYSC_AWO_CLK_SEL_HBUS_L1,2);
 }
-
-#if (SDK_HCLK_MHZ==32)
-
-XIP_BANNED bool clk_check()
-{
-    return REG_FIELD_RD(SYSC_AWO->PD_AWO_CLK_CTRL, SYSC_AWO_CLK_SEL_HBUS_L0) == 4 && REG_FIELD_RD(SYSC_AWO->PD_AWO_CLK_CTRL,SYSC_AWO_CLK_DIV_PARA_HBUS_M1) == 0x4;
-}
-
-XIP_BANNED void clk_switch()
-{
-    switch_to_pll(4);
-}
-#elif(SDK_HCLK_MHZ==64)
-
-XIP_BANNED bool clk_check()
-{
-    return REG_FIELD_RD(SYSC_AWO->PD_AWO_CLK_CTRL, SYSC_AWO_CLK_SEL_HBUS_L0) == 4 && REG_FIELD_RD(SYSC_AWO->PD_AWO_CLK_CTRL,SYSC_AWO_CLK_DIV_PARA_HBUS_M1) == 0x2;
-}
-
-XIP_BANNED void clk_switch()
-{
-    switch_to_pll(2);
-}
-#elif(SDK_HCLK_MHZ==128)
+#if (SDK_HCLK_MHZ==128)
 XIP_BANNED bool clk_check()
 {
     return REG_FIELD_RD(SYSC_AWO->PD_AWO_CLK_CTRL, SYSC_AWO_CLK_SEL_HBUS_L0) == 4 && REG_FIELD_RD(SYSC_AWO->PD_AWO_CLK_CTRL,SYSC_AWO_CLK_SEL_HBUS_L1) == 0x1;
 }
-
 XIP_BANNED void clk_switch()
 {
-    switch_to_pll(0);
     REG_FIELD_WR(SYSC_AWO->PD_AWO_CLK_CTRL,SYSC_AWO_CLK_SEL_HBUS_L1,1);
+    switch_to_pll();
 }
 #else
-// #error HCLK not supported
+XIP_BANNED void dpll_div(uint8_t hclk_scal)
+{
+    REG_FIELD_WR(SYSC_AWO->PD_AWO_CLKG_SRST,SYSC_AWO_CLKG_CLR_DIV_HBUS,1);
+    REG_FIELD_WR(SYSC_AWO->PD_AWO_CLK_CTRL,SYSC_AWO_CLK_DIV_PARA_HBUS_M1,hclk_scal-1);
+    REG_FIELD_WR(SYSC_AWO->PD_AWO_CLKG_SRST,SYSC_AWO_CLKG_SET_DIV_HBUS,1);
+    REG_FIELD_WR(SYSC_AWO->PD_AWO_CLK_CTRL,SYSC_AWO_CLK_SEL_HBUS_L1,2);
+}
+#if(SDK_HCLK_MHZ==32)
+XIP_BANNED bool clk_check()
+{
+    return REG_FIELD_RD(SYSC_AWO->PD_AWO_CLK_CTRL, SYSC_AWO_CLK_SEL_HBUS_L0) == 4 && REG_FIELD_RD(SYSC_AWO->PD_AWO_CLK_CTRL,SYSC_AWO_CLK_DIV_PARA_HBUS_M1) == 0x2;
+}
+XIP_BANNED void clk_switch()
+{
+    dpll_div(4);
+    switch_to_pll();
+}
+#elif(SDK_HCLK_MHZ==64)
+XIP_BANNED bool clk_check()
+{
+    return REG_FIELD_RD(SYSC_AWO->PD_AWO_CLK_CTRL, SYSC_AWO_CLK_SEL_HBUS_L0) == 4 && REG_FIELD_RD(SYSC_AWO->PD_AWO_CLK_CTRL,SYSC_AWO_CLK_DIV_PARA_HBUS_M1) == 0x2;
+}
+XIP_BANNED void clk_switch()
+{
+    dpll_div(2);
+    switch_to_pll();
+}
+#endif 
 #endif
 #endif
 
