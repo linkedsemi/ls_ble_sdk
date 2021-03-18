@@ -50,7 +50,8 @@
         "lsiwdg.h": "c",
         "lstrng.h": "c",
         "sys_stat.h": "c",
-        "stdint.h": "c"
+        "stdint.h": "c",
+        "ll_evt.h": "c"
     },
     "editor.detectIndentation": false,
     "restructuredtext.confPath": "${workspaceFolder}\\doc",

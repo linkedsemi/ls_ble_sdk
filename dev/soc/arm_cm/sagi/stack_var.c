@@ -15,13 +15,7 @@ uint8_t *get_peer_id_buf()
     return peer_id_buf;
 }
 
-void app_init(void);
-void host_read(uint8_t *, uint32_t, void (*)(void *, uint8_t), void *);
-void host_write(uint8_t *, uint32_t ,void (*)(void *, uint8_t), void*);
-void host_flow_on();
-bool host_flow_off();
-void controller_read(uint8_t *buf,uint16_t length,void (*cb)());
-void controller_write(uint8_t *buf,uint16_t length,void (*cb)());
+
 
 
 extern uint8_t main_task;
@@ -47,27 +41,45 @@ extern uint32_t (*ble_hclk2lpclk_fn)(uint32_t);
 extern uint32_t (*ble_lpclk2hclk_fn)(uint32_t);
 extern void (*io_set_pin_fn)(uint8_t);
 extern void (*io_clr_pin_fn)(uint8_t);
+extern void *hci_write;
+extern void *hci_read;
+static bool dummy()
+{
+    return true;
+}
 
 __attribute__((weak)) void uart_eif_read(uint8_t *bufptr, uint32_t size, void (*callback)(void *,uint8_t), void* dummy){}
 __attribute__((weak)) void uart_eif_write(uint8_t *bufptr, uint32_t size, void (*callback)(void *,uint8_t), void* dummy){}
-__attribute__((weak)) void uart_eif_flow_on(void){}
-__attribute__((weak)) bool uart_eif_flow_off(void){return false;}
+void controller_read(uint8_t *buf,uint16_t length,void (*cb)());
+void controller_write(uint8_t *buf,uint16_t length,void (*cb)());
+
+static void eif0_set()
+{
+    eif_read = (void (*)(uint8_t *, uint32_t, void (*)(void *, uint8_t), void *))dummy;
+    eif_write = (void (*)(uint8_t *, uint32_t, void (*)(void *, uint8_t), void *))dummy;
+    eif_flow_on = (void (*)(void))dummy;
+    eif_flow_off = (bool (*)(void))dummy;
+}
+
+void app_init(void);
+
 void main_task_app_init()
 {
     main_task = 0;
     app_init_fn = app_init;
-    eif_read = uart_eif_read;
-    eif_write = uart_eif_write;
-    eif_flow_on = uart_eif_flow_on;
-    eif_flow_off = uart_eif_flow_off;
+    hci_read = controller_read;
+    hci_write = controller_write;
+    eif0_set();
 }
-
-
 
 
 void main_task_itf_init()
 {
-
+    main_task = 6;
+    app_init_fn = (void (*)(void))dummy;
+    hci_read = uart_eif_read;
+    hci_write = uart_eif_write;
+    eif0_set();
 }
 
 struct {
