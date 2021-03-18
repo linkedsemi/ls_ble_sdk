@@ -103,10 +103,70 @@ void pll_enable()
     }
 }
 
-void clk_switch(void)
+XIP_BANNED void switch_to_xo16m()
 {
-    pll_enable();
+    REG_FIELD_WR(SYSC_AWO->PD_AWO_CLK_CTRL,SYSC_AWO_CLK_SEL_HBUS_L0,2);//16M
 }
+
+#if (SDK_HCLK_MHZ==16)
+XIP_BANNED bool clk_check()
+{
+    return REG_FIELD_RD(SYSC_AWO->PD_AWO_CLK_CTRL,SYSC_AWO_CLK_SEL_HBUS_L0) == 2 ;
+}
+
+XIP_BANNED void clk_switch()
+{
+    switch_to_xo16m();
+}
+
+#else
+XIP_BANNED static void switch_to_pll(uint8_t hclk_scal)
+{
+    REG_FIELD_WR(SYSC_AWO->PD_AWO_CLK_CTRL,SYSC_AWO_CLK_SEL_HBUS_L0,4);//dpll enable
+    REG_FIELD_WR(SYSC_AWO->PD_AWO_CLKG_SRST,SYSC_AWO_CLKG_CLR_DIV_HBUS,1);
+    DELAY_US(2);
+    REG_FIELD_WR(SYSC_AWO->PD_AWO_CLK_CTRL,SYSC_AWO_CLK_DIV_PARA_HBUS_M1,hclk_scal-1);
+    REG_FIELD_WR(SYSC_AWO->PD_AWO_CLKG_SRST,SYSC_AWO_CLKG_SET_DIV_HBUS,1);
+    REG_FIELD_WR(SYSC_AWO->PD_AWO_CLK_CTRL,SYSC_AWO_CLK_SEL_HBUS_L1,2);
+}
+
+#if (SDK_HCLK_MHZ==32)
+
+XIP_BANNED bool clk_check()
+{
+    return REG_FIELD_RD(SYSC_AWO->PD_AWO_CLK_CTRL, SYSC_AWO_CLK_SEL_HBUS_L0) == 4 && REG_FIELD_RD(SYSC_AWO->PD_AWO_CLK_CTRL,SYSC_AWO_CLK_DIV_PARA_HBUS_M1) == 0x4;
+}
+
+XIP_BANNED void clk_switch()
+{
+    switch_to_pll(4);
+}
+#elif(SDK_HCLK_MHZ==64)
+
+XIP_BANNED bool clk_check()
+{
+    return REG_FIELD_RD(SYSC_AWO->PD_AWO_CLK_CTRL, SYSC_AWO_CLK_SEL_HBUS_L0) == 4 && REG_FIELD_RD(SYSC_AWO->PD_AWO_CLK_CTRL,SYSC_AWO_CLK_DIV_PARA_HBUS_M1) == 0x2;
+}
+
+XIP_BANNED void clk_switch()
+{
+    switch_to_pll(2);
+}
+#elif(SDK_HCLK_MHZ==128)
+XIP_BANNED bool clk_check()
+{
+    return REG_FIELD_RD(SYSC_AWO->PD_AWO_CLK_CTRL, SYSC_AWO_CLK_SEL_HBUS_L0) == 4 && REG_FIELD_RD(SYSC_AWO->PD_AWO_CLK_CTRL,SYSC_AWO_CLK_SEL_HBUS_L1) == 0x1;
+}
+
+XIP_BANNED void clk_switch()
+{
+    switch_to_pll(0);
+    REG_FIELD_WR(SYSC_AWO->PD_AWO_CLK_CTRL,SYSC_AWO_CLK_SEL_HBUS_L1,1);
+}
+#else
+// #error HCLK not supported
+#endif
+#endif
 
 static void ble_irq_config()
 {
@@ -122,6 +182,9 @@ static void ble_irq_config()
 
 static void module_init()
 {
+    SYSC_AWO->PIN_SEL3 = FIELD_BUILD(SYSC_AWO_MAC_DBG_EN, 0xFFFF);
+    //SYSC_AWO->PIN_SEL3 = FIELD_BUILD(SYSC_AWO_MDM_DBG_EN, 0xFFFF);
+    SYSC_BLE->PD_BLE_CLKG = SYSC_BLE_CLKG_SET_MAC_MASK | SYSC_BLE_CLKG_SET_MDM_MASK | SYSC_BLE_CLKG_SET_RF_MASK;
     io_cfg_output(PB02);
     io_cfg_output(PB03);
     io_cfg_output(PB04);
@@ -131,22 +194,17 @@ static void module_init()
     modem_rf_init();
 }
 
-static void clk_init()
+static void analog_init()
 {
-    clk_switch();
-    REG_FIELD_WR(SYSC_AWO->PD_AWO_CLK_CTRL,SYSC_AWO_CLK_SEL_HBUS_L0,2);//16M
+    pll_enable();
+    if(clk_check()==false)
+    {
+        clk_switch();
+    }
     REG_FIELD_WR(SYSC_AWO->PD_AWO_ANA0,SYSC_AWO_AWO_BG_RES_TRIM,0x33);
     REG_FIELD_WR(SYSC_AWO->PD_AWO_ANA2,SYSC_AWO_AWO_BG_RBIAS_TRIM,0xf);
     MODIFY_REG(SYSC_AWO->PD_AWO_ANA1,SYSC_AWO_AWO_XO16M_LP_MASK|SYSC_AWO_AWO_XO16M_CAP_TRIM_MASK,1<<SYSC_AWO_AWO_XO16M_LP_POS | 7<<SYSC_AWO_AWO_XO16M_CAP_TRIM_POS);
-    SYSC_AWO->PIN_SEL3 = FIELD_BUILD(SYSC_AWO_MAC_DBG_EN, 0xFFFF);
-    //SYSC_AWO->PIN_SEL3 = FIELD_BUILD(SYSC_AWO_MDM_DBG_EN, 0xFFFF);
 
-    SYSC_BLE->PD_BLE_CLKG = SYSC_BLE_CLKG_SET_MAC_MASK | SYSC_BLE_CLKG_SET_MDM_MASK | SYSC_BLE_CLKG_SET_RF_MASK;
-}
-
-static void analog_init()
-{
-    clk_init();
 }
 
 static void host_bss_init()
