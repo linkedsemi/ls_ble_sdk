@@ -20,6 +20,7 @@ void ble_util_isr(void);
 void SWINT_Handler_ASM(void);
 void swint2_process(void);
 void main_task_app_init(void);
+void main_task_itf_init(void);
 void stack_var_ptr_init(void);
 
 __attribute__((weak)) void SystemInit(){
@@ -143,10 +144,9 @@ static void clk_init()
     SYSC_BLE->PD_BLE_CLKG = SYSC_BLE_CLKG_SET_MAC_MASK | SYSC_BLE_CLKG_SET_MDM_MASK | SYSC_BLE_CLKG_SET_RF_MASK;
 }
 
-void sys_init_itf()
+static void analog_init()
 {
     clk_init();
-    module_init();
 }
 
 static void host_bss_init()
@@ -156,13 +156,26 @@ static void host_bss_init()
     memset(&__stack_bss_start__,0,(uint32_t)&__stack_bss_end__-(uint32_t)&__stack_bss_start__);
 }
 
-void sys_init_app()
+static void var_init()
 {
-    clk_init();
     host_bss_init();
     stack_var_ptr_init();
-    main_task_app_init();
     spi_flash_drv_var_init(true,false);
+}
+
+void sys_init_itf()
+{
+    analog_init();
+    var_init();
+    main_task_itf_init();
+    module_init();
+}
+
+void sys_init_app()
+{
+    analog_init();
+    var_init();
+    main_task_app_init();
     module_init();
 }
 
