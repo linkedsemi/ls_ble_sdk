@@ -290,7 +290,8 @@ HAL_StatusTypeDef HAL_ADC_Init(ADC_HandleTypeDef *hadc)
   }
   
     tmp_ccr = FIELD_BUILD(ADC_MSBCAL, 2)  |
-                FIELD_BUILD(ADC_VRPS, ADC_VRPS_MASK)    |
+                FIELD_BUILD(ADC_VRPS, hadc->Init.Vref)  |
+                FIELD_BUILD(ADC_VRBUFEN, 1) |
                 FIELD_BUILD(ADC_BP, 0)      |
                 FIELD_BUILD(ADC_VCMEN, 1)   |
                 FIELD_BUILD(ADC_VREFEN, 1)  |
