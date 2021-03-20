@@ -43,7 +43,10 @@ def mdk_builder(target,source,env):
     beforecompile2 = mdk_xml_schema.UserAction('')
     beforebuild1 = mdk_xml_schema.UserAction('')
     beforebuild2 = mdk_xml_schema.UserAction('')
-    afterbuild1 = mdk_xml_schema.UserAction(os.path.relpath(env.Dir("#").abspath, prj_dir) + '\\tools\\le501x\\after_build.bat @L ' + os.path.relpath(env.Dir("#").abspath, prj_dir) + ' ' + env['STACK_HEX_PATH'])
+    if env.get('STACK_HEX_PATH') is None:
+        afterbuild1 = mdk_xml_schema.UserAction('')
+    else:
+        afterbuild1 = mdk_xml_schema.UserAction(os.path.relpath(env.Dir("#").abspath, prj_dir) + '\\tools\\le501x\\after_build.bat @L ' + os.path.relpath(env.Dir("#").abspath, prj_dir) + ' ' + env['STACK_HEX_PATH'])
     afterbuild2 = mdk_xml_schema.UserAction('')
     prj.User = pyxb.BIND(BeforeCompile1=beforecompile1,BeforeCompile2=beforecompile2,BeforeBuild1=beforebuild1,BeforeBuild2=beforebuild2,AfterBuild1=afterbuild1,AfterBuild2=afterbuild2)
     

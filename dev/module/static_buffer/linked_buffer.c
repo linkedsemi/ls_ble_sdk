@@ -5,6 +5,11 @@
 #include "compile_flag.h"
 #define LINKED_BUF_ASSERT(...) LS_ASSERT(__VA_ARGS__)
 
+__attribute__((weak)) void co_list_init(struct co_list *list){}
+__attribute__((weak)) void co_list_push_back(struct co_list *list, struct co_list_hdr *list_hdr){}
+__attribute__((weak)) struct co_list_hdr *co_list_pop_front(struct co_list *list){return NULL;}
+__attribute__((weak)) uint16_t co_list_size(struct co_list *list){return 0;}
+
 ROM_SYMBOL void linked_buf_init(linked_buffer_t *ptr,uint16_t element_size,uint16_t buf_length,uint8_t *buf,uint8_t *ref_cnt)
 {
     memset(ref_cnt,0,buf_length);

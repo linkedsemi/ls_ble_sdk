@@ -19,26 +19,26 @@
 
 
 
-extern void (*stack_assert_asm_fn)(uint32_t,uint32_t,uint32_t);
-extern void (*app_init_fn)(void); 
-extern void (*platform_reset_fn)(uint32_t);
-extern int (*rand_fn) (void);
-extern uint64_t (*idiv_acc_fn)(uint32_t,uint32_t,bool);
-extern void (*ecc_calc_fn)(const uint8_t*,const uint8_t*,const uint8_t*,uint8_t*,uint8_t*,void (*)(void *),void *);
-extern void (*exit_critical_fn)(uint32_t);
-extern uint32_t (*enter_critical_fn)(void);
-extern void (*log_output_fn)(bool linefeed,const char *format,...);
-extern void (*log_hex_output_fn)(const void * data_pointer , uint16_t data_length);
-extern void (*aes_encrypt_fn)(void (*)(void),const uint8_t*,const uint8_t*);
-extern void (*aes_encrypt_comp_fn)(void (*)(uint32_t *),uint32_t*);
-extern void (*stack_reset_hook_fn)(void);
-extern bool em_fixed;
+__attribute((weak)) void (*stack_assert_asm_fn)(uint32_t,uint32_t,uint32_t);
+__attribute((weak)) void (*app_init_fn)(void); 
+__attribute((weak)) void (*platform_reset_fn)(uint32_t);
+__attribute((weak)) int (*rand_fn) (void);
+__attribute((weak)) uint64_t (*idiv_acc_fn)(uint32_t,uint32_t,bool);
+__attribute((weak)) void (*ecc_calc_fn)(const uint8_t*,const uint8_t*,const uint8_t*,uint8_t*,uint8_t*,void (*)(void *),void *);
+__attribute((weak)) void (*exit_critical_fn)(uint32_t);
+__attribute((weak)) uint32_t (*enter_critical_fn)(void);
+__attribute((weak)) void (*log_output_fn)(bool linefeed,const char *format,...);
+__attribute((weak)) void (*log_hex_output_fn)(const void * data_pointer , uint16_t data_length);
+__attribute((weak)) void (*aes_encrypt_fn)(void (*)(void),const uint8_t*,const uint8_t*);
+__attribute((weak)) void (*aes_encrypt_comp_fn)(void (*)(uint32_t *),uint32_t*);
+__attribute((weak)) void (*stack_reset_hook_fn)(void);
+__attribute((weak)) bool em_fixed;
 
-extern uint8_t main_task;
-extern uint8_t max_activity_num;
-extern uint8_t max_profile_num;
-extern uint8_t max_ral_num;
-extern uint8_t max_user_task_num;
+__attribute((weak)) uint8_t main_task;
+__attribute((weak)) uint8_t max_activity_num;
+__attribute((weak)) uint8_t max_profile_num;
+__attribute((weak)) uint8_t max_ral_num;
+__attribute((weak)) uint8_t max_user_task_num;
 
 #if !defined(CONFIG_AOS)
 struct {
@@ -119,11 +119,11 @@ struct
 
 uint32_t heap_buf[ENV_BUF_SIZE/sizeof(uint32_t)+DB_BUF_SIZE/sizeof(uint32_t)+MSG_BUF_SIZE/sizeof(uint32_t)+NON_RET_BUF_SIZE/sizeof(uint32_t)];
 
-void statck_buffer_init(uint32_t,uint32_t,uint32_t,uint32_t);
+__attribute((weak)) void statck_buffer_init(uint32_t size0,uint32_t size1,uint32_t size2,uint32_t size3){}
 
-void prf_fn_init(void);
+__attribute((weak)) void prf_fn_init(void){}
 
-void ble_storage_max_num_init(uint8_t num);
+__attribute((weak)) void ble_storage_max_num_init(uint8_t num){}
 
 void stack_var_ptr_init()
 {
@@ -160,17 +160,17 @@ static bool dummy()
     return true;
 }
 
-extern void (*eif_read) (uint8_t *bufptr, uint32_t size, void (*callback)(void *,uint8_t), void* dummy);
-extern void (*eif_write)(uint8_t *bufptr, uint32_t size, void (*callback)(void *,uint8_t), void* dummy);
-extern void (*eif_flow_on)(void);
-extern bool (*eif_flow_off)(void);
+__attribute((weak)) void (*eif_read) (uint8_t *bufptr, uint32_t size, void (*callback)(void *,uint8_t), void* dummy);
+__attribute((weak)) void (*eif_write)(uint8_t *bufptr, uint32_t size, void (*callback)(void *,uint8_t), void* dummy);
+__attribute((weak)) void (*eif_flow_on)(void);
+__attribute((weak)) bool (*eif_flow_off)(void);
 
 __attribute__((weak)) void uart_eif_read(uint8_t *bufptr, uint32_t size, void (*callback)(void *,uint8_t), void* dummy){}
 __attribute__((weak)) void uart_eif_write(uint8_t *bufptr, uint32_t size, void (*callback)(void *,uint8_t), void* dummy){}
 __attribute__((weak)) void uart_eif_flow_on(void){}
 __attribute__((weak)) bool uart_eif_flow_off(void){return false;}
 
-void app_init(void);
+__attribute((weak)) void app_init(void){}
 
 void main_task_app_init()
 {

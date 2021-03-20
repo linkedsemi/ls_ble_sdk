@@ -66,7 +66,7 @@ static void uart_init(void)
 
 int main()
 {
-    sys_init_app();
+    sys_init_none();
     uart1_io_init(PB00,PB01);
     uart_init();
 #ifdef DMA_UART

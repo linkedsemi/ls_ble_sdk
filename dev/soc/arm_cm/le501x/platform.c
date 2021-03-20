@@ -40,6 +40,7 @@ void main_task_app_init(void);
 
 void main_task_itf_init(void);
 
+__attribute__((weak)) void builtin_timer_env_register(linked_buffer_t *env){}
 
 static void bb_mem_clr(void)
 {
@@ -59,14 +60,14 @@ static void irq_priority()
     NVIC->IP[7] = IRQ_NVIC_PRIO(UART2_IRQn,2) | IRQ_NVIC_PRIO(UART3_IRQn,2) | IRQ_NVIC_PRIO(BLE_FIFO_IRQn,0) | IRQ_NVIC_PRIO(BLE_CRYPT_IRQn,0);
 }
 
+__attribute__((weak)) uint32_t __stack_bss_start__;
+__attribute__((weak)) uint32_t __stack_bss_size__;
+__attribute__((weak)) uint32_t __stack_data_lma__;
+__attribute__((weak)) uint32_t __stack_data_start__;
+__attribute__((weak)) uint32_t __stack_data_size__;
 static void stack_data_bss_init()
 {
-    extern uint32_t __stack_bss_start__;
-    extern uint32_t __stack_bss_size__;
     memset(&__stack_bss_start__,0,(uint32_t)&__stack_bss_size__);
-    extern uint32_t __stack_data_lma__;
-    extern uint32_t __stack_data_start__;
-    extern uint32_t __stack_data_size__;
     memcpy(&__stack_data_start__,&__stack_data_lma__,(uint32_t)&__stack_data_size__);
 }
 
@@ -252,6 +253,13 @@ void sys_init_app()
     var_init();
     main_task_app_init();
     module_init();
+}
+
+void sys_init_none()
+{
+    analog_init();
+    spi_flash_drv_var_init(true,false);
+    io_init();
 }
 
 void ll_stack_var_ptr_init(void);

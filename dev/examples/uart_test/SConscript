@@ -5,4 +5,4 @@ src = [
 inc = [
     '.'
 ]
-app_build('uart_test',src,inc)
+app_build('uart_test',src,inc,ble = False)

@@ -59,30 +59,36 @@ def image_build(name,src,inc,linkscript = ''):
 
     return img_env,img_target
   
-def app_build(app_name,src,inc,linkscript = '',mesh = False):
+def app_build(app_name,src,inc,linkscript = '',ble = True,mesh = False):
     app_env,app_target = image_build(app_name,src,inc,linkscript)
     if mesh:
         fw_lib = app_env['MESH_LIB']
-    else:
+    elif ble:
         fw_lib = app_env['FW_LIB']
     if app_env['IC'] == 'le501x':
         if mesh:
             stack_hex = app_env['FW_MESH_HEX']
-        else:
+            app_env.Depends(app_target,[stack_hex])
+        elif ble:
             stack_hex = app_env['FW_HEX']
-        app_env.Depends(app_target,[stack_hex])
+            app_env.Depends(app_target,[stack_hex])
         if not 'mdk' in app_env['TOOLS']:
-            app_env.AddPostAction(app_target,Action('$OBJCOPY -O binary $TARGET ${TARGET.base}.ota.bin'))
             app_hex = app_env.Command('#build/$IC/examples/'+app_name+'.hex',app_target,Action('$OBJCOPY -O ihex $SOURCES $TARGET'))
-            app_env.Command('#build/$IC/examples/'+app_name+'_production.hex',['#build/$IC/examples/info_sbl.hex',app_hex,stack_hex],Action('python tools/hexmerge.py $SOURCES > $TARGET'))
+            if mesh or ble:
+                app_env.AddPostAction(app_target,Action('$OBJCOPY -O binary $TARGET ${TARGET.base}.ota.bin'))
+                app_env.Command('#build/$IC/examples/'+app_name+'_production.hex',['#build/$IC/examples/info_sbl.hex',app_hex,stack_hex],Action('python tools/hexmerge.py $SOURCES > $TARGET'))
+            else:
+                app_env.Command('#build/$IC/examples/'+app_name+'_production.hex',['#build/$IC/examples/info_sbl.hex',app_hex],Action('python tools/hexmerge.py $SOURCES > $TARGET'))
         else:
-            print(stack_hex.srcnode().path)
-            app_env['STACK_HEX_PATH'] = stack_hex.srcnode().path
+            if mesh or ble:
+                print(stack_hex.srcnode().path)
+                app_env['STACK_HEX_PATH'] = stack_hex.srcnode().path
     else:
         app_env.Append(LINKFLAGS = ' -Wl,-R,' + File(app_env['ROM_SYM'][0]).path)
         app_env.Depends(app_target,app_env['ROM_SYM'])
         app_hex = app_env.Command('#build/$IC/examples/'+app_name+'.hex',app_target,Action('$OBJCOPY -O ihex $SOURCES $TARGET'))
-    app_env.Append(LIBS = [fw_lib])
+    if mesh or ble:
+        app_env.Append(LIBS = [fw_lib])
     return app_env,app_target
 
 env.Append(LINKFLAGS = ' $GC_OPTION ')
