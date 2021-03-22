@@ -21,7 +21,7 @@ static UART_HandleTypeDef log_uart;
 
 static void log_uart_tx(char *ptr,int len)
 {
-    HAL_UART_Transmit(&log_uart,(void *)ptr,(uint16_t)len,0);
+    HAL_UART_Transmit(&log_uart,(void *)ptr,(uint16_t)len,1000);
 }
 
 static void log_uart_init()
