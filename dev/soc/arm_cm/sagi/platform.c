@@ -235,6 +235,11 @@ void sys_init_app()
     module_init();
 }
 
+void sys_init_none()
+{
+    analog_init();
+}
+
 void platform_reset(uint32_t error)
 {
 
