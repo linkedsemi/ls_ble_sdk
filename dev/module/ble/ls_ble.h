@@ -392,6 +392,7 @@ enum gap_evt_type
     GET_DEV_INFO_DEV_NAME,
     GET_DEV_INFO_APPEARANCE,
     GET_DEV_INFO_SLV_PRE_PARAM,
+    GET_DEV_INFO_PEER_RSSI,
 };
 enum
 {
@@ -521,6 +522,11 @@ struct gap_dev_info_slave_pref_param
     uint16_t conn_timeout;
 };
 
+struct gap_dev_info_peer_rssi
+{
+    int8_t rssi;
+};
+
 union gap_evt_u
 {
     struct gap_connected connected;
@@ -537,6 +543,7 @@ union gap_evt_u
     struct gap_dev_info_dev_name get_dev_name;
     struct gap_dev_info_appearance get_appearance;
     struct gap_dev_info_slave_pref_param slv_pref_param;
+    struct gap_dev_info_peer_rssi peer_rssi;
 };
 
 struct gap_update_conn_param
@@ -790,6 +797,8 @@ void gap_manager_delete_bonding(uint8_t peer_id);
 uint8_t gap_manager_get_bonding_peer_id(uint8_t link_id);
 
 uint8_t gap_manager_get_bonded_dev_num(void);
+
+void gap_manager_get_peer_rssi(uint8_t link_id);
 
 void gatt_manager_init(void (*evt_cb)(enum gatt_evt_type,union gatt_evt_u *,uint8_t));
 
