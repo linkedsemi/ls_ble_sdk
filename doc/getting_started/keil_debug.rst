@@ -35,7 +35,7 @@ JLINK烧录、调试的准备工作
 
 JFlash使用
 -------------------------
-#. 打开J-FLash,配置target device为``LinkedSemi LE501X``
+#. 打开J-FLash,配置target device为 ``LinkedSemi LE501X``
 
  .. image:: jflash_start.png
 

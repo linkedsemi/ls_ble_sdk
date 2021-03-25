@@ -42,16 +42,14 @@ JLINK烧录、调试的准备工作
 除了Persistent Data区域是运行时写入的数据，其他四个区域都需要预先写入Flash，程序才能正确运行。
 
 **Info + Second Boot**
-    build/examples/info_sbl.hex
+    build/examples/le501x/info_sbl.hex
     
 **Protocol Stack**
     dev/soc/arm_cm/le501x/bin/fw.hex
 
 *开发调试* 阶段，需要预先将上述两个hex文件烧录Flash。
 
-*量产* 前，用hexmerge.py将上述两个hex和应用镜像hex合并::
-
-    hexmerge.py build/examples/info_sbl.hex dev/soc/arm_cm/le501x/bin/fw.hex build/examples/myapp.hex > mayapp_production.hex
+*量产* 时，可以使用对应工程的XXX_production.hex，该文件是由info_sbl.hex、fw.hex以及应用hex文件合并之后的固件。
 
 JFlash使用
 ~~~~~~~~~~~~~
