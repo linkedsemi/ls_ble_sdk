@@ -751,7 +751,7 @@ void io_init(void)
     LSGPIOA->IE = 0;
     LSGPIOA->OE = 0;
     LSGPIOA->PUPD = 0;
-    LSGPIOB->MODE = 0x2800;
+    LSGPIOB->MODE &= 0x3c00;
     LSGPIOB->IE = 0;
     LSGPIOB->OE = 0;
     LSGPIOB->PUPD = 0x2800;
