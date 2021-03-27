@@ -352,8 +352,8 @@ enum SYSCFG_REG_PMU_ANALOG_FIELD
 
 enum SYSCFG_REG_BKD_FIELD
 {
-    SYSCFG_BK_DATA_MASK = (int)0xffff0000,
-    SYSCFG_BK_DATA_POS = 16,
+    SYSCFG_BK_DATA_MASK = (int)0xffffffff,
+    SYSCFG_BK_DATA_POS = 0,
 };
 
 #endif
