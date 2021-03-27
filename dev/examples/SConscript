@@ -3,6 +3,7 @@ SConscript(dirs = 'flash_prog',exports=['image_build','env'])
 SConscript(dirs = 'host_test',exports=['app_build'])
 SConscript(dirs = 'ble_dis',exports=['app_build'])
 SConscript(dirs = 'uart_test',exports=['app_build'])
+SConscript(dirs = 'gpio_test',exports=['app_build'])
 
 if env['IC'] == 'le501x':
     SConscript(dirs = 'fota',exports=['app_build','env'])
@@ -15,7 +16,6 @@ if env['IC'] == 'le501x':
     SConscript(dirs = 'ble_at_proj',exports=['app_build'])
     SConscript(dirs = 'ble_hid',exports=['app_build'])
     SConscript(dirs = 'adc_test',exports=['app_build'])
-    SConscript(dirs = 'gpio_test',exports=['app_build'])
     SConscript(dirs = 'mesh_app',exports=['app_build'])
     SConscript(dirs = 'ble_uart_server_sleep_mode',exports=['app_build'])
     SConscript(dirs = 'timer_test',exports=['app_build'])

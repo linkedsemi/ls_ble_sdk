@@ -4,94 +4,120 @@
 
 typedef struct
 {
-    volatile uint32_t SFT_CTRL00;
+    volatile uint32_t SFT_CTRL00;  //0x00
     volatile uint32_t SFT_CTRL01;
     volatile uint32_t SFT_CTRL02;
     volatile uint32_t SFT_CTRL03;
-    volatile uint32_t SFT_CTRL04;
+    volatile uint32_t SFT_CTRL04;  //0x10
     volatile uint32_t SFT_CTRL05;
     volatile uint32_t SFT_CTRL06;
     volatile uint32_t SFT_CTRL07;
-    volatile uint32_t SFT_CTRL08;
-    volatile uint32_t SFT_CTRL09;
+    volatile uint32_t SFT_CTRL08;   //0x20
+    volatile uint32_t SFT_CTRL09;   
     volatile uint32_t SFT_CTRL0A;
     volatile uint32_t SFT_CTRL0B;
-    volatile uint32_t SFT_CTRL0C;
+    volatile uint32_t SFT_CTRL0C;   //0x30
     volatile uint32_t SFT_CTRL0D;
     volatile uint32_t SFT_CTRL0E;
     volatile uint32_t SFT_CTRL0F;
-    volatile uint32_t TIM_CTRL0;
+    volatile uint32_t TIM_CTRL0;    //x040
     volatile uint32_t TIM_CTRL1;
     volatile uint32_t TIM_CTRL2;
     volatile uint32_t TIM_CTRL3;
-    volatile uint32_t TIM_CTRL4;
+    volatile uint32_t TIM_CTRL4;    //x050
     volatile uint32_t LVD33;
     volatile uint32_t TRIM0;
     volatile uint32_t TRIM1;
-    volatile uint32_t TRIM2;
+    volatile uint32_t TRIM2;       //0x60
     volatile uint32_t WKUP_CTRL0;
     volatile uint32_t TRIM3;
     volatile uint32_t DCDC0;
-    volatile uint32_t DCDC1;
+    volatile uint32_t DCDC1;       //0x70
     volatile uint32_t DCDC2;
     volatile uint32_t DCDC3;
     volatile uint32_t DCDC4;
-    volatile uint32_t WDT0;
+    volatile uint32_t WDT0;       //0x80
     volatile uint32_t WDT1;
     volatile uint32_t WDT2;
     volatile uint32_t WDT3;
-    volatile uint32_t WDT4;
+    volatile uint32_t WDT4;      //0x90
     volatile uint32_t RESERVED0[3];
-    volatile uint32_t RTC0;
-    volatile uint32_t RTC1;
-    volatile uint32_t RTC2;
-    volatile uint32_t RTC3;
-    volatile uint32_t RTC4;
-    volatile uint32_t RTC5;
-    volatile uint32_t RTC6;
-    volatile uint32_t RTC7;
-    volatile uint32_t RTC8;
-    volatile uint32_t RTC9;
-    volatile uint32_t RTC10;
+    volatile uint32_t RTC_CTRL;      //0xa0
+    volatile uint32_t RTC_1HZ_H;
+    volatile uint32_t RTC_1HZ_L;
+    volatile uint32_t RTC_CALIB;
+    volatile uint32_t RTC_SEC;       //0XB0
+    volatile uint32_t RTC_MIN;
+    volatile uint32_t RTC_HOUR;
+    volatile uint32_t RTC_DAY;
+    volatile uint32_t RTC_WEEK;     //0XC0
+    volatile uint32_t RTC_MON;
+    volatile uint32_t RTC_YEAR;
     volatile uint32_t RESERVED1[5];
-    volatile uint32_t RST_SFT;
+    volatile uint32_t RST_SFT;    //0XE0
     volatile uint32_t LKRST;
     volatile uint32_t RST_SRC_CLR;
     volatile uint32_t WKUP_TIM0;
-    volatile uint32_t WKUP_TIM1;
+    volatile uint32_t WKUP_TIM1;    //0XF0
     volatile uint32_t PMU_SET_VAL;
     volatile uint32_t PWR_CTRL0;
     volatile uint32_t PWR_CTRL1;
-    volatile uint32_t EXTI_CTRL0;
-    volatile uint32_t EXTI_CTRL1;
-    volatile uint32_t EXTI_CTRL2;
-    volatile uint32_t EXTI_CTRL3;
-    volatile uint32_t EXTI_CTRL4;
-    volatile uint32_t EXTI_CTRL5;
-    volatile uint32_t EXTI_CTRL6;
-    volatile uint32_t EXTI_CTRL7;
-    volatile uint32_t EXTI_CTRL8;
-    volatile uint32_t EXTI_CTRL9;
-    volatile uint32_t EXTI_CTRL10;
-    volatile uint32_t EXTI_CTRL11;
-    volatile uint32_t EXTI_CTRL12;
-    volatile uint32_t EXTI_CTRL13;
-    volatile uint32_t EXTI_CTRL14;
-    volatile uint32_t EXTI_CTRL15;
-    volatile uint32_t EXTI_CTRL16;
-    volatile uint32_t EXTI_CTRL17;
-    volatile uint32_t WKUP_CTRL1;
-    volatile uint32_t PMU_SET_TGGL;
-    volatile uint32_t RESERVED2[20];
-    volatile uint32_t RTC_CNT0;
-    volatile uint32_t RTC_CNT1;
-    volatile uint32_t RTC_CNT2;
-    volatile uint32_t RTC_CNT3;
-    volatile uint32_t RTC_CNT4;
-    volatile uint32_t RTC_CNT5;
-    volatile uint32_t RTC_CNT6;
-    volatile uint32_t RESERVED3[26];
-    volatile uint32_t PMU_CTRL;
+    volatile uint32_t GPIOA_INTR_EN_L;    //0X100
+    volatile uint32_t GPIOA_INTR_EN_H;
+    volatile uint32_t GPIOB_INTR_EN_L;
+    volatile uint32_t GPIOB_INTR_EN_H;
+    volatile uint32_t GPIOC_INTR_EN_L;    //0X110
+    volatile uint32_t GPIOC_INTR_EN_H;
+    volatile uint32_t GPIOA_INTR_POL_L;
+    volatile uint32_t GPIOA_INTR_POL_H;
+    volatile uint32_t GPIOB_INTR_POL_L;   //0X120
+    volatile uint32_t GPIOB_INTR_POL_H;
+    volatile uint32_t GPIOC_INTR_POL_L;
+    volatile uint32_t GPIOC_INTR_POL_H;
+    volatile uint32_t GPIOA_INTR_CLR_L;   //0X130
+    volatile uint32_t GPIOA_INTR_CLR_H;
+    volatile uint32_t GPIOB_INTR_CLR_L;
+    volatile uint32_t GPIOB_INTR_CLR_H;
+    volatile uint32_t GPIOC_INTR_CLR_L;   //0X140
+    volatile uint32_t GPIOC_INTR_CLR_H;
+    volatile uint32_t SWD_IO_WKUP_EN;
+    volatile uint32_t PMU_SET_TGGL;  //0X14C
+    volatile uint32_t RESERVED2[12];
+    volatile uint32_t WDT_CNT0;  //0X180
+    volatile uint32_t WDT_CNT1;
+    volatile uint32_t WDT_CNT2;
+    volatile uint32_t WDT_CNT3;
+    volatile uint32_t WDT_INTR;   //0X190
+    volatile uint32_t RESERVED3[3];
+    volatile uint32_t RTC_SEC_VAL;     //0X1A0
+    volatile uint32_t RTC_MIN_VAL;
+    volatile uint32_t RTC_HOUR_VAL;
+    volatile uint32_t RTC_DAY_VAL;
+    volatile uint32_t RTC_WEEK_VAL;    //0X1B0
+    volatile uint32_t RTC_MON_VAL;
+    volatile uint32_t RTC_YEAR_VAL;
+    volatile uint32_t RTC_INTR;
+    volatile uint32_t RST_SRC;      //0X1C0
+    volatile uint32_t TIM_CNT0;
+    volatile uint32_t TIM_CNT1;
+    volatile uint32_t TIM_CNT2;
+    volatile uint32_t TIM_CNT3;     //0X1D0
+    volatile uint32_t TIM_INTR;
+    volatile uint32_t RESERVED4[6];
+    volatile uint32_t GPIOA_INTR_L;  //0X1F0
+    volatile uint32_t GPIOA_INTR_H;
+    volatile uint32_t GPIOB_INTR_L;
+    volatile uint32_t GPIOB_INTR_H;
+    volatile uint32_t GPIOC_INTR_L;   //0X200
+    volatile uint32_t GPIOC_INTR_H;
+    volatile uint32_t EXT_INTR;
+    volatile uint32_t GPIOA_INTR_RAW_L;
+    volatile uint32_t GPIOA_INTR_RAW_H;  //0X210
+    volatile uint32_t GPIOB_INTR_RAW_L;
+    volatile uint32_t GPIOB_INTR_RAW_H;
+    volatile uint32_t GPIOC_INTR_RAW_L;
+    volatile uint32_t GPIOC_INTR_RAW_H;   //0X220
+    volatile uint32_t PMU_CTRL;    //0X224
 }reg_v33_rg_t;
 
 enum V33_RG_REG_SFT_CTRL00_FIELD
@@ -252,6 +278,10 @@ enum V33_RG_REG_TRIM1_FIELD
 
 enum V33_RG_REG_TRIM2_FIELD
 {
+    V33_RG_PD_AMIC_MASK = (int)0x2,
+    V33_RG_PD_AMIC_POS = 1,
+    V33_RG_latch_gpio_MASK = (int)0x4,
+    V33_RG_latch_gpio_POS = 2,
     V33_RG_PD_ADC12_MASK = (int)0x8,
     V33_RG_PD_ADC12_POS = 3,
     V33_RG_PD_GPIO_MASK = (int)0x10,
@@ -644,6 +674,12 @@ enum V33_RG_REG_EXTI_CTRL17_FIELD
 {
     V33_RG_GPIOC_INTR_CLR_H_MASK = (int)0x7,
     V33_RG_GPIOC_INTR_CLR_H_POS = 0,
+};
+
+enum V33_RG_REG_EXTI_INTR_FIELD
+{
+    V33_RG_EXT_INTR_MASK = (int)0x1,
+    V33_RG_EXT_INTR_POS = 0,
 };
 
 enum V33_RG_REG_WKUP_CTRL1_FIELD

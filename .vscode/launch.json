@@ -467,7 +467,7 @@
             "cwd": "${workspaceRoot}",
             "executable": "./build/sagi/examples/uart_test.elf",
             "name": "Attach SAGI UART_TEST",
-            "device": "LE501X",
+            "device": "SAGI",
             "interface": "swd",
             "preAttachCommands":[
                 "monitor flash breakpoints = 0",
@@ -583,6 +583,20 @@
             "request": "launch",
             "servertype": "jlink",
             "cwd": "${workspaceRoot}",
+            "executable": "./build/sagi/examples/gpio_test.elf",
+            "name": "Debug SAGI GPIO_TEST",
+            "device": "SAGI",
+            "interface": "swd",
+            "runToMain": true,
+            "preLaunchCommands" :[
+                "monitor flash breakpoints = 0",        
+            ]
+        },
+        {
+            "type": "cortex-debug",
+            "request": "launch",
+            "servertype": "jlink",
+            "cwd": "${workspaceRoot}",
             "executable": "./build/le501x/examples/tmall_mesh.elf",
             "name": "Debug LE501X TMALL_MESH",
             "device": "LE501X",
@@ -595,6 +609,7 @@
                 //"add-symbol-file build/fw.elf",                
             ]
         },
+
         {
             "type": "cortex-debug",
             "request": "attach",

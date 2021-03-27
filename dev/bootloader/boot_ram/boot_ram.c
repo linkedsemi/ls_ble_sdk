@@ -22,7 +22,10 @@ static void boot_app(uint32_t base)
 
 void boot_ram_start(uint32_t exec_addr)
 {
-    clk_switch();
+    if(clk_check()==false)
+    {
+        clk_switch();
+    }
     spi_flash_drv_var_init(false,false);
     spi_flash_init();
     spi_flash_qe_status_read_and_set();

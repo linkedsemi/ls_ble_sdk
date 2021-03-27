@@ -1,5 +1,3 @@
-#include "le501x.h"
-#include "sys_stat.h"
 #include "io_config.h"
 #include "platform.h"
 #include <string.h>
@@ -21,7 +19,7 @@ void exti_test(void)
 }
 int main(void)
 {
-    sys_init_app();
+    sys_init_none();
     gpio_init();
     exti_test();
     while (1)

@@ -3,14 +3,113 @@
 #include "field_manipulate.h"
 #include "per_func_mux.h"
 #include "reg_sysc_per.h"
+#include "ARMCM3.h"
+#include "platform.h"
+#include "reg_v33_rg.h"
 gpio_pin_t uart1_txd;
 gpio_pin_t uart1_rxd;
 gpio_pin_t iic1_scl;
 gpio_pin_t iic1_sda;
 
+__attribute__((weak)) void io_exti_callback(uint8_t pin){}
+
+static void exti_io_handler(uint8_t port,uint8_t num)
+{
+    uint8_t pin = port<<4 | num;
+    io_exti_callback(pin);
+}
+
+void EXTI_Handler(void)
+{
+    uint8_t i;
+    uint8_t gpio_status = V33_RG->GPIOA_INTR_L;
+    if(gpio_status != 0)
+    {
+        for(i=0;i<8;++i)
+        {
+            if(1<<i & gpio_status)
+            {
+                V33_RG->GPIOA_INTR_CLR_L = 1<<i;
+                V33_RG->GPIOA_INTR_CLR_L = 0;
+                exti_io_handler(0,i);
+            }
+        }
+    }
+    gpio_status = V33_RG->GPIOA_INTR_H;
+    if(gpio_status != 0)
+    {
+        for(i=0;i<8;++i)
+        {
+            if(1<<i & gpio_status)
+            {
+                V33_RG->GPIOA_INTR_CLR_H = 1<<i;
+                V33_RG->GPIOA_INTR_CLR_H = 0;
+                exti_io_handler(0,i+8);
+            }
+        }
+    }
+    gpio_status = V33_RG->GPIOB_INTR_L;
+    if(gpio_status != 0)
+    {
+        for(i=0;i<8;++i)
+        {
+            if(1<<i & gpio_status)
+            {
+                V33_RG->GPIOB_INTR_CLR_L = 1<<i;
+                V33_RG->GPIOB_INTR_CLR_L = 0;
+                exti_io_handler(1,i);
+            }
+        }
+    }
+    gpio_status = V33_RG->GPIOB_INTR_H;
+    if(gpio_status != 0)
+    {
+        for(i=0;i<8;++i)
+        {
+            if(1<<i & gpio_status)
+            {
+                V33_RG->GPIOB_INTR_CLR_H = 1<<i;
+                V33_RG->GPIOB_INTR_CLR_H = 0;
+                exti_io_handler(1,i+8);
+            }
+        }
+    }
+    gpio_status = V33_RG->GPIOC_INTR_L;
+    if(gpio_status != 0)
+    {
+        for(i=0;i<8;++i)
+        {
+            if(1<<i & gpio_status)
+            {
+                V33_RG->GPIOC_INTR_CLR_L = 1<<i;
+                V33_RG->GPIOC_INTR_CLR_L = 0;
+                exti_io_handler(2,i);
+            }
+        }
+    }
+    gpio_status = V33_RG->GPIOC_INTR_H;
+    if(gpio_status != 0)
+    {
+        for(i=0;i<8;++i)
+        {
+            if(1<<i & gpio_status)
+            {
+                V33_RG->GPIOC_INTR_CLR_H = 1<<i;
+                V33_RG->GPIOC_INTR_CLR_H = 0;
+                exti_io_handler(2,i+8);
+            }
+        }
+    }
+}
+
 void io_init(void)
 {
-    
+    SYSC_AWO->IO[0].IE_OD = 0;
+    SYSC_AWO->IO[0].OE_DOT= 0;
+    SYSC_AWO->IO[1].IE_OD = 0;
+    SYSC_AWO->IO[1].OE_DOT = 0;
+    arm_cm_set_int_isr(EXT_IRQn,EXTI_Handler);
+    __NVIC_EnableIRQ(EXT_IRQn);
 }
 
 void io_cfg_output(uint8_t pin)
@@ -99,11 +198,215 @@ io_pull_type_t io_pull_read(uint8_t pin)
     }
 }
 
-void io_exti_config(uint8_t pin,exti_edge_t edge);
+static void io_intr_flag_clr(gpio_pin_t *x)
+{
+    switch (x->port)
+    {
+    case 0:
+        if(x->num<=7)
+        {
+            V33_RG->GPIOA_INTR_CLR_L = 1<<(x->num);
+            V33_RG->GPIOA_INTR_CLR_L = 0;
+        }
+        else
+        {
+            V33_RG->GPIOA_INTR_CLR_H = 1<<(x->num -8);
+            V33_RG->GPIOA_INTR_CLR_H = 0;
+        }
+        break;
+    case 1:
+        if(x->num<=7)
+        {
+            V33_RG->GPIOB_INTR_CLR_L = 1<<(x->num);
+            V33_RG->GPIOB_INTR_CLR_L  = 0;
+        }
+        else
+        {
+            V33_RG->GPIOB_INTR_CLR_H = 1<<(x->num -8);
+            V33_RG->GPIOB_INTR_CLR_H  = 0;
+        }
+        break;
+    case 2:
+        if(x->num<=7)
+        {
+            V33_RG->GPIOC_INTR_CLR_L = 1<<(x->num);
+            V33_RG->GPIOC_INTR_CLR_L  = 0;
+        }
+        else
+        {
+            V33_RG->GPIOC_INTR_CLR_H = 1<<(x->num -8);
+            V33_RG->GPIOC_INTR_CLR_H  = 0;
+        }
+        break;
+    default:
+        break;
+    }
+}
 
-void io_exti_enable(uint8_t pin,bool enable);
+void io_exti_config(uint8_t pin,exti_edge_t edge)
+{
+    gpio_pin_t *x = (gpio_pin_t *)&pin;
+    switch (x->port)
+    {
+    case 0:
+        if(x->num<=7)
+        {
+            if(edge == INT_EDGE_RISING)
+            {
+                V33_RG->GPIOA_INTR_POL_L &= ~(1<<(x->num));
+            }
+            else
+            {
+                V33_RG->GPIOA_INTR_POL_L |= 1<<(x->num);
+            }
+        }
+        else
+        {
+            if(edge == INT_EDGE_RISING)
+            {
+                V33_RG->GPIOA_INTR_POL_H &=~(1<<(x->num-8));
+            }
+            else
+            {
+                V33_RG->GPIOA_INTR_POL_H |= 1<<(x->num-8);
+            }
+        }
+        break;
+    case 1:
+        if(x->num<=7)
+        {
+            if(edge == INT_EDGE_RISING)
+            {
+                V33_RG->GPIOB_INTR_POL_L &= ~(1<<(x->num));
+            }
+            else
+            {
+                V33_RG->GPIOB_INTR_POL_L |= 1<<(x->num);
+            }
+        }
+        else
+        {
+            if(edge == INT_EDGE_RISING)
+            {
+                V33_RG->GPIOB_INTR_POL_H &= ~(1<<(x->num-8));
+            }
+            else
+            {
+                V33_RG->GPIOB_INTR_POL_H |= 1<<(x->num-8);
+            }
+        }
+        break;
+    case 2:
+        if(x->num<=7)
+        {
+            if(edge == INT_EDGE_RISING)
+            {
+               V33_RG->GPIOC_INTR_POL_L &= ~(1<<(x->num));
+            }
+            else
+            {
+                V33_RG->GPIOC_INTR_POL_L |= 1<<(x->num);
+            }
+        }
+        else
+        {
+            if(edge == INT_EDGE_RISING)
+            {
+                V33_RG->GPIOC_INTR_POL_H &= ~(1<<(x->num-8));
+            }
+            else
+            {
+                V33_RG->GPIOC_INTR_POL_H |= 1<<(x->num-8);
+            }
+        }
+        break;
+    default:
+        break;
+    }
+}
 
-void io_exti_callback(uint8_t pin);
+void io_exti_enable(uint8_t pin,bool enable)
+{
+    gpio_pin_t *x = (gpio_pin_t *)&pin;
+    io_intr_flag_clr(x);
+    switch (x->port)
+    {
+    case 0:
+        if(x->num<=7)
+        {
+            if(enable)
+            {
+                V33_RG->GPIOA_INTR_EN_L |= 1<<(x->num);
+            }
+            else
+            {
+                V33_RG->GPIOA_INTR_EN_L &= ~(1<<(x->num));
+            }
+        }
+        else
+        {
+            if(enable)
+            {
+                V33_RG->GPIOA_INTR_EN_H |= 1<<(x->num-8);
+            }
+            else
+            {
+                V33_RG->GPIOA_INTR_EN_H &= ~(1<<(x->num - 8));
+            }
+        }
+        break;
+    case 1:
+        if(x->num<=7)
+        {
+            if(enable)
+            {
+                V33_RG->GPIOB_INTR_EN_L |= 1<<(x->num);
+            }
+            else
+            {
+                V33_RG->GPIOB_INTR_EN_L &= ~(1<<(x->num));
+            }
+        }
+        else
+        {
+            if(enable)
+            {
+                V33_RG->GPIOB_INTR_EN_H |= 1<<(x->num-8);
+            }
+            else
+            {
+                V33_RG->GPIOB_INTR_EN_H &= ~(1<<(x->num - 8));
+            }
+        }
+        break;
+    case 2:
+        if(x->num<=7)
+        {
+            if(enable)
+            {
+                V33_RG->GPIOC_INTR_EN_L |= 1<<(x->num);
+            }
+            else
+            {
+                V33_RG->GPIOC_INTR_EN_L &= ~(1<<(x->num));
+            }
+        }
+        else
+        {
+            if(enable)
+            {
+                V33_RG->GPIOC_INTR_EN_H |= 1<<(x->num-8);
+            }
+            else
+            {
+                V33_RG->GPIOC_INTR_EN_H &= ~(1<<(x->num - 8));
+            }
+        }
+        break;
+    default:
+        break;
+    }
+}
 
 static void uart_io_cfg(uint8_t txd,uint8_t rxd)
 {

@@ -115,6 +115,7 @@ XIP_BANNED bool clk_check()
 
 XIP_BANNED void clk_switch()
 {
+    pll_enable();
     switch_to_xo16m();
 }
 
@@ -131,6 +132,7 @@ XIP_BANNED bool clk_check()
 }
 XIP_BANNED void clk_switch()
 {
+    pll_enable();
     REG_FIELD_WR(SYSC_AWO->PD_AWO_CLK_CTRL,SYSC_AWO_CLK_SEL_HBUS_L1,1);
     switch_to_pll();
 }
@@ -149,6 +151,7 @@ XIP_BANNED bool clk_check()
 }
 XIP_BANNED void clk_switch()
 {
+    pll_enable();
     dpll_div(4);
     switch_to_pll();
 }
@@ -159,6 +162,7 @@ XIP_BANNED bool clk_check()
 }
 XIP_BANNED void clk_switch()
 {
+    pll_enable();
     dpll_div(2);
     switch_to_pll();
 }
@@ -194,7 +198,6 @@ static void module_init()
 
 static void analog_init()
 {
-    pll_enable();
     if(clk_check()==false)
     {
         clk_switch();
@@ -238,6 +241,8 @@ void sys_init_app()
 void sys_init_none()
 {
     analog_init();
+    spi_flash_drv_var_init(true,false);
+    io_init();
 }
 
 void platform_reset(uint32_t error)

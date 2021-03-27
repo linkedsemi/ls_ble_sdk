@@ -21,6 +21,8 @@ uint32_t get_app_image_base();
 
 void sys_init_none();
 
+void pll_enable();
+
 #define DELAY_US(a) arm_cm_delay_asm((a)*(SDK_HCLK_MHZ/4))
 
 #endif
