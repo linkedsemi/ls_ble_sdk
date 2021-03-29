@@ -4,6 +4,7 @@ SConscript(dirs = 'host_test',exports=['app_build'])
 SConscript(dirs = 'ble_dis',exports=['app_build'])
 SConscript(dirs = 'uart_test',exports=['app_build'])
 SConscript(dirs = 'gpio_test',exports=['app_build'])
+SConscript(dirs = 'test_code',exports=['app_build'])
 
 if env['IC'] == 'le501x':
     SConscript(dirs = 'fota',exports=['app_build','env'])

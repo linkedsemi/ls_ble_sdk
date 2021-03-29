@@ -9,7 +9,7 @@
 #include "tinyfs.h"
 #include "spi_flash.h"
 #include "compile_flag.h"
-
+#include "reg_v33_rg.h"
 
 
 void modem_rf_init(void);
