@@ -297,6 +297,12 @@ static void prf_hid_server_callback(enum hid_evt_type type, union hid_evt_u *evt
         }
         tinyfs_write_through();
         break;
+    case HID_NTF_DONE:
+        LOG_I("HID NTF DONE");
+        break;
+    case HID_REPORT_WRITE:
+        LOG_I("HID REPORT WRITE");
+        break;
     default:
         break;
     }

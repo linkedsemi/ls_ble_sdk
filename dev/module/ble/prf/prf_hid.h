@@ -57,9 +57,17 @@ enum hid_evt_type
 {
     HID_REPORT_READ,
     HID_NTF_CFG,
+    HID_NTF_DONE,
+    HID_REPORT_WRITE,
 };
 
 struct hid_read_report_req_evt
+{
+    uint16_t length;
+    uint8_t* value;
+};
+
+struct hid_write_report_req_evt
 {
     uint16_t length;
     uint8_t* value;
@@ -73,6 +81,7 @@ union hid_evt_u
 {
     struct hid_read_report_req_evt read_report_req;
     struct hid_ntf_cfg_evt ntf_cfg;
+    struct hid_write_report_req_evt write_report_req;
 };
 
 
