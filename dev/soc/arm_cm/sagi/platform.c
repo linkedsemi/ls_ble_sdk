@@ -198,6 +198,7 @@ static void module_init()
 
 static void analog_init()
 {
+    dcdc_init();
     if(clk_check()==false)
     {
         clk_switch();
@@ -236,6 +237,70 @@ void sys_init_app()
     var_init();
     main_task_app_init();
     module_init();
+}
+
+void dcdc_init()
+{
+    V33_RG->DCDC0 = FIELD_BUILD(V33_RG_DCDC_TEST,0)
+                    |FIELD_BUILD(V33_RG_DCDC_DELAY,1)
+                    |FIELD_BUILD(V33_RG_DCDC_EN_OVC,1)
+                    |FIELD_BUILD( V33_RG_DCDC_EN_ZOC,0)
+                    |FIELD_BUILD(V33_RG_DCDC_RAMP_I_HALF,0)
+                    |FIELD_BUILD(V33_RG_DCDC_OUT_ADJ,4);  //0-7  mean 1.1 - 1.8
+    V33_RG->DCDC1 = FIELD_BUILD(V33_RG_DCDC_PSW_ADJ,3)
+                    |FIELD_BUILD(V33_RG_DCDC_NSW_ADJ,3)
+                    |FIELD_BUILD(V33_RG_DCDC_VBG_VCTL,8);
+    V33_RG->DCDC2 = FIELD_BUILD(V33_RG_DCDC_VCTL,13)
+                    |FIELD_BUILD(V33_RG_DCDC_OVC_CTL,3);
+    V33_RG->DCDC3 = FIELD_BUILD(V33_RG_DCDC_PWM_FI,4)
+                    |FIELD_BUILD(V33_RG_DCDC_PWM_FC,4);
+    V33_RG->DCDC4 = FIELD_BUILD(V33_RG_DCDC_PWM_HYS_CTL,4)
+                    |FIELD_BUILD(V33_RG_DCDC_PFM_HYS_CTL,4);
+}
+
+void dcdc_switch_to_pwm()
+{
+    V33_RG->PMU_SET_VAL = FIELD_BUILD(V33_RG_CLK_SET_LSE,1)
+                          |FIELD_BUILD(V33_RG_CLK_SET_HSI,1)
+                          |FIELD_BUILD(V33_RG_CLK_SET_HSE,1)
+                          |FIELD_BUILD(V33_RG_CLK_SET_HSE_BUF,1)
+                          |FIELD_BUILD(V33_RG_PMU_SET_DCDC_BYP,1)
+                          |FIELD_BUILD(V33_RG_PMU_SET_DCDC_PWM,1)
+                          |FIELD_BUILD(V33_RG_PMU_SET_DCDC_PFM,0)
+                          |FIELD_BUILD(V33_RG_PMU_SET_DCDC_FLT,0);
+    V33_RG->PMU_SET_TGGL = FIELD_BUILD(V33_RG_PMU_SET_TGGL,!REG_FIELD_RD(V33_RG->PMU_SET_TGGL,V33_RG_PMU_SET_TGGL));
+}
+
+void dcdc_switch_to_pfm()
+{
+    V33_RG->DCDC0 = FIELD_BUILD(V33_RG_DCDC_TEST,0)
+                    |FIELD_BUILD(V33_RG_DCDC_DELAY,1)
+                    |FIELD_BUILD(V33_RG_DCDC_EN_OVC,1)
+                    |FIELD_BUILD( V33_RG_DCDC_EN_ZOC,1)
+                    |FIELD_BUILD(V33_RG_DCDC_RAMP_I_HALF,0)
+                    |FIELD_BUILD(V33_RG_DCDC_OUT_ADJ,4);
+    V33_RG->PMU_SET_VAL = FIELD_BUILD(V33_RG_CLK_SET_LSE,1)
+                          |FIELD_BUILD(V33_RG_CLK_SET_HSI,1)
+                          |FIELD_BUILD(V33_RG_CLK_SET_HSE,1)
+                          |FIELD_BUILD(V33_RG_CLK_SET_HSE_BUF,1)
+                          |FIELD_BUILD(V33_RG_PMU_SET_DCDC_BYP,1)
+                          |FIELD_BUILD(V33_RG_PMU_SET_DCDC_PWM,0)
+                          |FIELD_BUILD(V33_RG_PMU_SET_DCDC_PFM,1)
+                          |FIELD_BUILD(V33_RG_PMU_SET_DCDC_FLT,0);
+    V33_RG->PMU_SET_TGGL = FIELD_BUILD(V33_RG_PMU_SET_TGGL,!REG_FIELD_RD(V33_RG->PMU_SET_TGGL,V33_RG_PMU_SET_TGGL));
+}
+
+void dcdc_switch_to_bypass()
+{
+    V33_RG->PMU_SET_VAL = FIELD_BUILD(V33_RG_CLK_SET_LSE,1)
+                          |FIELD_BUILD(V33_RG_CLK_SET_HSI,1)
+                          |FIELD_BUILD(V33_RG_CLK_SET_HSE,1)
+                          |FIELD_BUILD(V33_RG_CLK_SET_HSE_BUF,1)
+                          |FIELD_BUILD(V33_RG_PMU_SET_DCDC_BYP,0)
+                          |FIELD_BUILD(V33_RG_PMU_SET_DCDC_PWM,0)
+                          |FIELD_BUILD(V33_RG_PMU_SET_DCDC_PFM,0)
+                          |FIELD_BUILD(V33_RG_PMU_SET_DCDC_FLT,0);
+    V33_RG->PMU_SET_TGGL = FIELD_BUILD(V33_RG_PMU_SET_TGGL,!REG_FIELD_RD(V33_RG->PMU_SET_TGGL,V33_RG_PMU_SET_TGGL));
 }
 
 void sys_init_none()
