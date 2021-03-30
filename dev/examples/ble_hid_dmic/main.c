@@ -15,8 +15,6 @@
 #include "tinyfs.h"
 #include "lstimer.h"
 #include "co_list.h"
-
-
 #include "adpcm.h"
 #include "lsdmac.h"
 #include "lspdm.h"
@@ -63,28 +61,41 @@
 #define DIR_NAME    7
 #define RECORD_KEY1 1
 #define RECORD_KEY2 2
-
-#define ONE_TIMEOUT 1000 // timer units: ms
-#define TWO_TIMEOUT 7000 // timer units: ms
+#define FIRST_TIMER_TIMEOUT 1000 // timer units: ms
+#define SECOND_TIMER_TIMEOUT 7000 // timer units: ms
 #define KEYSCAN_TIMER_TIMEOUT (400) // timer units: ms
-
 #define NTF_TIMEOUT 50 // timer units: ms
-
 #define DMIC_CLK_IO (PB10)
 #define DMIC_DATA_IO (PB09)
 #define DMIC_VDD_IO (PB04)
 #define KEY_REPORT_IDX (0)
 #define KEY_VOICE_REPORT_IDX (1)
-
-#define BUFFER_SIZE 7370
-
-///voice_co_list
 #define DATASIZE_GENERATE_EACH_TIME 134
 #define DATA_BUFFER_SIZE 7370
 #define DATA_ELEMENT_SIZE 20
 #define DATA_PACKET_COUNT_GENERATE_EACH_TIME   7 
-#define DATA_ARRAY_NUM ((DATA_BUFFER_SIZE/DATASIZE_GENERATE_EACH_TIME)*7)
+#define DATA_ARRAY_NUM ((DATA_BUFFER_SIZE/DATASIZE_GENERATE_EACH_TIME)*DATA_PACKET_COUNT_GENERATE_EACH_TIME)
+#define PDM_CLK_KHZ 1024
+#define PDM_SAMPLE_RATE_HZ 16000
+#define FRAME_BUF_SIZE 256
+/**defgroup BLE_GAP_IO_CAPS GAP IO Capabilities**/
+#define BLE_GAP_IO_CAPS_DISPLAY_ONLY 0x0     /**< Display Only. */
+#define BLE_GAP_IO_CAPS_DISPLAY_YESNO 0x1    /**< Display and Yes/No entry. */
+#define BLE_GAP_IO_CAPS_KEYBOARD_ONLY 0x2    /**< Keyboard Only. */
+#define BLE_GAP_IO_CAPS_NONE 0x3             /**< No I/O capabilities. */
+#define BLE_GAP_IO_CAPS_KEYBOARD_DISPLAY 0x4 /**< Keyboard and Display. */
 
+struct gap_slave_security_req test_auth;
+struct pair_feature test_feat = {BLE_GAP_IO_CAPS_NONE,
+                                 OOB_DATA_FLAG,
+                                 AUTHREQ,
+                                 KEY_SIZE,
+                                 INIT_KEY_DIST,
+                                 RESP_KEY_DIST};
+
+struct gap_pin_str test_passkey = {passkey_number, 0};
+
+DEF_DMA_CONTROLLER(dmac1_inst,DMAC1);
 struct data_element
 {
     co_list_hdr_t list_header;
@@ -94,49 +105,64 @@ struct data_element
 struct data_element data_element_array[DATA_ARRAY_NUM];
 static co_list_t tx_unused_list;
 static co_list_t tx_used_list;
-static bool atv_voice_ntf_done = false;
-
-/* Buffer used for transmission */
-#define PDM_CLK_KHZ 1024
-#define PDM_SAMPLE_RATE_HZ 16000
-#define FRAME_BUF_SIZE 256
-DEF_DMA_CONTROLLER(dmac1_inst,DMAC1);
 PDM_HandleTypeDef hdmic;
+tinyfs_dir_t hid_dir;
+static struct PDM_PingPong_Bufptr pdm_data_receive;
 DMA_RAM_ATTR int16_t Buf0[FRAME_BUF_SIZE];
 DMA_RAM_ATTR int16_t Buf1[FRAME_BUF_SIZE];
-DMA_RAM_ATTR uint8_t EncodeBuffer[FRAME_BUF_SIZE * 2 / 4];
 DMA_RAM_ATTR google_tv_audio_header audioHeader;
-static struct PDM_PingPong_Bufptr pdm_data_receive;
-uint8_t adpcm_ntf_buf[134] = {0};
+DMA_RAM_ATTR uint8_t EncodeBuffer[FRAME_BUF_SIZE * 2 / 4];
+static uint16_t send_voice_data_handle;
+static struct gatt_svc_env dis_server_svc_env;
+static struct gatt_svc_env dis_server_svc_first_env;
+static struct gatt_svc_env dis_server_svc_second_env;
+static struct gatt_svc_env dis_server_svc_third_env;
+static struct gatt_svc_env dis_server_svc_user_fourth_svc_env;
+static struct gatt_svc_env dis_server_svc_atv_voice_env;
 
-static bool buf0_flag = false;
-static bool buf1_flag = false;
-bool Change_Hz = true;
-UART_HandleTypeDef huart;
-
-static uint16_t handle_test;
-extern uint8_t adpcm_ntf_buf[134];
-static uint8_t   GET_CAPS[1]={0x0A};  
-static uint8_t   MIC_OPEN[1]={0x0C}; 
-static uint8_t  MIC_CLOSE[1]={0x0D}; 
-
-
+static bool atv_voice_ntf_done = false;
 static bool get_caps = false;
-bool search_key = false; 
+bool search_key_pressed = false; 
+static bool search = false;
 static bool mic_open = false;
 static bool mic_close = false;
-static bool search = false;
 static bool sync_atv_voice = false;
+static bool buf0_flag = false;
+static bool buf1_flag = false;
+static bool mic_open_ntf_flag = false;
 
-static uint8_t sync_atv_voice_buf[3] = {0x0A};
+
+static struct builtin_timer *first_timer_inst = NULL;
+static struct builtin_timer *second_timer_inst = NULL;
+static struct builtin_timer *ntf_timer_inst = NULL;
+static struct builtin_timer *keyscan_timer_inst = NULL;
+static uint8_t adv_obj_hdl;
+
+static uint8_t hid_connect_id = 0xff; 
 static uint32_t sync_atv_voice_count = 0;
-static  uint8_t get_caps_respone_buf[] = {0x0B,0x00,0x04,0x00,0x03,0x00,0x86,0x00,0x14};
+static uint8_t service_flag = 0;
+static uint8_t profile_flag = 0;
+static uint16_t atv_first_cccd_config = 0;
+static uint16_t atv_second_cccd_config = 0;
+static uint16_t first_svc_first_cccd_config = 0;
+static uint16_t fourth_svc_first_cccd_config = 0;
+static uint16_t fourth_svc_second_cccd_config = 0;
+static uint16_t third_svc_first_cccd_config = 0;
+
+static uint8_t advertising_data[28];
+static uint8_t scan_response_data[31];
+uint8_t adpcm_ntf_buf[134] = {0};
+static uint8_t GET_CAPS[1] = {0x0A};
+static uint8_t MIC_OPEN[1] = {0x0C};
+static uint8_t MIC_CLOSE[1] = {0x0D};
+static uint8_t sync_atv_voice_buf[3] = {0x0A};
 static  uint8_t mic_open_buf[3] = {0};
 static uint8_t search_buf[1]={0x08};
 static uint8_t audio_start[1]={0x04};
 static uint8_t audio_end[1]={0x00};
 static uint8_t mic_open_error[]={0x0C,0x01,0x0F};
-tinyfs_dir_t hid_dir;
+static  uint8_t get_caps_respone_buf[] = {0x0B,0x00,0x04,0x00,0x03,0x00,0x86,0x00,0x14};
+
 
 ///BLE SERVICES
 static const uint8_t dis_svc_uuid[] ={0x0A,0x18};//device information
@@ -151,58 +177,43 @@ static const uint8_t dis_char_software_revision_uuid[] ={0x28,0x2A};// software_
 static const uint8_t dis_char_IEEE_uuid[] ={0x2A,0x2A};// IEEE id
 static const uint8_t att_decl_char_array[] = {0x03,0x28};//Characteristic
 
-static const uint8_t unknown_first_svc_uuid[] = {0x71,0x01,0x11,0x79,0x9e,0xcd,0x72,0x8e,0x08,0x47,0xda,0xef,0xcb,0x51,0x8d,0xc8};
-static const uint8_t unknown_first_charc_uuid[] = {0x2a,0x09,0x4d,0xa9,0xe1,0x83,0xcf,0xbe,0xda,0x4a,0xe7,0xce,0xca,0xdd,0x3d,0xea};
-static const uint8_t unknown_first_desc_client_char_cfg_array[] = {0x02,0x29};
+static const uint8_t first_svc_uuid[] = {0x71,0x01,0x11,0x79,0x9e,0xcd,0x72,0x8e,0x08,0x47,0xda,0xef,0xcb,0x51,0x8d,0xc8};
+static const uint8_t first_charc_uuid[] = {0x2a,0x09,0x4d,0xa9,0xe1,0x83,0xcf,0xbe,0xda,0x4a,0xe7,0xce,0xca,0xdd,0x3d,0xea};
+static const uint8_t first_desc_client_char_cfg_array[] = {0x02,0x29};
 
-static const uint8_t unknown_second_svc_uuid[] = {0x12,0xa2,0x4d,0x2e,0xfe,0x14,0x48,0x8e,0x93,0xd2,0x17,0x3c,0xff,0xd0,0x00,0x00};
-static const uint8_t unknown_second_svc_one_charc_uuid[] = {0xD1,0xFF};
-static const uint8_t unknown_second_svc_two_charc_uuid[] = {0xD2,0xFF};
-static const uint8_t unknown_second_svc_three_charc_uuid[] = {0xD3,0xFF};
-static const uint8_t unknown_second_svc_four_charc_uuid[] = {0xD4,0xFF};
-static const uint8_t unknown_second_svc_five_charc_uuid[] = {0xD5,0xFF};
-static const uint8_t unknown_second_svc_six_charc_uuid[] = {0xD8,0xFF};
-static const uint8_t unknown_second_svc_senven_charc_uuid[] = {0xF1,0xFF};
-static const uint8_t unknown_second_svc_eight_charc_uuid[] = {0xF2,0xFF};
-static const uint8_t unknown_second_svc_nine_charc_uuid[] = {0xE0,0xFF};
+static const uint8_t second_svc_uuid[] = {0x12,0xa2,0x4d,0x2e,0xfe,0x14,0x48,0x8e,0x93,0xd2,0x17,0x3c,0xff,0xd0,0x00,0x00};
+static const uint8_t second_svc_first_charc_uuid[] = {0xD1,0xFF};
+static const uint8_t second_svc_second_charc_uuid[] = {0xD2,0xFF};
+static const uint8_t second_svc_third_charc_uuid[] = {0xD3,0xFF};
+static const uint8_t second_svc_fourth_charc_uuid[] = {0xD4,0xFF};
+static const uint8_t second_svc_fifth_charc_uuid[] = {0xD5,0xFF};
+static const uint8_t second_svc_sixth_charc_uuid[] = {0xD8,0xFF};
+static const uint8_t second_svc_seventh_charc_uuid[] = {0xF1,0xFF};
+static const uint8_t second_svc_eighth_charc_uuid[] = {0xF2,0xFF};
+static const uint8_t second_svc_ninth_charc_uuid[] = {0xE0,0xFF};
 
-static const uint8_t unknown_one_svc_uuid_128[] = {0x64,0xb6,0x17,0xf7,0x01,0xaf,0x7d,0xbc,0x05,0x4f,0x21,0x5a,0x01,0x00,0x5e,0xad};
-static const uint8_t unknown_one_one_uuid_128[] = {0x64,0xb6,0x17,0xf7,0x01,0xaf,0x7d,0xbc,0x05,0x4f,0x21,0x5a,0x02,0x00,0x5e,0xad};
-static const uint8_t unknown_one_two_uuid_128[] = {0x64,0xb6,0x17,0xf7,0x01,0xaf,0x7d,0xbc,0x05,0x4f,0x21,0x5a,0x03,0x00,0x5e,0xad};
-static const uint8_t unknown_one_desc_client_char_cfg_array[] = {0x02,0x29};
-static const uint8_t unknown_one_three_uuid_128[] = {0x64,0xb6,0x17,0xf7,0x01,0xaf,0x7d,0xbc,0x05,0x4f,0x21,0x5a,0x04,0x00,0x5e,0xad};
-static const uint8_t unknown_one_two_desc_client_char_cfg_array[] = {0x02,0x29};
+static const uint8_t third_svc_uuid_128[] = {0x12,0xa2,0x4d,0x2e,0xfe,0x14,0x48,0x8e,0x93,0xd2,0x17,0x3c,0x87,0x62,0x00,0x00};
+static const uint8_t third_svc_first_charc_uuid_128[] = {0x12,0xa2,0x4d,0x2e,0xfe,0x14,0x48,0x8e,0x93,0xd2,0x17,0x3c,0x87,0x63,0x00,0x00};
+static const uint8_t third_svc_second_charc_uuid_128[] = {0x12,0xa2,0x4d,0x2e,0xfe,0x14,0x48,0x8e,0x93,0xd2,0x17,0x3c,0x87,0x64,0x00,0x00};
+static const uint8_t third_svc_client_char_cfg_array[] = {0x02,0x29};
 
-static const uint8_t unknown_third_svc_uuid_128[] = {0x12,0xa2,0x4d,0x2e,0xfe,0x14,0x48,0x8e,0x93,0xd2,0x17,0x3c,0x87,0x62,0x00,0x00};
-static const uint8_t unknown_third_svc_one_charc_uuid_128[] = {0x12,0xa2,0x4d,0x2e,0xfe,0x14,0x48,0x8e,0x93,0xd2,0x17,0x3c,0x87,0x63,0x00,0x00};
-static const uint8_t unknown_third_svc_two_charc_uuid_128[] = {0x12,0xa2,0x4d,0x2e,0xfe,0x14,0x48,0x8e,0x93,0xd2,0x17,0x3c,0x87,0x64,0x00,0x00};
-static const uint8_t unknown_third_svc_client_char_cfg_array[] = {0x02,0x29};
+
+static const uint8_t fourth_svc_uuid_128[] = {0x64,0xb6,0x17,0xf7,0x01,0xaf,0x7d,0xbc,0x05,0x4f,0x21,0x5a,0x01,0x00,0x5e,0xad};
+static const uint8_t fourth_svc_first_charc_uuid[] = {0x64,0xb6,0x17,0xf7,0x01,0xaf,0x7d,0xbc,0x05,0x4f,0x21,0x5a,0x02,0x00,0x5e,0xad};
+static const uint8_t fourth_svc_second_charc_uuid[] = {0x64,0xb6,0x17,0xf7,0x01,0xaf,0x7d,0xbc,0x05,0x4f,0x21,0x5a,0x03,0x00,0x5e,0xad};
+static const uint8_t fourth_svc_first_desc_client_char_cfg_array[] = {0x02,0x29};
+static const uint8_t fourth_svc_third_charc_uuid[] = {0x64,0xb6,0x17,0xf7,0x01,0xaf,0x7d,0xbc,0x05,0x4f,0x21,0x5a,0x04,0x00,0x5e,0xad};
+static const uint8_t fourth_svc_second_desc_client_char_cfg_array[] = {0x02,0x29};
+
 
 static const uint8_t ATV_Voice_Service_uuid_128[] = {0x64,0xB6,0x17,0xF6,0x01,0xAF,0x7D,0xBC,0x05,0x4F,0x21,0x5A,0x01,0x00,0x5E,0xAB};
 static const uint8_t Write_uuid_128[] = {0x64,0xB6,0x17,0xF6,0x01,0xAF,0x7D,0xBC,0x05,0x4F,0x21,0x5A,0x02,0x00,0x5E,0xAB};
 static const uint8_t Read_uuid_128[] = {0x64,0xB6,0x17,0xF6,0x01,0xAF,0x7D,0xBC,0x05,0x4F,0x21,0x5A,0x03,0x00,0x5E,0xAB};
 static const uint8_t Control_uuid_128[] = {0x64,0xB6,0x17,0xF6,0x01,0xAF,0x7D,0xBC,0x05,0x4F,0x21,0x5A,0x04,0x00,0x5E,0xAB};
 
-static uint8_t service_flag = 0;
-static uint8_t profile_flag = 0;
-static uint16_t atv_one_cccd_config = 0;
-static uint16_t atv_two_cccd_config = 0;
-static uint16_t first_svc_one_cccd_config = 0;
-static uint16_t unknow_one_svc_one_cccd_config = 0;
-static uint16_t unknow_one_svc_two_cccd_config = 0;
-static uint16_t third_svc_one_cccd_config = 0;
 
-static uint8_t hid_connect_id = 0xff; 
-static bool mic_open_ntf_flag = false;
-
-
-static struct builtin_timer *one_timer_inst = NULL;
-static struct builtin_timer *two_timer_inst = NULL;
-static struct builtin_timer *ntf_timer_inst = NULL;
-static struct builtin_timer *keyscan_timer_inst = NULL;
-
-static void one_timer_cb(void *param);
-static void two_timer_cb(void *param);
+static void first_timer_cb(void *param);
+static void second_timer_cb(void *param);
 static void ntf_timer_cb(void *param);
 static void keyscan_timer_cb(void *param);
 static void ls_timer_init(void);
@@ -213,15 +224,18 @@ void data_generator(uint8_t *buff, uint8_t length);
 static void send_ntf_once(void);
 static void data_tx_buf_init(void);
 static void data_sender(void);
-static void init_two_list(void);
+static void init_two_lists(void);
 void pdm_dma_init();
 void pdm_init();
 void gpio_exit_init(void);
+static void at_start_adv(void);
+static void hid_server_get_dev_name(struct gap_dev_info_dev_name *dev_name_ptr, uint8_t con_idx);
+
 
 static void ls_timer_init(void)
 {
-    one_timer_inst = builtin_timer_create(one_timer_cb);
-    two_timer_inst = builtin_timer_create(two_timer_cb);
+    first_timer_inst = builtin_timer_create(first_timer_cb);
+    second_timer_inst = builtin_timer_create(second_timer_cb);
     ntf_timer_inst = builtin_timer_create(ntf_timer_cb);
     builtin_timer_start(ntf_timer_inst, NTF_TIMEOUT, NULL); 
 }
@@ -240,9 +254,9 @@ static void ntf_timer_cb(void *param)
         {
             data_sender();
         }
-        if(search_key)
+        if(search_key_pressed)
         {
-            search_key = false;
+            search_key_pressed = false;
             search = true;
         }
     }
@@ -275,253 +289,70 @@ enum dis_svc_att_db_hdl
     APP_DIS_PNP_ID_VAL,
     DIS_SVC_ATT_NUM,
 };
-enum dis_svc_att_db_hdl_user_one
+enum dis_svc_att_db_hdl_user_first_v
 {
-    UNKNOWN_ONE_SVC_ONE_CHAR,
-    UNKNOWN_ONE_SVC_ONE_VAL,
-    UNKNOWN_ONE_SVC_TWO_CHAR, 
-    UNKNOWN_ONE_SVC_TWO_VAL,
-    UNKNOWN_ONE_SVC_ONE_NTF_CFG,
-    UNKNOWN_ONE_SVC_THREE_CHAR, 
-    UNKNOWN_ONE_SVC_THREE_VAL,
-    UNKNOWN_ONE_SVC_TWO_NTF_CFG,
-    UNKNOWN_ONE_SVC_ATT_NUM,
+    FIRST_SVC_FIRST_CHAR_V,
+    FIRST_SVC_FIRST_CHARC_VAL_V,
+    FIRST_SVC_FIRST_NTF_CFG_V,
+    FIRST_SVC_ATT_NUM_V,
 };
+
+enum dis_svc_att_db_hdl_user_second
+{
+    SECOND_SVC_FIRST_CHARC_CHAR,
+    SECOND_SVC_FIRST_CHARC_VAL,
+    SECOND_SVC_SECOND_CHARC_CHAR,
+    SECOND_SVC_SECOND_CHARC_VAL,
+    SECOND_SVC_THIRD_CHARC_CHAR,
+    SECOND_SVC_THIRD_CHARC_VAL,
+    SECOND_SVC_FOURTH_CHARC_CHAR,
+    SECOND_SVC_FOURTH_CHARC_VAL,
+    SECOND_SVC_FIFTH_CHARC_CHAR,
+    SECOND_SVC_FIFTH_CHARC_VAL,
+    SECOND_SVC_SIXTH_CHARC_CHAR,
+    SECOND_SVC_SIXTH_CHARC_VAL,
+    SECOND_SVC_SEVENTH_CHARC_CHAR,
+    SECOND_SVC_SEVENTH_CHARC_VAL,
+    SECOND_SVC_EIGHTH_CHARC_CHAR,
+    SECOND_SVC_EIGHTH_CHARC_VAL,
+    SECOND_SVC_NINTH_CHARC_CHAR,
+    SECOND_SVC_NINTH_CHARC_VAL,
+    SECOND_SVC_ATT_NUM,
+};
+enum dis_svc_att_db_hdl_user_third
+{
+    THIRD_SVC_FIRST_CHARC_CHAR,
+    THIRD_SVC_FIRST_CHARC_VAL,
+    THIRD_SVC_SECOND_CHARC_CHAR,
+    THIRD_SVC_SECOND_CHARC_VAL,
+    THIRD_SVC_FIRST_NTF_CFG,
+    THIRD_SVC_ATT_NUM,
+};
+
+enum dis_svc_att_db_hdl_user_fouth
+{
+    FOUTH_SVC_FIRST_CHAR,
+    FOUTH_SVC_FIRST_VAL,
+    FOUTH_SVC_SECOND_CHAR, 
+    FOUTH_SVC_SECOND_VAL,
+    FOUTH_SVC_FIRST_NTF_CFG,
+    FOUTH_SVC_THIRD_CHAR, 
+    FOUTH_SVC_THIRD_VAL,
+    FOUTH_SVC_SECOND_NTF_CFG,
+    FOUTH_SVC_ATT_NUM,
+};
+
 enum dis_svc_att_db_hdl_atv_voice
 {
     WRITE_CHAR,
     WRITE_VAL,
     READ_CHAR,
     READ_VAL,
-    ATV_VOICE_SVC_NTF_CFG_ONE,
+    ATV_VOICE_SVC_FIRST_NTF_CFG,
     CONTROL_CHAR,
     CONTROL_VAL,
-    ATV_VOICE_SVC_NTF_CFG_TWO,
+    ATV_VOICE_SVC_SECOND_NTF_CFG,
     ATV_VOICE_SVC_ATT_NUM,
-};
-enum dis_svc_att_db_hdl_user_first
-{
-    FIRST_SVC_ONE_CHARC_CHAR,
-    FIRST_SVC_ONE_CHARC_VAL,
-    FIRST_SVC_ONE_NTF_CFG,
-    FIRST_SVC_ATT_NUM,
-};
-enum dis_svc_att_db_hdl_user_second
-{
-    SECOND_SVC_ONE_CHARC_CHAR,
-    SECOND_SVC_ONE_CHARC_VAL,
-    SECOND_SVC_TWO_CHARC_CHAR,
-    SECOND_SVC_TWO_CHARC_VAL,
-    SECOND_SVC_THREE_CHARC_CHAR,
-    SECOND_SVC_THREE_CHARC_VAL,
-    SECOND_SVC_FOUR_CHARC_CHAR,
-    SECOND_SVC_FOUR_CHARC_VAL,
-    SECOND_SVC_FIVE_CHARC_CHAR,
-    SECOND_SVC_FIVE_CHARC_VAL,
-    SECOND_SVC_SIX_CHARC_CHAR,
-    SECOND_SVC_SIX_CHARC_VAL,
-    SECOND_SVC_SEVEN_CHARC_CHAR,
-    SECOND_SVC_SEVEN_CHARC_VAL,
-    SECOND_SVC_EIGHT_CHARC_CHAR,
-    SECOND_SVC_EIGHT_CHARC_VAL,
-    SECOND_SVC_NINE_CHARC_CHAR,
-    SECOND_SVC_NINE_CHARC_VAL,
-    SECOND_SVC_ATT_NUM,
-};
-enum dis_svc_att_db_hdl_user_third
-{
-    THIRD_SVC_ONE_CHARC_CHAR,
-    THIRD_SVC_ONE_CHARC_VAL,
-    THIRD_SVC_TWO_CHARC_CHAR,
-    THIRD_SVC_TWO_CHARC_VAL,
-    THIRD_SVC_ONE_NTF_CFG,
-    THIRD_SVC_ATT_NUM,
-};
-
-static const struct att_decl dis_server_att_decl_first_svc[FIRST_SVC_ATT_NUM] =
-{
-    [FIRST_SVC_ONE_CHARC_CHAR] = {
-        .uuid = att_decl_char_array,
-        .s.max_len = 0,
-        .s.uuid_len = UUID_LEN_16BIT,   
-        .char_prop.wr_cmd = 1,
-        .char_prop.ntf_en = 1,
-    },
-    [FIRST_SVC_ONE_CHARC_VAL] = {
-        .uuid = unknown_first_charc_uuid,
-        .s.max_len = 256,
-        .s.uuid_len = UUID_LEN_128BIT,
-        .char_prop.wr_cmd = 1,
-        .char_prop.ntf_en = 1,
-    },
-    [FIRST_SVC_ONE_NTF_CFG] = {
-            .uuid = unknown_first_desc_client_char_cfg_array,
-            .s.max_len = 0,
-            .s.uuid_len = UUID_LEN_16BIT,
-            .s.read_indication = 1,
-            .char_prop.rd_en = 1,
-            .char_prop.wr_req = 1,
-        },
-};
-static const struct att_decl dis_server_att_decl_second_svc[SECOND_SVC_ATT_NUM] =
-    {
-        [SECOND_SVC_ONE_CHARC_CHAR] = {
-            .uuid = att_decl_char_array,
-            .s.max_len = 0,
-            .s.uuid_len = UUID_LEN_16BIT,
-            .char_prop.wr_cmd = 1,
-        },
-        [SECOND_SVC_ONE_CHARC_VAL] = {
-            .uuid = unknown_second_svc_one_charc_uuid,
-            .s.max_len = 256,
-            .s.uuid_len = UUID_LEN_16BIT,
-            .char_prop.wr_cmd = 1,
-        },
-        [SECOND_SVC_TWO_CHARC_CHAR] = {
-            .uuid = att_decl_char_array,
-            .s.max_len = 0,
-            .s.uuid_len = UUID_LEN_16BIT,
-            .s.read_indication = 1,
-            .char_prop.rd_en = 1,
-        },
-        [SECOND_SVC_TWO_CHARC_VAL] = {
-            .uuid = unknown_second_svc_two_charc_uuid,
-            .s.max_len = 256,
-            .s.uuid_len = UUID_LEN_16BIT,
-            .s.read_indication = 1,
-            .char_prop.rd_en = 1,
-        },
-        [SECOND_SVC_THREE_CHARC_CHAR] = {
-            .uuid = att_decl_char_array,
-            .s.max_len = 0,
-            .s.uuid_len = UUID_LEN_16BIT,
-            .s.read_indication = 1,
-            .char_prop.rd_en = 1,
-        },
-        [SECOND_SVC_THREE_CHARC_VAL] = {
-            .uuid = unknown_second_svc_three_charc_uuid,
-            .s.max_len = 256,
-            .s.uuid_len = UUID_LEN_16BIT,
-            .s.read_indication = 1,
-            .char_prop.rd_en = 1,
-        },
-        [SECOND_SVC_FOUR_CHARC_CHAR] = {
-            .uuid = att_decl_char_array,
-            .s.max_len = 0,
-            .s.uuid_len = UUID_LEN_16BIT,
-            .s.read_indication = 1,
-            .char_prop.rd_en = 1,
-        },
-        [SECOND_SVC_FOUR_CHARC_VAL] = {
-            .uuid = unknown_second_svc_four_charc_uuid,
-            .s.max_len = 256,
-            .s.uuid_len = UUID_LEN_16BIT,
-            .s.read_indication = 1,
-            .char_prop.rd_en = 1,
-        },
-        [SECOND_SVC_FIVE_CHARC_CHAR] = {
-            .uuid = att_decl_char_array,
-            .s.max_len = 0,
-            .s.uuid_len = UUID_LEN_16BIT,
-            .s.read_indication = 1,
-            .char_prop.rd_en = 1,
-        },
-        [SECOND_SVC_FIVE_CHARC_VAL] = {
-            .uuid = unknown_second_svc_five_charc_uuid,
-            .s.max_len = 256,
-            .s.uuid_len = UUID_LEN_16BIT,
-            .s.read_indication = 1,
-            .char_prop.rd_en = 1,
-        },
-        [SECOND_SVC_SIX_CHARC_CHAR] = {
-            .uuid = att_decl_char_array,
-            .s.max_len = 0,
-            .s.uuid_len = UUID_LEN_16BIT,
-            .char_prop.wr_cmd = 1,
-        },
-        [SECOND_SVC_SIX_CHARC_VAL] = {
-            .uuid = unknown_second_svc_six_charc_uuid,
-            .s.max_len = 256,
-            .s.uuid_len = UUID_LEN_16BIT,
-            .char_prop.wr_cmd = 1,
-        },
-        [SECOND_SVC_SEVEN_CHARC_CHAR] = {
-            .uuid = att_decl_char_array,
-            .s.max_len = 0,
-            .s.uuid_len = UUID_LEN_16BIT,
-            .s.read_indication = 1,
-            .char_prop.rd_en = 1,
-        },
-        [SECOND_SVC_SEVEN_CHARC_VAL] = {
-            .uuid = unknown_second_svc_senven_charc_uuid,
-            .s.max_len = 256,
-            .s.uuid_len = UUID_LEN_16BIT,
-            .s.read_indication = 1,
-            .char_prop.rd_en = 1,
-        },
-        [SECOND_SVC_EIGHT_CHARC_CHAR] = {
-            .uuid = att_decl_char_array,
-            .s.max_len = 0,
-            .s.uuid_len = UUID_LEN_16BIT,
-            .char_prop.wr_req = 1,
-        },
-        [SECOND_SVC_EIGHT_CHARC_VAL] = {
-            .uuid = unknown_second_svc_eight_charc_uuid,
-            .s.max_len = 256,
-            .s.uuid_len = UUID_LEN_16BIT,
-            .char_prop.wr_req = 1,
-        },
-        [SECOND_SVC_NINE_CHARC_CHAR] = {
-            .uuid = att_decl_char_array,
-            .s.max_len = 0,
-            .s.uuid_len = UUID_LEN_16BIT,
-            .s.read_indication = 1,
-            .char_prop.rd_en = 1,
-        },
-        [SECOND_SVC_NINE_CHARC_VAL] = {
-            .uuid = unknown_second_svc_nine_charc_uuid,
-            .s.max_len = 256,
-            .s.uuid_len = UUID_LEN_16BIT,
-            .s.read_indication = 1,
-            .char_prop.rd_en = 1,
-        },
-};
-static const struct att_decl dis_server_att_decl_third_svc[THIRD_SVC_ATT_NUM] =
-    {
-        [THIRD_SVC_ONE_CHARC_CHAR] = {
-            .uuid = att_decl_char_array,
-            .s.max_len = 0,
-            .s.uuid_len = UUID_LEN_16BIT,
-            .char_prop.wr_cmd = 1,
-        },
-        [THIRD_SVC_ONE_CHARC_VAL] = {
-            .uuid = unknown_third_svc_one_charc_uuid_128,
-            .s.max_len = 256,
-            .s.uuid_len = UUID_LEN_128BIT,
-            .char_prop.wr_cmd = 1,
-        },
-        [THIRD_SVC_TWO_CHARC_CHAR] = {
-            .uuid = att_decl_char_array,
-            .s.max_len = 0,
-            .s.uuid_len = UUID_LEN_16BIT,
-            .char_prop.wr_req = 1,
-            .char_prop.ntf_en = 1,
-        },
-        [THIRD_SVC_TWO_CHARC_VAL] = {
-            .uuid = unknown_third_svc_two_charc_uuid_128,
-            .s.max_len = 256,
-            .s.uuid_len = UUID_LEN_128BIT,
-            .char_prop.wr_req = 1,
-            .char_prop.ntf_en = 1,
-        },
-        [THIRD_SVC_ONE_NTF_CFG] = {
-            .uuid = unknown_third_svc_client_char_cfg_array,
-            .s.max_len = 0,
-            .s.uuid_len = UUID_LEN_16BIT,
-            .s.read_indication = 1,
-            .char_prop.rd_en = 1,
-            .char_prop.wr_req = 1,
-        },
 };
 static const struct att_decl dis_server_att_decl[DIS_SVC_ATT_NUM] =
 {
@@ -652,62 +483,248 @@ static const struct att_decl dis_server_att_decl[DIS_SVC_ATT_NUM] =
         .char_prop.rd_en = 1,
     },
 };
-static const struct att_decl dis_server_att_decl_one_svc[UNKNOWN_ONE_SVC_ATT_NUM] =
+static const struct att_decl dis_server_att_decl_first_svc[FIRST_SVC_ATT_NUM_V] =
+{
+    [FIRST_SVC_FIRST_CHAR_V] = {
+        .uuid = att_decl_char_array,
+        .s.max_len = 0,
+        .s.uuid_len = UUID_LEN_16BIT,   
+        .char_prop.wr_cmd = 1,
+        .char_prop.ntf_en = 1,
+    },
+    [FIRST_SVC_FIRST_CHARC_VAL_V] = {
+        .uuid = first_charc_uuid,
+        .s.max_len = 256,
+        .s.uuid_len = UUID_LEN_128BIT,
+        .char_prop.wr_cmd = 1,
+        .char_prop.ntf_en = 1,
+    },
+    [FIRST_SVC_FIRST_NTF_CFG_V] = {
+            .uuid = first_desc_client_char_cfg_array,
+            .s.max_len = 0,
+            .s.uuid_len = UUID_LEN_16BIT,
+            .s.read_indication = 1,
+            .char_prop.rd_en = 1,
+            .char_prop.wr_req = 1,
+        },
+};
+static const struct att_decl dis_server_att_decl_second_svc[SECOND_SVC_ATT_NUM] =
     {
-        [UNKNOWN_ONE_SVC_ONE_CHAR] = {
+        [SECOND_SVC_FIRST_CHARC_CHAR] = {
             .uuid = att_decl_char_array,
             .s.max_len = 0,
             .s.uuid_len = UUID_LEN_16BIT,
-            .char_prop.wr_req = 1,
+            .char_prop.wr_cmd = 1,
         },
-        [UNKNOWN_ONE_SVC_ONE_VAL] = {
-            .uuid = unknown_one_one_uuid_128,
+        [SECOND_SVC_FIRST_CHARC_VAL] = {
+            .uuid = second_svc_first_charc_uuid,
             .s.max_len = 256,
-            .s.uuid_len = UUID_LEN_128BIT,
-            .char_prop.wr_req = 1,
-        },
-        [UNKNOWN_ONE_SVC_TWO_CHAR] = {
-            .uuid = att_decl_char_array,
-            .s.max_len = 0,
             .s.uuid_len = UUID_LEN_16BIT,
-            .s.read_indication = 1,
-            .char_prop.rd_en = 1,
-            .char_prop.ntf_en = 1,
+            .char_prop.wr_cmd = 1,
         },
-        [UNKNOWN_ONE_SVC_TWO_VAL] = {
-            .uuid = unknown_one_two_uuid_128,
-            .s.max_len = 256,
-            .s.uuid_len = UUID_LEN_128BIT,
-            .s.read_indication = 1,
-            .char_prop.rd_en = 1,
-            .char_prop.ntf_en = 1,
-        },
-        [UNKNOWN_ONE_SVC_ONE_NTF_CFG] = {
-            .uuid = unknown_one_desc_client_char_cfg_array,
-            .s.max_len = 0,
-            .s.uuid_len = UUID_LEN_16BIT,
-            .s.read_indication = 1,
-            .char_prop.rd_en = 1,
-            .char_prop.wr_req = 1,
-        },
-        [UNKNOWN_ONE_SVC_THREE_CHAR] = {
+        [SECOND_SVC_SECOND_CHARC_CHAR] = {
             .uuid = att_decl_char_array,
             .s.max_len = 0,
             .s.uuid_len = UUID_LEN_16BIT,
             .s.read_indication = 1,
             .char_prop.rd_en = 1,
+        },
+        [SECOND_SVC_SECOND_CHARC_VAL] = {
+            .uuid = second_svc_second_charc_uuid,
+            .s.max_len = 256,
+            .s.uuid_len = UUID_LEN_16BIT,
+            .s.read_indication = 1,
+            .char_prop.rd_en = 1,
+        },
+        [SECOND_SVC_THIRD_CHARC_CHAR] = {
+            .uuid = att_decl_char_array,
+            .s.max_len = 0,
+            .s.uuid_len = UUID_LEN_16BIT,
+            .s.read_indication = 1,
+            .char_prop.rd_en = 1,
+        },
+        [SECOND_SVC_THIRD_CHARC_VAL] = {
+            .uuid = second_svc_third_charc_uuid,
+            .s.max_len = 256,
+            .s.uuid_len = UUID_LEN_16BIT,
+            .s.read_indication = 1,
+            .char_prop.rd_en = 1,
+        },
+        [SECOND_SVC_FOURTH_CHARC_CHAR] = {
+            .uuid = att_decl_char_array,
+            .s.max_len = 0,
+            .s.uuid_len = UUID_LEN_16BIT,
+            .s.read_indication = 1,
+            .char_prop.rd_en = 1,
+        },
+        [SECOND_SVC_FOURTH_CHARC_VAL] = {
+            .uuid = second_svc_fourth_charc_uuid,
+            .s.max_len = 256,
+            .s.uuid_len = UUID_LEN_16BIT,
+            .s.read_indication = 1,
+            .char_prop.rd_en = 1,
+        },
+        [SECOND_SVC_FIFTH_CHARC_CHAR] = {
+            .uuid = att_decl_char_array,
+            .s.max_len = 0,
+            .s.uuid_len = UUID_LEN_16BIT,
+            .s.read_indication = 1,
+            .char_prop.rd_en = 1,
+        },
+        [SECOND_SVC_FIFTH_CHARC_VAL] = {
+            .uuid = second_svc_fifth_charc_uuid,
+            .s.max_len = 256,
+            .s.uuid_len = UUID_LEN_16BIT,
+            .s.read_indication = 1,
+            .char_prop.rd_en = 1,
+        },
+        [SECOND_SVC_SIXTH_CHARC_CHAR] = {
+            .uuid = att_decl_char_array,
+            .s.max_len = 0,
+            .s.uuid_len = UUID_LEN_16BIT,
+            .char_prop.wr_cmd = 1,
+        },
+        [SECOND_SVC_SIXTH_CHARC_VAL] = {
+            .uuid = second_svc_sixth_charc_uuid,
+            .s.max_len = 256,
+            .s.uuid_len = UUID_LEN_16BIT,
+            .char_prop.wr_cmd = 1,
+        },
+        [SECOND_SVC_SEVENTH_CHARC_CHAR] = {
+            .uuid = att_decl_char_array,
+            .s.max_len = 0,
+            .s.uuid_len = UUID_LEN_16BIT,
+            .s.read_indication = 1,
+            .char_prop.rd_en = 1,
+        },
+        [SECOND_SVC_SEVENTH_CHARC_VAL] = {
+            .uuid = second_svc_seventh_charc_uuid,
+            .s.max_len = 256,
+            .s.uuid_len = UUID_LEN_16BIT,
+            .s.read_indication = 1,
+            .char_prop.rd_en = 1,
+        },
+        [SECOND_SVC_EIGHTH_CHARC_CHAR] = {
+            .uuid = att_decl_char_array,
+            .s.max_len = 0,
+            .s.uuid_len = UUID_LEN_16BIT,
+            .char_prop.wr_req = 1,
+        },
+        [SECOND_SVC_EIGHTH_CHARC_VAL] = {
+            .uuid = second_svc_eighth_charc_uuid,
+            .s.max_len = 256,
+            .s.uuid_len = UUID_LEN_16BIT,
+            .char_prop.wr_req = 1,
+        },
+        [SECOND_SVC_NINTH_CHARC_CHAR] = {
+            .uuid = att_decl_char_array,
+            .s.max_len = 0,
+            .s.uuid_len = UUID_LEN_16BIT,
+            .s.read_indication = 1,
+            .char_prop.rd_en = 1,
+        },
+        [SECOND_SVC_NINTH_CHARC_VAL] = {
+            .uuid = second_svc_ninth_charc_uuid,
+            .s.max_len = 256,
+            .s.uuid_len = UUID_LEN_16BIT,
+            .s.read_indication = 1,
+            .char_prop.rd_en = 1,
+        },
+};
+static const struct att_decl dis_server_att_decl_third_svc[THIRD_SVC_ATT_NUM] =
+    {
+        [THIRD_SVC_FIRST_CHARC_CHAR] = {
+            .uuid = att_decl_char_array,
+            .s.max_len = 0,
+            .s.uuid_len = UUID_LEN_16BIT,
+            .char_prop.wr_cmd = 1,
+        },
+        [THIRD_SVC_FIRST_CHARC_VAL] = {
+            .uuid = third_svc_first_charc_uuid_128,
+            .s.max_len = 256,
+            .s.uuid_len = UUID_LEN_128BIT,
+            .char_prop.wr_cmd = 1,
+        },
+        [THIRD_SVC_SECOND_CHARC_CHAR] = {
+            .uuid = att_decl_char_array,
+            .s.max_len = 0,
+            .s.uuid_len = UUID_LEN_16BIT,
+            .char_prop.wr_req = 1,
             .char_prop.ntf_en = 1,
         },
-        [UNKNOWN_ONE_SVC_THREE_VAL] = {
-            .uuid = unknown_one_three_uuid_128,
+        [THIRD_SVC_SECOND_CHARC_VAL] = {
+            .uuid = third_svc_second_charc_uuid_128,
+            .s.max_len = 256,
+            .s.uuid_len = UUID_LEN_128BIT,
+            .char_prop.wr_req = 1,
+            .char_prop.ntf_en = 1,
+        },
+        [THIRD_SVC_FIRST_NTF_CFG] = {
+            .uuid = third_svc_client_char_cfg_array,
+            .s.max_len = 0,
+            .s.uuid_len = UUID_LEN_16BIT,
+            .s.read_indication = 1,
+            .char_prop.rd_en = 1,
+            .char_prop.wr_req = 1,
+        },
+};
+
+static const struct att_decl dis_server_att_decl_fourth_svc[FOUTH_SVC_ATT_NUM] =
+    {
+        [FOUTH_SVC_FIRST_CHAR] = {
+            .uuid = att_decl_char_array,
+            .s.max_len = 0,
+            .s.uuid_len = UUID_LEN_16BIT,
+            .char_prop.wr_req = 1,
+        },
+        [FOUTH_SVC_FIRST_VAL] = {
+            .uuid = fourth_svc_first_charc_uuid,
+            .s.max_len = 256,
+            .s.uuid_len = UUID_LEN_128BIT,
+            .char_prop.wr_req = 1,
+        },
+        [FOUTH_SVC_SECOND_CHAR] = {
+            .uuid = att_decl_char_array,
+            .s.max_len = 0,
+            .s.uuid_len = UUID_LEN_16BIT,
+            .s.read_indication = 1,
+            .char_prop.rd_en = 1,
+            .char_prop.ntf_en = 1,
+        },
+        [FOUTH_SVC_SECOND_VAL] = {
+            .uuid = fourth_svc_second_charc_uuid,
             .s.max_len = 256,
             .s.uuid_len = UUID_LEN_128BIT,
             .s.read_indication = 1,
             .char_prop.rd_en = 1,
             .char_prop.ntf_en = 1,
         },
-        [UNKNOWN_ONE_SVC_TWO_NTF_CFG] = {
-            .uuid = unknown_one_two_desc_client_char_cfg_array,
+        [FOUTH_SVC_FIRST_NTF_CFG] = {
+            .uuid = fourth_svc_first_desc_client_char_cfg_array,
+            .s.max_len = 0,
+            .s.uuid_len = UUID_LEN_16BIT,
+            .s.read_indication = 1,
+            .char_prop.rd_en = 1,
+            .char_prop.wr_req = 1,
+        },
+        [FOUTH_SVC_THIRD_CHAR] = {
+            .uuid = att_decl_char_array,
+            .s.max_len = 0,
+            .s.uuid_len = UUID_LEN_16BIT,
+            .s.read_indication = 1,
+            .char_prop.rd_en = 1,
+            .char_prop.ntf_en = 1,
+        },
+        [FOUTH_SVC_THIRD_VAL] = {
+            .uuid = fourth_svc_third_charc_uuid,
+            .s.max_len = 256,
+            .s.uuid_len = UUID_LEN_128BIT,
+            .s.read_indication = 1,
+            .char_prop.rd_en = 1,
+            .char_prop.ntf_en = 1,
+        },
+        [FOUTH_SVC_SECOND_NTF_CFG] = {
+            .uuid = fourth_svc_second_desc_client_char_cfg_array,
             .s.max_len = 0,
             .s.uuid_len = UUID_LEN_16BIT,
             .s.read_indication = 1,
@@ -752,8 +769,8 @@ static const struct att_decl dis_server_att_decl_atv_voice[ATV_VOICE_SVC_ATT_NUM
         // .char_prop.rd_en = 1, 
         .char_prop.ntf_en = 1,
     },
-    [ATV_VOICE_SVC_NTF_CFG_ONE] = {
-        .uuid = unknown_one_desc_client_char_cfg_array,
+    [ATV_VOICE_SVC_FIRST_NTF_CFG] = {
+        .uuid = fourth_svc_first_desc_client_char_cfg_array,
         .s.max_len = 0,
         .s.uuid_len = UUID_LEN_16BIT,
         .s.read_indication = 1,
@@ -776,8 +793,8 @@ static const struct att_decl dis_server_att_decl_atv_voice[ATV_VOICE_SVC_ATT_NUM
         // .char_prop.rd_en = 1,  
         .char_prop.ntf_en = 1,
     },
-    [ATV_VOICE_SVC_NTF_CFG_TWO] = {
-        .uuid = unknown_one_desc_client_char_cfg_array,
+    [ATV_VOICE_SVC_SECOND_NTF_CFG] = {
+        .uuid = fourth_svc_first_desc_client_char_cfg_array,
         .s.max_len = 0,
         .s.uuid_len = UUID_LEN_16BIT,
         .s.read_indication = 1,
@@ -797,15 +814,15 @@ static const struct svc_decl dis_server_svc =
 };
 static const struct svc_decl dis_server_svc_first =
 {
-    .uuid = unknown_first_svc_uuid,
+    .uuid = first_svc_uuid,
     .att = (struct att_decl*)dis_server_att_decl_first_svc,
-    .nb_att = FIRST_SVC_ATT_NUM,
+    .nb_att = FIRST_SVC_ATT_NUM_V,
     .uuid_len = UUID_LEN_128BIT,
     .sec_lvl = 1,
 };
 static const struct svc_decl dis_server_svc_second =
 {
-    .uuid = unknown_second_svc_uuid,
+    .uuid = second_svc_uuid,
     .att = (struct att_decl*)dis_server_att_decl_second_svc,
     .nb_att = SECOND_SVC_ATT_NUM,
     .uuid_len = UUID_LEN_128BIT,
@@ -813,17 +830,17 @@ static const struct svc_decl dis_server_svc_second =
 };
 static const struct svc_decl dis_server_svc_third =
 {
-    .uuid = unknown_third_svc_uuid_128,
+    .uuid = third_svc_uuid_128,
     .att = (struct att_decl*)dis_server_att_decl_third_svc,
     .nb_att = THIRD_SVC_ATT_NUM,
     .uuid_len = UUID_LEN_128BIT,
     .sec_lvl = 1,
 };
-static const struct svc_decl dis_server_svc_decl_one_svc =
+static const struct svc_decl dis_server_svc_decl_fourth_svc =
 {
-    .uuid = unknown_one_svc_uuid_128,
-    .att = (struct att_decl*)dis_server_att_decl_one_svc,
-    .nb_att = UNKNOWN_ONE_SVC_ATT_NUM,
+    .uuid = fourth_svc_uuid_128,
+    .att = (struct att_decl*)dis_server_att_decl_fourth_svc,
+    .nb_att = FOUTH_SVC_ATT_NUM,
     .uuid_len = UUID_LEN_128BIT,
     .sec_lvl = 1,
 };
@@ -836,36 +853,6 @@ static const struct svc_decl atv_voice_svc_user =
     .sec_lvl = 1,
 };
 
-static struct gatt_svc_env dis_server_svc_env;
-static struct gatt_svc_env dis_server_svc_first_env;
-static struct gatt_svc_env dis_server_svc_second_env;
-static struct gatt_svc_env dis_server_svc_third_env;
-static struct gatt_svc_env dis_server_svc_user_one_svc_env;
-static struct gatt_svc_env dis_server_svc_atv_voice_env;
-
-static uint8_t adv_obj_hdl;
-static uint8_t advertising_data[28];
-static uint8_t scan_response_data[31];
-
-/**defgroup BLE_GAP_IO_CAPS GAP IO Capabilities**/
-#define BLE_GAP_IO_CAPS_DISPLAY_ONLY 0x0     /**< Display Only. */
-#define BLE_GAP_IO_CAPS_DISPLAY_YESNO 0x1    /**< Display and Yes/No entry. */
-#define BLE_GAP_IO_CAPS_KEYBOARD_ONLY 0x2    /**< Keyboard Only. */
-#define BLE_GAP_IO_CAPS_NONE 0x3             /**< No I/O capabilities. */
-#define BLE_GAP_IO_CAPS_KEYBOARD_DISPLAY 0x4 /**< Keyboard and Display. */
-
-struct gap_slave_security_req test_auth;
-struct pair_feature test_feat = {BLE_GAP_IO_CAPS_NONE,
-                                 OOB_DATA_FLAG,
-                                 AUTHREQ,
-                                 KEY_SIZE,
-                                 INIT_KEY_DIST,
-                                 RESP_KEY_DIST};
-
-struct gap_pin_str test_passkey = {passkey_number, 0};//这个结构体是什么含义？？
-
-static void at_start_adv(void);
-static void hid_server_get_dev_name(struct gap_dev_info_dev_name *dev_name_ptr, uint8_t con_idx);
 
 const uint8_t hid_report_map[] =
     {
@@ -921,195 +908,234 @@ static void dis_server_read_req_ind(union gatt_evt_u *evt, uint8_t att_idx, uint
     uint16_t handle = 0;
     if (evt->server_read_req.svc == &dis_server_svc_env)
     {
-        if(att_idx == APP_DIS_PNP_ID_VAL)
+        switch (att_idx)
+        {
+        case APP_DIS_PNP_ID_VAL:
         {
             handle = gatt_manager_get_svc_att_handle(&dis_server_svc_env, att_idx);
-            gatt_manager_server_read_req_reply(con_idx, handle, 0, (void*)APP_DIS_PNP_ID, APP_DIS_PNP_ID_LEN);
+            gatt_manager_server_read_req_reply(con_idx, handle, 0, (void *)APP_DIS_PNP_ID, APP_DIS_PNP_ID_LEN);
         }
-        else if(att_idx == APP_DIS_MANUFACTURER_NAME_VAL)
+        break;
+        case APP_DIS_MANUFACTURER_NAME_VAL:
         {
             handle = gatt_manager_get_svc_att_handle(&dis_server_svc_env, att_idx);
-            gatt_manager_server_read_req_reply(con_idx, handle, 0, (void*)APP_DIS_MANUFACTURER_NAME, APP_DIS_MANUFACTURER_NAME_LEN);
+            gatt_manager_server_read_req_reply(con_idx, handle, 0, (void *)APP_DIS_MANUFACTURER_NAME, APP_DIS_MANUFACTURER_NAME_LEN);
         }
-        else if(att_idx == APP_DIS_SYSTEM_ID_VAL)
+        break;
+        case APP_DIS_SYSTEM_ID_VAL:
         {
             handle = gatt_manager_get_svc_att_handle(&dis_server_svc_env, att_idx);
-            gatt_manager_server_read_req_reply(con_idx, handle, 0, (void*)APP_DIS_SYSTEM_ID, APP_DIS_SYSTEM_ID_LEN);
+            gatt_manager_server_read_req_reply(con_idx, handle, 0, (void *)APP_DIS_SYSTEM_ID, APP_DIS_SYSTEM_ID_LEN);
         }
-        else if(att_idx == APP_DIS_MODEL_NB_STR_VAL)
+        break;
+        case APP_DIS_MODEL_NB_STR_VAL:
         {
             handle = gatt_manager_get_svc_att_handle(&dis_server_svc_env, att_idx);
-            gatt_manager_server_read_req_reply(con_idx, handle, 0, (void*)APP_DIS_MODEL_NB_STR, APP_DIS_MODEL_NB_STR_LEN);
+            gatt_manager_server_read_req_reply(con_idx, handle, 0, (void *)APP_DIS_MODEL_NB_STR, APP_DIS_MODEL_NB_STR_LEN);
         }
-        else if(att_idx == APP_DIS_SERIAL_NB_STR_VAL)
+        break;
+        case APP_DIS_SERIAL_NB_STR_VAL:
         {
             handle = gatt_manager_get_svc_att_handle(&dis_server_svc_env, att_idx);
-            gatt_manager_server_read_req_reply(con_idx, handle, 0, (void*)APP_DIS_SERIAL_NB_STR, APP_DIS_SERIAL_NB_STR_LEN);
+            gatt_manager_server_read_req_reply(con_idx, handle, 0, (void *)APP_DIS_SERIAL_NB_STR, APP_DIS_SERIAL_NB_STR_LEN);
         }
-        else if(att_idx == APP_DIS_FIRM_REV_STR_VAL)
+        break;
+        case APP_DIS_FIRM_REV_STR_VAL:
         {
             handle = gatt_manager_get_svc_att_handle(&dis_server_svc_env, att_idx);
-            gatt_manager_server_read_req_reply(con_idx, handle, 0, (void*)APP_DIS_FIRM_REV_STR, APP_DIS_FIRM_REV_STR_LEN);
+            gatt_manager_server_read_req_reply(con_idx, handle, 0, (void *)APP_DIS_FIRM_REV_STR, APP_DIS_FIRM_REV_STR_LEN);
         }
-        else if(att_idx == APP_DIS_HARD_REV_STR_VAL)
+        break;
+        case APP_DIS_HARD_REV_STR_VAL:
         {
             handle = gatt_manager_get_svc_att_handle(&dis_server_svc_env, att_idx);
-            gatt_manager_server_read_req_reply(con_idx, handle, 0, (void*)APP_DIS_HARD_REV_STR, APP_DIS_HARD_REV_STR_LEN);
+            gatt_manager_server_read_req_reply(con_idx, handle, 0, (void *)APP_DIS_HARD_REV_STR, APP_DIS_HARD_REV_STR_LEN);
         }
-        else if(att_idx == APP_DIS_SW_REV_STR_VAL)
+        break;
+        case APP_DIS_SW_REV_STR_VAL:
         {
             handle = gatt_manager_get_svc_att_handle(&dis_server_svc_env, att_idx);
-            gatt_manager_server_read_req_reply(con_idx, handle, 0, (void*)APP_DIS_SW_REV_STR, APP_DIS_SW_REV_STR_LEN);
+            gatt_manager_server_read_req_reply(con_idx, handle, 0, (void *)APP_DIS_SW_REV_STR, APP_DIS_SW_REV_STR_LEN);
         }
-        else if(att_idx == APP_DIS_IEEE_VAL)
-        {
-            handle = gatt_manager_get_svc_att_handle(&dis_server_svc_env, att_idx);
-            gatt_manager_server_read_req_reply(con_idx, handle, 0, (void*)APP_DIS_IEEE, APP_DIS_IEEE_LEN);
-        }
+        break;
+            case APP_DIS_IEEE_VAL:
+            {
+                handle = gatt_manager_get_svc_att_handle(&dis_server_svc_env, att_idx);
+                gatt_manager_server_read_req_reply(con_idx, handle, 0, (void *)APP_DIS_IEEE, APP_DIS_IEEE_LEN);
+            }
+            break;
+            default:
+                break;
+            }
     }
-    else if (evt->server_read_req.svc == &dis_server_svc_first_env) 
-    { 
-        if(att_idx == FIRST_SVC_ONE_NTF_CFG)
+    if (evt->server_read_req.svc == &dis_server_svc_first_env)
+    {
+        if (att_idx == FIRST_SVC_FIRST_NTF_CFG_V)
         {
             handle = gatt_manager_get_svc_att_handle(&dis_server_svc_first_env, att_idx);
-            gatt_manager_server_read_req_reply(con_idx, handle, 0, (void*)&first_svc_one_cccd_config, 2);
+            gatt_manager_server_read_req_reply(con_idx, handle, 0, (void *)&first_svc_first_cccd_config, 2);
         }
     }
-    else if (evt->server_read_req.svc == &dis_server_svc_second_env) 
-    { 
-        if(att_idx == SECOND_SVC_TWO_CHARC_VAL)
+     if (evt->server_read_req.svc == &dis_server_svc_second_env)
+    {
+        switch (att_idx)
         {
-            uint8_t read_second_svc_two_charc[] = {0x18,0x46,0x44,0x70,0x23,0x5F};
+        case SECOND_SVC_SECOND_CHARC_VAL:
+        {
+            uint8_t read_second_svc_second_charc[] = {0x18, 0x46, 0x44, 0x70, 0x23, 0x5F};
             handle = gatt_manager_get_svc_att_handle(&dis_server_svc_second_env, att_idx);
-            gatt_manager_server_read_req_reply(con_idx, handle, 0, (void*)&read_second_svc_two_charc, sizeof(read_second_svc_two_charc));
+            gatt_manager_server_read_req_reply(con_idx, handle, 0, (void *)&read_second_svc_second_charc, sizeof(read_second_svc_second_charc));
         }
-        else if(att_idx == SECOND_SVC_THREE_CHARC_VAL)
+        break;
+        case SECOND_SVC_THIRD_CHARC_VAL:
         {
-            uint8_t read_second_svc_three_charc[] = {0x01,0x90,0x10,0x88};
+            uint8_t read_second_svc_third_charc[] = {0x01, 0x90, 0x10, 0x88};
             handle = gatt_manager_get_svc_att_handle(&dis_server_svc_second_env, att_idx);
-            gatt_manager_server_read_req_reply(con_idx, handle, 0, (void*)&read_second_svc_three_charc, sizeof(read_second_svc_three_charc));
+            gatt_manager_server_read_req_reply(con_idx, handle, 0, (void *)&read_second_svc_third_charc, sizeof(read_second_svc_third_charc));
         }
-        else if(att_idx == SECOND_SVC_FOUR_CHARC_VAL)
+        break;
+        case SECOND_SVC_FOURTH_CHARC_VAL:
         {
-            uint8_t read_second_svc_four_charc[] = {0x11,0x00,0x00,0x50};
+            uint8_t read_second_svc_fourth_charc[] = {0x11, 0x00, 0x00, 0x50};
             handle = gatt_manager_get_svc_att_handle(&dis_server_svc_second_env, att_idx);
-            gatt_manager_server_read_req_reply(con_idx, handle, 0, (void*)&read_second_svc_four_charc, sizeof(read_second_svc_four_charc));
+            gatt_manager_server_read_req_reply(con_idx, handle, 0, (void *)&read_second_svc_fourth_charc, sizeof(read_second_svc_fourth_charc));
         }
-        else if(att_idx == SECOND_SVC_FIVE_CHARC_VAL)
+        break;
+        case SECOND_SVC_FIFTH_CHARC_VAL:
         {
-            uint8_t read_second_svc_five_charc[] = {0};
+            uint8_t read_second_svc_fifth_charc[] = {0};
             handle = gatt_manager_get_svc_att_handle(&dis_server_svc_second_env, att_idx);
-            gatt_manager_server_read_req_reply(con_idx, handle, 0, (void*)&read_second_svc_five_charc, sizeof(read_second_svc_five_charc));
+            gatt_manager_server_read_req_reply(con_idx, handle, 0, (void *)&read_second_svc_fifth_charc, sizeof(read_second_svc_fifth_charc));
         }
-        else if(att_idx == SECOND_SVC_SEVEN_CHARC_VAL)
+        break;
+        case SECOND_SVC_SEVENTH_CHARC_VAL:
         {
-            uint8_t read_second_svc_seven_charc[] = {0x05,0x01,0x00,0x07,0x00,0x08,0x00,0x00,0xF0,0x0F,0x00,0x00};
+            uint8_t read_second_svc_seventh_charc[] = {0x05, 0x01, 0x00, 0x07, 0x00, 0x08, 0x00, 0x00, 0xF0, 0x0F, 0x00, 0x00};
             handle = gatt_manager_get_svc_att_handle(&dis_server_svc_second_env, att_idx);
-            gatt_manager_server_read_req_reply(con_idx, handle, 0, (void*)&read_second_svc_seven_charc, sizeof(read_second_svc_seven_charc));
+            gatt_manager_server_read_req_reply(con_idx, handle, 0, (void *)&read_second_svc_seventh_charc, sizeof(read_second_svc_seventh_charc));
         }
-        else if(att_idx == SECOND_SVC_NINE_CHARC_VAL)
+        break;
+        case SECOND_SVC_NINTH_CHARC_VAL:
         {
-            uint8_t read_second_svc_nine_charc[] = {0x01,0x00,0x00,0x01,0x01,0x00,0x00,0x00,0x01,0x90,0x10,0x88,0x11,0x00,0x00,0x50};
+            uint8_t read_second_svc_ninth_charc[] = {0x01, 0x00, 0x00, 0x01, 0x01, 0x00, 0x00, 0x00, 0x01, 0x90, 0x10, 0x88, 0x11, 0x00, 0x00, 0x50};
             handle = gatt_manager_get_svc_att_handle(&dis_server_svc_second_env, att_idx);
-            gatt_manager_server_read_req_reply(con_idx, handle, 0, (void*)&read_second_svc_nine_charc, sizeof(read_second_svc_nine_charc));
+            gatt_manager_server_read_req_reply(con_idx, handle, 0, (void *)&read_second_svc_ninth_charc, sizeof(read_second_svc_ninth_charc));
+        }
+        break;
+        default:
+            break;
         }
     }
-    else if (evt->server_read_req.svc == &dis_server_svc_third_env) 
-    { 
-        if(att_idx == THIRD_SVC_ONE_NTF_CFG)
+    if (evt->server_read_req.svc == &dis_server_svc_third_env)
+    {
+        if (att_idx == THIRD_SVC_FIRST_NTF_CFG)
         {
             handle = gatt_manager_get_svc_att_handle(&dis_server_svc_third_env, att_idx);
-            gatt_manager_server_read_req_reply(con_idx, handle, 0, (void*)&third_svc_one_cccd_config, 2);
+            gatt_manager_server_read_req_reply(con_idx, handle, 0, (void *)&third_svc_first_cccd_config, 2);
         }
     }
-
-    else if (evt->server_read_req.svc == &dis_server_svc_user_one_svc_env)
+    if (evt->server_read_req.svc == &dis_server_svc_user_fourth_svc_env)
     {
-
-        if (att_idx == UNKNOWN_ONE_SVC_TWO_VAL)
+        switch (att_idx)
         {
-            uint8_t unknow_one_svc_two_charc[20] = {0};
-            handle = gatt_manager_get_svc_att_handle(&dis_server_svc_user_one_svc_env, att_idx);
-            gatt_manager_server_read_req_reply(con_idx, handle, 0, (void *)&unknow_one_svc_two_charc, sizeof(unknow_one_svc_two_charc));
+        case FOUTH_SVC_SECOND_VAL:
+        {
+            uint8_t fouth_svc_second_buf[20] = {0};
+            handle = gatt_manager_get_svc_att_handle(&dis_server_svc_user_fourth_svc_env, att_idx);
+            gatt_manager_server_read_req_reply(con_idx, handle, 0, (void *)&fouth_svc_second_buf, sizeof(fouth_svc_second_buf));
         }
-        else if (att_idx == UNKNOWN_ONE_SVC_THREE_VAL)
+        break;
+        case FOUTH_SVC_THIRD_VAL:
         {
-            uint8_t unknow_one_svc_three_charc[20] = {0};
-            handle = gatt_manager_get_svc_att_handle(&dis_server_svc_user_one_svc_env, att_idx);
-            gatt_manager_server_read_req_reply(con_idx, handle, 0, (void *)&unknow_one_svc_three_charc, sizeof(unknow_one_svc_three_charc));
+            uint8_t fouth_svc_third_buf[20] = {0};
+            handle = gatt_manager_get_svc_att_handle(&dis_server_svc_user_fourth_svc_env, att_idx);
+            gatt_manager_server_read_req_reply(con_idx, handle, 0, (void *)&fouth_svc_third_buf, sizeof(fouth_svc_third_buf));
         }
-        else if (att_idx == UNKNOWN_ONE_SVC_ONE_NTF_CFG)
+        break;
+        case FOUTH_SVC_FIRST_NTF_CFG:
         {
-            handle = gatt_manager_get_svc_att_handle(&dis_server_svc_user_one_svc_env, att_idx);
-            gatt_manager_server_read_req_reply(con_idx, handle, 0, (void *)&unknow_one_svc_one_cccd_config, 2);
+            handle = gatt_manager_get_svc_att_handle(&dis_server_svc_user_fourth_svc_env, att_idx);
+            gatt_manager_server_read_req_reply(con_idx, handle, 0, (void *)&fourth_svc_first_cccd_config, 2);
         }
-        else if (att_idx == UNKNOWN_ONE_SVC_TWO_NTF_CFG)
+        break;
+        case FOUTH_SVC_SECOND_NTF_CFG:
         {
-            handle = gatt_manager_get_svc_att_handle(&dis_server_svc_user_one_svc_env, att_idx);
-            gatt_manager_server_read_req_reply(con_idx, handle, 0, (void *)&unknow_one_svc_two_cccd_config, 2);
+            handle = gatt_manager_get_svc_att_handle(&dis_server_svc_user_fourth_svc_env, att_idx);
+            gatt_manager_server_read_req_reply(con_idx, handle, 0, (void *)&fourth_svc_second_cccd_config, 2);
+        }
+        break;
+        default:
+            break;
         }
     }
-    else if (evt->server_read_req.svc == &dis_server_svc_atv_voice_env) 
+    if (evt->server_read_req.svc == &dis_server_svc_atv_voice_env)
     {
-        if(att_idx == ATV_VOICE_SVC_NTF_CFG_ONE)
+        switch (att_idx)
         {
+        case ATV_VOICE_SVC_FIRST_NTF_CFG:
             handle = gatt_manager_get_svc_att_handle(&dis_server_svc_atv_voice_env, att_idx);
-            gatt_manager_server_read_req_reply(con_idx, handle, 0, (void*)&atv_one_cccd_config, 2); 
-        }
-        else if(att_idx == ATV_VOICE_SVC_NTF_CFG_TWO)
-        {
+            gatt_manager_server_read_req_reply(con_idx, handle, 0, (void *)&atv_first_cccd_config, 2);
+            break;
+        case ATV_VOICE_SVC_SECOND_NTF_CFG:
             handle = gatt_manager_get_svc_att_handle(&dis_server_svc_atv_voice_env, att_idx);
-            gatt_manager_server_read_req_reply(con_idx, handle, 0, (void*)&atv_two_cccd_config, 2);
+            gatt_manager_server_read_req_reply(con_idx, handle, 0, (void *)&atv_second_cccd_config, 2);
+            break;
+        default:
+            break;
         }
     }
-    
 }
-
-static void ls_server_write_req_ind(union gatt_evt_u *evt,uint8_t att_idx, uint8_t con_idx, uint16_t length, uint8_t const *value) 
+static void ls_server_write_req_ind(union gatt_evt_u *evt, uint8_t att_idx, uint8_t con_idx, uint16_t length, uint8_t const *value)
 {
-    LOG_I("---------WRITE-----------");  
-    if(evt->server_write_req.svc == &dis_server_svc_user_one_svc_env)
+    LOG_I("---------WRITE-----------");
+    if (evt->server_read_req.svc == &dis_server_svc_first_env)
     {
-        if (att_idx == UNKNOWN_ONE_SVC_ONE_NTF_CFG)
+        if (att_idx == FIRST_SVC_FIRST_NTF_CFG_V)
         {
             LS_ASSERT(length == 2);
-            memcpy(&unknow_one_svc_one_cccd_config, value, length);
-        }
-        else if (att_idx == UNKNOWN_ONE_SVC_TWO_NTF_CFG)
-        {
-            LS_ASSERT(length == 2);
-            memcpy(&unknow_one_svc_two_cccd_config, value, length);
+            memcpy(&first_svc_first_cccd_config, value, length);
         }
     }
-    else if(evt->server_write_req.svc == &dis_server_svc_first_env)
-    { 
-        if (att_idx == FIRST_SVC_ONE_NTF_CFG)
-        {
-            LS_ASSERT(length == 2);
-            memcpy(&first_svc_one_cccd_config, value, length);
-        }
-    }  
-    else if(evt->server_write_req.svc == &dis_server_svc_third_env)
-    { 
-        if (att_idx == THIRD_SVC_ONE_NTF_CFG)
-        {
-            LS_ASSERT(length == 2);
-            memcpy(&third_svc_one_cccd_config, value, length);
-        }
-    } 
-   else if(evt->server_write_req.svc == &dis_server_svc_atv_voice_env)
+    if (evt->server_read_req.svc == &dis_server_svc_third_env)
     {
-        if (att_idx == ATV_VOICE_SVC_NTF_CFG_ONE)
+        if (att_idx == THIRD_SVC_FIRST_NTF_CFG)
         {
             LS_ASSERT(length == 2);
-            memcpy(&atv_one_cccd_config, value, length);
+            memcpy(&third_svc_first_cccd_config, value, length);
         }
-        else if (att_idx == ATV_VOICE_SVC_NTF_CFG_TWO)
+    }
+
+    if (evt->server_read_req.svc == &dis_server_svc_atv_voice_env)
+    {
+        switch (att_idx)
         {
+        case ATV_VOICE_SVC_FIRST_NTF_CFG:
             LS_ASSERT(length == 2);
-            memcpy(&atv_two_cccd_config, value, length);
+            memcpy(&atv_first_cccd_config, value, length);
+            break;
+        case ATV_VOICE_SVC_SECOND_NTF_CFG:
+            LS_ASSERT(length == 2);
+            memcpy(&atv_second_cccd_config, value, length);
+            break;
+        default:
+            break;
         }
-    }   
+    }
+    if (evt->server_read_req.svc == &dis_server_svc_user_fourth_svc_env)
+    {
+        switch (att_idx)
+        {
+        case FOUTH_SVC_FIRST_NTF_CFG:
+            LS_ASSERT(length == 2);
+            memcpy(&fourth_svc_first_cccd_config, value, length);
+            break;
+        case FOUTH_SVC_SECOND_NTF_CFG:
+            LS_ASSERT(length == 2);
+            memcpy(&fourth_svc_second_cccd_config, value, length);
+        default:
+            break;
+        }
+    }
 }
 
 static void ls_voice_send_notification(void)
@@ -1142,20 +1168,19 @@ static void ls_voice_send_notification(void)
         mic_open = false;  
         uint16_t handle = gatt_manager_get_svc_att_handle(&dis_server_svc_atv_voice_env, CONTROL_VAL);
         gatt_manager_server_send_notification(hid_connect_id, handle, audio_start, 1, NULL);
-        builtin_timer_stop(one_timer_inst);
+        builtin_timer_stop(first_timer_inst);
         mic_open_ntf_flag = true;
         atv_voice_ntf_done = true;
         pdm_dma_init();
         atv_pdm_on();
-        builtin_timer_stop(two_timer_inst);
-        builtin_timer_start(two_timer_inst, TWO_TIMEOUT, NULL); 
+        builtin_timer_stop(second_timer_inst);
+        builtin_timer_start(second_timer_inst, SECOND_TIMER_TIMEOUT, NULL); 
     }
     else if(mic_close)
     {
         uint16_t handle = gatt_manager_get_svc_att_handle(&dis_server_svc_atv_voice_env, CONTROL_VAL);
         mic_close = false;
         gatt_manager_server_send_notification(hid_connect_id, handle, audio_end, sizeof(audio_end), NULL);
-        //测试关闭adpcm  能否成功
         atv_pdm_off();
         mic_open_ntf_flag = false;
         LOG_I("close_mic");
@@ -1292,16 +1317,16 @@ static void gatt_manager_callback(enum gatt_evt_type type, union gatt_evt_u *evt
         }
         else if(!memcmp(MIC_OPEN,evt->server_write_req.value,1))
         {
-            init_two_list();
+            init_two_lists();
             memcpy(mic_open_buf,evt->server_write_req.value,sizeof(mic_open_buf));
             LOG_HEX(mic_open_buf,3);
-            builtin_timer_stop(one_timer_inst);
-            builtin_timer_start(one_timer_inst, ONE_TIMEOUT, NULL);
+            builtin_timer_stop(first_timer_inst);
+            builtin_timer_start(first_timer_inst, FIRST_TIMER_TIMEOUT, NULL);
             mic_open = true;
         }
         else if(!memcmp(MIC_CLOSE,evt->server_write_req.value,1))
         {
-            builtin_timer_stop(two_timer_inst);
+            builtin_timer_stop(second_timer_inst);
             mic_close = true;
         }
         ls_server_write_req_ind(evt,evt->server_write_req.att_idx, con_idx, evt->server_write_req.length, evt->server_write_req.value);
@@ -1463,7 +1488,6 @@ static void dev_manager_callback(enum dev_evt_type type, union dev_evt_u *evt)
         LOG_HEX(addr, sizeof(addr));
         DMA_CONTROLLER_INIT(dmac1_inst);
         dev_manager_add_service((struct svc_decl *)&dis_server_svc);
-        
         ls_timer_init();
         pdm_init();
         data_tx_buf_init();
@@ -1474,41 +1498,39 @@ static void dev_manager_callback(enum dev_evt_type type, union dev_evt_u *evt)
     case SERVICE_ADDED:
     {
         service_flag++;
-        if(service_flag == 1)
+        switch (service_flag)
         {
+        case 1:
             gatt_manager_svc_register(evt->service_added.start_hdl, DIS_SVC_ATT_NUM, &dis_server_svc_env);
-            dev_manager_add_service((struct svc_decl *)&dis_server_svc_decl_one_svc);
-        }
-        else if(service_flag ==2)
-        {
-            gatt_manager_svc_register(evt->service_added.start_hdl, UNKNOWN_ONE_SVC_ATT_NUM, &dis_server_svc_user_one_svc_env);
-            dev_manager_add_service((struct svc_decl *)&dis_server_svc_first);  
-        }
-        else if(service_flag ==3)
-        {
-            gatt_manager_svc_register(evt->service_added.start_hdl, FIRST_SVC_ATT_NUM, &dis_server_svc_first_env);
-            dev_manager_add_service((struct svc_decl *)&dis_server_svc_second);  
-        }
-        else if(service_flag ==4)
-        {
+            dev_manager_add_service((struct svc_decl *)&dis_server_svc_decl_fourth_svc);
+            break;
+        case 2:
+            gatt_manager_svc_register(evt->service_added.start_hdl, FIRST_SVC_ATT_NUM_V, &dis_server_svc_user_fourth_svc_env);
+            dev_manager_add_service((struct svc_decl *)&dis_server_svc_first);
+            break;
+        case 3:
+            gatt_manager_svc_register(evt->service_added.start_hdl, FOUTH_SVC_ATT_NUM, &dis_server_svc_first_env);
+            dev_manager_add_service((struct svc_decl *)&dis_server_svc_second); 
+            break;
+        case 4:
             gatt_manager_svc_register(evt->service_added.start_hdl, SECOND_SVC_ATT_NUM, &dis_server_svc_second_env);
-            dev_manager_add_service((struct svc_decl *)&dis_server_svc_third);  
-        }
-        else if(service_flag ==5)
-        {
+            dev_manager_add_service((struct svc_decl *)&dis_server_svc_third); 
+            break;
+        case 5:
             gatt_manager_svc_register(evt->service_added.start_hdl, THIRD_SVC_ATT_NUM, &dis_server_svc_third_env);
-            dev_manager_add_service((struct svc_decl *)&atv_voice_svc_user);  
-        }
-        else if(service_flag ==6)
-        {
+            dev_manager_add_service((struct svc_decl *)&atv_voice_svc_user); 
+            break;
+        case 6:
             gatt_manager_svc_register(evt->service_added.start_hdl, ATV_VOICE_SVC_ATT_NUM, &dis_server_svc_atv_voice_env);
             struct bas_db_cfg db_cfg = {
                 .ins_num = 1,
                 .ntf_enable[0] = 1,
             };
             dev_manager_prf_bass_server_add(NO_SEC,&db_cfg,sizeof(db_cfg));
-        }
-        LOG_I("FLAG = %d",service_flag);    
+            break;             
+        default:
+            break;
+        }              
     }
         break;
     case PROFILE_ADDED:
@@ -1532,22 +1554,22 @@ static void dev_manager_callback(enum dev_evt_type type, union dev_evt_u *evt)
     }
 }
 
-static void one_timer_cb(void *param)
+static void first_timer_cb(void *param)
 {
     if(hid_connect_id != 0xff)
     {
-        builtin_timer_stop(one_timer_inst);
+        builtin_timer_stop(first_timer_inst);
         uint16_t handle = gatt_manager_get_svc_att_handle(&dis_server_svc_atv_voice_env, CONTROL_VAL);
         gatt_manager_server_send_notification(hid_connect_id, handle, mic_open_error, sizeof(mic_open_error), NULL);
         LOG_I("TIMEOUT 1");
     }
 }
 
-static void two_timer_cb(void *param)
+static void second_timer_cb(void *param)
 {
     if(hid_connect_id != 0xff)
     {
-        builtin_timer_stop(two_timer_inst);
+        builtin_timer_stop(second_timer_inst);
         atv_pdm_off();
         mic_open_ntf_flag = false;
         uint16_t handle = gatt_manager_get_svc_att_handle(&dis_server_svc_atv_voice_env, CONTROL_VAL);
@@ -1595,7 +1617,7 @@ static void data_tx_buf_init(void)
     co_list_push_back(&tx_unused_list, &data_element_array[DATA_ARRAY_NUM - 1].list_header);
 }
 
-static void init_two_list(void)
+static void init_two_lists(void)
 {
     uint16_t num_available_used_list = co_list_size(&tx_used_list);
     if (num_available_used_list > 0)
@@ -1643,8 +1665,8 @@ static void send_ntf_once(void)
     {
         struct co_list_hdr *item_ptr = co_list_pop_front(&tx_used_list);
         struct data_element *temp_element = CONTAINER_OF(item_ptr, struct data_element, list_header); 
-        handle_test = gatt_manager_get_svc_att_handle(&dis_server_svc_atv_voice_env, READ_VAL);
-        gatt_manager_server_send_notification(hid_connect_id, handle_test, temp_element->buf, temp_element->length, NULL);
+        send_voice_data_handle = gatt_manager_get_svc_att_handle(&dis_server_svc_atv_voice_env, READ_VAL);
+        gatt_manager_server_send_notification(hid_connect_id, send_voice_data_handle, temp_element->buf, temp_element->length, NULL);
         memset(temp_element->buf,0,temp_element->length);
         co_list_push_back(&tx_unused_list, item_ptr); 
         atv_voice_ntf_done = false;
@@ -1728,7 +1750,7 @@ static void keyscan_timer_cb(void *param)
     {
         if (io_read_pin(PB15))
         {
-            search_key = true;
+            search_key_pressed = true;
             app_hid_send_keyboard_report(KEY_VOICE_REPORT_IDX, (uint8_t *)&open_mic_buf[0], 4, hid_connect_id);
             app_hid_send_keyboard_report(KEY_VOICE_REPORT_IDX, clear_open_mic_buf, 4, hid_connect_id);
         }
