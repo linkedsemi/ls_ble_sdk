@@ -259,7 +259,11 @@ void sys_init_none()
 {
     analog_init();
     spi_flash_drv_var_init(true,false);
+    cpu_sleep_recover_init();
+    mac_init();
     io_init();
+    *(uint32_t *)0x50000000 |= 0x100;
+    *(uint32_t *)0x50000030 |= 0x7;
 }
 
 void ll_stack_var_ptr_init(void);
@@ -277,6 +281,7 @@ void sys_init_ll()
     analog_init();
     ll_var_init();
     io_init();
+    LOG_INIT();
     lsecc_init();
     calc_acc_init();
     cpu_sleep_recover_init();

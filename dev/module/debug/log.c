@@ -15,6 +15,8 @@
 #define LOG_UART_RXD (PB01)
 
 const uint8_t hex_num_tab[] = "0123456789ABCDEF";
+__attribute((weak)) void (*log_output_fn)(bool linefeed,const char *format,...);
+__attribute((weak)) void (*log_hex_output_fn)(const void * data_pointer , uint16_t data_length);
 
 #if (LOG_BACKEND&UART_LOG)
 static UART_HandleTypeDef log_uart;
@@ -109,6 +111,8 @@ void log_output(bool linefeed,const char *format,...)
 
 void ls_log_init()
 {
+    log_output_fn = log_output;
+    log_hex_output_fn = log_hex_output;
     #if(LOG_BACKEND&JLINK_RTT)
     {
         SEGGER_RTT_Init();

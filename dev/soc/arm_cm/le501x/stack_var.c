@@ -27,8 +27,6 @@ __attribute((weak)) uint64_t (*idiv_acc_fn)(uint32_t,uint32_t,bool);
 __attribute((weak)) void (*ecc_calc_fn)(const uint8_t*,const uint8_t*,const uint8_t*,uint8_t*,uint8_t*,void (*)(void *),void *);
 __attribute((weak)) void (*exit_critical_fn)(uint32_t);
 __attribute((weak)) uint32_t (*enter_critical_fn)(void);
-__attribute((weak)) void (*log_output_fn)(bool linefeed,const char *format,...);
-__attribute((weak)) void (*log_hex_output_fn)(const void * data_pointer , uint16_t data_length);
 __attribute((weak)) void (*aes_encrypt_fn)(void (*)(void),const uint8_t*,const uint8_t*);
 __attribute((weak)) void (*aes_encrypt_comp_fn)(void (*)(uint32_t *),uint32_t*);
 __attribute((weak)) void (*stack_reset_hook_fn)(void);
@@ -134,8 +132,6 @@ void stack_var_ptr_init()
     idiv_acc_fn = idiv_acc;
     enter_critical_fn = enter_critical;
     exit_critical_fn = exit_critical;
-    log_output_fn = log_output;
-    log_hex_output_fn = log_hex_output;
     aes_encrypt_fn = ls_ip_aes_encrypt_start;
     aes_encrypt_comp_fn = ls_ip_aes_encrypt_complete;
     stack_reset_hook_fn = NULL;
@@ -231,8 +227,6 @@ void ll_stack_var_ptr_init()
     idiv_acc_fn = idiv_acc;
     enter_critical_fn = enter_critical;
     exit_critical_fn = exit_critical;
-    log_output_fn = log_output;
-    log_hex_output_fn = log_hex_output;
     aes_encrypt_fn = ls_ip_aes_encrypt_start;
     aes_encrypt_comp_fn = ls_ip_aes_encrypt_complete;
     stack_reset_hook_fn = ll_stack_reset_hook;

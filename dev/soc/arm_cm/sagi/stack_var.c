@@ -28,8 +28,6 @@ extern void (*platform_reset_fn)(uint32_t);
 extern int (*rand_fn) (void);
 extern void (*exit_critical_fn)(uint32_t);
 extern uint32_t (*enter_critical_fn)(void);
-__attribute__((weak)) void (*log_output_fn)(bool linefeed,const char *format,...);
-__attribute__((weak)) void (*log_hex_output_fn)(const void * data_pointer , uint16_t data_length);
 extern void (*app_init_fn)(void); 
 extern void (*eif_read) (uint8_t *bufptr, uint32_t size, void (*callback)(void *,uint8_t), void* dummy);
 extern void (*eif_write)(uint8_t *bufptr, uint32_t size, void (*callback)(void *,uint8_t), void* dummy);
@@ -118,8 +116,6 @@ void stack_var_ptr_init()
     rand_fn = rand;
     enter_critical_fn = enter_critical;
     exit_critical_fn = exit_critical;
-    log_output_fn = log_output;
-    log_hex_output_fn = log_hex_output;
     ll_malloc_fn = malloc;
     ll_free_fn = free;
     io_set_pin_fn = io_set_pin;

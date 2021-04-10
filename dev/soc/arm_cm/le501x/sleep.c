@@ -300,6 +300,15 @@ void deep_sleep()
     systick_start();
 }
 
+void deep_sleep_no_ble()
+{
+    uint32_t cpu_stat = enter_critical();
+    NVIC->ICER[0] = ~(1<<LPWKUP_IRQn);
+    cpu_flash_deep_sleep_and_recover();
+    irq_reinit();
+    exit_critical(cpu_stat);
+}
+
 bool ble_wkup_status_get(void)
 {
     return waiting_ble_wkup_irq;
