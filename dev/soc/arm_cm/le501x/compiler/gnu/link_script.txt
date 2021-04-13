@@ -24,7 +24,6 @@ SECTIONS
         __data_start__ = .;
         *(.data*)
         *(.xip_banned)
-        *(.text.memcpy)
         __data_end__ = ALIGN(4);
     }>RAM AT> FLASH   
 

@@ -44,6 +44,16 @@ XIP_BANNED static void lsqspi_operation_wait(reg_lsqspi_t *reg)
 }
 #endif
 
+NOINLINE XIP_BANNED static void memcpy_ram(void *dst,void *src,uint32_t length)
+{
+    uint8_t *src_addr = src;
+    uint8_t *dst_addr = dst;
+    while(length--)
+    {
+        *dst_addr++=*src_addr++;
+    }
+}
+
 XIP_BANNED static void stig_read_start(reg_lsqspi_t *reg,struct stig_start_param *param,uint8_t start_length,bool hold_cs,bool quad_data)
 {
     reg->STIG_CMD = FIELD_BUILD(LSQSPI_CMD_OPCODE,param->opcode) | FIELD_BUILD(LSQSPI_OPCODE_EN, param->opcode_en) | FIELD_BUILD(LSQSPI_DATA_XFER_TYPE, quad_data)
@@ -55,7 +65,7 @@ XIP_BANNED static void stig_read_start(reg_lsqspi_t *reg,struct stig_start_param
     reg->STIG_GO = FIELD_BUILD(LSQSPI_STIG_HOLD_CS, hold_cs) | FIELD_BUILD(LSQSPI_STIG_GO,1);
     lsqspi_operation_wait(reg);
     uint32_t data = reg->STIG_RD[0];
-    memcpy(param->data,&data,start_length);
+    memcpy_ram(param->data,&data,start_length);
 }
 
 XIP_BANNED static void stig_read_continue(reg_lsqspi_t *reg,uint32_t *data,uint16_t size,bool quad_data)
@@ -77,7 +87,7 @@ XIP_BANNED static void stig_read_continue(reg_lsqspi_t *reg,uint32_t *data,uint1
         uint32_t buf[2];
         buf[0] = reg->STIG_RD[0];
         buf[1] = reg->STIG_RD[1];
-        memcpy(data,buf,size);
+        memcpy_ram(data,buf,size);
     }
 }
 
@@ -117,7 +127,7 @@ XIP_BANNED static void stig_write_start(reg_lsqspi_t *reg,struct stig_start_para
         | FIELD_BUILD(LSQSPI_WDATA_EN, start_length ? 1 : 0);
     reg->STIG_ADDR = param->addr;
     uint32_t data;
-    memcpy(&data,param->data,start_length);
+    memcpy_ram(&data,param->data,start_length);
     reg->STIG_WR[0] = data;
     reg->STIG_GO = FIELD_BUILD(LSQSPI_STIG_HOLD_CS, hold_cs) | FIELD_BUILD(LSQSPI_STIG_GO,1);
     lsqspi_operation_wait(reg);
