@@ -30,6 +30,9 @@ __attribute((weak)) uint32_t (*enter_critical_fn)(void);
 __attribute((weak)) void (*aes_encrypt_fn)(void (*)(void),const uint8_t*,const uint8_t*);
 __attribute((weak)) void (*aes_encrypt_comp_fn)(void (*)(uint32_t *),uint32_t*);
 __attribute((weak)) void (*stack_reset_hook_fn)(void);
+__attribute((weak)) uint32_t (*lpcycles_to_hus_fn)(uint32_t);
+__attribute((weak)) uint32_t (*lsi_freq_update_and_hs_to_lpcycles_fn)(int32_t);
+__attribute((weak)) bool lsi_used;
 __attribute((weak)) bool em_fixed;
 
 __attribute((weak)) uint8_t main_task;
@@ -135,6 +138,13 @@ void stack_var_ptr_init()
     aes_encrypt_fn = ls_ip_aes_encrypt_start;
     aes_encrypt_comp_fn = ls_ip_aes_encrypt_complete;
     stack_reset_hook_fn = NULL;
+    lpcycles_to_hus_fn = lpcycles_to_hus;
+    lsi_freq_update_and_hs_to_lpcycles_fn = lsi_freq_update_and_hs_to_lpcycles;
+    #if SDK_LSI_USED
+    lsi_used = true;
+    #else
+    lsi_used = false;
+    #endif
     #if EM_FIX
     em_fixed = true;
     #else

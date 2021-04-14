@@ -45,6 +45,10 @@
 #define SDK_PCLK_DIV 1
 #endif
 
+#ifndef SDK_LSI_USED
+#define SDK_LSI_USED 1
+#endif
+
 #ifndef FPGA
 #define FPGA 0
 #endif

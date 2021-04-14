@@ -25,6 +25,9 @@
 #include "io_config.h"
 #include "ls_dbg.h"
 #include "systick.h"
+#include "lspis.h"
+#include "lstimer.h"
+#include "reg_lptim.h"
 #define ISR_VECTOR_ADDR ((uint32_t *)(0x0))
 #define APP_IMAGE_BASE_OFFSET (0x24)
 #define FOTA_IMAGE_BASE_OFFSET (0x28)
@@ -156,6 +159,74 @@ void rco_calibration_start()
     REG_FIELD_WR(SYSCFG->ANACFG1, SYSCFG_EN_RCO_DIG_PWR, 0);
 }
 
+static uint32_t lsi_cnt_val;
+static uint32_t lsi_dummy_cnt;
+#define LSI_CNT_CYCLES (100)
+static void GPTIM_IRQ_Handler_For_LSI_Counting()
+{
+    LSGPTIMA->ICR = TIMER_ICR_UIE_MASK;         // Clear interrupt
+    lsi_dummy_cnt = LSGPTIMA->CCR1;
+    __NVIC_DisableIRQ(GPTIMA1_IRQn);
+}
+
+void rco_freq_counting_init()
+{
+    REG_FIELD_WR(RCC->CFG,RCC_LPTIM_CLKS,0);
+    REG_FIELD_WR(RCC->APB2EN,RCC_LPTIM,1);
+    REG_FIELD_WR(RCC->APB1EN,RCC_GPTIMA1,1);
+    arm_cm_set_int_isr(GPTIMA1_IRQn,GPTIM_IRQ_Handler_For_LSI_Counting);
+}
+
+void rco_freq_counting_config()
+{
+    HAL_PIS_Config(7,LPTIM_TRGO,GPTIMA1_ITR0,PIS_SYNC_SRC_LEVEL,PIS_EDGE_NONE);
+//GPTIMC Config
+    LSGPTIMA->PSC      = 0x0;         // Set precaler N+1
+    LSGPTIMA->ARR      = 0xFFFFFFFF;  // Set reload N+1 (16 bit)
+    REG_FIELD_WR(LSGPTIMA->CR1,TIMER_CR1_DIR,0);         // Set upcounting
+    LSGPTIMA->ICR = TIMER_ICR_UIE_MASK;         // Clear interrupt
+    LSGPTIMA->IER = TIMER_IER_UIE_MASK;
+    REG_FIELD_WR(LSGPTIMA->CCMR1,TIMER_CCMR1_CC1S,0x3);
+    REG_FIELD_WR(LSGPTIMA->SMCR,TIMER_SMCR_TS,0);
+    REG_FIELD_WR(LSGPTIMA->SMCR,TIMER_SMCR_SMS,4);
+    REG_FIELD_WR(LSGPTIMA->CR1,TIMER_CR1_CEN,1);  // Enable counter
+
+//LPTIM Config
+    LPTIM->ARR   = LSI_CNT_CYCLES-1;
+    LPTIM->CON1  = 1;
+    LPTIM->CON0 |= 1<<22;
+}
+
+void rco_freq_counting_start()
+{
+    __NVIC_ClearPendingIRQ(GPTIMA1_IRQn);
+    __NVIC_EnableIRQ(GPTIMA1_IRQn);
+    while(LPTIM->SYNCSTAT&2);
+    LPTIM->CON1 |= 4;
+}
+
+
+uint32_t lpcycles_to_hus(uint32_t lpcycles)
+{
+    uint32_t hus = 2*(uint64_t)lpcycles*lsi_cnt_val/LSI_CNT_CYCLES/SDK_HCLK_MHZ;
+    //LOG_I("%d,%d",lpcycles,hus);
+    return hus;
+}
+
+uint32_t lsi_freq_update_and_hs_to_lpcycles(int32_t hs_cnt)
+{
+    LS_ASSERT((NVIC->ISER[0U]&1<<GPTIMA1_IRQn)==0);
+    uint32_t ccr = LSGPTIMA->CCR1;
+    if(ccr!=lsi_dummy_cnt)
+    {
+        lsi_cnt_val = ccr;
+        //LOG_I("%d,%d",lsi_cnt_val,lsi_dummy_cnt);
+    }
+    uint32_t lpcycles = SDK_HCLK_MHZ*LSI_CNT_CYCLES*625*(uint64_t)hs_cnt/2/lsi_cnt_val;
+    //LOG_I("%d,%d,%d",lsi_cnt_val,lpcycles,hs_cnt);
+    return lpcycles - 1;
+}
+
 uint8_t get_reset_source()
 {
     uint8_t rst_stat = SYSCFG->RSTST;
@@ -198,9 +269,11 @@ uint32_t get_trng_value()
 static void module_init()
 {
     io_init();
+    rco_freq_counting_init();
     LOG_INIT();
     LOG_I("sys init");
     INIT_BUILTIN_TIMER_ENV();
+    HAL_PIS_Init();
     lsecc_init();
     lscrypt_init();
     srand(get_trng_value());
@@ -215,6 +288,8 @@ static void module_init()
     modem_rf_init();
     irq_init();
     systick_start();
+    rco_freq_counting_config();
+    rco_freq_counting_start();
 }
 
 static void analog_init()

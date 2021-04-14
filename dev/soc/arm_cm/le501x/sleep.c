@@ -293,11 +293,13 @@ void deep_sleep()
 {
     NVIC->ICER[0] = ~(1<<LPWKUP_IRQn);
     cpu_flash_deep_sleep_and_recover();
+    rco_freq_counting_config();
     wkup_ble();
     irq_reinit();
     ble_wkup_status_set(true);
     ble_radio_en_sync();
     systick_start();
+    rco_freq_counting_start();
 }
 
 void deep_sleep_no_ble()
