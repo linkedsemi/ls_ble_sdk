@@ -334,7 +334,7 @@ static void at_app_reset_handler(uint8_t *p_cmd_parse)
     uint8_t msg_rsp[100];
     memset(msg_rsp, 0, sizeof(msg_rsp));
 
-    msg_len = sprintf((char *)msg_rsp,"\r\n+Z\r\nOK\r\n");
+    msg_len = sprintf((char *)msg_rsp,"\r\n+RESET\r\nOK\r\n");
     uart_write(msg_rsp,msg_len);
     platform_reset(0);
 }

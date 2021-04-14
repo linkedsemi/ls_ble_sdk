@@ -7,7 +7,7 @@ AT指令是指在命令模式下用户通过 UART 与模块进行命令传递，
 一、串口配置
 ----------------
 
-默认使用PB08、PB09作为AT指令的通讯串口，其中PB08为模块的TX，PB09为模块的RX，默认的uart口的配置参数为： 波特率 115200、无校验、8位数据位、1位停止位。
+默认使用PB00、PB01作为AT指令的通讯串口，其中PB00为模块的TX，PB01为模块的RX，默认的uart口的配置参数为： 波特率 115200、无校验、8位数据位、1位停止位。
 
 
 二、AT指令格式
@@ -89,20 +89,20 @@ AT+指令可以直接通过常用的串口的调试助手程序进行输入，AT
  | 格式：
  | 查询当前参数值：AT+ADV?{CR}{LF}
  | 回应：{CR}{LF}+ADV:set{CR}{LF}OK{CR}{LF}
- | 设置：AT+ADVINT=set{CR}{LF}
- | 回应：{CR}{LF}+ADVINT:set{CR}{LF}OK{CR}{LF}
+ | 设置：AT+ADV=set{CR}{LF}
+ | 回应：{CR}{LF}+ADV:set{CR}{LF}OK{CR}{LF}
  | 参数：
  | set： 模块的广播状态
 
     - B: 广播开启
     - I: 广播空闲
 
-3.5 AT+Z
+3.5 AT+RESET
 ++++++++++++++
  | 功能： 控制模块重启
  | 格式：
- | 查询当前参数值：AT+Z?{CR}{LF}
- | 回应：{CR}{LF}+Z:set{CR}{LF}OK{CR}{LF}
+ | 设置：AT+RESET?{CR}{LF}
+ | 回应：{CR}{LF}+RESET{CR}{LF}OK{CR}{LF}
 
 3.6 AT+LINK
 ++++++++++++++
