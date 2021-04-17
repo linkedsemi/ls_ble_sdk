@@ -108,3 +108,8 @@ ROM_SYMBOL uint16_t linked_buf_element_size(linked_buffer_t *ptr)
 {
     return ptr->element_size;
 }
+
+ROM_SYMBOL uint16_t linked_buf_element_num(linked_buffer_t *ptr)
+{
+    return ptr->buf_length;
+}
