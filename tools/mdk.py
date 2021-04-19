@@ -44,7 +44,8 @@ def mdk_builder(target,source,env):
     beforebuild1 = mdk_xml_schema.UserAction('')
     beforebuild2 = mdk_xml_schema.UserAction('')
     if env.get('STACK_HEX_PATH') is None:
-        afterbuild1 = mdk_xml_schema.UserAction('')
+        afterbuild1 = mdk_xml_schema.UserAction(os.path.relpath(env.Dir("#").abspath, prj_dir) + '\\tools\\le501x\\after_build.bat @L ' + os.path.relpath(env.Dir("#").abspath, prj_dir))
+#        afterbuild1 = mdk_xml_schema.UserAction('')
     else:
         afterbuild1 = mdk_xml_schema.UserAction(os.path.relpath(env.Dir("#").abspath, prj_dir) + '\\tools\\le501x\\after_build.bat @L ' + os.path.relpath(env.Dir("#").abspath, prj_dir) + ' ' + env['STACK_HEX_PATH'])
     afterbuild2 = mdk_xml_schema.UserAction('')
