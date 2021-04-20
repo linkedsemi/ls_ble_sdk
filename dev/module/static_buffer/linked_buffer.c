@@ -55,8 +55,12 @@ ROM_SYMBOL uint8_t linked_buf_release(linked_buffer_t *ptr,struct co_list_hdr * 
     LINKED_BUF_ASSERT(linked_buf_hdl_sanity_check(ptr,(uint8_t *)hdr));
     uint16_t idx = linked_buf_get_elem_idx(ptr,hdr);
     LINKED_BUF_ASSERT(ptr->ref_cnt[idx]);
-    co_list_push_back(&ptr->allocatable, hdr);
-    return --ptr->ref_cnt[idx];
+    ptr->ref_cnt[idx] -= 1;
+    if(ptr->ref_cnt[idx]==0)
+    {
+        co_list_push_back(&ptr->allocatable, hdr);
+    }
+    return ptr->ref_cnt[idx];
 }
 
 ROM_SYMBOL uint16_t linked_buf_get_elem_idx(linked_buffer_t *ptr,struct co_list_hdr *hdr)
