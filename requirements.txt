@@ -3,5 +3,5 @@ PyXB
 scons
 sphinx==3.0
 sphinx_rtd_theme
-exhale
+breathe
 intelhex

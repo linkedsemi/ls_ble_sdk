@@ -10,7 +10,7 @@
 #include <string.h>
 #include "co_math.h"
 #include "io_config.h"
-
+#include "reg_base_addr.h"
 #define UART_SVC_ADV_NAME "LS Mult Roles"
 #define UART_SERVER_MAX_MTU  517
 #define UART_SERVER_MTU_DFT  23

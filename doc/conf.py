@@ -12,11 +12,13 @@
 #
 import sphinx_rtd_theme
 import textwrap
-#import os
-#import sys
-#sys.path.insert(0, os.path.abspath('.'))
-#sys.path.insert(0, os.path.abspath('../build/doc/'))
-#sys.path.insert(0, os.path.abspath('../inc/'))
+import subprocess, os
+
+read_the_docs_build = os.environ.get('READTHEDOCS', None) == 'True'
+
+subprocess.call('doxygen', shell=True)
+   
+
 # -- Project information -----------------------------------------------------
 
 project = 'ls_sdk'
@@ -31,34 +33,13 @@ author = 'linkedsemi'
 # ones.
 extensions = [
     'breathe',
-    'exhale',
     "sphinx_rtd_theme",
 ]
 
 breathe_projects = {
-    "ls_sdk": "./_build/doxyoutput/xml"
+    "ls_sdk": "./_build/doxyxml"
 }
 breathe_default_project = "ls_sdk"
-
-#Setup the exhale extension
-exhale_args = {
-    # These arguments are required
-    "containmentFolder":     "./api",
-    "rootFileName":          "api_root.rst",
-    "rootFileTitle":         "API Reference",
-    "doxygenStripFromPath":  "..",
-    # Suggested optional arguments
-    "createTreeView":        True,
-    # TIP: if using the sphinx-bootstrap-theme, you need
-    # "treeViewIsBootstrap": True,
-    "exhaleExecutesDoxygen": True,
-    "exhaleDoxygenStdin":    textwrap.dedent('''
-                                    INPUT = ../inc/le501x.h
-                                    EXCLUDE_PATTERNS = */inc/cmsis/* *.c
-                                    '''),
-    #"exhaleUseDoxyfile":     True,
-    #"verboseBuild":          True,
-}
 
 # Tell sphinx what the primary language being documented is.
 primary_domain = 'c'

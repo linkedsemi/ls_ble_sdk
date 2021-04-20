@@ -2,6 +2,15 @@
 #define IO_CONFIG_H_
 #include <stdint.h>
 #include <stdbool.h>
+
+/** \addtogroup PERIPHERAL
+ *  @{
+ */
+
+/** \addtogroup GPIO
+ *  @{
+ */
+ 
 /**@brief IO pull type */
 typedef enum 
 {
@@ -300,6 +309,11 @@ void pdm_data0_io_init(uint8_t pin);
 void pdm_data0_io_deinit(void);
 void pdm_data1_io_init(uint8_t pin);
 void pdm_data1_io_deinit(void);
+
+/** @}*/
+
+
+/** @}*/
 
 #endif
 

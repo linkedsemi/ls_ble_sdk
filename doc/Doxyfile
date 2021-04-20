@@ -1,0 +1,17 @@
+PROJECT_NAME           = LS_SDK_API
+
+INPUT                  = ..\dev\peripheral\api\lsssi.h \
+                         ..\dev\peripheral\api\io_config.h \
+                         ..\dev\peripheral\api\spi_flash.h \
+                         ..\dev\module\ble\ls_ble.h \
+                         
+
+GENERATE_XML           = YES
+
+XML_OUTPUT             = _build/doxyxml
+
+GENERATE_HTML          = YES
+
+HTML_OUTPUT            = _build/doxyhtml
+
+GENERATE_LATEX         = NO

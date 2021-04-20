@@ -2,8 +2,17 @@
 #define SPI_FLASH_H_
 #include <stdint.h>
 #include <stdbool.h>
-#define FLASH_BASE_ADDR (0x18000000)
+
+/** \addtogroup PERIPHERAL
+ *  @{
+ */
+
+/** \addtogroup SPI_FLASH
+ *  @{
+ */
+
 #define FLASH_PAGE_SIZE (256)
+#define FLASH_SECTOR_SIZE (0x1000)
 
 void spi_flash_xip_status_set(bool xip);
 
@@ -62,6 +71,11 @@ void spi_flash_prog_erase_resume(void);
 bool spi_flash_writing_busy(void);
 
 bool spi_flash_xip_status_get(void);
+
+/** @}*/
+
+
+/** @}*/
 
 #endif
 

@@ -17,6 +17,7 @@
 #include "prf_fotas.h"
 #include "cpu.h"
 #include "io_config.h"
+#include "reg_base_addr.h"
 #define FLASH_SECTOR_SIZE (4096)
 
 

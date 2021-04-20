@@ -1,0 +1,7 @@
+PERIPHERAL API
+================
+
+.. toctree::
+    
+    gpio
+

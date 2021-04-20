@@ -5,6 +5,14 @@
 #include "HAL_def.h"
 #include "ssi_misc.h"
 
+/** \addtogroup PERIPHERAL
+ *  @{
+ */
+
+/** \addtogroup SSI
+ *  @{
+ */
+ 
 #ifdef LSSSI_BASE_ADDR
 #define SSI ((reg_ssi_t *)LSSSI_BASE_ADDR)
 #endif
@@ -145,4 +153,10 @@ HAL_StatusTypeDef HAL_SSI_TransmitReceive_DMA(SSI_HandleTypeDef *hssi,void *TX_D
 void HAL_SSI_TxRxDMACpltCallback(SSI_HandleTypeDef *hssi);
 
 void HAL_SSI_IRQHandler(SSI_HandleTypeDef *hssi);
+
+/** @}*/
+
+
+/** @}*/
+
 #endif

@@ -3,6 +3,11 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <stddef.h>
+
+/** \addtogroup BLE
+ *  @{
+ */
+
 #define INVALID_CON_IDX (0xff)
 #define INVALID_PEER_ID (0xff)
 
@@ -829,5 +834,8 @@ void gatt_manager_client_desc_char_discover(uint8_t con_idx,uint16_t start_hdl,u
 void gatt_manager_client_mtu_exch_send(uint8_t con_idx);
 
 void gatt_manager_client_read(uint8_t con_idx,uint16_t handle);
+
+/** @}*/
+
 #endif
 
