@@ -28,7 +28,7 @@ struct adv_set_env
     struct ll_evt second_evt;
     struct adv_current_tx_env current_tx;
     struct sync_env *periodic;
-    timer_env_t duration_timer;
+    timer_t duration_timer;
     uint32_t secondary_anchor;
     struct adv_data_scan_rsp_data data_list[2];
     struct le_ext_adv_param ext_param;

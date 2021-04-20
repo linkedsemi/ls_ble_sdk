@@ -348,14 +348,14 @@ struct llcp_tx_pdu_env
     struct llcp_normal_pdu peer_proc;
 };
 
-enum conn_evt_end_action
+struct ll_ctrl_procedure
 {
-    CONN_EVT_END_NO_ACTION,
-    CONN_EVT_END_SUP_TO_START,
-    CONN_EVT_END_SUP_TO_RESET,
+    union llcp_env env;
+    enum llcp_type ctrl_type;
 };
 
-struct ll_conn_evt{
+struct ll_conn_env{
+    struct co_list_hdr hdr;
     struct ll_evt evt;
     struct co_list pending_tx;
     struct co_list received;
@@ -364,7 +364,7 @@ struct ll_conn_evt{
     struct co_list rx_acl_data;
     struct conn_txrx_data *tx;
     struct hci_acl_air_rx_data *rx;
-    timer_env_t supv_to_timer;
+    timer_t supv_to_timer;
     struct ll_crypto_env crypto;
     struct data_length_env data_len_ext;    
     struct llcp_tx_pdu_env tx_ctrl;
@@ -376,10 +376,13 @@ struct ll_conn_evt{
     uint16_t slv_latency;
     uint16_t supervision_timeout;
     uint16_t counter;
+    struct ll_ctrl_procedure local;
+    struct ll_ctrl_procedure peer;
+    struct le_features peer_features;
+    struct version_ind peer_ver;
     struct le_chnl_map channel_map;
     struct conn_data_header rx_header;
-    struct conn_header_lsb prev_rx_header;    
-    enum conn_evt_end_action evt_end_action;
+    struct conn_header_lsb prev_rx_header;
     uint8_t unmapped_channel;
     uint8_t disconnect_reason;
     uint8_t force_disconnect;
@@ -390,21 +393,6 @@ struct ll_conn_evt{
     uint8_t sn;
     uint8_t encrypted;
     uint8_t master;
-};
-
-struct ll_ctrl_procedure
-{
-    union llcp_env env;
-    enum llcp_type ctrl_type;
-};
-
-struct ll_conn_env{
-    struct co_list_hdr hdr;
-    struct ll_conn_evt evt;
-    struct ll_ctrl_procedure local;
-    struct ll_ctrl_procedure peer;
-    struct le_features peer_features;
-    struct version_ind peer_ver;
     uint8_t peer_version_valid:1,
             peer_features_valid:1;
 };
@@ -442,7 +430,7 @@ struct ll_conn_env *get_ll_conn_env_by_idx(uint16_t idx);
 
 void ll_hci_rx_air_tx_start(struct ll_conn_env *env,struct hci_acl_air_tx_data *buf);
 
-void ll_conn_evt_init(struct ll_conn_evt *evt,bool master,struct conn_req_lldata *lldata,uint32_t conn_req_end_time,bool csa2);
+void ll_conn_evt_init(struct ll_conn_env *env,bool master,struct conn_req_lldata *lldata,uint32_t conn_req_end_time,bool csa2);
 
 void conn_evt_end_handler(struct ll_evt *evt);
 

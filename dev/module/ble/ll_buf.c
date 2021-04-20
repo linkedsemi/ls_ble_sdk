@@ -26,7 +26,7 @@
 #define WHITE_LIST_SIZE 2
 #define PER_ADV_LIST_SIZE 2
 #define ADV_REPORT_CACHE_SIZE 10
-
+#define SW_TIMER_BUF_NUM 5
 //ll_ext_adv
 struct adv_set_env adv_sets[ADV_SETS_NUM];
 extern struct adv_set_env *adv_sets_ptr;
@@ -80,6 +80,10 @@ extern struct sw_cache *per_adv_list_ptr;
 //adv_report_cache
 DEF_SW_CACHE(adv_rx_cache,struct adv_report_cache,ADV_REPORT_CACHE_SIZE);
 extern struct sw_cache *adv_rx_cache_ptr;
+
+//timer_wrapper
+DEF_LINKED_BUF(sw_timer_buf,struct sw_timer_env,SW_TIMER_BUF_NUM);
+extern linked_buffer_t *sw_timer_buf_ptr;
 
 static void adv_report_cache_init(void)
 {
@@ -164,6 +168,12 @@ static void white_list_buf_init()
     white_list_cache_ptr = &white_list_cache;
 }
 
+static void sw_timer_buf_init()
+{
+    INIT_LINKED_BUF(sw_timer_buf);
+    sw_timer_buf_ptr = &sw_timer_buf;
+}
+
 void ll_buf_init()
 {
     adv_report_cache_init();
@@ -179,4 +189,5 @@ void ll_buf_init()
     ll_sync_buf_init();
     per_adv_list_init();
     white_list_buf_init();
+    sw_timer_buf_init();
 }

@@ -52,8 +52,8 @@ struct ll_ext_scan_env
     struct ll_evt second_evt;
     struct prim_scan_rx_env *prim_rx;
     struct co_list second_scan;
-    timer_env_t duration;
-    timer_env_t period;
+    timer_t duration;
+    timer_t period;
     struct conn_req_data_env conn_req_data;
     struct ext_scan_param scan_param;
     struct ext_create_con_param init_param;

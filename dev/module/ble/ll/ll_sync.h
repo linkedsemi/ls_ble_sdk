@@ -46,7 +46,7 @@ struct sync_scan_env
 {
     struct sync_evt_rx_env *rx;
     struct per_adv_list_env *adv_info;
-    timer_env_t sync_timeout_timer;
+    timer_t sync_timeout_timer;
     struct per_adv_create_sync_param param;
     bool chain_header;
     bool synced;

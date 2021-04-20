@@ -27,6 +27,8 @@ uint32_t htimer_current_get(void);
 
 bool evt_cancel(bool ongoing,struct ll_evt *evt);
 
+bool evt_remove_no_evt_end(struct ll_evt *evt);
+
 bool evt_remove(struct ll_evt *evt);
 
 bool evt_remove_swint(struct ll_evt *evt);
