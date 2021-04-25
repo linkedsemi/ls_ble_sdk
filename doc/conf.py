@@ -34,6 +34,7 @@ author = 'linkedsemi'
 extensions = [
     'breathe',
     "sphinx_rtd_theme",
+     'sphinxcontrib.mermaid',
 ]
 
 breathe_projects = {
