@@ -6,7 +6,6 @@
 #include <string.h>
 #include "common.h"
 #include "ARMCM3.h"
-#define FLASH_SECTOR_SIZE (4096)
 
 void cpu_sleep_asm(void);
 void cpu_recover_asm(void);

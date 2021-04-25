@@ -5,7 +5,7 @@
 typedef struct sw_timer_env timer_env_t;
 typedef struct sw_timer_env *timer_t;
 
-#define MS_2_PERIOD(x) ((x)*MAC_CLK_MHZ*1000000/1000)
+#define MS_2_PERIOD(x) ((x)*MAC_CLK_MHZ*1000)
 
 #define PERIOD_2_MS(x) ((x)/MAC_CLK_MHZ/1000)
 
@@ -14,6 +14,8 @@ timer_t timer_create(void (*callback)(void *),void *param,uint32_t period);
 void timer_delete(timer_t timer);
 
 uint32_t timer_period_get(timer_t timer);
+
+void timer_period_set(timer_t timer,uint32_t period);
 
 void timer_start(timer_t timer);
 
@@ -24,6 +26,7 @@ void timer_wrapper_init_sw_timer(void);
 extern timer_t (*timer_create_fn)(void (*callback)(void *),void *param,uint32_t period);
 extern void (*timer_delete_fn)(timer_t timer);
 extern uint32_t (*timer_period_get_fn)(timer_t timer);
+extern void (*timer_period_set_fn)(timer_t timer,uint32_t period);
 extern void (*timer_start_fn)(timer_t timer);
 extern bool (*timer_stop_fn)(timer_t timer);
 #endif

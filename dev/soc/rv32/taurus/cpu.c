@@ -2,16 +2,16 @@
 #include "cpu.h"
 #include "compile_flag.h"
 
-static uint32_t critical_nested_cnt;
-XIP_BANNED void enter_critical()
+XIP_BANNED uint32_t enter_critical()
 {
+    uint32_t stat = CLIC->MINTTHRESH;
     CLIC->MINTTHRESH = 254<<24;
-    ++critical_nested_cnt;
+    return stat;
 }
 
-XIP_BANNED void exit_critical()
+XIP_BANNED void exit_critical(uint32_t prev_stat)
 {
-    if(--critical_nested_cnt==0)
+    if(prev_stat==0)
     {
         CLIC->MINTTHRESH = 0;
     }

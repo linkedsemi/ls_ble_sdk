@@ -1,7 +1,9 @@
 #ifndef PLATFORM_H_
 #define PLATFORM_H_
 #include <stdint.h>
+#include <stdbool.h>
 #include "sdk_config.h"
+bool clk_check(void);
 
 void clk_switch(void);
 

@@ -350,6 +350,7 @@ struct llcp_tx_pdu_env
 
 struct ll_ctrl_procedure
 {
+    timer_t rsp_timeout_timer;
     union llcp_env env;
     enum llcp_type ctrl_type;
 };
@@ -365,6 +366,8 @@ struct ll_conn_env{
     struct conn_txrx_data *tx;
     struct hci_acl_air_rx_data *rx;
     timer_t supv_to_timer;
+    struct ll_ctrl_procedure local;
+    struct ll_ctrl_procedure peer;
     struct ll_crypto_env crypto;
     struct data_length_env data_len_ext;    
     struct llcp_tx_pdu_env tx_ctrl;
@@ -376,8 +379,6 @@ struct ll_conn_env{
     uint16_t slv_latency;
     uint16_t supervision_timeout;
     uint16_t counter;
-    struct ll_ctrl_procedure local;
-    struct ll_ctrl_procedure peer;
     struct le_features peer_features;
     struct version_ind peer_ver;
     struct le_chnl_map channel_map;
@@ -430,7 +431,7 @@ struct ll_conn_env *get_ll_conn_env_by_idx(uint16_t idx);
 
 void ll_hci_rx_air_tx_start(struct ll_conn_env *env,struct hci_acl_air_tx_data *buf);
 
-void ll_conn_evt_init(struct ll_conn_env *env,bool master,struct conn_req_lldata *lldata,uint32_t conn_req_end_time,bool csa2);
+void ll_conn_env_init(struct ll_conn_env *env,bool master,struct conn_req_lldata *lldata,uint32_t conn_req_end_time,bool csa2);
 
 void conn_evt_end_handler(struct ll_evt *evt);
 

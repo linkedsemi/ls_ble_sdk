@@ -51,7 +51,9 @@
         "lstrng.h": "c",
         "sys_stat.h": "c",
         "stdint.h": "c",
-        "ll_evt.h": "c"
+        "ll_evt.h": "c",
+        "swint_call_asm.h": "c",
+        "taurus.h": "c"
     },
     "editor.detectIndentation": false,
     "restructuredtext.confPath": "${workspaceFolder}\\doc",

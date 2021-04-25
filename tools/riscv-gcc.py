@@ -7,13 +7,13 @@ def generate(env):
     assembler.generate(env)
     ar.generate(env)
     link.generate(env)
-    env['CC'] = 'riscv-none-embed-gcc'
-    env['AS'] = 'riscv-none-embed-as'
-    env['AR'] = 'riscv-none-embed-ar'
-    env['OBJDUMP'] = 'riscv-none-embed-objdump'
-    env['OBJCOPY'] = 'riscv-none-embed-objcopy'
-    env['NM'] = 'riscv-none-embed-nm'
-    env['READELF'] = 'riscv-none-embed-readelf'
+    env['CC'] = 'riscv64-unknown-elf-gcc'
+    env['AS'] = 'riscv64-unknown-elf-as'
+    env['AR'] = 'riscv64-unknown-elf-gcc-ar'
+    env['OBJDUMP'] = 'riscv64-unknown-elf-objdump'
+    env['OBJCOPY'] = 'riscv64-unknown-elf-objcopy'
+    env['NM'] = 'riscv64-unknown-elf-nm'
+    env['READELF'] = 'riscv64-unknown-elf-readelf'
     env['PROGSUFFIX'] = '.elf'    
     
 def exists(env):
