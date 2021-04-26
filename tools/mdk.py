@@ -7,13 +7,20 @@ import subprocess
 import shutil
 
 def mdk_builder(target,source,env):
+    prj_dir = os.path.join(env['PROJ_DIR'].srcnode().abspath,'mdk')
+    proj_path = os.path.join(prj_dir,os.path.basename(target[0].path)+'.uvprojx')
+    operation = env.get('OPERATION','proj_gen')
+    if operation == 'build':
+        proj_log = os.path.join(os.path.join(prj_dir,'UVBuild'),os.path.basename(target[0].path)+'.txt')
+        proj_build = env['UV'] + ' -b "' + proj_path + '" -o "' + proj_log + '" -j0'
+        complete = subprocess.run(proj_build,shell=True)
+        subprocess.run('type "'+proj_log+'"',shell=True)
+        return complete.returncode
+
     prj = mdk_xml_schema.Project()
     prj.ToolsetName = 'ARM'
     prj.Device = 'ARMCM0'
     prj.useUlib = 1
-#    target_path = target[0].path[0: target[0].path.rfind("\\")+1]
-#    target_name = target[0].path[target[0].path.rfind("\\")+1: len(target[0].path)]
-    prj_dir = os.path.join(env['PROJ_DIR'].srcnode().abspath,'mdk')
     if os.path.exists(prj_dir)==False:
         os.mkdir(prj_dir)
     jlink_script_src_dir = os.path.join(env.Dir('.').abspath,'tools\\prog\\LinkedSemi\\LE501X.jlinkscript')
@@ -38,14 +45,13 @@ def mdk_builder(target,source,env):
     
     prj.CDefines = "" 
     prj.COptions = "--c99 -O2 " 
-    prj.LinkOptions = "--datacompressor=off"
+    prj.LinkOptions = " --datacompressor=off --diag_suppress=L6314 "
     beforecompile1 = mdk_xml_schema.UserAction('')
     beforecompile2 = mdk_xml_schema.UserAction('')
     beforebuild1 = mdk_xml_schema.UserAction('')
     beforebuild2 = mdk_xml_schema.UserAction('')
     if env.get('STACK_HEX_PATH') is None:
         afterbuild1 = mdk_xml_schema.UserAction(os.path.relpath(env.Dir("#").abspath, prj_dir) + '\\tools\\le501x\\after_build.bat @L ' + os.path.relpath(env.Dir("#").abspath, prj_dir))
-#        afterbuild1 = mdk_xml_schema.UserAction('')
     else:
         afterbuild1 = mdk_xml_schema.UserAction(os.path.relpath(env.Dir("#").abspath, prj_dir) + '\\tools\\le501x\\after_build.bat @L ' + os.path.relpath(env.Dir("#").abspath, prj_dir) + ' ' + env['STACK_HEX_PATH'])
     afterbuild2 = mdk_xml_schema.UserAction('')
@@ -60,11 +66,6 @@ def mdk_builder(target,source,env):
         src = build_src.srcnode().path
         filepath,extension = os.path.splitext(src)
         all_file_list.append(os.path.relpath(src,prj_dir))
-        #if extension == '.c':
-        #    c_list.append(os.path.relpath(src,prj_dir))
-        #elif extension == '.s' or extension == 'S':
-        #    asm_list.append(os.path.relpath(src,prj_dir))
-        #else:
         if extension != '.c' and extension != '.C' and extension != '.s' and extension != '.S':
             obj_list.append(os.path.relpath(src,prj_dir))
     if 'LIBS' in env:
@@ -75,7 +76,6 @@ def mdk_builder(target,source,env):
                 obj_list.append(os.path.relpath(lib.path,prj_dir))
             else:
                 lib_list.append(os.path.relpath(lib.path,prj_dir))
-    #file_list = file_list_build(c_list,1) + file_list_build(asm_list,2) + file_list_build(obj_list,3) + file_list_build(lib_list,4)
 
     group_name_list = []
     group_file_list = []
@@ -117,9 +117,7 @@ def mdk_builder(target,source,env):
     if os.path.isfile(os.path.join(prj_dir,os.path.basename(target[0].path)+'.uvoptx'))==True:
         os.remove(os.path.join(prj_dir,os.path.basename(target[0].path)+'.uvoptx'))    
     
-    proj_path = os.path.join(prj_dir,os.path.basename(target[0].path)+'.uvprojx')
     proj_gen = env['UV'] + ' ' + proj_path + ' -i ' + filename
-    proj_build = env['UV'] + ' -b ' + proj_path
     complete = subprocess.run(proj_gen,shell=True)
     return complete.returncode
 

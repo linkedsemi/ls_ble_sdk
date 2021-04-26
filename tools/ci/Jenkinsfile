@@ -10,9 +10,20 @@ pipeline {
             }
         }
         stage('Test') {
-            options {
-                timeout(time: 10, unit: 'MINUTES') 
+            steps {
+                powershell label: '', script: '''
+
+                '''
             }
+        }
+        stage('MDK_Build'){
+            steps {
+                powershell label: '', script: '''
+                    scons toolchain=mdk operation=build
+                '''    
+            }
+        }
+        stage('MDK_Test') {
             steps {
                 powershell label: '', script: '''
 

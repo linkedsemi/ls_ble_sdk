@@ -12,11 +12,13 @@ default_toolchain = {
     'rv32': 'riscv-gcc',
 }
 tool = ARGUMENTS.get('toolchain',default_toolchain[base_arch])
+operation = ARGUMENTS.get('operation','proj_gen')
 env = Environment(ENV = os.environ,tools=[tool],toolpath=['tools'])
 print(env['TOOLS'])
 env['IC'] = ic
 env['CPU'] = cpu
 env['BASE_ARCH'] = base_arch
+env["OPERATION"] = operation
 env.VariantDir('build/$IC', '.',duplicate=0)
 
 if env['IC'] == 'le501x':

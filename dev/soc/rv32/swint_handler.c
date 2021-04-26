@@ -26,6 +26,11 @@ XIP_BANNED void do_spi_flash_read_svcall(void *param)
     SWINT_FUNC_CALL_INLINE_ASM(do_spi_flash_read,flash_swint_set);
 }
 
+XIP_BANNED void do_spi_flash_read_reg_svcall(void *param)
+{
+    SWINT_FUNC_CALL_INLINE_ASM(do_spi_flash_read_reg,flash_swint_set);
+}
+
 XIP_BANNED void do_spi_flash_chip_erase_svcall(void)
 {
     SWINT_FUNC_CALL_INLINE_ASM(do_spi_flash_chip_erase,flash_swint_set);

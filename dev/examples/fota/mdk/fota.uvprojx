@@ -337,7 +337,7 @@
               <MiscControls>--c99 -O2</MiscControls>
               <Define></Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\..\module\crc;..\..\..\module\debug;..\..\..\module\debug\RTT;..\..\..\module\static_buffer;..\..\..\module\tinyfs;..\..\..\module\tinycrypt\lib\include;..\..\..\module\ble;..\..\..\module\ble\prf;..\..\..\module\common;..\..\..\module\adpcm;..\..\..\peripheral\ecc;..\..\..\peripheral\crypt;..\..\..\peripheral\spi;..\..\..\peripheral\api;..\..\..\peripheral\inc;..\..\..\soc\arm_cm;..\..\..\soc\arm_cm\cmsis;..\..\..\soc\arm_cm\le501x;..\..\..\soc\arm_cm\le501x\integration;..\..\..\soc;..\..\..;..;</IncludePath>
+              <IncludePath>..\..\..\module\crc;..\..\..\module\debug;..\..\..\module\debug\RTT;..\..\..\module\static_buffer;..\..\..\module\tinyfs;..\..\..\module\tinycrypt\lib\include;..\..\..\module\ble;..\..\..\module\ble\prf;..\..\..\module\ble\ll;..\..\..\module\common;..\..\..\module\adpcm;..\..\..\peripheral\ecc;..\..\..\peripheral\crypt;..\..\..\peripheral\spi;..\..\..\peripheral\api;..\..\..\peripheral\inc;..\..\..\soc\arm_cm;..\..\..\soc\arm_cm\cmsis;..\..\..\soc\arm_cm\le501x;..\..\..\soc\arm_cm\le501x\integration;..\..\..\soc;..\..\..;..;</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -355,7 +355,7 @@
               <MiscControls></MiscControls>
               <Define></Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\..\module\crc;..\..\..\module\debug;..\..\..\module\debug\RTT;..\..\..\module\static_buffer;..\..\..\module\tinyfs;..\..\..\module\tinycrypt\lib\include;..\..\..\module\ble;..\..\..\module\ble\prf;..\..\..\module\common;..\..\..\module\adpcm;..\..\..\peripheral\ecc;..\..\..\peripheral\crypt;..\..\..\peripheral\spi;..\..\..\peripheral\api;..\..\..\peripheral\inc;..\..\..\soc\arm_cm;..\..\..\soc\arm_cm\cmsis;..\..\..\soc\arm_cm\le501x;..\..\..\soc\arm_cm\le501x\integration;..\..\..\soc;..\..\..;..;</IncludePath>
+              <IncludePath>..\..\..\module\crc;..\..\..\module\debug;..\..\..\module\debug\RTT;..\..\..\module\static_buffer;..\..\..\module\tinyfs;..\..\..\module\tinycrypt\lib\include;..\..\..\module\ble;..\..\..\module\ble\prf;..\..\..\module\ble\ll;..\..\..\module\common;..\..\..\module\adpcm;..\..\..\peripheral\ecc;..\..\..\peripheral\crypt;..\..\..\peripheral\spi;..\..\..\peripheral\api;..\..\..\peripheral\inc;..\..\..\soc\arm_cm;..\..\..\soc\arm_cm\cmsis;..\..\..\soc\arm_cm\le501x;..\..\..\soc\arm_cm\le501x\integration;..\..\..\soc;..\..\..;..;</IncludePath>
             </VariousControls>
           </Aads>
           <LDads>
@@ -371,7 +371,7 @@
             <ScatterFile>..\compiler\armcc\single_bank_fota_link.txt</ScatterFile>
             <IncludeLibs></IncludeLibs>
             <IncludeLibsPath></IncludeLibsPath>
-            <Misc>--datacompressor=off</Misc>
+            <Misc>--datacompressor=off --diag_suppress=L6314</Misc>
             <LinkerInputFile></LinkerInputFile>
             <DisabledWarnings></DisabledWarnings>
           </LDads>
@@ -412,6 +412,11 @@
               <FilePath>..\..\..\module\adpcm\adpcm.c</FilePath>
             </File>
             <File>
+              <FileName>circular_doubly_linked_list.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\module\common\circular_doubly_linked_list.c</FilePath>
+            </File>
+            <File>
               <FileName>common.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\module\common\common.c</FilePath>
@@ -440,6 +445,11 @@
               <FileName>fifo.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\module\static_buffer\fifo.c</FilePath>
+            </File>
+            <File>
+              <FileName>linked_async_framework.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\module\common\linked_async_framework.c</FilePath>
             </File>
             <File>
               <FileName>linked_buffer.c</FileName>
@@ -550,6 +560,11 @@
               <FileName>lspdm_dma.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\peripheral\src\lspdm_dma.c</FilePath>
+            </File>
+            <File>
+              <FileName>lspis.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\peripheral\src\lspis.c</FilePath>
             </File>
             <File>
               <FileName>lsqspi.c</FileName>
@@ -665,6 +680,11 @@
               <FileName>lspdm_msp.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\soc\arm_cm\le501x\integration\lspdm_msp.c</FilePath>
+            </File>
+            <File>
+              <FileName>lspis_msp.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\soc\arm_cm\le501x\integration\lspis_msp.c</FilePath>
             </File>
             <File>
               <FileName>lsqspi_msp.c</FileName>

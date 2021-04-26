@@ -18,9 +18,6 @@
 #include "cpu.h"
 #include "io_config.h"
 #include "reg_base_addr.h"
-#define FLASH_SECTOR_SIZE (4096)
-
-
 #define TRIM_4202_BUF_SIZE (12)
 
 static void swd_pull_down()
