@@ -34,11 +34,11 @@ author = 'linkedsemi'
 extensions = [
     'breathe',
     "sphinx_rtd_theme",
-     'sphinxcontrib.mermaid',
+    'sphinxcontrib.mermaid',
 ]
 
 breathe_projects = {
-    "ls_sdk": "./_build/doxyxml"
+    "ls_sdk": "_build/doxyxml"
 }
 breathe_default_project = "ls_sdk"
 
