@@ -168,7 +168,6 @@ static uint8_t scan_response_data[31];
 static uint8_t scan_obj_hdl = 0xff;
 static uint8_t init_obj_hdl = 0xff;
 static uint8_t init_status = INIT_IDLE; 
-static uint8_t scan_status = SCAN_IDLE;
 
 static void ls_uart_server_init(void);
 static void ls_uart_server_timer_cb(void *param);
@@ -237,8 +236,6 @@ static void ls_uart_client_init(void)
         uart_client_svc_attribute_handle[i] = 0x1;
         uart_client_svc_end_handle[i] = 0xffff;  
     } 
-    // scan_status = SCAN_IDLE;
-    // init_status = INIT_IDLE;
 }
 static void ls_uart_server_timer_cb(void *param)
 {
@@ -356,10 +353,8 @@ static void ls_uart_server_read_req_ind(uint8_t att_idx, uint8_t con_idx)
 }
 static void ls_uart_server_write_req_ind(uint8_t att_idx, uint8_t con_idx, uint16_t length, uint8_t const *value)
 {
-    uint16_t handle = 0;
     uint8_t array_idx = search_conidx(con_idx);
     LS_ASSERT(array_idx != 0xff);
-    handle = gatt_manager_get_svc_att_handle(&ls_uart_server_svc_env, att_idx);
     if(att_idx == UART_SVC_IDX_RX_VAL && uart_server_tx_buf[array_idx][0] != UART_SYNC_BYTE)
     { 
         LS_ASSERT(length <= UART_TX_PAYLOAD_LEN_MAX);
@@ -585,7 +580,6 @@ static void gap_manager_callback(enum gap_evt_type type,union gap_evt_u *evt,uin
             if (uart_client_connected_num < UART_CLIENT_NUM )
             {
                 start_scan();
-                scan_status = SCAN_BUSY;
                 init_status = INIT_IDLE;
             }         
         }
@@ -867,12 +861,10 @@ static void dev_manager_callback(enum dev_evt_type type,union dev_evt_u *evt)
         LS_ASSERT(evt->obj_created.status == 0);
         scan_obj_hdl = evt->obj_created.handle;
         start_scan();
-        scan_status = SCAN_BUSY;
         create_init_obj();
     break;
     case SCAN_STOPPED:
         LOG_I("scan stopped, next_connect_addr=%d", next_connect_addr);
-        scan_status = SCAN_IDLE;
         if (next_connect_addr)
         {
             start_init(next_connect_addr);
@@ -929,7 +921,6 @@ static void dev_manager_callback(enum dev_evt_type type,union dev_evt_u *evt)
         else
         {
             start_scan();
-            scan_status = SCAN_BUSY;
         }       
     break;
     default:

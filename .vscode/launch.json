@@ -740,37 +740,6 @@
             "request": "launch",
             "servertype": "jlink",
             "cwd": "${workspaceRoot}",
-            "executable": "./build/le501x/examples/ble_uart_server_sleep_mode.elf",
-            "name": "Debug LE501X BLE_UART_SERVER_SLEEP_MODE",
-            "device": "LE501X",
-            "interface": "swd",
-            "runToMain": true,
-            "preLaunchCommands":[
-                "monitor flash breakpoints = 0",
-                "monitor reset",
-                "load", 
-                //"add-symbol-file build/fw.elf",  
-            ]
-        },
-        {
-            "type": "cortex-debug",
-            "request": "attach",
-            "servertype": "jlink",
-            "cwd": "${workspaceRoot}",
-            "executable": "./build/le501x/examples/ble_uart_server_sleep_mode.elf",
-            "name": "Attach BLE_UART_SERVER_SLEEP_MODE",
-            "device": "LE501X",
-            "interface": "swd",
-            "preAttachCommands":[
-                "monitor flash breakpoints = 0",
-                //"add-symbol-file build/fw.elf",  
-            ]
-        },
-        {
-            "type": "cortex-debug",
-            "request": "launch",
-            "servertype": "jlink",
-            "cwd": "${workspaceRoot}",
             "executable": "./build/le501x/examples/timer_test.elf",
             "name": "Debug LE501X TIMER_TEST",
             "device": "LE501X",

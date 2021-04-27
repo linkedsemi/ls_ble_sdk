@@ -184,7 +184,6 @@ static uint8_t *next_connect_addr;
 static uint8_t scan_obj_hdl = 0xff;
 static uint8_t init_obj_hdl = 0xff;
 static uint8_t init_status = INIT_IDLE; 
-static uint8_t scan_status = SCAN_IDLE;
 
 static void ls_uart_client_init(void);
 static void ls_uart_client_service_dis(uint8_t con_idx);
@@ -628,7 +627,6 @@ static void gap_manager_callback(enum gap_evt_type type,union gap_evt_u *evt,uin
             con_idx_client = CON_IDX_INVALID_VAL;        
             uart_client_mtu = UART_SERVER_MTU_DFT;
             start_scan();
-            scan_status = SCAN_BUSY;
             init_status = INIT_IDLE;   
 #endif                
         }
@@ -838,7 +836,6 @@ static void dev_manager_callback(enum dev_evt_type type,union dev_evt_u *evt)
     break;
     case SCAN_STOPPED:
         LOG_I("scan stopped, next_connect_addr=%d", next_connect_addr);
-        scan_status = SCAN_IDLE;
         if (next_connect_addr)
         {
             start_init(next_connect_addr);
@@ -869,7 +866,6 @@ static void dev_manager_callback(enum dev_evt_type type,union dev_evt_u *evt)
         LS_ASSERT(evt->obj_created.status == 0);
         init_obj_hdl = evt->obj_created.handle;
         start_scan();
-        scan_status = SCAN_BUSY;
     break;
     case INIT_STOPPED:
         init_status = INIT_IDLE;
