@@ -127,8 +127,6 @@ static bool search = false;
 static bool mic_open = false;
 static bool mic_close = false;
 static bool sync_atv_voice = false;
-static bool buf0_flag = false;
-static bool buf1_flag = false;
 static bool mic_open_ntf_flag = false;
 
 
@@ -225,8 +223,8 @@ static void send_ntf_once(void);
 static void data_tx_buf_init(void);
 static void data_sender(void);
 static void init_two_lists(void);
-void pdm_dma_init();
-void pdm_init();
+void dmic_pdm_dma_init(void);
+void dmic_pdm_init(void);
 void gpio_exit_init(void);
 static void at_start_adv(void);
 static void hid_server_get_dev_name(struct gap_dev_info_dev_name *dev_name_ptr, uint8_t con_idx);
@@ -1171,7 +1169,7 @@ static void ls_voice_send_notification(void)
         builtin_timer_stop(first_timer_inst);
         mic_open_ntf_flag = true;
         atv_voice_ntf_done = true;
-        pdm_dma_init();
+        dmic_pdm_dma_init();
         atv_pdm_on();
         builtin_timer_stop(second_timer_inst);
         builtin_timer_start(second_timer_inst, SECOND_TIMER_TIMEOUT, NULL); 
@@ -1187,52 +1185,53 @@ static void ls_voice_send_notification(void)
     }   
 }
 
-static void gap_manager_callback(enum gap_evt_type type, union gap_evt_u *evt, uint8_t con_idx)
-{
-    uint16_t ntf_cfg;
-    uint16_t len = sizeof(ntf_cfg);
-    struct ble_addr direct_master_addr;
-    switch (type)
-    {
-    case CONNECTED:
-        
-        hid_connect_id = con_idx;
-        service_flag = 0;
-        test_auth.auth = 0x5;
-        mic_open_ntf_flag = false;
-        gap_manager_get_peer_addr(hid_connect_id, &direct_master_addr);
-        LOG_HEX(direct_master_addr.addr.addr,sizeof(direct_master_addr.addr.addr));
-        LOG_I("connected! direct_master_addr.type : %d", direct_master_addr.type);
-        uint8_t record_key2_write_flag =  tinyfs_write(hid_dir, RECORD_KEY2, (uint8_t*)&direct_master_addr.addr.addr, sizeof(direct_master_addr.addr.addr));
-        if(record_key2_write_flag == TINYFS_NO_ERROR)
-        {
-            tinyfs_write_through();
-            LOG_I("record_key2_write_peer_addr1_success :%d",record_key2_write_flag);
-        }
-        else 
-        {
-            LOG_I("record_key2_write_peer_addr1_fail :%d",record_key2_write_flag);
-        } 
-        uint8_t record_key1_read_flag =  tinyfs_read(hid_dir, RECORD_KEY1, (uint8_t*)&ntf_cfg, &len);
-        if (record_key1_read_flag == TINYFS_NO_ERROR)
-        {
-            hid_ntf_cfg_init(ntf_cfg, con_idx, evt->connected.peer_id);
-            LOG_I("record_key1_read_ntf_cfg_success :%d", record_key1_read_flag);
-        }
-        else
-        {
-            LOG_I("record_key1_read_ntf_cfg_fail :%d", record_key1_read_flag);
-        }
-        
-        bas_batt_lvl_update(0,0x62);
-        struct gap_update_conn_param con_param = {
-                .intv_min = 0x0B,
-                .intv_max = 0x0B,
-                .latency = 0,
-                .sup_timeout = 400,
-            };
-        gap_manager_update_conn_param(con_idx,&con_param);
-        break;
+	static void gap_manager_callback(enum gap_evt_type type, union gap_evt_u *evt, uint8_t con_idx)
+	{
+			uint16_t ntf_cfg;
+			uint16_t len = sizeof(ntf_cfg);
+			struct ble_addr direct_master_addr;
+			switch(type)
+			{
+			case CONNECTED:
+			{      
+					hid_connect_id = con_idx;
+					service_flag = 0;
+					test_auth.auth = 0x5;
+					mic_open_ntf_flag = false;
+					gap_manager_get_peer_addr(hid_connect_id, &direct_master_addr);
+					LOG_HEX(direct_master_addr.addr.addr,sizeof(direct_master_addr.addr.addr));
+					LOG_I("connected! direct_master_addr.type : %d", direct_master_addr.type);
+					uint8_t record_key2_write_flag =  tinyfs_write(hid_dir, RECORD_KEY2, (uint8_t*)&direct_master_addr.addr.addr, sizeof(direct_master_addr.addr.addr));
+					if(record_key2_write_flag == TINYFS_NO_ERROR)
+					{
+							tinyfs_write_through();
+							LOG_I("record_key2_write_peer_addr1_success :%d",record_key2_write_flag);
+					}
+					else 
+					{
+							LOG_I("record_key2_write_peer_addr1_fail :%d",record_key2_write_flag);
+					} 
+					uint8_t record_key1_read_flag =  tinyfs_read(hid_dir, RECORD_KEY1, (uint8_t*)&ntf_cfg, &len);
+					if (record_key1_read_flag == TINYFS_NO_ERROR)
+					{
+							hid_ntf_cfg_init(ntf_cfg, con_idx, evt->connected.peer_id);
+							LOG_I("record_key1_read_ntf_cfg_success :%d", record_key1_read_flag);
+					}
+					else
+					{
+							LOG_I("record_key1_read_ntf_cfg_fail :%d", record_key1_read_flag);
+					}
+					
+					bas_batt_lvl_update(0,0x62);
+					struct gap_update_conn_param con_param = {
+									.intv_min = 0x0B,
+									.intv_max = 0x0B,
+									.latency = 0,
+									.sup_timeout = 400,
+							};
+					gap_manager_update_conn_param(con_idx,&con_param);
+		}
+					break;
     case DISCONNECTED:
         LOG_I("disconnected! reson : %x",evt->disconnected.reason);
         hid_connect_id = 0xff;
@@ -1425,133 +1424,135 @@ static void create_adv_obj()
 
 static void prf_added_handler(struct profile_added_evt *evt)
 {
-    LOG_I("added profile idx:%d, start handle:0x%x\n", evt->id, evt->start_hdl);
-    uint16_t error_mkdir = 0;
-    switch (evt->id)
-    {
-    case PRF_HID:
-        error_mkdir = tinyfs_mkdir(&hid_dir, ROOT_DIR, DIR_NAME);
-        LOG_I("error_mkdir = %d", error_mkdir);
-        prf_hid_server_callback_init(prf_hid_server_callback);
-        create_adv_obj();
-        break;
-    case PRF_BASS:
-    {
-        struct hid_db_cfg db_cfg;
-        db_cfg.hids_nb = 1;
-        db_cfg.cfg[0].svc_features = HID_PROTO_MODE;
-        db_cfg.cfg[0].report_nb = 3;
-        db_cfg.cfg[0].report_id[0] = 1;
-        db_cfg.cfg[0].report_id[1] = 3;
-        db_cfg.cfg[0].report_id[2] = 90;
+		LOG_I("added profile idx:%d, start handle:0x%x\n", evt->id, evt->start_hdl);
+		uint16_t error_mkdir = 0;
+		switch (evt->id)
+		{
+		case PRF_HID:
+				error_mkdir = tinyfs_mkdir(&hid_dir, ROOT_DIR, DIR_NAME);
+				LOG_I("error_mkdir = %d", error_mkdir);
+				prf_hid_server_callback_init(prf_hid_server_callback);
+				create_adv_obj();
+				break;
+		case PRF_BASS:
+		{
+				struct hid_db_cfg db_cfg;
+				db_cfg.hids_nb = 1;
+				db_cfg.cfg[0].svc_features = HID_PROTO_MODE;
+				db_cfg.cfg[0].report_nb = 3;
+				db_cfg.cfg[0].report_id[0] = 1;
+				db_cfg.cfg[0].report_id[1] = 3;
+				db_cfg.cfg[0].report_id[2] = 90;
 
-        db_cfg.cfg[0].report_cfg[0] = HID_REPORT_IN;
-        db_cfg.cfg[0].report_cfg[1] = HID_REPORT_IN;
-        db_cfg.cfg[0].report_cfg[2] = HID_REPORT_FEAT;
+				db_cfg.cfg[0].report_cfg[0] = HID_REPORT_IN;
+				db_cfg.cfg[0].report_cfg[1] = HID_REPORT_IN;
+				db_cfg.cfg[0].report_cfg[2] = HID_REPORT_FEAT;
 
-        db_cfg.cfg[0].info.bcdHID = 0;
-        db_cfg.cfg[0].info.bCountryCode = 0;
-        db_cfg.cfg[0].info.flags = HID_WKUP_FOR_REMOTE;
-        prf_bass_server_callback_init(prf_batt_server_callback);
-        dev_manager_prf_hid_server_add(NO_SEC, &db_cfg, sizeof(db_cfg));
-        LOG_I("--------------------------");
-    }
-    break;
+				db_cfg.cfg[0].info.bcdHID = 0;
+				db_cfg.cfg[0].info.bCountryCode = 0;
+				db_cfg.cfg[0].info.flags = HID_WKUP_FOR_REMOTE;
+				prf_bass_server_callback_init(prf_batt_server_callback);
+				dev_manager_prf_hid_server_add(NO_SEC, &db_cfg, sizeof(db_cfg));
+				LOG_I("--------------------------");
+		}
+		break;
 
-    default:
-        break;
-    }
+		default:
+				break;
+		}
 }
 
 static void dev_manager_callback(enum dev_evt_type type, union dev_evt_u *evt)
 {
 
 
-    switch (type)
-    {
-    case STACK_INIT:
-    {
-        struct ble_stack_cfg cfg = {
-            .private_addr = false,
-            .controller_privacy = false,
-        };
-        dev_manager_stack_init(&cfg);
+		switch (type)
+		{
+		case STACK_INIT:
+		{
+				struct ble_stack_cfg cfg = {
+						.private_addr = false,
+						.controller_privacy = false,
+				};
+				dev_manager_stack_init(&cfg);
 
-    }
-    break;
-    case STACK_READY:
-    {
-        uint8_t addr[6];
-        bool type;
-        dev_manager_get_identity_bdaddr(addr, &type);
-        LOG_I("type:%d,addr:", type);
-        LOG_HEX(addr, sizeof(addr));
-        DMA_CONTROLLER_INIT(dmac1_inst);
-        dev_manager_add_service((struct svc_decl *)&dis_server_svc);
-        ls_timer_init();
-        pdm_init();
-        data_tx_buf_init();
-        gpio_exit_init();
-             
-    }
-    break;
-    case SERVICE_ADDED:
-    {
-        service_flag++;
-        switch (service_flag)
-        {
-        case 1:
-            gatt_manager_svc_register(evt->service_added.start_hdl, DIS_SVC_ATT_NUM, &dis_server_svc_env);
-            dev_manager_add_service((struct svc_decl *)&dis_server_svc_decl_fourth_svc);
-            break;
-        case 2:
-            gatt_manager_svc_register(evt->service_added.start_hdl, FIRST_SVC_ATT_NUM_V, &dis_server_svc_user_fourth_svc_env);
-            dev_manager_add_service((struct svc_decl *)&dis_server_svc_first);
-            break;
-        case 3:
-            gatt_manager_svc_register(evt->service_added.start_hdl, FOUTH_SVC_ATT_NUM, &dis_server_svc_first_env);
-            dev_manager_add_service((struct svc_decl *)&dis_server_svc_second); 
-            break;
-        case 4:
-            gatt_manager_svc_register(evt->service_added.start_hdl, SECOND_SVC_ATT_NUM, &dis_server_svc_second_env);
-            dev_manager_add_service((struct svc_decl *)&dis_server_svc_third); 
-            break;
-        case 5:
-            gatt_manager_svc_register(evt->service_added.start_hdl, THIRD_SVC_ATT_NUM, &dis_server_svc_third_env);
-            dev_manager_add_service((struct svc_decl *)&atv_voice_svc_user); 
-            break;
-        case 6:
-            gatt_manager_svc_register(evt->service_added.start_hdl, ATV_VOICE_SVC_ATT_NUM, &dis_server_svc_atv_voice_env);
-            struct bas_db_cfg db_cfg = {
-                .ins_num = 1,
-                .ntf_enable[0] = 1,
-            };
-            dev_manager_prf_bass_server_add(NO_SEC,&db_cfg,sizeof(db_cfg));
-            break;             
-        default:
-            break;
-        }              
-    }
-        break;
-    case PROFILE_ADDED:
-        profile_flag++;
-        prf_added_handler(&evt->profile_added);
-        LOG_I("PROFILE_FLAG = %d",profile_flag);
-        break;
-    case ADV_OBJ_CREATED:
-        LS_ASSERT(evt->obj_created.status == 0);
-        adv_obj_hdl = evt->obj_created.handle;
-        at_start_adv();
-        break;
-    case ADV_STOPPED:
-        break;
-    case SCAN_STOPPED:
+		}
+		break;
+		case STACK_READY:
+		{
+				uint8_t addr[6];
+				bool type;
+				dev_manager_get_identity_bdaddr(addr, &type);
+				LOG_I("type:%d,addr:", type);
+				LOG_HEX(addr, sizeof(addr));
+				DMA_CONTROLLER_INIT(dmac1_inst);
+				dev_manager_add_service((struct svc_decl *)&dis_server_svc);
+				ls_timer_init();
+				dmic_pdm_init();
+				data_tx_buf_init();
+				gpio_exit_init();
+							 
+			}
+			break;
+			case SERVICE_ADDED:
+			{
+					service_flag++;
+					switch (service_flag)
+					{
+					case 1:
+							gatt_manager_svc_register(evt->service_added.start_hdl, DIS_SVC_ATT_NUM, &dis_server_svc_env);
+							dev_manager_add_service((struct svc_decl *)&dis_server_svc_decl_fourth_svc);
+							break;
+					case 2:
+							gatt_manager_svc_register(evt->service_added.start_hdl, FIRST_SVC_ATT_NUM_V, &dis_server_svc_user_fourth_svc_env);
+							dev_manager_add_service((struct svc_decl *)&dis_server_svc_first);
+							break;
+					case 3:
+							gatt_manager_svc_register(evt->service_added.start_hdl, FOUTH_SVC_ATT_NUM, &dis_server_svc_first_env);
+							dev_manager_add_service((struct svc_decl *)&dis_server_svc_second); 
+							break;
+					case 4:
+							gatt_manager_svc_register(evt->service_added.start_hdl, SECOND_SVC_ATT_NUM, &dis_server_svc_second_env);
+							dev_manager_add_service((struct svc_decl *)&dis_server_svc_third); 
+							break;
+					case 5:
+							gatt_manager_svc_register(evt->service_added.start_hdl, THIRD_SVC_ATT_NUM, &dis_server_svc_third_env);
+							dev_manager_add_service((struct svc_decl *)&atv_voice_svc_user); 
+							break;
+					case 6:
+					{
+							gatt_manager_svc_register(evt->service_added.start_hdl, ATV_VOICE_SVC_ATT_NUM, &dis_server_svc_atv_voice_env);
+							struct bas_db_cfg db_cfg = {
+									.ins_num = 1,
+									.ntf_enable[0] = 1,
+							};
+							dev_manager_prf_bass_server_add(NO_SEC,&db_cfg,sizeof(db_cfg));
+						}
+							break;             
+					default:
+							break;
+					}              
+			}
+					break;
+		case PROFILE_ADDED:
+				profile_flag++;
+				prf_added_handler(&evt->profile_added);
+				LOG_I("PROFILE_FLAG = %d",profile_flag);
+				break;
+		case ADV_OBJ_CREATED:
+				LS_ASSERT(evt->obj_created.status == 0);
+				adv_obj_hdl = evt->obj_created.handle;
+				at_start_adv();
+				break;
+		case ADV_STOPPED:
+				break;
+		case SCAN_STOPPED:
 
-        break;
-    default:
+				break;
+		default:
 
-        break;
-    }
+				break;
+		}
 }
 
 static void first_timer_cb(void *param)
@@ -1693,13 +1694,10 @@ void HAL_PDM_DMA_CpltCallback(PDM_HandleTypeDef *hpdm, uint8_t buf_idx)
         if (buf_idx)
         {
             Adpcm_FrameEncode_Google_TV_Audio((int16_t *)pdm_data_receive.Bufptr[1], EncodeBuffer, &audioHeader, FRAME_BUF_SIZE);
-
-            buf1_flag = true;
         }
         else
         {
             Adpcm_FrameEncode_Google_TV_Audio((int16_t *)pdm_data_receive.Bufptr[0], EncodeBuffer, &audioHeader, FRAME_BUF_SIZE);
-            buf0_flag = true;
         }
         adpcm_ntf_buf[0] = ((audioHeader.frame_number & 0xff00) >> 8);
         adpcm_ntf_buf[1] = ((audioHeader.frame_number & 0xff) - 1);
@@ -1711,7 +1709,7 @@ void HAL_PDM_DMA_CpltCallback(PDM_HandleTypeDef *hpdm, uint8_t buf_idx)
         data_generator(adpcm_ntf_buf, 134);
     }
 }
-void pdm_dma_init()
+void dmic_pdm_dma_init(void)
 {
     
     hdmic.DMAC_Instance = &dmac1_inst;
@@ -1723,7 +1721,7 @@ void pdm_dma_init()
     
 }
 
-void pdm_init()
+void dmic_pdm_init(void)
 {
     pdm_clk_io_init(DMIC_CLK_IO);
     pdm_data0_io_init(DMIC_DATA_IO);
