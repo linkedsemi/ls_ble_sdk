@@ -248,7 +248,7 @@ void ble_slave_send_data(uint8_t con_idx, uint8_t *value, uint16_t len)
 void ble_master_send_data(uint8_t con_idx, uint8_t *value, uint16_t len)
 {
     uint8_t idx = search_client_conidx(con_idx);
-    if(con_idx != CON_IDX_INVALID_VAL) //&& uart_client_wr_cmd_done_array[idx]) 
+    if(con_idx != CON_IDX_INVALID_VAL&& uart_client_wr_cmd_done_array[idx]) 
     {
         uart_client_wr_cmd_done_array[idx] = false;
         uint16_t tx_len = co_min(len, gattc_get_mtu(con_idx)-3);
@@ -621,6 +621,10 @@ static void create_init_obj(void)
 void start_init(uint8_t *peer_addr,uint8_t addr_type)
 {
     struct dev_addr peer_dev_addr_str;
+    
+    if(init_status != INIT_IDLE)
+        return;
+
     memcpy(peer_dev_addr_str.addr, peer_addr, BLE_ADDR_LEN);
     struct start_init_param init_param = {
         .scan_intv = 64,
@@ -635,6 +639,7 @@ void start_init(uint8_t *peer_addr,uint8_t addr_type)
         .peer_addr_type = addr_type,        // Address type of the device 0=public/1=private random
         .type = DIRECT_CONNECTION,
     };
+    init_status = INIT_BUSY;
     dev_manager_start_init(init_obj_hdl, &init_param);
 }
 
