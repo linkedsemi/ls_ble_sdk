@@ -245,16 +245,4 @@ LinkedSemi文件夹和JLinkDevices.xml在SDK目录，可以复制添加到JLink�
 
 .. _header-n216:
 
-参考
---------------
-
-.. _header-n217:
-
- LinkedSemi SDK 
- ++++++++++++++++++++
-
--  https://github.com/linkedsemi/ls\ *ble*\ sdk
-
--  https://gitee.com/linkedsemi/ls\ *ble*\ sdk
-
 *注：离线安装包请联系我们*
