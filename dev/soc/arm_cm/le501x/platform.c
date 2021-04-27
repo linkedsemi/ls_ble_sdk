@@ -495,10 +495,9 @@ XIP_BANNED void clk_switch()
 
 uint32_t get_ota_info_offset()
 {
-    uint8_t manufacturer_id;
-    uint8_t mem_type_id;
-    uint8_t capacity_id;
-    spi_flash_read_id(&manufacturer_id,&mem_type_id,&capacity_id);
+    uint8_t jedec_id[3];
+    spi_flash_read_id(jedec_id);
+    uint8_t capacity_id = jedec_id[0];
     uint32_t flash_size = 1<<capacity_id;
     return flash_size - FLASH_PAGE_SIZE;
 }

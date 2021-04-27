@@ -71,7 +71,7 @@ void spi_flash_deep_power_down(void);
 void spi_flash_release_from_deep_power_down(void);
 
 /** \brief Read ID */
-void spi_flash_read_id(uint8_t *manufacturer_id,uint8_t *mem_type_id,uint8_t *capacity_id);
+void spi_flash_read_id(uint8_t jedec_id[3]);
 
 /** \brief Read Unique ID */
 void spi_flash_read_unique_id(uint8_t unique_serial_id[16]);

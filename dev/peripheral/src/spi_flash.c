@@ -375,17 +375,13 @@ void do_spi_flash_read_reg(void *param)
     flash_reading_critical(do_spi_flash_read_reg_func,param);
 }
 
-void spi_flash_read_id(uint8_t *manufacturer_id,uint8_t *mem_type_id,uint8_t *capacity_id)
+void spi_flash_read_id(uint8_t jedec_id[3])
 {
-    uint8_t buf[3];
     struct flash_read_reg_param param;
-    param.buf = buf;
+    param.buf = jedec_id;
     param.opcode = READ_IDENTIFICATION_OPCODE;
-    param.length = sizeof(buf);
+    param.length = 3;
     spi_flash_read_reg_operation(&param);
-    *manufacturer_id = buf[0];
-    *mem_type_id = buf[1];
-    *capacity_id = buf[2];
 }
 
 void spi_flash_read_unique_id(uint8_t unique_serial_id[16])
