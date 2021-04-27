@@ -371,7 +371,7 @@
             <ScatterFile>..\..\..\soc\arm_cm\le501x\compiler\armcc\link_script.txt</ScatterFile>
             <IncludeLibs></IncludeLibs>
             <IncludeLibsPath></IncludeLibsPath>
-            <Misc>--datacompressor=off --diag_suppress=L6314</Misc>
+            <Misc>--datacompressor=off --diag_suppress=L6314,L6329</Misc>
             <LinkerInputFile></LinkerInputFile>
             <DisabledWarnings></DisabledWarnings>
           </LDads>

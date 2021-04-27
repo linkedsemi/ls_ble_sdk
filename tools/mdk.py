@@ -45,7 +45,7 @@ def mdk_builder(target,source,env):
     
     prj.CDefines = "" 
     prj.COptions = "--c99 -O2 " 
-    prj.LinkOptions = " --datacompressor=off --diag_suppress=L6314 "
+    prj.LinkOptions = " --datacompressor=off --diag_suppress=L6314,L6329 "
     beforecompile1 = mdk_xml_schema.UserAction('')
     beforecompile2 = mdk_xml_schema.UserAction('')
     beforebuild1 = mdk_xml_schema.UserAction('')
