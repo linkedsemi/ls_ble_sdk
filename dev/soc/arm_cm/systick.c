@@ -117,8 +117,7 @@ XIP_BANNED bool systick_poll_timeout(uint32_t start_tick,uint32_t timeout,bool (
             i -= 1;
         }
     }
-    while(systick_get_value()>end_tick)
-    {
+    do{
         if(poll)
         {
             va_start(ap,poll);
@@ -127,6 +126,6 @@ XIP_BANNED bool systick_poll_timeout(uint32_t start_tick,uint32_t timeout,bool (
                 return false;
             }
         }
-    }
+    }while(systick_get_value()>end_tick);
     return true;
 }

@@ -497,7 +497,7 @@ uint32_t get_ota_info_offset()
 {
     uint8_t jedec_id[3];
     spi_flash_read_id(jedec_id);
-    uint8_t capacity_id = jedec_id[0];
+    uint8_t capacity_id = jedec_id[2];
     uint32_t flash_size = 1<<capacity_id;
     return flash_size - FLASH_PAGE_SIZE;
 }

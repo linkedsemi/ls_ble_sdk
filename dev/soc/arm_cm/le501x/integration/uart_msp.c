@@ -9,7 +9,7 @@
 #include "dmac_config.h"
 #include "dmac_msp.h"
 #include <stddef.h>
-static UART_HandleTypeDef *uart_inst_env[3];
+static void *uart_inst_env[3];
 
 void UART1_Handler(void)
 {
@@ -26,36 +26,89 @@ void UART3_Handler(void)
     HAL_UARTx_IRQHandler( uart_inst_env[2]);
 }
 
+static void uart1_msp_init(void *inst,void (*handler)())
+{
+    uart_inst_env[0] = inst;
+    arm_cm_set_int_isr(UART1_IRQn,handler);
+    REG_FIELD_WR(RCC->APB2RST, RCC_UART1, 1);
+    REG_FIELD_WR(RCC->APB2RST, RCC_UART1, 0);
+    __NVIC_ClearPendingIRQ(UART1_IRQn);
+    __NVIC_EnableIRQ(UART1_IRQn);
+    REG_FIELD_WR(RCC->APB2EN, RCC_UART1, 1);
+}
+
+static void uart2_msp_init(void *inst,void (*handler)())
+{
+    uart_inst_env[1] = inst;
+    arm_cm_set_int_isr(UART2_IRQn,handler);
+    REG_FIELD_WR(RCC->APB1RST, RCC_UART2, 1);
+    REG_FIELD_WR(RCC->APB1RST, RCC_UART2, 0);
+    __NVIC_ClearPendingIRQ(UART2_IRQn);
+    __NVIC_EnableIRQ(UART2_IRQn);
+    REG_FIELD_WR(RCC->APB1EN, RCC_UART2, 1);
+}
+
+static void uart3_msp_init(void *inst,void (*handler)())
+{
+    uart_inst_env[2] = inst;
+    arm_cm_set_int_isr(UART3_IRQn,handler);
+    REG_FIELD_WR(RCC->APB1RST, RCC_UART3, 1);
+    REG_FIELD_WR(RCC->APB1RST, RCC_UART3, 0);
+    __NVIC_ClearPendingIRQ(UART3_IRQn);
+    __NVIC_EnableIRQ(UART3_IRQn);
+    REG_FIELD_WR(RCC->APB1EN, RCC_UART3, 1);
+}
+
+void csi_uart_isr(void *inst);
+
+void CSI_UART1_Handler()
+{
+    csi_uart_isr(uart_inst_env[0]);
+}
+
+void CSI_UART2_Handler()
+{
+    csi_uart_isr(uart_inst_env[1]);
+}
+
+void CSI_UART3_Handler()
+{
+    csi_uart_isr(uart_inst_env[2]);
+}
+
+uint32_t CSI_UART_MSP_Init(void *inst,uint32_t idx)
+{
+    uint32_t reg_base = 0;
+    switch(idx)
+    {
+    case 0:
+        uart1_msp_init(inst,CSI_UART1_Handler);
+        reg_base = UART1_BASE_ADDR;
+    break;
+    case 1:
+        uart1_msp_init(inst,CSI_UART2_Handler);
+        reg_base = UART2_BASE_ADDR;
+    break;
+    case 2:
+        uart1_msp_init(inst,CSI_UART3_Handler);
+        reg_base = UART3_BASE_ADDR;
+    break;
+    }
+    return reg_base;
+}
+
 void HAL_UART_MSP_Init(UART_HandleTypeDef *inst)
 {
     switch((uint32_t)inst->UARTX)
     {
     case (uint32_t)UART1:
-        REG_FIELD_WR(RCC->APB2RST, RCC_UART1, 1);
-        REG_FIELD_WR(RCC->APB2RST, RCC_UART1, 0);
-        arm_cm_set_int_isr(UART1_IRQn,UART1_Handler);
-        uart_inst_env[0] = inst;
-        __NVIC_ClearPendingIRQ(UART1_IRQn);
-        __NVIC_EnableIRQ(UART1_IRQn);
-        REG_FIELD_WR(RCC->APB2EN, RCC_UART1, 1);
+        uart1_msp_init(inst,UART1_Handler);
     break;
     case (uint32_t)UART2:
-        REG_FIELD_WR(RCC->APB1RST, RCC_UART2, 1);
-        REG_FIELD_WR(RCC->APB1RST, RCC_UART2, 0);
-        arm_cm_set_int_isr(UART2_IRQn,UART2_Handler);
-        uart_inst_env[1] = inst;
-        __NVIC_ClearPendingIRQ(UART2_IRQn);
-        __NVIC_EnableIRQ(UART2_IRQn);
-        REG_FIELD_WR(RCC->APB1EN, RCC_UART2, 1);
+        uart2_msp_init(inst,UART2_Handler);
     break;
     case (uint32_t)UART3:
-        REG_FIELD_WR(RCC->APB1RST, RCC_UART3, 1);
-        REG_FIELD_WR(RCC->APB1RST, RCC_UART3, 0);
-        arm_cm_set_int_isr(UART3_IRQn,UART3_Handler);
-        uart_inst_env[2] = inst;
-        __NVIC_ClearPendingIRQ(UART3_IRQn);
-        __NVIC_EnableIRQ(UART3_IRQn);
-        REG_FIELD_WR(RCC->APB1EN, RCC_UART3, 1);
+        uart3_msp_init(inst,UART3_Handler);
     break;
     }
 }
