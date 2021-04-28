@@ -29,7 +29,7 @@ QFN32管脚定义：
 ========  ========  =======
 1         PA01       IO /ADC5
 2         PA02       IO /ADC6
-3         PA07       IO /WUKP
+3         PA07       IO /WKUP
 4         PA08       IO
 5         PA09       IO
 6         DCDC_V33   Buck 3.3V电源输入
@@ -46,7 +46,7 @@ QFN32管脚定义：
 17        PB08       IO
 18        PB09       IO
 19        PB10       IO
-20        PB11       IO /WUKP
+20        PB11       IO /WKUP
 21        VDD12      1.2V电源
 22        RF_P       射频引脚
 23        VDD_PAHP   PAHP电源 1_
@@ -57,8 +57,8 @@ QFN32管脚定义：
 28        PB12       IO /ADC0
 29        PB13       IO /ADC1
 30        PB14       IO 
-31        PB15       IO /WUKP
-32        PA00       IO /ADC4 /WUKP
+31        PB15       IO /WKUP
+32        PA00       IO /ADC4 /WKUP
 33        GND        地
 ========  ========  =======
 
@@ -84,7 +84,7 @@ QFN48管脚定义：
 4         PC00       IO /ADC2
 5         PC01       IO /ADC3
 6         PA06       IO
-7         PA07       IO /WUKP
+7         PA07       IO /WKUP
 8         PA08       IO
 9         PA09       IO
 10        DCDC_V33   Buck 3.3V电源输入
@@ -109,7 +109,7 @@ QFN48管脚定义：
 29        PB08       IO
 30        PB09       IO
 31        PB10       IO
-32        PB11       IO /WUKP
+32        PB11       IO /WKUP
 33        VDD12      1.2V 电源 
 34        RF_P       射频引脚 
 35        VDD_PAHP   PAHP电源 2_
@@ -122,8 +122,8 @@ QFN48管脚定义：
 42        PB12       IO /ADC0
 43        PB13       IO /ADC1
 44        PB14       IO /BOOT控制
-45        PB15       IO /WUKP
-46        PA00       IO /WUKP /ADC4
+45        PB15       IO /WKUP
+46        PA00       IO /WKUP /ADC4
 47        PA01       IO /ADC5
 48        PA02       IO /ADC6
 49        GND        地
@@ -150,7 +150,7 @@ SOP16管脚定义：
 4         XO16M_I    晶振接口
 5         VDD33      3.3V电源输入
 6         PB14       IO
-7         PB15       IO
+7         PB15       IO /WKUP
 8         PA01       IO /ADC5
 9         PA02       IO /ADC6        
 10        PA09       IO
