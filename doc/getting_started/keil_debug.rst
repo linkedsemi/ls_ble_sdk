@@ -51,13 +51,17 @@ JFlash使用
 ----------------
 #. **务必先完成JLink烧录、调试的准备工作** ；
 
-#. 打开 ``ble_sdk_app\dev\examples\ble_uart_server\mdk`` 路径下的 ble_uart_server.uvprojx 工程文件,开始编译，编译成功会在 ``ble_sdk_app\dev\examples\ble_uart_server\mdk\UVBuild`` 路径下面生成 ble_uart_server.hex、info_sbl.hex和ble_uart_server_production.hex 以及其他编译产生的文件::
+#. 打开 ``ble_sdk_app\dev\examples\ble_uart_server\mdk`` 路径下的 ble_uart_server.uvprojx 工程文件,开始编译，编译成功会在 ``ble_sdk_app\dev\examples\ble_uart_server\mdk\UVBuild`` 路径下面生成 ble_uart_server.hex、info_sbl.hex和ble_uart_server_production.hex 以及其他编译产生的文件
     
+ .. note ::
+
     XXX_production.hex 是将second bootloader(info_sbl.hex)、协议栈(fw.hex)以及应用代码合并之后的文件
 
-#. 芯片在第一次使用或者执行过全擦指令后，需要提前烧录second bootloader和协议栈内容::
+#. 芯片在第一次使用或者执行过全擦指令后，需要提前烧录second bootloader和协议栈内容
 
-    使用JFlash工具将 XXX_production.hex 烧录到芯片内,或者分别将info_sbl.hex 、ble_sdk_app\dev\soc\arm_cm\le501x\bin\fw.hex 和 ble_uart_server.hex烧录到芯片内，烧录顺序没有限制
+ .. note ::
+
+  使用JFlash工具将 XXX_production.hex 烧录到芯片内,或者分别将info_sbl.hex 、ble_sdk_app\dev\soc\arm_cm\le501x\bin\fw.hex 和 ble_uart_server.hex烧录到芯片内，烧录顺序没有限制
 
 #. 在使用keil的download或者Debug功能时，需要确认芯片内已经烧录了second bootloader和协议栈，否则程序不能跑起来，如果已经烧录过则不需要重复烧录。如果需要重新烧录second bootloader和协议栈，先执行芯片全擦然后再开始烧录。 
 

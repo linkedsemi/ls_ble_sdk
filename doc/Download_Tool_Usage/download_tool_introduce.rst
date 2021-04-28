@@ -5,7 +5,11 @@
 一、 烧录工具获取
 ------------------
 
- :download:`ls_download_tool<./ls_download_tool.7z>`
+上位机烧录软件可以从百度网盘里面下载：
+
+链接：https://pan.baidu.com/s/1jisGXHonzePPIqtgnifUOA
+
+提取码：fr1a 
 
 ++++++++++++
 1.1 文件说明

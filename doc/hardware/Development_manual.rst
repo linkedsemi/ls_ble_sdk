@@ -297,8 +297,8 @@ C5、C6                   (±10%)/10V/2.2pF/0402             2
 
 各种封装原理图和PCB参考示例可以从百度网盘里面下载：
 
-链接：https://pan.baidu.com/s/1GPv3g2N5RyGrmRxKm4jGFA 
+链接：https://pan.baidu.com/s/1iPL2JWaDdYJRqNdGMwiK6w 
 
-提取码：roax 
+提取码：ijvd 
 
  
