@@ -30,11 +30,11 @@ void sig_mesh_mdl_state_upd_hdl(struct model_state_upd* msg)
         {
             if (msg->elmt_idx==model_env.info[MODEL0_GENERIC_ONOFF_SVC].element_id)
             {
-               ls_mesh_light_set_onoff(msg->state, LIGHT_LED_2); 
+               ls_mesh_light_set_onoff((uint8_t)msg->state, LIGHT_LED_2); 
             }
             else if (msg->elmt_idx==model_env.info[MODEL5_GENERIC_ONOFF_SVC].element_id)
             {
-                ls_mesh_light_set_onoff(msg->state, LIGHT_LED_3); 
+                ls_mesh_light_set_onoff((uint8_t)msg->state, LIGHT_LED_3); 
             }
         }    
         break;
@@ -42,7 +42,7 @@ void sig_mesh_mdl_state_upd_hdl(struct model_state_upd* msg)
         {
             if (msg->elmt_idx==model_env.info[MODEL1_GENERIC_LVL_SVC].element_id)
             {
-               ls_mesh_light_set_lightness((msg->state - GENERIC_LEVEL_MIN),LIGHT_LED_2); 
+               ls_mesh_light_set_lightness(((uint16_t)msg->state - GENERIC_LEVEL_MIN),LIGHT_LED_2); 
             }
             else if (msg->elmt_idx==model_env.info[MODEL2_GENERIC_LVL_SVC].element_id)
             {
