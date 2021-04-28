@@ -59,7 +59,7 @@ static void uart3_msp_init(void *inst,void (*handler)())
     REG_FIELD_WR(RCC->APB1EN, RCC_UART3, 1);
 }
 
-void csi_uart_isr(void *inst);
+__attribute__((weak)) void csi_uart_isr(void *inst){}
 
 void CSI_UART1_Handler()
 {
