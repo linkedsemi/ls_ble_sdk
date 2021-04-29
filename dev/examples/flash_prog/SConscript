@@ -1,16 +1,31 @@
 
 Import('image_build','env')
+if env['IC'] == 'taurus':
+    src = [
+        'csky/main.c',
+        'csky/FlashDev.c',
+        'csky/driver.c'
+    ]
+    inc = [
+        '.',
+        'csky'
+    ]
+    ld_file = 'csky/flash_prog_link.txt'
+else:
+    src = [
+        'arm_cm/FlashPrg.c',
+        'arm_cm/FlashDev.c',
+    ]
+    inc = [
+        '.',
+        'arm_cm'
+    ]
+    ld_file = 'arm_cm/flash_prog_link.txt'
 
-src = [
-    'FlashPrg.c',
-    'FlashDev.c'
-]
-inc = [
-    '.'
-]
 if not 'mdk' in env['TOOLS']:
-    flash_prog_env,flash_prog_target = image_build('flash_prog',src,inc,'flash_prog_link.txt')
-    flash_prog_env.Append(CPPDEFINES = ['GLOBAL_OUTPUT_LVL=0', 'FLASH_PROG_ALGO']) 
-    flash_prog_env.Append(CFLAGS = ' -fPIE ')
-    flash_prog_env.Append(LINKFLAGS = ' -nostartfiles -Wl,-n')
+    flash_prog_env,flash_prog_target = image_build('flash_prog',env.subst(src),env.subst(inc),ld_file)
+    flash_prog_env.Append(CPPDEFINES = ['GLOBAL_OUTPUT_LVL=0', 'FLASH_PROG_ALGO'])
+    if env['BASE_ARCH'] == 'arm_cm':
+        flash_prog_env.Append(CFLAGS = ' -fPIE ')
+        flash_prog_env.Append(LINKFLAGS = ' -nostartfiles -Wl,-n')
     flash_prog_env.AddPostAction(flash_prog_target,Copy('tools/prog/LinkedSemi/${IC}_flash_algo.elf','$TARGET'))

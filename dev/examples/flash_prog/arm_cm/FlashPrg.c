@@ -86,7 +86,8 @@ int Init (unsigned long adr, unsigned long clk, unsigned long fnc) {
  */
 
 int UnInit (unsigned long fnc) {
-  return (0);                                  // Finished without Errors
+    spi_flash_xip_stop();
+    return (0);                                  // Finished without Errors
 }
 
 
@@ -96,7 +97,6 @@ int UnInit (unsigned long fnc) {
  */
 
 int EraseChip (void) {
-    disable_global_irq();
     spi_flash_chip_erase();
     return (0);                                  // Finished without Errors
 }
@@ -109,7 +109,6 @@ int EraseChip (void) {
  */
 
 int EraseSector (unsigned long adr) {
-    disable_global_irq();
     spi_flash_sector_erase(adr - LSQSPI_MEM_MAP_BASE_ADDR);
     return (0);                                  // Finished without Errors
 }
@@ -124,7 +123,6 @@ int EraseSector (unsigned long adr) {
  */
 
 int ProgramPage (unsigned long adr, unsigned long sz, unsigned char *buf) {
-    disable_global_irq();
     spi_flash_quad_page_program(adr - LSQSPI_MEM_MAP_BASE_ADDR, buf, sz);
     return (0);                                  // Finished without Errors
 }

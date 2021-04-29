@@ -33,7 +33,7 @@ elif env['IC'] == 'taurus':
     env['STACK_BIN_OUTPUT_DIR'] = Dir('#dev/soc/arm_cm/taurus/bin/')
 
 if env['BASE_ARCH'] == 'rv32':
-    env['ARCH_FLAGS'] = ' -mabi=$ABI -march=$ARCH -mshorten-memrefs -mstrict-align -msave-restore -msmall-data-limit=0 '
+    env['ARCH_FLAGS'] = ' -mabi=$ABI -march=$ARCH -mshorten-memrefs -mstrict-align -msave-restore -msmall-data-limit=0 -malign-data=natural '
     env['AS_ARCH_FLAGS'] = ' -mabi=$ABI -march=$ARCH '
     env['LD_ARCH_FLAGS'] = ' -mccrt '
 else:

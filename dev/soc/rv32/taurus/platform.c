@@ -14,3 +14,8 @@ void flash_swint_set()
 {
     csi_vic_set_pending_irq(SWINT3_IRQn);
 }
+
+void clk_switch(void)
+{
+    
+}

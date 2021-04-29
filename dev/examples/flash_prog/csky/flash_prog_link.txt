@@ -5,6 +5,9 @@ MEMORY
 ENTRY(Reset_Handler)
 SECTIONS
 {
+    DevDscr(OVERLAY) : {
+		KEEP(*(DevDscr))
+	}
 	.text :
 	{
         *(.text.Reset_Handler)
