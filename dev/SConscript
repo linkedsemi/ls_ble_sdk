@@ -51,7 +51,11 @@ def image_build(name,src,inc,linkscript = ''):
         img_env['LINKSCRIPT'] = File(linkscript)
     img_env.Append(CPPPATH = list(map(lambda x:'#/'+x.srcnode().path,inc_dirs)))
     target_name = '#build/$IC/examples/'+name
-    img_target = img_env.Program(target_name, img_env['SDK_SRC'] + img_env['SDK_STARTUP_SRC'] + src_files,OBJPREFIX = name+'-')
+    if img_env['BASE_ARCH'] == 'rv32':
+        startfile_obj = img_env.Object(img_env['SDK_STARTUP_SRC'],CFLAGS = ' -mno-relax $CFLAGS ',OBJPREFIX = name+'-')
+        img_target = img_env.Program(target_name, img_env['SDK_SRC'] + startfile_obj + src_files,OBJPREFIX = name+'-')
+    else:
+        img_target = img_env.Program(target_name, img_env['SDK_SRC'] + img_env['SDK_STARTUP_SRC'] + src_files,OBJPREFIX = name+'-') #compatible to MDK
     img_env.Depends(img_target,[img_env['LINKSCRIPT']])
     if not 'mdk' in img_env['TOOLS']:
         img_env.AddPostAction(img_target,Action('$OBJDUMP -d -z -x $TARGET > ${TARGET.base}.asm'))

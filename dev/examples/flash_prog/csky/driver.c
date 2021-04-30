@@ -216,3 +216,5 @@ void __bkpt_label()
 {
     __asm("ebreak"::);
 }
+
+void __continue_label(){}

@@ -28,15 +28,17 @@ SECTIONS
 		*(.dtors)
 
 		*(.eh_frame*)
-		*(.text* .rodata*)
+		*(.text* .*rodata*)
+        KEEP(*(.text.__continue_label))
+
 	}>RAM
 
-	__data_lma__ = ORIGIN(RAM);
+	__data_lma__ = .;
 
-	.data :
+	.data . :
 	{
 		. = ALIGN(4);
-		__data_start__ = .;
+   		__data_start__ = .;
         *(.sdata*)
 		*(.data*)
 		*(.xip_banned)

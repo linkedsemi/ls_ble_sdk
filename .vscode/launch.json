@@ -30,6 +30,19 @@
 
         },
         {
+            "name": "TAURUS FLASH PROG",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "build/taurus/examples/flash_prog.elf",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "miDebuggerPath": "riscv64-unknown-elf-gdb",
+            "miDebuggerServerAddress": "172.31.16.1:1025",
+        },
+        {
             "name": "Python: info sbl merge",
             "type": "python",
             "request": "launch",
