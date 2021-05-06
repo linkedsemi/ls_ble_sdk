@@ -1,8 +1,4 @@
 Import('app_build')
-src = [
-    'main.c'
-]
-inc = [
-    '.'
-]
-app_build('uart_test',src,inc,ble = False)
+SConscript(dirs = 'uart_polling',exports=['app_build'])
+SConscript(dirs = 'uart_it',exports=['app_build'])
+SConscript(dirs = 'uart_dma',exports=['app_build'])
