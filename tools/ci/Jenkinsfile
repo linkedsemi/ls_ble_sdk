@@ -30,6 +30,15 @@ pipeline {
                 '''
             }
         }
+        stage('Doc_Build') {
+            steps {
+                bat label: '', script: '''
+                    cd doc
+                    mkdir _build
+                    make html
+                '''
+            }
+        }
     }
     post {
         unsuccessful  {
