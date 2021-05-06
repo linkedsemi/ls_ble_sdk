@@ -45,9 +45,11 @@ if 'mdk' in env['TOOLS']:
     
 else:
     env['COMPILER'] = 'gnu'
-    env['CFLAGS'] = '${ARCH_FLAGS} -Os -std=c11 -g -ffunction-sections -fdata-sections -fstrict-volatile-bitfields -fno-common -fno-optimize-sibling-calls -Wall'
+    env['C_CXX_FLAGS'] = '${ARCH_FLAGS} -Os -g -ffunction-sections -fdata-sections -fstrict-volatile-bitfields -fno-common -fno-optimize-sibling-calls -Wall'
+    env['CFLAGS'] = '-std=c11 ${C_CXX_FLAGS}'
+    env['CXXFLAGS'] = '${C_CXX_FLAGS} -fno-exceptions '
     env['ASFLAGS'] = '${AS_ARCH_FLAGS} -g '
-    env['LINKFLAGS'] = '${ARCH_FLAGS} -Os -std=c11 -g -specs=nano.specs -T ${LINKSCRIPT} -Wl,-Map=${TARGET.base}.map -Wl,--cref ${LD_ARCH_FLAGS} '
+    env['LINKFLAGS'] = '${ARCH_FLAGS} -Os -g -specs=nano.specs -T ${LINKSCRIPT} -Wl,-Map=${TARGET.base}.map -Wl,--cref ${LD_ARCH_FLAGS} '
     env['GC_OPTION'] = ' -Wl,--gc-sections '
 
 env['CPPDEFINES'] = ['-D{}'.format(env['IC'].upper())]

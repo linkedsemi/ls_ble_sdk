@@ -1,14 +1,16 @@
-from SCons.Tool import cc,ar,link
+from SCons.Tool import cc,cxx,ar,link
 import importlib
 assembler = importlib.import_module('SCons.Tool.as')
 
 def generate(env):
 
     cc.generate(env)
+    cxx.generate(env)
     assembler.generate(env)
     ar.generate(env)
     link.generate(env)
     env['CC'] = 'arm-none-eabi-gcc'
+    env['CXX'] = 'arm-none-eabi-g++'
     env['AS'] = 'arm-none-eabi-as'
     env['AR'] = 'arm-none-eabi-ar'
     env['OBJDUMP'] = 'arm-none-eabi-objdump'
