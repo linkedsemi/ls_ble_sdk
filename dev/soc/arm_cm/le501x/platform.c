@@ -535,19 +535,27 @@ uint32_t get_ota_status_offset()
 
 bool ota_copy_info_get(struct fota_image_info *ptr)
 {
-    spi_flash_quad_io_read(get_ota_status_offset(),(uint8_t *)ptr, sizeof(struct fota_image_info));
-    if(ptr->base==0xffffffff && ptr->size ==0xffffffff)
-    {
-        return false;
-    }else
+    struct fota_image_info ota_image_info_array[2];
+    spi_flash_quad_io_read(get_ota_status_offset(), (uint8_t *)&ota_image_info_array[0], sizeof(ota_image_info_array));
+    ptr->base = ota_image_info_array[0].base;
+    ptr->size = ota_image_info_array[0].size;
+    if(ota_image_info_array[0].base == ~ota_image_info_array[1].base && ota_image_info_array[0].size == ~ota_image_info_array[1].size)
     {
         return true;
+    }else
+    {
+        return false;
     }
 }
 
 void ota_copy_info_set(struct fota_image_info *ptr)
 {
-    spi_flash_quad_page_program(get_ota_status_offset(), (uint8_t *)ptr, sizeof(struct fota_image_info));
+    struct fota_image_info ota_image_info_array[2];
+    ota_image_info_array[0].base = ptr->base;
+    ota_image_info_array[0].size = ptr->size;
+    ota_image_info_array[1].base = ~ptr->base;
+    ota_image_info_array[1].size = ~ptr->size;
+    spi_flash_quad_page_program(get_ota_status_offset(), (uint8_t *)&ota_image_info_array[0], sizeof(ota_image_info_array));
 }
 
 uint32_t get_app_image_base()
