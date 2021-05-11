@@ -88,7 +88,7 @@ HAL_StatusTypeDef RTC_CalendarGet(calendar_cal_t *calendar_cal, calendar_time_t 
  *
  ****************************************************************************************
  */
-void RTC_wkuptime_set(uint16_t second);
+void RTC_wkuptime_set(uint32_t second);
 
 /**
  ****************************************************************************************

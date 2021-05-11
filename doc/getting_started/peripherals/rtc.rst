@@ -56,7 +56,7 @@ RTC的主要功能包括万年历功能和唤醒功能（LP0 & LP2模式）。
 
 .. code ::
 
-    void RTC_wkuptime_set(uint16_t second);
+    void RTC_wkuptime_set(uint32_t second);
 
 参数second为唤醒时间，单位为秒。
 当系统唤醒后，会调用rtc_wkup_callback函数：
@@ -74,7 +74,7 @@ RTC的主要功能包括万年历功能和唤醒功能（LP0 & LP2模式）。
 
 .. code ::
 
-    void RTC_wkuptime_set(uint16_t second);
+    void RTC_wkuptime_set(uint32_t second);
 
 另外，进入LP2模式需要调用enter_deep_sleep_mode_lvl2_lvl3()，如下：
 

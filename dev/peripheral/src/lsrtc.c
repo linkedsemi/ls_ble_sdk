@@ -70,7 +70,7 @@ HAL_StatusTypeDef RTC_CalendarGet(calendar_cal_t *calendar_cal, calendar_time_t 
     return result;
 }
 
-void RTC_wkuptime_set(uint16_t second)
+void RTC_wkuptime_set(uint32_t second)
 {
     LS_ASSERT(second > 0);
     REG_FIELD_WR(RTC->WKUP, RTC_WKUP_WKCAL, second);
