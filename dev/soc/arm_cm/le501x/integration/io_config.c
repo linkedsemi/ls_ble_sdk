@@ -140,6 +140,7 @@ static void spi_clk_io_cfg(uint8_t clk)
 static void spi_nss_io_cfg(uint8_t nss)
 {
     io_set_pin(nss);
+    io_pull_write(nss,IO_PULL_UP);
     io_cfg_output(nss);
 }
 
@@ -190,6 +191,7 @@ void spi2_clk_io_deinit(void)
 
 void spi2_nss_io_deinit(void)
 {
+    io_pull_write(*(uint8_t *)&spi2_nss,IO_PULL_DISABLE);
     set_gpio_mode((gpio_pin_t *)&spi2_nss);
 }
 

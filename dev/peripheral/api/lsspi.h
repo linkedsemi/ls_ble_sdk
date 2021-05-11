@@ -1,40 +1,16 @@
-/**
-  ******************************************************************************
-  * @file    le501x_hal_spi.h
-  * @author  MCD Application Team
-  * @brief   Header file of SPI HAL module.
-  ******************************************************************************
-  */
-
-/* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef LSSPI_H
-#define LSSPI_H
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-/* Includes ------------------------------------------------------------------*/
-#include "reg_spi.h"
+#ifndef LSSPI_H_
+#define LSSPI_H_
+#include <stdbool.h>
+#include "reg_spi_type.h"
 #include "HAL_def.h"
 #include "sdk_config.h"
-#include "log.h"
-#include "ls_dbg.h"
-#include "systick.h"
-/** @addtogroup _HAL_Driver
-  * @{
-  */
+#include "reg_base_addr.h"
 
-/** @addtogroup SPI
-  * @{
-  */
+#define SPI2 ((reg_spi_t *)SPI2_BASE_ADDR)
+
 
 #define SPI_CLOCK   (SDK_PCLK_MHZ*1000000)
 
-/* Exported types ------------------------------------------------------------*/
-/** @defgroup SPI_Exported_Types SPI Exported Types
-  * @{
-  */
 
 /**
   * @brief  SPI Configuration Structure definition
@@ -74,9 +50,6 @@ typedef struct
 
   uint32_t CRCCalculation;      /*!< Specifies if the CRC calculation is enabled or not.
                                      This parameter can be a value of @ref SPI_CRC_Calculation */
-
-  uint32_t CRCPolynomial;       /*!< Specifies the polynomial used for the CRC calculation.
-                                     This parameter must be an odd number between Min_Data = 1 and Max_Data = 65535 */
 } SPI_InitTypeDef;
 
 /**
@@ -97,73 +70,42 @@ typedef enum
 /**
   * @brief  SPI handle Structure definition
   */
+ struct SPI_DMA_Env
+{
+    uint8_t DMA_Channel;
+    bool DMA_EN;
+};
+
+struct SPI_Interrupt_Env
+{
+    uint8_t *Data;
+    uint16_t Count;
+};
+
 typedef struct __SPI_HandleTypeDef
 {
   reg_spi_t               	 *Instance;      /*!< SPI registers base address               */
   SPI_InitTypeDef            Init;           /*!< SPI communication parameters             */
   uint8_t                    *pTxBuffPtr;    /*!< Pointer to SPI Tx transfer Buffer        */
   uint16_t                   TxXferSize;     /*!< SPI Tx Transfer size                     */
-  uint16_t              		 TxXferCount;    /*!< SPI Tx Transfer Counter                  */
+  uint16_t              	 TxXferCount;    /*!< SPI Tx Transfer Counter                  */
   uint8_t                    *pRxBuffPtr;    /*!< Pointer to SPI Rx transfer Buffer        */
   uint16_t                   RxXferSize;     /*!< SPI Rx Transfer size                     */
-  uint16_t              		RxXferCount;    /*!< SPI Rx Transfer Counter                  */
+  uint16_t              	 RxXferCount;    /*!< SPI Rx Transfer Counter                  */
   void (*RxISR)(struct __SPI_HandleTypeDef *hspi);   /*!< function pointer on Rx ISR       */
   void (*TxISR)(struct __SPI_HandleTypeDef *hspi);   /*!< function pointer on Tx ISR       */
-//  DMA_HandleTypeDef          *hdmatx;        /*!< SPI Tx DMA Handle parameters             */
-//  DMA_HandleTypeDef          *hdmarx;        /*!< SPI Rx DMA Handle parameters             */
+  void                       *DMAC_Instance;
+  union{
+        struct SPI_DMA_Env DMA;
+  }Tx_Env,Rx_Env;
   HAL_LockTypeDef            Lock;           /*!< Locking object                           */
-  HAL_SPI_StateTypeDef  		 State;          /*!< SPI communication state                  */
-  uint32_t              		 ErrorCode;      /*!< SPI Error code                           */
+  HAL_SPI_StateTypeDef  	 State;          /*!< SPI communication state                  */
+  uint32_t              	 ErrorCode;      /*!< SPI Error code                           */
 
-#if (USE_HAL_SPI_REGISTER_CALLBACKS == 1U)
-  void (* TxCpltCallback)(struct __SPI_HandleTypeDef *hspi);             /*!< SPI Tx Completed callback          */
-  void (* RxCpltCallback)(struct __SPI_HandleTypeDef *hspi);             /*!< SPI Rx Completed callback          */
-  void (* TxRxCpltCallback)(struct __SPI_HandleTypeDef *hspi);           /*!< SPI TxRx Completed callback        */
-  void (* TxHalfCpltCallback)(struct __SPI_HandleTypeDef *hspi);         /*!< SPI Tx Half Completed callback     */
-  void (* RxHalfCpltCallback)(struct __SPI_HandleTypeDef *hspi);         /*!< SPI Rx Half Completed callback     */
-  void (* TxRxHalfCpltCallback)(struct __SPI_HandleTypeDef *hspi);       /*!< SPI TxRx Half Completed callback   */
-  void (* ErrorCallback)(struct __SPI_HandleTypeDef *hspi);              /*!< SPI Error callback                 */
-  void (* AbortCpltCallback)(struct __SPI_HandleTypeDef *hspi);          /*!< SPI Abort callback                 */
-  void (* MspInitCallback)(struct __SPI_HandleTypeDef *hspi);            /*!< SPI Msp Init callback              */
-  void (* MspDeInitCallback)(struct __SPI_HandleTypeDef *hspi);          /*!< SPI Msp DeInit callback            */
-
-#endif  /* USE_HAL_SPI_REGISTER_CALLBACKS */
 } SPI_HandleTypeDef;
 
-#if (USE_HAL_SPI_REGISTER_CALLBACKS == 1U)
-/**
-  * @brief  HAL SPI Callback ID enumeration definition
-  */
-typedef enum
-{
-  HAL_SPI_TX_COMPLETE_CB_ID             = 0x00U,    /*!< SPI Tx Completed callback ID         */
-  HAL_SPI_RX_COMPLETE_CB_ID             = 0x01U,    /*!< SPI Rx Completed callback ID         */
-  HAL_SPI_TX_RX_COMPLETE_CB_ID          = 0x02U,    /*!< SPI TxRx Completed callback ID       */
-  HAL_SPI_TX_HALF_COMPLETE_CB_ID        = 0x03U,    /*!< SPI Tx Half Completed callback ID    */
-  HAL_SPI_RX_HALF_COMPLETE_CB_ID        = 0x04U,    /*!< SPI Rx Half Completed callback ID    */
-  HAL_SPI_TX_RX_HALF_COMPLETE_CB_ID     = 0x05U,    /*!< SPI TxRx Half Completed callback ID  */
-  HAL_SPI_ERROR_CB_ID                   = 0x06U,    /*!< SPI Error callback ID                */
-  HAL_SPI_ABORT_CB_ID                   = 0x07U,    /*!< SPI Abort callback ID                */
-  HAL_SPI_MSPINIT_CB_ID                 = 0x08U,    /*!< SPI Msp Init callback ID             */
-  HAL_SPI_MSPDEINIT_CB_ID               = 0x09U     /*!< SPI Msp DeInit callback ID           */
-
-} HAL_SPI_CallbackIDTypeDef;
-
-/**
-  * @brief  HAL SPI Callback pointer definition
-  */
-typedef  void (*pSPI_CallbackTypeDef)(SPI_HandleTypeDef *hspi); /*!< pointer to an SPI callback function */
-
-#endif /* USE_HAL_SPI_REGISTER_CALLBACKS */
-/**
-  * @}
-  */
 
 /* Exported constants --------------------------------------------------------*/
-/** @defgroup SPI_Exported_Constants SPI Exported Constants
-  * @{
-  */
-
 /** @defgroup SPI_Error_Code SPI Error Code
   * @{
   */
@@ -174,9 +116,6 @@ typedef  void (*pSPI_CallbackTypeDef)(SPI_HandleTypeDef *hspi); /*!< pointer to 
 #define HAL_SPI_ERROR_DMA               (0x00000010U)   /*!< DMA transfer error                     */
 #define HAL_SPI_ERROR_FLAG              (0x00000020U)   /*!< Error on RXNE/TXE/BSY Flag             */
 #define HAL_SPI_ERROR_ABORT             (0x00000040U)   /*!< Error during SPI Abort procedure       */
-#if (USE_HAL_SPI_REGISTER_CALLBACKS == 1U)
-#define HAL_SPI_ERROR_INVALID_CALLBACK  (0x00000080U)   /*!< Invalid Callback error                 */
-#endif /* USE_HAL_SPI_REGISTER_CALLBACKS */
 /**
   * @}
   */
@@ -263,15 +202,6 @@ typedef  void (*pSPI_CallbackTypeDef)(SPI_HandleTypeDef *hspi); /*!< pointer to 
   * @{
   */
 #define SPI_TIMODE_DISABLE              (0x00000000U)
-/**
-  * @}
-  */
-
-/** @defgroup SPI_CRC_Calculation SPI CRC Calculation
-  * @{
-  */
-#define SPI_CRCCALCULATION_DISABLE      (0x00000000U)
-#define SPI_CRCCALCULATION_ENABLE       SPI_CR1_CRCEN_MASK
 /**
   * @}
   */
@@ -646,14 +576,6 @@ HAL_StatusTypeDef HAL_SPI_DeInit(SPI_HandleTypeDef *hspi);
 void HAL_SPI_MspInit(SPI_HandleTypeDef *hspi);
 void HAL_SPI_MspDeInit(SPI_HandleTypeDef *hspi);
 
-/* Callbacks Register/UnRegister functions  ***********************************/
-#if (USE_HAL_SPI_REGISTER_CALLBACKS == 1U)
-HAL_StatusTypeDef HAL_SPI_RegisterCallback(SPI_HandleTypeDef *hspi, HAL_SPI_CallbackIDTypeDef CallbackID, pSPI_CallbackTypeDef pCallback);
-HAL_StatusTypeDef HAL_SPI_UnRegisterCallback(SPI_HandleTypeDef *hspi, HAL_SPI_CallbackIDTypeDef CallbackID);
-#endif /* USE_HAL_SPI_REGISTER_CALLBACKS */
-/**
-  * @}
-  */
 
 /** @addtogroup SPI_Exported_Functions_Group2
   * @{
@@ -669,12 +591,19 @@ HAL_StatusTypeDef HAL_SPI_TransmitReceive_IT(SPI_HandleTypeDef *hspi, uint8_t *p
                                              uint16_t Size);
 
 
+HAL_StatusTypeDef HAL_SPI_Transmit_DMA(SPI_HandleTypeDef *hspi,void *Data,uint16_t Count);
+HAL_StatusTypeDef HAL_SPI_Receive_DMA(SPI_HandleTypeDef *hspi,void *Data,uint16_t Count);
+HAL_StatusTypeDef HAL_SPI_TransmitReceive_DMA(SPI_HandleTypeDef *hspi,void *TX_Data,void *RX_Data,uint16_t Count);
+
 void HAL_SPI_IRQHandler(SPI_HandleTypeDef *hspi);
 void HAL_SPI_TxCpltCallback(SPI_HandleTypeDef *hspi);
 void HAL_SPI_RxCpltCallback(SPI_HandleTypeDef *hspi);
 void HAL_SPI_TxRxCpltCallback(SPI_HandleTypeDef *hspi);
-
 void HAL_SPI_ErrorCallback(SPI_HandleTypeDef *hspi);
+
+void HAL_SPI_TxDMACpltCallback(SPI_HandleTypeDef *hspi);
+void HAL_SPI_RxDMACpltCallback(SPI_HandleTypeDef *hspi);
+void HAL_SPI_TxRxDMACpltCallback(SPI_HandleTypeDef *hspi);
 
 /**
   * @}
@@ -689,23 +618,6 @@ uint32_t             HAL_SPI_GetError(SPI_HandleTypeDef *hspi);
 /**
   * @}
   */
-
-/**
-  * @}
-  */
-
-/**
-  * @}
-  */
-
-/**
-  * @}
-  */
-
-#ifdef __cplusplus
-}
 #endif
-
-#endif /* LE501x_HAL_SPI_H */
 
 /************************ (C) COPYRIGHT linkedsemi *************END OF FILE****/

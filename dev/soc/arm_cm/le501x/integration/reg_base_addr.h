@@ -1,6 +1,7 @@
 #ifndef REG_BASE_ADDR_H_
 #define REG_BASE_ADDR_H_
 
+#define SPI2_BASE_ADDR (0x40003800)
 
 #define I2C1_BASE_ADDR (0x40005400)
 #define I2C2_BASE_ADDR (0x40005800)
