@@ -1,0 +1,12 @@
+Import('app_build','image_build','env')
+SConscript(dirs = 'host_test',exports=['app_build'])
+SConscript(dirs = 'ble_dis',exports=['app_build'])
+if env['IC'] == 'le501x':
+    SConscript(dirs = 'fota',exports=['app_build','env'])
+    SConscript(dirs = 'ble_uart_server',exports=['app_build'])
+    SConscript(dirs = 'ble_uart_server_mult_link',exports=['app_build'])
+    SConscript(dirs = 'ble_master_slave_combine',exports=['app_build'])
+    SConscript(dirs = 'ble_single_role',exports=['app_build'])
+    SConscript(dirs = 'ble_at_proj',exports=['app_build'])
+    SConscript(dirs = 'ble_hid',exports=['app_build'])
+    SConscript(dirs = 'ble_hid_dmic',exports=['app_build'])

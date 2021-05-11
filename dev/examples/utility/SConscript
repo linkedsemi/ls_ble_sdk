@@ -1,0 +1,4 @@
+Import('app_build','image_build','env')
+SConscript(dirs = 'flash_prog',exports=['image_build','env'])
+if env['IC'] == 'le501x':
+    SConscript(dirs = 'ram_test',exports=['image_build','env'])

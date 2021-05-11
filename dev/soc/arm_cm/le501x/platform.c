@@ -63,11 +63,19 @@ static void irq_priority()
     NVIC->IP[7] = IRQ_NVIC_PRIO(UART2_IRQn,2) | IRQ_NVIC_PRIO(UART3_IRQn,2) | IRQ_NVIC_PRIO(BLE_FIFO_IRQn,0) | IRQ_NVIC_PRIO(BLE_CRYPT_IRQn,0);
 }
 
+#if defined(__CC_ARM)
 __attribute__((weak)) uint32_t __stack_bss_start__;
 __attribute__((weak)) uint32_t __stack_bss_size__;
 __attribute__((weak)) uint32_t __stack_data_lma__;
 __attribute__((weak)) uint32_t __stack_data_size__;
+__attribute__((weak)) uint32_t __stack_data_start__;
+#elif defined(__GNUC__)
+extern uint32_t __stack_bss_start__;
+extern uint32_t __stack_bss_size__;
+extern uint32_t __stack_data_lma__;
+extern uint32_t __stack_data_size__;
 extern uint32_t __stack_data_start__;
+#endif
 static void stack_data_bss_init()
 {
     memset(&__stack_bss_start__,0,(uint32_t)&__stack_bss_size__);

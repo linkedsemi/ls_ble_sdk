@@ -1,0 +1,10 @@
+Import('app_build','image_build','env')
+SConscript(dirs = 'uart',exports=['app_build'])
+SConscript(dirs = 'gpio',exports=['app_build'])
+if env['IC'] == 'le501x':
+    SConscript(dirs = 'adc',exports=['app_build'])
+    SConscript(dirs = 'timer',exports=['app_build'])
+    SConscript(dirs = 'rtc',exports=['app_build'])
+    SConscript(dirs = 'spi',exports=['app_build'])
+    SConscript(dirs = 'pdm',exports=['app_build'])
+    SConscript(dirs = 'i2c',exports=['app_build'])
