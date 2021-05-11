@@ -66,8 +66,8 @@ static void irq_priority()
 __attribute__((weak)) uint32_t __stack_bss_start__;
 __attribute__((weak)) uint32_t __stack_bss_size__;
 __attribute__((weak)) uint32_t __stack_data_lma__;
-__attribute__((weak)) uint32_t __stack_data_start__;
 __attribute__((weak)) uint32_t __stack_data_size__;
+extern uint32_t __stack_data_start__;
 static void stack_data_bss_init()
 {
     memset(&__stack_bss_start__,0,(uint32_t)&__stack_bss_size__);
