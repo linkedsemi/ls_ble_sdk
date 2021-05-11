@@ -1,5 +1,6 @@
 #include "FlashOS.h"
-
+#include "reg_base_addr.h"
+#include "spi_flash.h"
 /**
  * structure to describe flash device
  */
@@ -10,9 +11,9 @@ struct FlashDevice const FlashDevices  INDEVSECTION =  {
     0x123456,               // Flash ID
     "NorFlash",             // type
     512*1024,               // Reserved
-    1,                      // Access directly
+    0,                      // Access directly
     1,                      // RangeNumbers
 	// {start address, the flash size, sector size}
-    {{0x0, 0x80000, 0x1000}},
+    {{FLASH_BASE_ADDR, 0x80000, FLASH_SECTOR_SIZE}},
     "LinkedSemi"
 };

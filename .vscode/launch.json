@@ -4,7 +4,6 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
-
         {
             "name": "TAURUS HOST TEST",
             "type": "cppdbg",
@@ -31,16 +30,20 @@
         },
         {
             "name": "TAURUS FLASH PROG",
-            "type": "cppdbg",
-            "request": "launch",
-            "program": "build/taurus/examples/flash_prog.elf",
-            "args": [],
-            "stopAtEntry": false,
+            "type": "gdb",
+            "request": "attach",
+            "target": "172.31.16.1:1025",
+            "executable": "build/taurus/examples/flash_prog.elf",
             "cwd": "${workspaceFolder}",
-            "externalConsole": false,
-            "MIMode": "gdb",
-            "miDebuggerPath": "riscv64-unknown-elf-gdb",
-            "miDebuggerServerAddress": "172.31.16.1:1025",
+            "remote": true,
+            "gdbpath": "riscv64-unknown-elf-gdb",
+            "debugger_args": ["-iex \"set arch riscv:rv32\""],
+            "autorun": [
+
+                
+            ],
+            "printCalls":true,
+            "showDevDebugOutput":true,
         },
         {
             "name": "Python: info sbl merge",

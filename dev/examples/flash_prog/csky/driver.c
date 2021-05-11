@@ -36,7 +36,6 @@ int  flashInit(){
     spi_flash_release_from_deep_power_down();
     DELAY_US(100);
     spi_flash_qe_status_read_and_set();
-    spi_flash_xip_start();
     return 0;
 }
 
@@ -48,7 +47,6 @@ int  flashInit(){
  * Otherwise return 0.
  */
 int  flashUnInit(){
-    spi_flash_xip_stop();
     return 0;
 }
 
@@ -118,7 +116,7 @@ int flashProgram(char* dst, char *src, int size){
  * Otherwise return 0.
  */
 int flashRead(char* dst, char *src, int length){
-    spi_flash_quad_io_read((uint32_t)dst - FLASH_BASE_ADDR,(uint8_t *)src,length);
+    spi_flash_quad_io_read((uint32_t)src - FLASH_BASE_ADDR,(uint8_t *)dst,length);
     return 0;
 }
 
@@ -182,9 +180,11 @@ int flashChipErase( ){
  */
 int flashChecksum(char*dst, int length, int checksum) {
     int i, sum = 0;
+    spi_flash_xip_start();
     for (i = 0; i < length; i++) {
         sum += dst[i];
     }
+    spi_flash_xip_stop();
     return sum == checksum ? 0 : ERROR_CHECKSUM;
 }
 
@@ -205,6 +205,7 @@ int flashTest(){
 	// read flash id
 	flashID(&ID);
 
+    flashProgram(FLASH_BASE_ADDR,0x780000,0x1000);
     // other drivers test
     return ID;
 #else

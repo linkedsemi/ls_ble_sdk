@@ -19,7 +19,7 @@ XIP_BANNED uint8_t lsqspi_rd_cap_dly_get(struct lsqspi_instance *inst)
 #else
 XIP_BANNED uint8_t lsqspi_rd_cap_dly_get(struct lsqspi_instance *inst)
 {
-    return 1;
+    return 0;
 }
 #endif
 

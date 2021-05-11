@@ -1,8 +1,11 @@
 #ifndef FLASH_SVCALL_INT_H_
 #define FLASH_SVCALL_INT_H_
 #include "core_rv32.h"
-
+#if defined(FLASH_PROG_ALGO) || BOOT_RAM==1
+#define GLOBAL_INT_MASK_STATUS() (!(__get_MSTATUS()&0x8))
+#else
 #define GLOBAL_INT_MASK_STATUS() (CLIC->MINTTHRESH)
+#endif
 
 void do_spi_flash_program_svcall(uint32_t offset,uint8_t *data,uint16_t length,bool quad);
 void do_spi_flash_erase_svcall(uint32_t offset,uint8_t opcode);
