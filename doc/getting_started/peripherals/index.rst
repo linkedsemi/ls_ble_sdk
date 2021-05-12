@@ -10,4 +10,5 @@
     timer
     rtc
     pdm
+    adc
     
