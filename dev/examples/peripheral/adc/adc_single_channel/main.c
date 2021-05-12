@@ -6,29 +6,16 @@
 #include "log.h"
 #include "lsdmac.h"
 #include "reg_syscfg.h"
-#include "field_manipulate.h"
-/* ADC work mode -------------------------------------------------------------*/
-#define DMA_EN
-//#define Injected_Mode
-/* Private function prototypes -----------------------------------------------*/
 static void Error_Handler(void);
 
-uint16_t adc_value;
+static uint16_t adc_value;
 
 ADC_HandleTypeDef hadc;
 
-volatile uint8_t recv_flag = 0;
+static volatile uint8_t recv_flag = 0;
 
-/* Private functions ---------------------------------------------------------*/
-
-static void adc_io_init(void)
+static void lsadc_init(void)
 {
-   adc12b_in5_io_init();
-}
-
-void lsadc_init(void)
-{
-    /** Common config  */
     hadc.Instance = LSADC;
     hadc.Init.DataAlign             = ADC_DATAALIGN_RIGHT;
     hadc.Init.ScanConvMode          = ADC_SCAN_DISABLE;              /* Sequencer disabled (ADC conversion on only 1 channel: channel set on rank 1) */
@@ -44,7 +31,6 @@ void lsadc_init(void)
         Error_Handler();
     }
     ADC_InjectionConfTypeDef sConfigInjected = {0};
-    /* Configure ADC injected channel */
     sConfigInjected.InjectedChannel = ADC_CHANNEL_VBAT;
     sConfigInjected.InjectedRank = ADC_INJECTED_RANK_1;
     sConfigInjected.InjectedSamplingTime = ADC_SAMPLETIME_15CYCLES;
@@ -63,9 +49,7 @@ void lsadc_init(void)
 int main(void)
 {
     sys_init_none();
-	adc_io_init();
 	lsadc_init();
-  /* Start ADC conversion on regular group with transfer by IT */
     HAL_ADCEx_InjectedStart_IT(&hadc);
     recv_flag = 0;
 	while(1)
@@ -74,7 +58,7 @@ int main(void)
 		{
             DELAY_US(1000);
             recv_flag = 0;
-            LOG_I("bat_value: %d",adc_value*2);
+            LOG_I("bat_value: %d",adc_value*8);  //By default, 1/8 of the power supply is used to collect
 			HAL_ADCEx_InjectedStart_IT(&hadc);
 		}
 	};

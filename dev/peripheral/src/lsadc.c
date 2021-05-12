@@ -1588,6 +1588,11 @@ HAL_StatusTypeDef HAL_ADCEx_InjectedConfigChannel(ADC_HandleTypeDef* hadc, ADC_I
                                   sConfigInjected->InjectedRank)   ,
                  ADC_JSQR_RK_JL(sConfigInjected->InjectedChannel,      
                                   sConfigInjected->InjectedRank)    );
+
+        if(sConfigInjected->InjectedChannel == ADC_CHANNEL_VBAT) 
+        {
+            adc_channel_vbat_enable();
+        }
     }
     else
     {
