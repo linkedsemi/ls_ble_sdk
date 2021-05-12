@@ -23,6 +23,7 @@
 #define ADC_CLOCK   (SDK_PCLK_MHZ*1000000)
 
 /** 
+  * @struct  ADC_InitTypeDef
   * @brief  Structure definition of ADC and regular group initialization 
   * @note   Parameters of this structure are shared within 2 scopes:
   *          - Scope entire ADC (affects regular and injected groups): DataAlign, ScanConvMode.
@@ -63,7 +64,11 @@ typedef struct
                                                   If set to ADC_SOFTWARE_START, external triggers are disabled.
                                                   If set to external trigger source, triggering is on event rising edge.
                                                   This parameter can be a value of @ref ADC_External_trigger_source_Regular */
-    uint32_t Vref;                                              
+    uint32_t Vref;                          /*!<Select ADC reference voltage, please refer to the type @ref enum ADC_Vref_TypeDef*/
+
+    uint32_t AdcDriveType;                /*!<Select ADC Driving mode, please refer to the type @ref  enum ADC_Drv_TypeDef*/
+
+    uint32_t AdcCkDiv;                    /*!<ADC division coefficient ranges from 1 to 128 */
 } ADC_InitTypeDef;
 
 
@@ -190,6 +195,16 @@ typedef struct __ADC_HandleTypeDef
 
 } ADC_HandleTypeDef;
 
+ /** @enum ADC_Drv_TypeDef
+  * @brief  driving ADC type enumeration definition 
+  */
+ enum ADC_Drv_TypeDef
+ {
+    EINBUF_DRIVE_ADC,
+    INRES_ONETHIRD_EINBUF_DRIVE_ADC,    /*1/3 partial voltage input signal */
+    BINBUF_DIRECT_DRIVE_ADC, 
+ };
+
 /**
   * @brief  HAL ADC Callback ID enumeration definition
   */
@@ -255,6 +270,17 @@ typedef enum
   * @}
   */
 
+/** @defgroup ADC Clock Division
+  * @{
+  */               
+#define ADC_CLOCK_DIV2          0x00000001U                 
+#define ADC_CLOCK_DIV4          0x00000002U                 
+#define ADC_CLOCK_DIV8          0x00000003U                 
+#define ADC_CLOCK_DIV16         0x00000004U               
+#define ADC_CLOCK_DIV32         0x00000005U                 
+#define ADC_CLOCK_DIV64         0x00000006U                 
+#define ADC_CLOCK_DIV128        0x00000007U  
+
 /** @defgroup ADC_sampling_times ADC sampling times
   * @{
   */
@@ -298,8 +324,9 @@ typedef enum
 #define ADC_CHANNEL_7               0x00000007U
 #define ADC_CHANNEL_8               0x00000008U
 #define ADC_CHANNEL_TEMPSENSOR      0x00000009U  /* ADC internal channel (no connection on device pin) */
-#define ADC_CHANNEL_VBAT            0x0000000BU  /* ADC internal channel (no connection on device pin) */
-#define ADC_CHANNEL_VREFINT         0x0000000AU  /* ADC internal channel (no connection on device pin) */
+#define ADC_CHANNEL_VBAT            0x0000000AU  /* ADC internal channel (no connection on device pin) */
+#define ADC_CHANNEL_VREFINT         0x0000000BU  /* ADC internal channel (no connection on device pin) */
+
 /**
   * @}
   */
@@ -757,8 +784,8 @@ HAL_StatusTypeDef ADC_ConversionStop_Disable(ADC_HandleTypeDef *hadc);
 /* Blocking mode: Polling */
 HAL_StatusTypeDef HAL_ADC_Start(ADC_HandleTypeDef *hadc);
 HAL_StatusTypeDef HAL_ADC_Stop(ADC_HandleTypeDef *hadc);
-HAL_StatusTypeDef HAL_ADC_PollForConversion(ADC_HandleTypeDef *hadc, uint32_t Timeout);
-HAL_StatusTypeDef HAL_ADC_PollForEvent(ADC_HandleTypeDef *hadc, uint32_t EventType, uint32_t Timeout);
+// HAL_StatusTypeDef HAL_ADC_PollForConversion(ADC_HandleTypeDef *hadc, uint32_t Timeout);
+// HAL_StatusTypeDef HAL_ADC_PollForEvent(ADC_HandleTypeDef *hadc, uint32_t EventType, uint32_t Timeout);
 
 /* Blocking mode: Polling */
 HAL_StatusTypeDef HAL_ADCEx_InjectedStart(ADC_HandleTypeDef* hadc);

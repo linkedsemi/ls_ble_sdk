@@ -8,4 +8,7 @@ void HAL_ADC_MSP_DeInit(ADC_HandleTypeDef *inst);
 void HAL_ADC_MSP_Busy_Set(ADC_HandleTypeDef *inst);
 void HAL_ADC_MSP_Idle_Set(ADC_HandleTypeDef *inst);
 
+void adc_channel_vbat_enable(void);
+void adc_channel_vbat_disable(void);
+
 #endif

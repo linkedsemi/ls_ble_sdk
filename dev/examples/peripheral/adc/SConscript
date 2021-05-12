@@ -1,9 +1,4 @@
 Import('app_build')
-
-src = [
-    'main.c'
-]
-inc = [
-    '.'
-]
-app_build('adc_test',src,inc)
+SConscript(dirs = 'adc_multi_channel',exports=['app_build'])
+SConscript(dirs = 'adc_single_channel',exports=['app_build'])
+SConscript(dirs = 'adc_multi_channel_dma',exports=['app_build'])

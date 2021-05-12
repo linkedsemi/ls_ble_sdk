@@ -289,23 +289,36 @@ HAL_StatusTypeDef HAL_ADC_Init(ADC_HandleTypeDef *hadc)
     tmp_hal_status = HAL_ERROR;
   }
   
-    tmp_ccr = FIELD_BUILD(ADC_MSBCAL, 2)  |
-                FIELD_BUILD(ADC_VRPS, hadc->Init.Vref)  |
-                FIELD_BUILD(ADC_VRBUFEN, 1) |
-                FIELD_BUILD(ADC_BP, 0)      |
-                FIELD_BUILD(ADC_VCMEN, 1)   |
-                FIELD_BUILD(ADC_VREFEN, 1)  |
+        /* Configuration of ADC_CCR:                                              */
+    /*  - reference voltage                                                  */
+    /*  - adc clk                                                             */
+    /*  - discontinuous mode number of conversions                            */
+
+    switch(hadc->Init.Vref)
+    {
+        case ADC_VREF_VCC:
+            tmp_ccr = FIELD_BUILD(ADC_VRPS,1) | FIELD_BUILD(ADC_BP,1) | FIELD_BUILD(ADC_VRBUFEN,0) | FIELD_BUILD(ADC_VCMEN,1) | FIELD_BUILD(ADC_VREFEN,0);
+         break;
+         case ADC_VREF_EXPOWER:
+            tmp_ccr = FIELD_BUILD(ADC_VRPS,2) | FIELD_BUILD(ADC_BP,1) | FIELD_BUILD(ADC_VRBUFEN,0) | FIELD_BUILD(ADC_VCMEN,1) | FIELD_BUILD(ADC_VREFEN,0);
+         break;
+         case ADC_VREF_INSIDE: //default
+         default:
+            tmp_ccr = FIELD_BUILD(ADC_VRPS,4) | FIELD_BUILD(ADC_BP,1) | FIELD_BUILD(ADC_VRBUFEN,1) | FIELD_BUILD(ADC_VCMEN,1) | FIELD_BUILD(ADC_VREFEN,1);
+           break;
+    }
+
+     tmp_ccr |= FIELD_BUILD(ADC_MSBCAL, 2)  |
                 FIELD_BUILD(ADC_LPCTL, 1)   |
                 FIELD_BUILD(ADC_GCALV, 0)   |
                 FIELD_BUILD(ADC_OCALV, 0)   |
-                FIELD_BUILD(ADC_CKDIV, 5); //default 1Mhz
+	            FIELD_BUILD(ADC_CKDIV, (hadc->Init.AdcCkDiv==0)?(ADC_CLOCK_DIV32):hadc->Init.AdcCkDiv);
 
     MODIFY_REG(hadc->Instance->CCR,
                 ADC_MSBCAL_MASK      |
-                    ADC_VRPS_MASK    |
+                    ADC_VRPS_MASK   |
                     ADC_VRBUFEN_MASK |
                     ADC_BP_MASK      |
-                    ADC_VREFEN_MASK  |
                     ADC_VCMEN_MASK   |
                     ADC_LPCTL_MASK   |
                     ADC_GCALV_MASK   |
@@ -1223,6 +1236,8 @@ void HAL_ADC_IRQHandler(ADC_HandleTypeDef *hadc)
     {
         if(__HAL_ADC_GET_FLAG(hadc, ADC_FLAG_EOC) )
         {
+            /* Clear regular group conversion flag */
+            __HAL_ADC_CLEAR_FLAG(hadc, ADC_RSTRTCC_MASK | ADC_REOCC_MASK);
             /* Update state machine on conversion status if not in error state */
             if (HAL_IS_BIT_CLR(hadc->State, HAL_ADC_STATE_ERROR_INTERNAL))
             {
@@ -1248,9 +1263,6 @@ void HAL_ADC_IRQHandler(ADC_HandleTypeDef *hadc)
             }
             /* Conversion complete callback */
             HAL_ADC_ConvCpltCallback(hadc);
-            
-            /* Clear regular group conversion flag */
-            __HAL_ADC_CLEAR_FLAG(hadc, ADC_RSTRTCC_MASK | ADC_REOCC_MASK);
         }
     }
 
@@ -1289,12 +1301,11 @@ void HAL_ADC_IRQHandler(ADC_HandleTypeDef *hadc)
                     SET_BIT(hadc->State, HAL_ADC_STATE_READY);
                 }
             }
-            void HAL_ADCEx_InjectedConvCpltCallback(ADC_HandleTypeDef* hadc);
+            /* Clear injected group conversion flag */
+            __HAL_ADC_CLEAR_FLAG(hadc, (ADC_JSTRTCC_MASK | ADC_JEOCC_MASK | ADC_JEOSC_MASK));
             /* Conversion complete callback */ 
             HAL_ADCEx_InjectedConvCpltCallback(hadc);
             
-            /* Clear injected group conversion flag */
-            __HAL_ADC_CLEAR_FLAG(hadc, (ADC_JSTRTCC_MASK | ADC_JEOCC_MASK | ADC_JEOSC_MASK));
         }
     }
     /* ========== Check Analog watchdog flags ========== */
@@ -1304,12 +1315,10 @@ void HAL_ADC_IRQHandler(ADC_HandleTypeDef *hadc)
         {
         /* Set ADC state */
         SET_BIT(hadc->State, HAL_ADC_STATE_AWD1);
-        
-        /* Level out of window callback */ 
-        HAL_ADC_LevelOutOfWindowCallback(hadc);
-        
         /* Clear the ADC analog watchdog flag */
         __HAL_ADC_CLEAR_FLAG(hadc, ADC_AWDC_MASK);
+        /* Level out of window callback */ 
+        HAL_ADC_LevelOutOfWindowCallback(hadc);
         }
     }
 
@@ -1446,6 +1455,10 @@ HAL_StatusTypeDef HAL_ADC_ConfigChannel(ADC_HandleTypeDef *hadc, ADC_ChannelConf
     MODIFY_REG(hadc->Instance->SMPR1                          ,
             ADC_SMPR1(ADC_SMP0_MASK, sConfig->Channel)      ,
             ADC_SMPR1(sConfig->SamplingTime, sConfig->Channel) );
+    if (sConfig->Channel == ADC_CHANNEL_VBAT)
+    {
+        adc_channel_vbat_enable();
+    }
 
     /* Process unlocked */
     __HAL_UNLOCK(hadc);
@@ -1628,7 +1641,10 @@ HAL_StatusTypeDef HAL_ADCEx_InjectedConfigChannel(ADC_HandleTypeDef* hadc, ADC_I
 	MODIFY_REG(hadc->Instance->SMPR1                          ,
 					ADC_SMPR1(ADC_SMP0_MASK, sConfigInjected->InjectedChannel)      ,
 					ADC_SMPR1(sConfigInjected->InjectedSamplingTime, sConfigInjected->InjectedChannel) ); 
-  
+   if(sConfigInjected->InjectedChannel == ADC_CHANNEL_VBAT)
+   {
+    //    adc_channel_vbat_init();
+   }
   /* Configure the offset: offset enable/disable, InjectedChannel, offset value */
   switch(sConfigInjected->InjectedRank)
   {

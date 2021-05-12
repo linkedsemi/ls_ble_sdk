@@ -9,7 +9,7 @@
 #include "dmac_config.h"
 #include "dmac_msp.h"
 #include <stddef.h>
-
+#include "reg_syscfg.h"
 
 
 static ADC_HandleTypeDef *adc_inst_env;
@@ -47,4 +47,13 @@ void HAL_ADC_MSP_Idle_Set(ADC_HandleTypeDef *inst)
     adc12b_status_set(false);
 }
 
+void adc_channel_vbat_enable(void)
+{
+    REG_FIELD_WR(SYSCFG->PMU_TRIM, SYSCFG_EN_BAT_DET, 1);
+}
+
+void adc_channel_vbat_disable(void)
+{
+    REG_FIELD_WR(SYSCFG->PMU_TRIM, SYSCFG_EN_BAT_DET, 0);
+}
 
