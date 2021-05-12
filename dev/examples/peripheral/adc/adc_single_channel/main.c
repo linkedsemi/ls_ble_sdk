@@ -10,7 +10,7 @@ static void Error_Handler(void);
 
 static uint16_t adc_value;
 
-ADC_HandleTypeDef hadc;
+static ADC_HandleTypeDef hadc;
 
 static volatile uint8_t recv_flag = 0;
 
@@ -24,7 +24,7 @@ static void lsadc_init(void)
     hadc.Init.NbrOfDiscConversion   = 1;                             /* Parameter discarded because sequencer is disabled */
     hadc.Init.ContinuousConvMode    = DISABLE;                        /* Continuous mode to have maximum conversion speed (no delay between conversions) */
     hadc.Init.TrigType      = ADC_INJECTED_SOFTWARE_TRIGT;            /* The reference voltage uses an internal reference */
-    hadc.Init.Vref          = ADC_VREF_VCC;
+    hadc.Init.Vref          = ADC_VREF_INSIDE;
 
     if (HAL_ADC_Init(&hadc) != HAL_OK)
     {
@@ -56,9 +56,9 @@ int main(void)
 	{
 		if(recv_flag == 1) 
 		{
-            DELAY_US(1000);
+            DELAY_US(200*1000); //delay 200ms
             recv_flag = 0;
-            LOG_I("bat_value: %d",adc_value*8);  //By default, 1/8 of the power supply is used to collect
+            LOG_I("Vbat_vol: %d mv",(8*1400*adc_value/4095));  //By default, 1/8 of the power supply is used to collect
 			HAL_ADCEx_InjectedStart_IT(&hadc);
 		}
 	};
@@ -68,7 +68,7 @@ int main(void)
   * @brief  This function is executed in case of error occurrence.
   * @retval None
   */
-void Error_Handler(void)
+static void Error_Handler(void)
 {
     /* USER CODE BEGIN Error_Handler_Debug */
     /* User can add his own implementation to report the HAL error return state */
