@@ -130,52 +130,26 @@ void clr_ble_wkup_req()
     RCC->BLECFG &= ~RCC_BLE_WKUP_RST_MASK;
 }
 
-extern bool em_fixed;
-
 XIP_BANNED void power_up_hardware_modules()
 {
-    if(em_fixed)
-    {
-        SYSCFG->PMU_PWR = FIELD_BUILD(SYSCFG_PERI_PWR2_PD, 0) 
+    SYSCFG->PMU_PWR = FIELD_BUILD(SYSCFG_PERI_PWR2_PD, 0) 
                     | FIELD_BUILD(SYSCFG_PERI_ISO2_EN,1)
                     | FIELD_BUILD(SYSCFG_SEC_PWR4_PD,0)
                     | FIELD_BUILD(SYSCFG_SEC_ISO4_EN,1);
-    }else
-    {
-        SYSCFG->PMU_PWR = FIELD_BUILD(SYSCFG_PERI_PWR2_PD, 0) 
-                    | FIELD_BUILD(SYSCFG_PERI_ISO2_EN,1)
-                    | FIELD_BUILD(SYSCFG_ERAM_PWR7_PD,0)
-                    | FIELD_BUILD(SYSCFG_ERAM_ISO7_EN,2);
-    }
 }
 
 XIP_BANNED void remove_hw_isolation()
 {
-    if(em_fixed)
-    {
-        while((SYSCFG->PMU_PWR & ((uint32_t)SYSCFG_PERI_PWR2_ST_MASK)) && (SYSCFG->PMU_PWR & ((uint32_t)SYSCFG_SEC_PWR4_ST_MASK)));
-    }else
-    {
-        while((SYSCFG->PMU_PWR & ((uint32_t)SYSCFG_PERI_PWR2_ST_MASK)) && (SYSCFG->PMU_PWR & ((uint32_t)SYSCFG_ERAM_PWR7_ST_MASK)));
-    }
+    while((SYSCFG->PMU_PWR & ((uint32_t)SYSCFG_PERI_PWR2_ST_MASK)) && (SYSCFG->PMU_PWR & ((uint32_t)SYSCFG_SEC_PWR4_ST_MASK)));
     SYSCFG->PMU_PWR = 0;
 }
 
 XIP_BANNED static void power_down_hardware_modules()
 {
-    if(em_fixed)
-    {
-        SYSCFG->PMU_PWR = FIELD_BUILD(SYSCFG_PERI_PWR2_PD, 1) 
+    SYSCFG->PMU_PWR = FIELD_BUILD(SYSCFG_PERI_PWR2_PD, 1) 
                     | FIELD_BUILD(SYSCFG_PERI_ISO2_EN,1)
                     | FIELD_BUILD(SYSCFG_SEC_PWR4_PD, 1)
                     | FIELD_BUILD(SYSCFG_SEC_ISO4_EN ,1);
-    }else
-    {
-        SYSCFG->PMU_PWR = FIELD_BUILD(SYSCFG_PERI_PWR2_PD, 1) 
-                    | FIELD_BUILD(SYSCFG_PERI_ISO2_EN,1)
-                    | FIELD_BUILD(SYSCFG_ERAM_ISO7_EN,2)
-                    | FIELD_BUILD(SYSCFG_ERAM_PWR7_PD,2);
-    }
 }
 
 NOINLINE XIP_BANNED static void cpu_flash_deep_sleep_and_recover()

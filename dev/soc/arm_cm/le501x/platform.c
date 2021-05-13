@@ -20,7 +20,6 @@
 #include "reg_syscfg.h"
 #include "lsecc.h"
 #include "lstrng.h"
-#include "lscrypt.h"
 #include "field_manipulate.h"
 #include "io_config.h"
 #include "ls_dbg.h"
@@ -283,7 +282,6 @@ static void module_init()
     INIT_BUILTIN_TIMER_ENV();
     HAL_PIS_Init();
     lsecc_init();
-    lscrypt_init();
     srand(get_trng_value());
     calc_acc_init();
     cpu_sleep_recover_init();

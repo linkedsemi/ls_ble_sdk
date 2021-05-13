@@ -18,7 +18,6 @@ if env['IC'] == 'le501x':
     'src/lsssi.c',
     'src/lstrng.c',
     'ecc/lsecc.c',
-    'crypt/lscrypt.c',
     'src/lsspi.c',
     'src/lspis.c',
 ]
@@ -38,7 +37,6 @@ if env['IC'] != 'taurus' and env['IC'] == 'le501x':
 
 inc = [
     'ecc',
-    'crypt',
     'api',
     'inc',
 ]
