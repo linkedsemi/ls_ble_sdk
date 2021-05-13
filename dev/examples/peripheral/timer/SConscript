@@ -1,8 +1,5 @@
 Import('app_build')
-src = [
-    'main.c'
-]
-inc = [
-    '.'
-]
-app_build('timer_test',src,inc)
+SConscript(dirs = 'Basic_TIM',exports=['app_build'])
+SConscript(dirs = 'Basic_PWM',exports=['app_build'])
+SConscript(dirs = 'DTC_PWM',exports=['app_build'])
+SConscript(dirs = 'Input_Capture',exports=['app_build'])
