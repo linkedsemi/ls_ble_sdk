@@ -18,18 +18,6 @@ static UART_HandleTypeDef UART_PDM_Config;
 static bool buf0_flag = false;
 static bool buf1_flag = false;
 
-///中断模式下收pdm数据完成回调函数
-void HAL_PDM_CpltCallback(PDM_HandleTypeDef *hpdm)
-{
-    LOG_I("%s",__FUNCTION__);
-    HAL_PDM_Transfer_Config_IT(&pdm,Buf0,Buf1,FRAME_BUF_SIZE);
-}
-
-void pdm_interrupt_test()
-{
-    HAL_PDM_Transfer_Config_IT(&pdm,Buf0,Buf1,FRAME_BUF_SIZE);
-}
-
 static void ls_pdm_uart_init(void)
 {
 
@@ -37,7 +25,7 @@ static void ls_pdm_uart_init(void)
     UART_PDM_Config.UARTX = UART1;
     UART_PDM_Config.DMAC_Instance = &dmac1_inst;
     UART_PDM_Config.Tx_Env.DMA.DMA_Channel = 3;
-    UART_PDM_Config.Init.BaudRate = UART_BAUDRATE_1000000;
+    UART_PDM_Config.Init.BaudRate = UART_BAUDRATE_500000;
     UART_PDM_Config.Init.MSBEN = 0;
     UART_PDM_Config.Init.Parity = UART_NOPARITY;
     UART_PDM_Config.Init.StopBits = UART_STOPBITS1;
@@ -45,7 +33,7 @@ static void ls_pdm_uart_init(void)
     HAL_UART_Init(&UART_PDM_Config);
 }
 
-///用户重定义的uart发送完成回调函数
+
 void HAL_UART_DMA_TxCpltCallback(UART_HandleTypeDef *huart)
 {
     LOG_I("uart send Done");
@@ -66,12 +54,12 @@ void HAL_PDM_DMA_CpltCallback(PDM_HandleTypeDef *hpdm,uint8_t buf_idx)
 void pdm_dma_test()
 {
     
-    pdm.DMAC_Instance = &dmac1_inst; //pdm的dma实例选择
-    pdm.Env.DMA.Channel[0] = 1; //dma通道选择
-    // pdm.Env.DMA.Channel[1] = 2; //dma通道选择,只有在配置立体声通道模式的时候才打开
+    pdm.DMAC_Instance = &dmac1_inst; 
+    pdm.Env.DMA.Channel[0] = 1; ///Configure the DMA channel to receive PDM data
+    // pdm.Env.DMA.Channel[1] = 2; ///Only when PDM_MODE_STEREO mode is configured will two DMA channels be used to receive PDM data
     pdm_data_receive.Bufptr[0] = Buf0;
     pdm_data_receive.Bufptr[1] = Buf1;
-    HAL_PDM_PingPong_Transfer_Config_DMA(&pdm,&pdm_data_receive,NULL,FRAME_BUF_SIZE);//dma配置，并把pdm的dma使能
+    HAL_PDM_PingPong_Transfer_Config_DMA(&pdm,&pdm_data_receive,NULL,FRAME_BUF_SIZE); ///DMA receives PDM data streams in Ping-Pong mode
     HAL_PDM_Start(&pdm);
 }
 
@@ -97,11 +85,10 @@ void pdm_init()
 int main()
 {
     sys_init_app();   
-    DMA_CONTROLLER_INIT(dmac1_inst); //dma对象初始化
+    DMA_CONTROLLER_INIT(dmac1_inst);
     ls_pdm_uart_init();
     pdm_init();
-    // pdm_interrupt_test(); //在中断方式收pdm数据
-    pdm_dma_test(); //在dma模式下收pdm数据
+    pdm_dma_test(); 
     while(1)
     {
         if(buf0_flag)
