@@ -26,7 +26,7 @@ typedef struct
     volatile uint32_t RES3;
     volatile uint32_t CR;
     volatile uint32_t SR;
-    volatile uint32_t ICRF;
+    volatile uint32_t ICFR;
     volatile uint32_t FIFO;
 }reg_crypt_t;
 
@@ -190,7 +190,7 @@ enum CRYPT_REG_SR_FIELD
     CRYPT_DONE_POS = 8,
 };
 
-enum CRYPT_REG_ICRF_FIELD
+enum CRYPT_REG_ICFR_FIELD
 {
     CRYPT_AESIF_MASK = 0x1,
     CRYPT_AESIF_POS = 0,

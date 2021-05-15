@@ -41,4 +41,7 @@
 #define LSTRNG_BASE_ADDR (0x40001c00)
 
 #define LSPIS_BASE_ADDR (0x40014800)
+
+#define LSCRYPT_BASE_ADDR (0x40002800)
+
 #endif

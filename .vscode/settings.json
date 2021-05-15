@@ -54,7 +54,9 @@
         "ll_evt.h": "c",
         "swint_call_asm.h": "c",
         "taurus.h": "c",
-        "adc_msp.h": "c"
+        "adc_msp.h": "c",
+        "lscrypt_msp.h": "c",
+        "lscrypt.h": "c"
     },
     "editor.detectIndentation": false,
     "restructuredtext.confPath": "${workspaceFolder}\\doc",

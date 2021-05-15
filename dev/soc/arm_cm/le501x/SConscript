@@ -23,6 +23,7 @@ src = [
     'integration/ssi_msp.c',
     'integration/trng_msp.c',
     'integration/lspis_msp.c',
+    'integration/lscrypt_msp.c',
     'sleep.c',
     'sys_stat.c',
 ]
