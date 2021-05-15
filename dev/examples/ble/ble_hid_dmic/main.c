@@ -1367,8 +1367,12 @@ static void prf_hid_server_callback(enum hid_evt_type type, union hid_evt_u *evt
     switch (type)
     {
     case HID_REPORT_READ:
-        evt->read_report_req.value = (uint8_t *)hid_report_map;
-        evt->read_report_req.length = HID_REPORT_MAP_LEN;
+        evt->read_report_req.length = 0;  
+        if(evt->read_report_req.type == APP_HOGPD_REPORT_MAP)
+        {
+            evt->read_report_req.value = (uint8_t *)hid_report_map;
+            evt->read_report_req.length = HID_REPORT_MAP_LEN;
+        }
         break;
     case HID_NTF_CFG:
         LOG_I("hid_ntf_cfg save flash record_key1 : %x",evt->ntf_cfg.value);

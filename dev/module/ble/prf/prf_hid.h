@@ -61,10 +61,30 @@ enum hid_evt_type
     HID_REPORT_WRITE,
 };
 
+enum app_hogpd_report_type
+{
+    /// The Report characteristic is used to exchange data between a HID Device and a HID Host.
+    APP_HOGPD_REPORT,
+    /// The Report Map characteristic
+    APP_HOGPD_REPORT_MAP,
+    /// Boot Keyboard Input Report
+    APP_HOGPD_BOOT_KEYBOARD_INPUT_REPORT,
+    /// Boot Keyboard Output Report
+    APP_HOGPD_BOOT_KEYBOARD_OUTPUT_REPORT,
+    /// Boot Mouse Input Report
+    APP_HOGPD_BOOT_MOUSE_INPUT_REPORT,
+};
+
 struct hid_read_report_req_evt
 {
     uint16_t length;
     uint8_t* value;
+    /// HIDS Instance
+    uint8_t  hid_idx;
+    /// type of report (@see enum app_hogpd_report_type)
+    uint8_t  type;
+    /// Report Instance - 0 for boot reports and report map
+    uint8_t  idx;
 };
 
 struct hid_write_report_req_evt
