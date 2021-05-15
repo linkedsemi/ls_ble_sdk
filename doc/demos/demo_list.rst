@@ -12,3 +12,4 @@
    rtc_example
    gpio_example
    pdm_example
+   spi_example
