@@ -13,7 +13,7 @@ ADC是Analog-to-Digital Converter的缩写。指模/数转换器或者模拟/数
 
     调用IO 的初始化接口，可以配置具体的IO的ADC模拟功能。
 
-.. code:: c
+.. code :: 
 
    void adc12b_in0_io_init(void);
    void adc12b_in1_io_init(void);
@@ -25,7 +25,7 @@ ADC是Analog-to-Digital Converter的缩写。指模/数转换器或者模拟/数
    void adc12b_in7_io_init(void);
    void adc12b_in8_io_init(void);
 
-.. note::
+.. note ::
 
     每一个ADC的通道都有其对应的IO，不可随意映射。具体的对应关系如下：
 
@@ -58,7 +58,7 @@ ADC是Analog-to-Digital Converter的缩写。指模/数转换器或者模拟/数
 
 设置ADC模块的参数变量，其结构体的参数原型如下：
 
-.. code:: c
+.. code :: 
 
     /**
       * @struct __ADC_HandleTypeDef
@@ -118,7 +118,7 @@ ADC是Analog-to-Digital Converter的缩写。指模/数转换器或者模拟/数
 
        设置读取ADC数据的变量(单次转换)
 
-       .. code:: c
+       .. code :: 
 
           /**
             * @struct AdcInterruptEnv
@@ -132,7 +132,8 @@ ADC是Analog-to-Digital Converter的缩写。指模/数转换器或者模拟/数
 
 1.2.1ADC初始化
 +++++++++++++++++
-.. code:: c
+
+   .. code :: 
 
     /** 
       * @struct  ADC_InitTypeDef
@@ -152,7 +153,7 @@ ADC是Analog-to-Digital Converter的缩写。指模/数转换器或者模拟/数
         FunctionalState DiscontinuousConvMode; 
         uint32_t NbrOfDiscConversion;        
         uint32_t TrigType;  
-        uint32_t VrefType;
+        uint32_t Vref;
         uint32_t AdcDriveType;
         uint32_t AdcCkDiv;
     } ADC_InitTypeDef;
@@ -186,15 +187,13 @@ ADC是Analog-to-Digital Converter的缩写。指模/数转换器或者模拟/数
  
         ..
  
-           规则组序列转换或注入组序列转换的条件下需要使能
- 
-           序列连续转换模式
- 
-           序列间断转换模式
- 
-           参数：NbrOfConversion有效
- 
-           参数：NbrOfDiscConversion有效
+           会扫描所有规则通道。
+
+           与ContinuousConvMode的联动：
+
+           使能ContinuousConvMode，会连续采集所有通道，从rank1开始扫描，到最后一个rank。
+
+           禁止ContinuousConvMode，只会扫描一轮，从rank1开始扫描，到最后一个rank。
  
 （3） 连续转换模式(ContinuousConvMode)
  
@@ -208,7 +207,7 @@ ADC是Analog-to-Digital Converter的缩写。指模/数转换器或者模拟/数
  
         ..
  
-           连续多通道转换
+           连续多通道转换，与NbrOfConversion相对应。
  
 （4） 连续转换的次数(NbrOfConversion)
  
@@ -222,44 +221,225 @@ ADC是Analog-to-Digital Converter的缩写。指模/数转换器或者模拟/数
  
         -  规则组子序列转换
  
-        -  参数：ScanConvMode 必须使能
+        -  参数：ScanConvMode 必须禁止
  
         -  参数：ContinuousConvMode 必须禁止
+  
+        -  具体每次采集的个数与(NbrOfDiscConversion)相对应。
  
 （6） 间断转换的次数(NbrOfDiscConversion)
  
         -  规则组转换子序列数
  
-        -  转换次数范围：≤9
+        -  转换次数范围：≤8
  
         -  参数：DiscontinuousConvMode 必须使能
  
 （7） 触发转换的方式(TrigType)
  
-        -  规则组转换的触发方式
+============================= =============================
+触发转换的方式                  TrigType
+============================= =============================
+PIS                            ADC_PIS_TRIG 
+软件规则组触发                  ADC_REGULAR_SOFTWARE_TRIGT
+软件注入组触发                  ADC_INJECTED_SOFTWARE_TRIGT
+============================= =============================
  
-        -  注入组转换的触发方式
+（8） 选择参考电压(Vref)
+
+============================= =============================
+选择参考电压                    Vref
+============================= =============================
+默认芯片内部1.4V为参考电压        ADC_VREF_INSIDE 
+PA05输入参考电压                 ADC_VREF_EXPOWER
+芯片工作电压AVDD为参考电压        ADC_VREF_VCC
+============================= =============================
  
-（8） 选择参考电压(VrefType)
- 
-        -  默认芯片内部1.4V为参考电压
- 
-        -  GPIO输入参考电压
- 
-        -  芯片工作电压AVDD为参考电压
+.. NOTE :: 
+
+   当选择外部IO 为参考电压的时候，需要特殊配置PA05。
  
 （9） ADC通道的驱动方式(AdcDriveType)
  
-        -  输入信号经过输入buf运放驱动ADC
- 
-        -  输入信号1/3分压，并经过输入buf运放驱动ADC
- 
-        -  默认关闭输入buf运放，输入信号直接驱动ADC
+========================================= =============================
+ADC通道的驱动方式                           AdcDriveType
+========================================= =============================
+输入信号经过输入buf运放驱动ADC               EINBUF_DRIVE_ADC 
+输入信号1/3分压，并经过输入buf运放驱动ADC     INRES_ONETHIRD_EINBUF_DRIVE_ADC
+默认关闭输入buf运放，输入信号直接驱动ADC      BINBUF_DIRECT_DRIVE_ADC
+========================================= =============================
  
 （10） ADC时钟分频系数(AdcCkDiv)
  
-        -  系统时钟按AdcCkDiv分频获得ADC运行时钟
+        -  系统时钟按AdcCkDiv分频获得ADC运行时钟，默认ADC时钟为APBCLK的32分频，可以选择。
 
+    .. code ::
+
+            #define ADC_CLOCK_DIV2          0x00000001U                 
+            #define ADC_CLOCK_DIV4          0x00000002U                 
+            #define ADC_CLOCK_DIV8          0x00000003U                 
+            #define ADC_CLOCK_DIV16         0x00000004U               
+            #define ADC_CLOCK_DIV32         0x00000005U                 
+            #define ADC_CLOCK_DIV64         0x00000006U                 
+            #define ADC_CLOCK_DIV128        0x00000007U  
+
+
+1.2.2 ADC采集通道的初始化
+++++++++++++++++++++++++++
+
+规则组转换参数配置
+^^^^^^^^^^^^^^^^^^
+
+   .. code :: 
+
+    /** 
+    * @struct ADC_ChannelConfTypeDef
+    * @brief  Structure definition of ADC channel for regular group   
+    * @note   The setting of these parameters with function HAL_ADC_ConfigChannel() is conditioned to ADC state.
+    *         ADC can be either disabled or enabled without conversion on going on regular group.
+    */
+    typedef struct
+    {
+      uint32_t    Channel;      
+      uint32_t    Rank;        
+      uint32_t    SamplingTime; 
+    } ADC_ChannelConfTypeDef;
+ 
+ -  参数说明
+ 
+ 1. 规则通道( Channel)
+ 
+       -  采样通道说明：
+ 
+    .. code :: 
+ 
+       #define ADC_CHANNEL_0               0x00000000U
+       #define ADC_CHANNEL_1               0x00000001U
+       #define ADC_CHANNEL_2               0x00000002U
+       #define ADC_CHANNEL_3               0x00000003U
+       #define ADC_CHANNEL_4               0x00000004U
+       #define ADC_CHANNEL_5               0x00000005U
+       #define ADC_CHANNEL_6               0x00000006U
+       #define ADC_CHANNEL_7               0x00000007U
+       #define ADC_CHANNEL_8               0x00000008U
+       #define ADC_CHANNEL_TEMPSENSOR      0x00000009U      /* ADC internal channel (no connection on device pin) */
+       #define ADC_CHANNEL_VBAT            0x0000000AU      /* ADC internal channel (no connection on device pin) */
+       #define ADC_CHANNEL_VREFINT         0x0000000BU      /* ADC internal channel (no connection on device pin) */
+ 
+ 2. 规则转换序列(Rank)
+ 
+       -  规则组序列说明：
+ 
+    .. code :: 
+ 
+       #define ADC_REGULAR_RANK_1          0x00000001U
+       #define ADC_REGULAR_RANK_2          0x00000002U
+       #define ADC_REGULAR_RANK_3          0x00000003U
+       #define ADC_REGULAR_RANK_4          0x00000004U
+       #define ADC_REGULAR_RANK_5          0x00000005U
+       #define ADC_REGULAR_RANK_6          0x00000006U
+       #define ADC_REGULAR_RANK_7          0x00000007U
+       #define ADC_REGULAR_RANK_8          0x00000008U
+       #define ADC_REGULAR_RANK_9          0x00000009U
+       #define ADC_REGULAR_RANK_10         0x0000000AU
+       #define ADC_REGULAR_RANK_11         0x0000000BU
+       #define ADC_REGULAR_RANK_12         0x0000000CU
+ 
+ 3. 规则转换采样周期(SamplingTime)
+ 
+       -  采样周期说明：
+ 
+    .. code :: 
+ 
+       #define ADC_SAMPLETIME_1CYCLE        0x00000000U                 /*!< Sampling time 1 ADC clock cycle */
+       #define ADC_SAMPLETIME_2CYCLES       0x00000001U                 /*!< Sampling time 2 ADC clock cycles */
+       #define ADC_SAMPLETIME_4CYCLES       0x00000002U                 /*!< Sampling time 4 ADC clock cycles */
+       #define ADC_SAMPLETIME_15CYCLES      0x00000003U                 /*!< Sampling time 15 ADC clock cycles */
+ 
+ -  ADC 规则转换API函数
+ 
+.. code :: 
+ 
+    HAL_StatusTypeDef HAL_ADC_ConfigChannel(ADC_HandleTypeDef *hadc, ADC_ChannelConfTypeDef *sConfig);
+
+注入组转换参数配置
+^^^^^^^^^^^^^^^^^^
+
+   .. code :: 
+
+    /** 
+      * @struct ADC_InjectionConfTypeDef
+      * @brief  ADC Configuration injected Channel structure definition
+      * @note   Parameters of this structure are shared within 2 scopes:
+      *          - Scope channel: InjectedChannel, InjectedRank, InjectedSamplingTime, InjectedOffset
+      *          - Scope injected group (affects all channels of injected group): InjectedNbrOfConversion, InjectedDiscontinuousConvMode,
+      *            AutoInjectedConv, ExternalTrigInjecConv.
+      */
+    typedef struct 
+    {
+      uint32_t InjectedChannel;                                                      
+      uint32_t InjectedRank;                         
+      uint32_t InjectedSamplingTime;                 
+      uint32_t InjectedOffset;                       
+      uint32_t InjectedNbrOfConversion;               
+      FunctionalState InjectedDiscontinuousConvMode; 
+      FunctionalState AutoInjectedConv;               
+    }ADC_InjectionConfTypeDef;
+ 
+ -  参数说明：
+ 
+ 1. 注入通道(InjectedChannel)
+ 
+       与规则通道一致，请参考规则通道
+ 
+ 2. 注入转换序列(Rank)
+ 
+       注入组序列说明：
+ 
+    .. code :: 
+ 
+       #define ADC_INJECTED_RANK_1                0x00000001U
+       #define ADC_INJECTED_RANK_2                0x00000002U
+       #define ADC_INJECTED_RANK_3                0x00000003U
+       #define ADC_INJECTED_RANK_4                0x00000004U
+ 
+ 3. 注入转换采样周期(SamplingTime)
+ 
+       与规则转换采样周期一致 请参考规则转换采样周期
+ 
+ 4. 注入转换数据偏移量(InjectedOffset)
+ 
+       -  该偏移量为有符号数，其中bit11表示符号位
+ 
+       -  注入组转换数据寄存器((ADC_JDRx)： *Raw Converted Data +
+          JnjectOffset*
+ 
+ 5. 注入转换的次数(InjectedNbrOfConversion)
+ 
+       -  注入转换序列子序列数
+ 
+       -  范围：1～4
+ 
+       -  参数：ScanConvMode 必须使能。
+ 
+ 6. 注入序列间断转换模式(InjectedDiscontinuousConvMode)
+ 
+       -  参数：ScanConvMode 必须禁止
+ 
+       -  参数：ContinuousConvMode 必须禁止
+ 
+ 7. 自动注入转换模式（AutoInjectedConv）
+ 
+       -  参数：DiscontinuousConvMode 必须禁止
+ 
+       -  参数：InjectedDiscontinuousConvMode必须禁止
+ 
+ -  ADC注入转换API函数
+ 
+ .. code :: 
+ 
+    HAL_StatusTypeDef  HAL_ADCEx_InjectedConfigChannel(ADC_HandleTypeDef* hadc,ADC_InjectionConfTypeDef* sConfigInjected);
+ 
 
 1.3 初始化ADC模块
 ..................
