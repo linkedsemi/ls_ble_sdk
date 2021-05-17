@@ -52,17 +52,23 @@ struct ll_ext_scan_env
     struct ll_evt second_evt;
     struct prim_scan_rx_env *prim_rx;
     struct co_list second_scan;
-    timer_t duration;
-    timer_t period;
-    struct conn_req_data_env conn_req_data;
-    struct ext_scan_param scan_param;
-    struct ext_create_con_param init_param;
-    bool duration_timeout;
+    union{
+        struct {
+            timer_t duration;
+            timer_t period;
+            struct ext_scan_param param;
+            bool duration_timeout;
+            uint8_t scan_rsp_receiving;
+            uint8_t scan_rsp_pdu_type;
+            uint8_t filter_dup;
+        }scan;
+        struct {
+            struct conn_req_data_env conn_req_data;
+            struct ext_create_con_param param;
+            uint8_t conn_req_sent;
+        }init;
+    }u;
     uint8_t current_phy_idx;
-    uint8_t scan_rsp_receiving;
-    uint8_t scan_rsp_pdu_type;
-    uint8_t conn_req_sent;
-    uint8_t filter_dup;
     uint8_t scanning;
     uint8_t initiating;
 };
