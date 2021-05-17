@@ -176,6 +176,8 @@ static void sw_timer_buf_init()
 
 void ll_buf_init()
 {
+    adv_sets_ptr = adv_sets;
+    adv_sets_num = ADV_SETS_NUM;
     adv_report_cache_init();
     hci_acl_data_rx_buf_init();
     rx_buf_list_init();
