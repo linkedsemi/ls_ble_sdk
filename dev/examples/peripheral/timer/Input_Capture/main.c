@@ -58,9 +58,9 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
     {
         io_toggle_pin(PA01);
         // clear timer counts
-        __HAL_TIM_SET_COUNTER(htim, 0); 
         TIM_ICUserValueStructure.usPeriod = 0;
         TIM_ICUserValueStructure.usCtr = 0;
+        TIM_ICUserValueStructure.usCtr = HAL_TIM_ReadCapturedValue(&TimHandle, TIM_CHANNEL_1);
 
         // Configure the input capture parameters, modify the trigger level
         IC_Config.ICPolarity = TIM_INPUTCHANNELPOLARITY_FALLING;
@@ -78,7 +78,7 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
     {
         io_toggle_pin(PA01);
         // get timer counter
-        TIM_ICUserValueStructure.usCtr = HAL_TIM_ReadCapturedValue(&TimHandle, TIM_CHANNEL_1);
+        TIM_ICUserValueStructure.usCtr = HAL_TIM_ReadCapturedValue(&TimHandle, TIM_CHANNEL_1) - TIM_ICUserValueStructure.usCtr + TIM_ICUserValueStructure .usPeriod*65535;
         // Configure the input capture parameters, modify the trigger level
         IC_Config.ICPolarity = TIM_INPUTCHANNELPOLARITY_RISING;
         IC_Config.ICSelection = TIM_ICSELECTION_DIRECTTI;
@@ -92,7 +92,7 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
         HAL_TIM_IC_Start_IT(&TimHandle, TIM_CHANNEL_1);
         TIM_ICUserValueStructure.ucStartFlag = 0;
 
-        // LOG_I("IC Time:%d us",TIM_ICUserValueStructure .usPeriod*65535+TIM_ICUserValueStructure.usCtr);
+        LOG_I("IC Time:%d us",TIM_ICUserValueStructure.usCtr);
     }
 }
 
