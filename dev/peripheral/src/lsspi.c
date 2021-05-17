@@ -423,10 +423,7 @@ HAL_StatusTypeDef HAL_SPI_Receive(SPI_HandleTypeDef *hspi, uint8_t *pData, uint1
   hspi->pRxBuffPtr  = (uint8_t *)pData;
   hspi->RxXferSize  = Size;
   hspi->RxXferCount = Size;
-  if(hspi->RxXferCount>1)
-  {
-    REG_FIELD_WR(hspi->Instance->CR2,SPI_CR2_RXFTH, 0x07);
-  }
+
   /*Init field not used in handle to zero */
   hspi->pTxBuffPtr  = (uint8_t *)NULL;
   hspi->TxXferSize  = 0U;
@@ -448,7 +445,26 @@ HAL_StatusTypeDef HAL_SPI_Receive(SPI_HandleTypeDef *hspi, uint8_t *pData, uint1
   }
 
   /* Receive data in 8 Bit mode */
-  if (hspi->Init.DataSize == SPI_DATASIZE_16BIT)
+  if (hspi->Init.DataSize == SPI_DATASIZE_8BIT)
+  {
+    /* Transfer loop */
+    while (hspi->RxXferCount > 0U)
+    {
+      /* Check the RXNE flag */
+     if(systick_poll_timeout(tickstart,timeout,spi_flag_poll,hspi,SPI_FLAG_RXNE))
+      {
+          errorcode = HAL_TIMEOUT;
+          goto error;
+      }
+      else
+      {
+        (* (uint8_t *)hspi->pRxBuffPtr) = hspi->Instance->DR;
+        hspi->pRxBuffPtr += sizeof(uint8_t);
+        hspi->RxXferCount--;
+      }
+    }
+  }
+  else
   {
     /* Transfer loop */
     while (hspi->RxXferCount > 0U)
@@ -464,25 +480,6 @@ HAL_StatusTypeDef HAL_SPI_Receive(SPI_HandleTypeDef *hspi, uint8_t *pData, uint1
           /* read the received data */
         (* (uint16_t *)hspi->pRxBuffPtr) = hspi->Instance->DR;
         hspi->pRxBuffPtr += sizeof(uint16_t);
-        hspi->RxXferCount--;
-      }
-    }
-  }
-  else
-  {
-    /* Transfer loop */
-    while (hspi->RxXferCount > 0U)
-    {
-      /* Check the RXNE flag */
-     if(systick_poll_timeout(tickstart,timeout,spi_flag_poll,hspi,SPI_FLAG_RXNE))
-      {
-          errorcode = HAL_TIMEOUT;
-          goto error;
-      }
-      else
-      {
-        (* (uint8_t *)hspi->pRxBuffPtr) = hspi->Instance->DR;
-        hspi->pRxBuffPtr += sizeof(uint8_t);
         hspi->RxXferCount--;
       }
     }

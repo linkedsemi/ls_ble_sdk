@@ -52,7 +52,7 @@ enum {
 SPI_HandleTypeDef SpiHandle;
 
 /* Buffer used for transmission */
-uint8_t aTxBuffer[] = "****SPI - Two Boards communication based on Polling ";
+uint8_t aTxBuffer[] = "****SPI - Two Boards communication based on IT ";
 
 /* Buffer used for reception */
 uint8_t aRxBuffer[BUFFERSIZE];
