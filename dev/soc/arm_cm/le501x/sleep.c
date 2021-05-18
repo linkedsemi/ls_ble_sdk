@@ -184,11 +184,13 @@ static void lvl2_lvl3_io_retention(reg_lsgpio_t *gpiox)
     uint16_t ie = gpiox->IE;
     uint16_t dout = gpiox->DOUT;
     uint32_t pull = 0;
+    uint32_t mask = 0;
     uint8_t i;
     for(i=0;i<16;++i)
     {
         if(1<<i & oe)
         {
+            mask |= 3<<(2*i);
             if(1<<i & dout)
             {
                 pull |= IO_PULL_UP <<(2*i);
@@ -198,10 +200,11 @@ static void lvl2_lvl3_io_retention(reg_lsgpio_t *gpiox)
             }
         }else if((1<<i & ie)==0)
         {
+            mask |= 3<<(2*i);
             pull |= IO_PULL_DOWN << (2*i);
         }
     }
-    gpiox->PUPD = pull;
+    gpiox->PUPD = gpiox->PUPD & ~mask | pull;
 }
 
 void ble_wkup_status_set(bool status)
