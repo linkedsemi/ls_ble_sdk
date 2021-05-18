@@ -1,7 +1,8 @@
 PROJECT_NAME           = LS_SDK_API
 
 INPUT                  = ..\dev\peripheral\api\spi_flash.h \
-                         ..\dev\peripheral\api\lscrypt.h
+                         ..\dev\peripheral\api\lscrypt.h \
+                         ..\dev\peripheral\api\lsssi.h
                          
 
 GENERATE_XML           = YES
@@ -15,3 +16,5 @@ HTML_OUTPUT            = _build/doxyhtml
 GENERATE_LATEX         = NO
 
 WARN_IF_UNDOCUMENTED   = NO
+
+OPTIMIZE_OUTPUT_FOR_C  = YES

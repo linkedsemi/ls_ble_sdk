@@ -14,8 +14,8 @@
  *  @{
  */
 
+#ifdef LSCRYPT_BASE_ADDR
 /// LSCRYPT Macro for Register Access
-#ifndef LSCRYPT
 #define LSCRYPT ((reg_crypt_t *)LSCRYPT_BASE_ADDR)
 #endif
 
@@ -112,7 +112,7 @@ HAL_StatusTypeDef HAL_LSCRYPT_AES_CBC_Encrypt_IT(uint32_t iv[4],uint8_t *plainte
  */
 HAL_StatusTypeDef HAL_LSCRYPT_AES_CBC_Decrypt_IT(uint32_t iv[4],uint8_t *ciphertext,uint32_t length,uint8_t *plaintext);
 
-/** The callback function that will be invoked in the interrupt context when AES operation is complete.
+/** Callback function that will be invoked in the interrupt context when AES operation is complete.
  *  Overwrite this function to get notification of completion of AES operation.
  *  \param Encrypt the complete operation is Encryption if ture else Decryption
  *  \param CBC the block cipher mode of the complete operation is CBC if true else ECB
