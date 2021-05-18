@@ -5,3 +5,4 @@ PERIPHERAL API
     
     spi_flash
     gpio
+    lscrypt
