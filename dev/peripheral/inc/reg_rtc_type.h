@@ -18,6 +18,8 @@ typedef struct
     volatile uint32_t RIF;
     volatile uint32_t IFM;
     volatile uint32_t ICR;
+    volatile uint32_t reserved0;
+    volatile uint32_t reserved1;
     volatile uint32_t STA;
     volatile uint32_t BKEN;
 }reg_rtc_t;

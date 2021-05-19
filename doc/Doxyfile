@@ -3,7 +3,8 @@ PROJECT_NAME           = LS_SDK_API
 INPUT                  = ..\dev\peripheral\api\spi_flash.h \
                          ..\dev\peripheral\api\lscrypt.h \
                          ..\dev\peripheral\api\lsssi.h \
-                         ..\dev\peripheral\api\lspdm.h
+                         ..\dev\peripheral\api\lspdm.h \
+                         ..\dev\peripheral\api\lsrtc.h
                          
 
 GENERATE_XML           = YES

@@ -8,3 +8,4 @@ PERIPHERAL API
     lscrypt
     lsssi
     lspdm
+    lsrtc

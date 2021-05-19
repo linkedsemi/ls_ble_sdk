@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include "platform.h"
 #include "lsrtc.h"
 #include "rtc_msp.h" 
 #include "HAL_def.h"
@@ -52,20 +53,15 @@ void RTC_CalendarSet(calendar_cal_t *calendar_cal,calendar_time_t *calendar_time
 HAL_StatusTypeDef RTC_CalendarGet(calendar_cal_t *calendar_cal, calendar_time_t *calendar_time)
 {
     HAL_StatusTypeDef result = HAL_OK;
-    if(!REG_FIELD_RD(RTC->STA,RTC_STA_EMPTY))
-    {
-        calendar_cal->year  = REG_FIELD_RD(RTC->CAL,RTC_CAL_YEAR_T)*10 + REG_FIELD_RD(RTC->CAL,RTC_CAL_YEAR_U);
-        calendar_cal->mon   = REG_FIELD_RD(RTC->CAL,RTC_CAL_MON_T)*10 + REG_FIELD_RD(RTC->CAL,RTC_CAL_MON_U); 
-        calendar_cal->date  = REG_FIELD_RD(RTC->CAL,RTC_CAL_DATE_T)*10 + REG_FIELD_RD(RTC->CAL,RTC_CAL_DATE_U);     
-        calendar_time->week = REG_FIELD_RD(RTC->TIME,RTC_TIME_WEEK);
-        calendar_time->hour = REG_FIELD_RD(RTC->TIME,RTC_TIME_HOUR_T)*10 + REG_FIELD_RD(RTC->TIME,RTC_TIME_HOUR_U); 
-        calendar_time->min  = REG_FIELD_RD(RTC->TIME,RTC_TIME_MIN_T)*10 + REG_FIELD_RD(RTC->TIME,RTC_TIME_MIN_U);     
-        calendar_time->sec  = REG_FIELD_RD(RTC->TIME,RTC_TIME_SEC_T)*10 + REG_FIELD_RD(RTC->TIME,RTC_TIME_SEC_U);
-    }
-    else
-    {
-        result = HAL_STATE_ERROR;
-    }
+    REG_FIELD_WR(RTC->BKEN, RTC_BKEN_BKEN, 1); // set bken to update data immediately
+    DELAY_US(1);
+    calendar_cal->year  = REG_FIELD_RD(RTC->CAL,RTC_CAL_YEAR_T)*10 + REG_FIELD_RD(RTC->CAL,RTC_CAL_YEAR_U);
+    calendar_cal->mon   = REG_FIELD_RD(RTC->CAL,RTC_CAL_MON_T)*10 + REG_FIELD_RD(RTC->CAL,RTC_CAL_MON_U); 
+    calendar_cal->date  = REG_FIELD_RD(RTC->CAL,RTC_CAL_DATE_T)*10 + REG_FIELD_RD(RTC->CAL,RTC_CAL_DATE_U);     
+    calendar_time->week = REG_FIELD_RD(RTC->TIME,RTC_TIME_WEEK);
+    calendar_time->hour = REG_FIELD_RD(RTC->TIME,RTC_TIME_HOUR_T)*10 + REG_FIELD_RD(RTC->TIME,RTC_TIME_HOUR_U); 
+    calendar_time->min  = REG_FIELD_RD(RTC->TIME,RTC_TIME_MIN_T)*10 + REG_FIELD_RD(RTC->TIME,RTC_TIME_MIN_U);     
+    calendar_time->sec  = REG_FIELD_RD(RTC->TIME,RTC_TIME_SEC_T)*10 + REG_FIELD_RD(RTC->TIME,RTC_TIME_SEC_U);
     
     return result;
 }
@@ -77,5 +73,4 @@ void RTC_wkuptime_set(uint32_t second)
     REG_FIELD_WR(RTC->WKUP, RTC_WKUP_WKSEL, WKSEL_START_WAKEUP);
     REG_FIELD_WR(RTC->CTRL, RTC_CTRL_RTCEN, 1);
 }
-
 __attribute__((weak)) void rtc_wkup_callback(void){}
