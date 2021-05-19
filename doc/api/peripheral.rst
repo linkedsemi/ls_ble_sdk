@@ -7,3 +7,4 @@ PERIPHERAL API
     gpio
     lscrypt
     lsssi
+    lspdm

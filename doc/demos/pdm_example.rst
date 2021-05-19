@@ -10,7 +10,7 @@ PDM使用示例
 
  | 1. 包含io_config和lsuart头文件。
  | 2. 定义UART句柄，并调用HAL_UART_Init初始化函数。通过DMA搬运数据到串口助手上时，需要在uart初始化的时候同时配置uart所使用的dma对象和dma通道。
- | 3. 默认使用UART1并把PB00、PB01作为通讯串口，其中PB00为模块的TX，PB01为模块的RX，默认的uart口的配置参数为： 波特率 1000000、无校验、8位数据位、1位停止位。
+ | 3. 默认使用UART1并把PB00、PB01作为通讯串口，其中PB00为模块的TX，PB01为模块的RX，默认的uart口的配置参数为： 波特率 500000、无校验、8位数据位、1位停止位。
 
 .. code ::
 
@@ -23,7 +23,7 @@ PDM使用示例
 		UART_PDM_Config.UARTX = UART1;
 		UART_PDM_Config.DMAC_Instance = &dmac1_inst; //uart选择的dma对象
 		UART_PDM_Config.Tx_Env.DMA.DMA_Channel = 3; //uart选择的dma通道号
-		UART_PDM_Config.Init.BaudRate = UART_BAUDRATE_1000000;
+		UART_PDM_Config.Init.BaudRate = UART_BAUDRATE_500000;
 		UART_PDM_Config.Init.MSBEN = 0;
 		UART_PDM_Config.Init.Parity = UART_NOPARITY;
 		UART_PDM_Config.Init.StopBits = UART_STOPBITS1;
@@ -109,7 +109,7 @@ DMA对象初始化。
  | 1. 将编译好的程序下载到测试的模块中。
  | 2. 将芯片的uart接口（程序中设置的IO是PB00(TX) PB01(RX)）接到串口转接板的RX/TX上。同时两者的地线要接到一起。
  | 3. 将DMIC的clock引脚接PB10、outdata引脚接PB09、LR引脚接vdd或地线、GND引脚接地线、VDD引脚接电源vdd引脚。
- | 4. 打开电脑端的串口调试工具，设置波特率为：1000000 数据位：8 停止位：1 奇偶校验位：null。 
+ | 4. 打开电脑端的串口调试工具，设置波特率为：500000 数据位：8 停止位：1 奇偶校验位：null。 
  | 5. 打开串口就可以看到串口助手上显示的语音数据，预期结果如下图所示。
 
 ..  image:: pdm_data.png
