@@ -6,6 +6,7 @@
 #include "sdk_config.h"
 #include "reg_base_addr.h"
 
+/// LSUART Macro for Register Access
 #ifdef UART1_BASE_ADDR
 #define UART1 ((reg_uart_t *)UART1_BASE_ADDR)
 #endif
@@ -22,9 +23,22 @@
 #define UART_CLOCK   (SDK_PCLK_MHZ*1000000)
 
 #endif 
-
+/// Baud rate calculation
 #define UART_BUADRATE_ENUM_GEN(BAUD)  ((((UART_CLOCK<<4)/BAUD) +8)>>4)
 
+#define UART_NOPARITY       0x0     /// Parity diable
+#define UART_ODDPARITY      0x1     /// Parity Odd
+#define UART_EVENPARITY     0x3     /// Parity Even
+
+#define UART_BYTESIZE5      0X0     /// Byte size 5 bits
+#define UART_BYTESIZE6      0X1     /// Byte size 6 bits
+#define UART_BYTESIZE7      0X2     /// Byte size 7 bits
+#define UART_BYTESIZE8      0X3     /// Byte size 8 bits
+
+#define UART_STOPBITS1      0x0     /// Stop 1 bits
+#define UART_STOPBITS2      0x1     /// Stop 2 bits
+
+/// Baud rate setting
 typedef enum
 {
     UART_BAUDRATE_1200   = UART_BUADRATE_ENUM_GEN(1200),
@@ -48,7 +62,6 @@ typedef enum
     UART_BAUDRATE_2000000= UART_BUADRATE_ENUM_GEN(2000000),
 }app_uart_baudrate_t;
 
-
 /** @defgroup UART_Exported_Types UART Exported Types
   * @{
   */
@@ -58,23 +71,13 @@ typedef enum
   */
 typedef struct
 {
-    app_uart_baudrate_t BaudRate;                  /*!< This member configures the UART communication baud rate.*/
+    app_uart_baudrate_t BaudRate;
 
-    uint8_t     WordLength:2,                /*!< Specifies the number of data bits transmitted or received in a frame.
-                                                  This parameter can be a value of @ref UART_Word_Length */
-
-               StopBits:1,                  /*!< Specifies the number of stop bits transmitted.
-                                           This parameter can be a value of @ref UART_Stop_Bits */
-
-               Parity:2,                    /*!< Specifies the parity mode.
-                                           This parameter can be a value of @ref UART_Parity
-                                           @note When parity is enabled, the computed parity is inserted
-                                                 at the MSB position of the transmitted data (9th bit when
-                                                 the word length is set to 9 data bits; 8th bit when the
-                                                 word length is set to 8 data bits). */
-               MSBEN:1,
-               HwFlowCtl:1;                 /*!< Specifies whether the hardware flow control mode is enabled or disabled.
-                                                 This parameter can be a value of @ref UART_Hardware_Flow_Control */
+    uint8_t     WordLength:2, /*!< config uart byte size */
+               StopBits:1,    /*!< config uart stop bits */
+               Parity:2,      /*!< config uart parity type */
+               MSBEN:1,       /*!< config uart msb or lsb */
+               HwFlowCtl:1;   /*!< Specifies whether the hardware flow control mode is enabled or disabled. */             
 } UART_InitTypeDef;
 
 /**
@@ -82,39 +85,6 @@ typedef struct
   * @note  HAL UART State value is a combination of 2 different substates: gState and RxState.
   *        - gState contains UART state information related to global Handle management
   *          and also information related to Tx operations.
-  *          gState value coding follow below described bitmap :
-  *          b7-b6  Error information
-  *             00 : No Error
-  *             01 : (Not Used)
-  *             10 : Timeout
-  *             11 : Error
-  *          b5     Peripheral initialization status
-  *             0  : Reset (Peripheral not initialized)
-  *             1  : Init done (Peripheral not initialized. HAL UART Init function already called)
-  *          b4-b3  (not used)
-  *             xx : Should be set to 00
-  *          b2     Intrinsic process state
-  *             0  : Ready
-  *             1  : Busy (Peripheral busy with some configuration or internal operations)
-  *          b1     (not used)
-  *             x  : Should be set to 0
-  *          b0     Tx state
-  *             0  : Ready (no Tx operation ongoing)
-  *             1  : Busy (Tx operation ongoing)
-  *        - RxState contains information related to Rx operations.
-  *          RxState value coding follow below described bitmap :
-  *          b7-b6  (not used)
-  *             xx : Should be set to 00
-  *          b5     Peripheral initialization status
-  *             0  : Reset (Peripheral not initialized)
-  *             1  : Init done (Peripheral not initialized)
-  *          b4-b2  (not used)
-  *            xxx : Should be set to 000
-  *          b1     Rx state
-  *             0  : Ready (no Rx operation ongoing)
-  *             1  : Busy (Rx operation ongoing)
-  *          b0     (not used)
-  *             x  : Should be set to 0.
   */
 typedef enum
 {
@@ -123,25 +93,20 @@ typedef enum
     HAL_UART_STATE_READY             = 0x20U,    /*!< Peripheral Initialized and ready for use
                                                     Value is allowed for gState and RxState */
     HAL_UART_STATE_BUSY              = 0x24U,    /*!< an internal process is ongoing
-                                                    // Value is allowed for gState only */
+                                                    Value is allowed for gState only */
     HAL_UART_STATE_BUSY_TX           = 0x21U,    /*!< Data Transmission process is ongoing
                                                     Value is allowed for gState only */
     HAL_UART_STATE_BUSY_RX           = 0x22U,    /*!< Data Reception process is ongoing
                                                     Value is allowed for RxState only */
-    HAL_UART_STATE_BUSY_TX_RX        = 0x23U,    /*!< Data Transmission and Reception process is ongoing
-                                                    Not to be used for neither gState nor RxState.
-                                                    Value is result of combination (Or) between gState and RxState values */
-    HAL_UART_STATE_TIMEOUT           = 0xA0U,    /*!< Timeout state
-                                                    Value is allowed for gState only */
-    HAL_UART_STATE_ERROR             = 0xE0U     /*!< Error
-                                                    Value is allowed for gState only */
 } HAL_UART_StateTypeDef;
 
+/// UART DMA TX RX Environment
 struct UartDMAEnv
 {
     uint8_t                       DMA_Channel;
 };
 
+/// UART Interrupt TX Environment
 struct UartInterruptEnv
 {
     uint8_t                       *pBuffPtr;      /*!< Pointer to UART Tx transfer Buffer */
@@ -171,19 +136,6 @@ typedef struct __UART_HandleTypeDef
     uint32_t                 ErrorCode;        /*!< UART Error code                    */
 
 } UART_HandleTypeDef;
-
-#define UART_NOPARITY       0x0     // Parity diable
-#define UART_ODDPARITY      0x1     // Parity Odd
-#define UART_EVENPARITY     0x3     // Parity Even
-
-#define UART_BYTESIZE5      0X0     // Byte size 5 bits
-#define UART_BYTESIZE6      0X1     // Byte size 6 bits
-#define UART_BYTESIZE7      0X2     // Byte size 7 bits
-#define UART_BYTESIZE8      0X3     // Byte size 8 bits
-
-#define UART_STOPBITS1      0x0     // Stop 1 bits
-#define UART_STOPBITS2      0x1     // Stop 2 bits
-
 
 HAL_StatusTypeDef HAL_UART_AutoBaudRate_Detect(UART_HandleTypeDef *huart,uint8_t mode);
 HAL_StatusTypeDef HAL_UART_AutoBaudRate_Detect_IT(UART_HandleTypeDef * huart,uint8_t mode);
