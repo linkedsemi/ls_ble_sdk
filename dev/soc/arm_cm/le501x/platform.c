@@ -344,8 +344,6 @@ void sys_init_none()
     mac_init();
     io_init();
     LOG_INIT();
-    *(uint32_t *)0x50000000 |= 0x100;
-    *(uint32_t *)0x50000030 |= 0x7;
 }
 
 void ll_stack_var_ptr_init(void);

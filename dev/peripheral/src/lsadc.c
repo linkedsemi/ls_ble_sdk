@@ -189,12 +189,27 @@ HAL_StatusTypeDef HAL_ADC_Init(ADC_HandleTypeDef *hadc)
     /* Configuration of ADC_CR2:                                              */
     /*  - data alignment                                                      */
     /*  - continuous conversion mode                                          */  
-    tmp_cr2 |=(ADC_BINRES_MASK | ADC_BINBUF_MASK | hadc->Init.DataAlign);
+    /*  - ADC driver type                                                     */ 
+    tmp_cr2 |=hadc->Init.DataAlign;
   //  tmp_cr2 |=(0x00000003<<ADC_BATADJ_POS);
     if(hadc->Init.ContinuousConvMode == ENABLE)
     {
         tmp_cr2 |= ADC_CONT_MASK;
     }  
+
+     tmp_cr2 |=   (hadc->Init.AdcDriveType == EINBUF_DRIVE_ADC) ?(ADC_EINBUF_MASK | ADC_BINRES_MASK):\
+                   ((hadc->Init.AdcDriveType == INRES_ONETHIRD_EINBUF_DRIVE_ADC) ?(ADC_EINBUF_MASK):(ADC_BINBUF_MASK|ADC_BINRES_MASK));
+
+    /* Update ADC configuration register CR2 with previous settings */
+    MODIFY_REG(hadc->Instance->CR2,
+                   ADC_CONT_MASK   |
+                   ADC_BATADJ_MASK |
+                   ADC_BINRES_MASK |
+                   ADC_BINBUF_MASK |
+                   ADC_EINBUF_MASK |
+                   ADC_TEST_MASK   |
+                   ADC_DIFF_MASK,
+                   tmp_cr2);
     /* Configuration of ADC_CR1:                                              */
     /*  - scan mode                                                           */
     /*  - discontinuous mode disable/enable                                   */
@@ -231,16 +246,6 @@ HAL_StatusTypeDef HAL_ADC_Init(ADC_HandleTypeDef *hadc)
                  ADC_AWDCH_MASK  ,
                  tmp_cr1);
     
-    /* Update ADC configuration register CR2 with previous settings */
-    MODIFY_REG(hadc->Instance->CR2,
-                   ADC_CONT_MASK   |
-                   ADC_BATADJ_MASK |
-                   ADC_BINRES_MASK |
-                   ADC_BINBUF_MASK |
-                   ADC_EINBUF_MASK |
-                   ADC_TEST_MASK   |
-                   ADC_DIFF_MASK,
-                   tmp_cr2);
     /* Configuration of regular group sequencer:                              */
     /* - if scan mode is disabled, regular channels sequence length is set to */
     /*   0x00: 1 channel converted (channel on regular rank 1)                */
@@ -288,8 +293,8 @@ HAL_StatusTypeDef HAL_ADC_Init(ADC_HandleTypeDef *hadc)
         
     tmp_hal_status = HAL_ERROR;
   }
-  
-        /* Configuration of ADC_CCR:                                              */
+
+    /* Configuration of ADC_CCR:                                              */
     /*  - reference voltage                                                  */
     /*  - adc clk                                                             */
     /*  - discontinuous mode number of conversions                            */
@@ -1460,6 +1465,10 @@ HAL_StatusTypeDef HAL_ADC_ConfigChannel(ADC_HandleTypeDef *hadc, ADC_ChannelConf
         adc_channel_vbat_enable();
     }
 
+   if (sConfig->Channel == ADC_CHANNEL_TEMPSENSOR)
+   {
+       adc_channel_tempsensor_enable(); 
+   }
     /* Process unlocked */
     __HAL_UNLOCK(hadc);
   
@@ -1593,6 +1602,11 @@ HAL_StatusTypeDef HAL_ADCEx_InjectedConfigChannel(ADC_HandleTypeDef* hadc, ADC_I
         {
             adc_channel_vbat_enable();
         }
+
+       if (sConfigInjected->InjectedChannel == ADC_CHANNEL_TEMPSENSOR)
+       {
+           adc_channel_tempsensor_enable(); 
+       }
     }
     else
     {

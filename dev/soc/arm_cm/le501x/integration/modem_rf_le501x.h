@@ -23,5 +23,8 @@ void modem_rf_init(void);
 
 void rf_set_power(uint8_t tx_power);
 
+void tempsensor_ldo_init(void);
+
+void tempsensor_ldo_deinit(void);
 #endif
 

@@ -16,6 +16,8 @@ static volatile uint8_t recv_flag = 0;
 
 static void lsadc_init(void)
 {
+    io_clr_pin(PA00);
+    io_cfg_output(PA00);
     hadc.Instance = LSADC;
     hadc.Init.DataAlign             = ADC_DATAALIGN_RIGHT;
     hadc.Init.ScanConvMode          = ADC_SCAN_DISABLE;              /* Sequencer disabled (ADC conversion on only 1 channel: channel set on rank 1) */
@@ -25,6 +27,7 @@ static void lsadc_init(void)
     hadc.Init.ContinuousConvMode    = DISABLE;                        /* Continuous mode to have maximum conversion speed (no delay between conversions) */
     hadc.Init.TrigType      = ADC_INJECTED_SOFTWARE_TRIGT;            /* The reference voltage uses an internal reference */
     hadc.Init.Vref          = ADC_VREF_INSIDE;
+    hadc.Init.AdcCkDiv = ADC_CLOCK_DIV2;
 
     if (HAL_ADC_Init(&hadc) != HAL_OK)
     {

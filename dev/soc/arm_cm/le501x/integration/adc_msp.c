@@ -3,6 +3,7 @@
 #include "field_manipulate.h"
 #include "lsadc.h"
 #include "le501x.h"
+#include "modem_rf_le501x.h"
 #include "HAL_def.h"
 #include "sys_stat.h"
 #include "platform.h"
@@ -57,3 +58,12 @@ void adc_channel_vbat_disable(void)
     REG_FIELD_WR(SYSCFG->PMU_TRIM, SYSCFG_EN_BAT_DET, 0);
 }
 
+void adc_channel_tempsensor_enable(void)
+{
+    tempsensor_ldo_init();
+}
+
+void adc_channel_tempsensor_disable(void)
+{
+    tempsensor_ldo_deinit();
+}

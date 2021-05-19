@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include "log.h"
 #include "lsdmac.h"
+#include "log.h"
 
 #define CONVER_COMPLETED 1
 #define START_CONVER 0
@@ -19,7 +20,7 @@ ADC_HandleTypeDef hadc;
 
 /*Mutli Channel Mode*/
 
-#define CT_MUTLI_CHANNEL_SINGLE_SAMPLING 9
+#define CT_MUTLI_CHANNEL_SINGLE_SAMPLING 11
 DMA_RAM_ATTR uint16_t result_mutil_channel_single_sampling[CT_MUTLI_CHANNEL_SINGLE_SAMPLING];
 
 
@@ -133,7 +134,7 @@ static void lsadc_multi_channel_single_sampling_init(void)
        Error_Handler();
     }	
     sConfig.Channel  = ADC_CHANNEL_TEMPSENSOR;
-    sConfig.Rank         = ADC_REGULAR_RANK_9;
+    sConfig.Rank         = ADC_REGULAR_RANK_10;
     sConfig.SamplingTime = ADC_SAMPLETIME_15CYCLES;//ADC_SAMPLETIME_15CYCLES;
     
     if (HAL_ADC_ConfigChannel(&hadc, &sConfig) != HAL_OK)
@@ -141,7 +142,7 @@ static void lsadc_multi_channel_single_sampling_init(void)
        Error_Handler();
     }
     sConfig.Channel  = ADC_CHANNEL_VBAT;
-    sConfig.Rank         = ADC_REGULAR_RANK_10;
+    sConfig.Rank         = ADC_REGULAR_RANK_11;
     sConfig.SamplingTime = ADC_SAMPLETIME_15CYCLES;//ADC_SAMPLETIME_15CYCLES;
     
     if (HAL_ADC_ConfigChannel(&hadc, &sConfig) != HAL_OK)
@@ -156,7 +157,7 @@ int main(void)
 {
     sys_init_none();
     adc_io_init();
-	memset(&result_mutil_channel_single_sampling[0],0,CT_MUTLI_CHANNEL_SINGLE_SAMPLING);
+	memset(&result_mutil_channel_single_sampling[0],0,sizeof(result_mutil_channel_single_sampling));
 	lsadc_multi_channel_single_sampling_init();
 
     conver_flag = CONVER_COMPLETED;	
@@ -165,6 +166,17 @@ int main(void)
 	{
 		if(conver_flag == CONVER_COMPLETED) 
 		{
+            LOG_I("%4d %4d %4d %4d %4d %4d %4d %4d %4d %4d %4d", result_mutil_channel_single_sampling[0], 
+                                                                 result_mutil_channel_single_sampling[1], 
+                                                                 result_mutil_channel_single_sampling[2], 
+                                                                 result_mutil_channel_single_sampling[3], 
+                                                                 result_mutil_channel_single_sampling[4], 
+                                                                 result_mutil_channel_single_sampling[5], 
+                                                                 result_mutil_channel_single_sampling[6], 
+                                                                 result_mutil_channel_single_sampling[7], 
+                                                                 result_mutil_channel_single_sampling[8], 
+                                                                 result_mutil_channel_single_sampling[9], 
+                                                                 result_mutil_channel_single_sampling[10]);
             conver_flag = START_CONVER;
 		  	 /* Start ADC conversion on regular group with transfer by DMA */
             if (HAL_ADC_Start_DMA(&hadc, (uint16_t *)(&result_mutil_channel_single_sampling[0]), CT_MUTLI_CHANNEL_SINGLE_SAMPLING, HAL_ADC_ConvCpltCallback) != HAL_OK)

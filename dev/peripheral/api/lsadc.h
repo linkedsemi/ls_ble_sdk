@@ -288,15 +288,17 @@ typedef enum
 #define ADC_SAMPLETIME_2CYCLES  0x00000001U                 /*!< Sampling time 2 ADC clock cycles */
 #define ADC_SAMPLETIME_4CYCLES  0x00000002U                 /*!< Sampling time 4 ADC clock cycles */
 #define ADC_SAMPLETIME_15CYCLES 0x00000003U                 /*!< Sampling time 15 ADC clock cycles */
-/**
-  * @}
+
+/** @enum ADC_Vref_TypeDef
+  * @brief  Reference voltage type enumeration definition 
   */
-/** @defgroup ADC_Vref
-  * @{
-  */
-#define ADC_VREF_VCC        0x00000001U                  /*!< system power*/
-#define ADC_VREF_EXPOWER    0x00000002U                 /*!< External power */
-#define ADC_VREF_INSIDE     0x00000004U                 /*!< inside power */
+ enum ADC_Vref_TypeDef
+ {
+    ADC_VREF_VCC,    /*!< system power*/
+    ADC_VREF_EXPOWER,  /*!< External power */
+    ADC_VREF_INSIDE,   /*!< inside power */
+ };
+
 /**
   * @}
   */
@@ -763,6 +765,13 @@ typedef enum
   * @}
   */    
 
+/**
+ * @brief Converts the sampled value of the temperature channel to the temperature value
+ * @return  signed int16_t
+ */
+#define GET_ADC_TEMPSENSOR_VREF_INSIDE(adc_value)  (((((adc_value*140000)>>12)-27000)/118)-45)
+#define GET_ADC_TEMPSENSOR_VREF_VCC(adc_value)     (((((adc_value*330000)>>12)-27000)/118)-45)
+
 
 /* Initialization and de-initialization functions  **********************************/
 HAL_StatusTypeDef HAL_ADC_Init(ADC_HandleTypeDef *hadc);
@@ -784,7 +793,7 @@ HAL_StatusTypeDef ADC_ConversionStop_Disable(ADC_HandleTypeDef *hadc);
 /* Blocking mode: Polling */
 HAL_StatusTypeDef HAL_ADC_Start(ADC_HandleTypeDef *hadc);
 HAL_StatusTypeDef HAL_ADC_Stop(ADC_HandleTypeDef *hadc);
-// HAL_StatusTypeDef HAL_ADC_PollForConversion(ADC_HandleTypeDef *hadc, uint32_t Timeout);
+HAL_StatusTypeDef HAL_ADC_PollForConversion(ADC_HandleTypeDef *hadc, uint32_t Timeout);
 // HAL_StatusTypeDef HAL_ADC_PollForEvent(ADC_HandleTypeDef *hadc, uint32_t EventType, uint32_t Timeout);
 
 /* Blocking mode: Polling */

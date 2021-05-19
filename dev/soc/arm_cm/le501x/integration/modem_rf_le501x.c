@@ -359,6 +359,20 @@ static void pll_cal_testreg_deinit()
     REG_FIELD_WR(RF->REG10,RF_PLL_RTX_SEL,0);
     REG_FIELD_WR(RF->REG50,RF_PLL_TEST_EN,0);
 }
+
+void tempsensor_ldo_init(void)
+{
+    // AFE TEST mode enable
+    REG_FIELD_WR(RF->REG00,RF_EN_LDO_IF,1);
+    REG_FIELD_WR(RF->REG50,RF_LDO_TEST_EN,1); 
+}
+
+void tempsensor_ldo_deinit(void)
+{
+        // AFE TEST mode disenable
+    REG_FIELD_WR(RF->REG50,RF_LDO_TEST_EN,0);
+}
+
 static void rf_reg_retention()
 {
     uint32_t rf_reg08 = RF->REG08;
