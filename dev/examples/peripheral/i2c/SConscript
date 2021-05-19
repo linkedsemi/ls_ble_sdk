@@ -1,9 +1,3 @@
 Import('app_build')
-
-src = [
-    'main.c'
-]
-inc = [
-    '.'
-]
-app_build('i2c_test',src,inc)
+SConscript(dirs = 'i2c_polling',exports=['app_build'])
+SConscript(dirs = 'i2c_it',exports=['app_build'])
