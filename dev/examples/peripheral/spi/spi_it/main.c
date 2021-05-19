@@ -134,7 +134,7 @@ void LED_flicker(void)
 int main(void)
 {
   /* system init app     */
-  sys_init_app();
+  sys_init_none();
   /* init spi and GPIO   */
   spi_init();
   LED_init();

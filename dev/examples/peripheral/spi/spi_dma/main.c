@@ -173,3 +173,8 @@ void HAL_SPI_TxRxDMACpltCallback(SPI_HandleTypeDef *hspi)
 {
   ComState = COM_COMPLETE;
 }
+
+void HAL_SPI_RxDMACpltCallback(SPI_HandleTypeDef *hspi) 
+{
+    ComState = COM_COMPLETE;
+}

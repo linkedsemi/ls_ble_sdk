@@ -5,4 +5,4 @@ src = [
 inc = [
     '.'
 ]
-app_build('spi_polling',src,inc)
+app_build('spi_polling',src,inc,ble = False)
