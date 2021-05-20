@@ -42,7 +42,7 @@ typedef struct
 /**
   * \brief  RTC clock source enumeration definition
   */
-enum 
+enum RTC_CLK_SEL
 {
     // RTC_CKSEL_HSI,
     RTC_CKSEL_LSE = 1,

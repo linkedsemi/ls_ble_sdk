@@ -399,7 +399,7 @@ enum gap_evt_type
     GET_DEV_INFO_SLV_PRE_PARAM,
     GET_DEV_INFO_PEER_RSSI,
 };
-enum
+enum LS_BLE_ROLE
 {
     LS_BLE_ROLE_MASTER,
     LS_BLE_ROLE_SLAVE,

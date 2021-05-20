@@ -38,7 +38,7 @@ int main()
     rtc_test();
     while(1)
     {
-        uint8_t status = RTC_CalendarGet(&calendar_cal,&calendar_time);
+        RTC_CalendarGet(&calendar_cal,&calendar_time);
         LOG_I("%d : %d : %d  %d/%d/%d week = %d", calendar_time.hour,
                                                   calendar_time.min,
                                                   calendar_time.sec,
