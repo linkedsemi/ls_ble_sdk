@@ -804,35 +804,176 @@ uint8_t gap_manager_get_bonding_peer_id(uint8_t link_id);
 uint8_t gap_manager_get_bonded_dev_num(void);
 
 void gap_manager_get_peer_rssi(uint8_t link_id);
-
+/**
+ ****************************************************************************************
+ * \brief Initialize GATT manager.
+ *
+ * \param[in]  evt_cb               Callback function for gatt service.
+ *
+ ****************************************************************************************
+ */
 void gatt_manager_init(void (*evt_cb)(enum gatt_evt_type,union gatt_evt_u *,uint8_t));
-
+/**
+ ****************************************************************************************
+ * \brief Register service in GATT manager.
+ *
+ * \param[in]  start_hdl               Start handle of the service to be registered.
+ * \param[in]  att_num                 Number of attributes contained in the service.
+ * \param[in]  svc                     Pointer of service to be registered.
+ *
+ ****************************************************************************************
+ */
 void gatt_manager_svc_register(uint16_t start_hdl,uint8_t att_num,struct gatt_svc_env *svc);
-
+/**
+ ****************************************************************************************
+ * \brief Send reply to read request from GATT client.
+ *
+ * \param[in]  con_idx                 Connection index.
+ * \param[in]  handle                  Handle of attribute to read.
+ * \param[in]  status                  Status of read command execution in application.
+ * \param[in]  data                    Pointer of data reply.
+ * \param[in]  length                  Length of data to send in the units of bytes.
+ *
+ ****************************************************************************************
+ */
 void gatt_manager_server_read_req_reply(uint8_t con_idx,uint16_t handle,uint8_t status,uint8_t *data,uint16_t length);
-
+/**
+ ****************************************************************************************
+ * \brief Send indication to client.
+ *
+ * \param[in]  con_idx                 Connection index.
+ * \param[in]  handle                  Handle of attribute to send indication.
+ * \param[in]  data                    Pointer of data reply.
+ * \param[in]  length                  Length of data to send in the units of bytes.
+ * \param[in]  transaction_id          Id of transaction between stack with application.
+ *
+ ****************************************************************************************
+ */
 void gatt_manager_server_send_indication(uint8_t con_idx,uint16_t handle,uint8_t *data,uint16_t length,uint16_t *transaction_id);
-
+/**
+ ****************************************************************************************
+ * \brief Send notification to client.
+ *
+ * \param[in]  con_idx                 Connection index.
+ * \param[in]  handle                  Handle of attribute to send notification.
+ * \param[in]  data                    Pointer of data reply.
+ * \param[in]  length                  Length of data to send in the units of bytes.
+ * \param[in]  transaction_id          Id of transaction between stack with application.
+ *
+ ****************************************************************************************
+ */
 void gatt_manager_server_send_notification(uint8_t con_idx,uint16_t handle,uint8_t *data,uint16_t length,uint16_t *transaction_id);
-
+/**
+ ****************************************************************************************
+ * \brief Send indication confirm to server.
+ *
+ * \param[in]  con_idx                 Connection index.
+ * \param[in]  handle                  Handle of attribute to send confirm.
+ *
+ ****************************************************************************************
+ */
 void gatt_manager_client_indication_confirm(uint8_t con_idx,uint16_t handle);
-
+/**
+ ****************************************************************************************
+ * \brief Get the handle of attribute in the specified service.
+ *
+ * \param[in]  svc                     Pointer of the service containing the attribute.
+ * \param[in]  att_idx                 Attribute index.
+ *
+ ****************************************************************************************
+ */
 uint16_t gatt_manager_get_svc_att_handle(struct gatt_svc_env *svc,uint8_t att_idx);
-
+/**
+ ****************************************************************************************
+ * \brief Send data to GATT server by writing command(write without response).
+ *
+ * \param[in]  con_idx                 Connection index.
+ * \param[in]  handle                  Handle of attribute to write.
+ * \param[in]  data                    Pointer of data to send.
+ * \param[in]  length                  Length of data to send in the units of bytes.
+ *
+ ****************************************************************************************
+ */
 void gatt_manager_client_write_no_rsp(uint8_t con_idx,uint16_t handle,uint8_t *data,uint16_t length);
-
+/**
+ ****************************************************************************************
+ * \brief Send data to GATT server by writing request(write with response).
+ *
+ * \param[in]  con_idx                 Connection index.
+ * \param[in]  handle                  Handle of attribute to write.
+ * \param[in]  data                    Pointer of data to send.
+ * \param[in]  length                  Length of data to send in the units of bytes.
+ *
+ ****************************************************************************************
+ */
 void gatt_manager_client_write_with_rsp(uint8_t con_idx,uint16_t handle,uint8_t *data,uint16_t length);
-
+/**
+ ****************************************************************************************
+ * \brief Enable cccd(client characteristic configuration descriptor) on GATT server service.
+ *
+ * \param[in]  con_idx                 Connection index.
+ * \param[in]  handle                  Handle of attribute of cccd.
+ * \param[in]  notification_en         1 = enable notification, 0 = disable notification.
+ * \param[in]  indication_en           1 = enable indication, 0 = disable indication.
+ *
+ ****************************************************************************************
+ */
 void gatt_manager_client_cccd_enable(uint8_t con_idx,uint16_t handle,bool notification_en, bool indication_en);
-
+/**
+ ****************************************************************************************
+ * \brief Discovery service by specified uuid.
+ *
+ * \param[in]  con_idx                 Connection index.
+ * \param[in]  uuid                    Pointer of uuid to be discovered.
+ * \param[in]  uuid_len                Length of uuid.
+ * \param[in]  start_hdl               Start handle of the range to search.
+ * \param[in]  end_hdl                 End handle of the range to search.
+ *
+ ****************************************************************************************
+ */
 void gatt_manager_client_svc_discover_by_uuid(uint8_t con_idx,uint8_t *uuid,enum uuid_length uuid_len,uint16_t start_hdl,uint16_t end_hdl);
-
+/**
+ ****************************************************************************************
+ * \brief Discovery characteristic by specified uuid.
+ *
+ * \param[in]  con_idx                 Connection index.
+ * \param[in]  uuid                    Pointer of uuid to be discovered.
+ * \param[in]  uuid_len                Length of uuid.
+ * \param[in]  start_hdl               Start handle of the range to search.
+ * \param[in]  end_hdl                 End handle of the range to search.
+ *
+ ****************************************************************************************
+ */
 void gatt_manager_client_char_discover_by_uuid(uint8_t con_idx,uint8_t *uuid,enum uuid_length uuid_len,uint16_t start_hdl,uint16_t end_hdl);
-
+/**
+ ****************************************************************************************
+ * \brief Discovery cccd.
+ *
+ * \param[in]  con_idx                 Connection index.
+ * \param[in]  start_hdl               Start handle of the range to search.
+ * \param[in]  end_hdl                 End handle of the range to search.
+ *
+ ****************************************************************************************
+ */
 void gatt_manager_client_desc_char_discover(uint8_t con_idx,uint16_t start_hdl,uint16_t end_hdl);
-
+/**
+ ****************************************************************************************
+ * \brief Send MTU exchange to GATT server.
+ *
+ * \param[in]  con_idx                 Connection index.
+ *
+ ****************************************************************************************
+ */
 void gatt_manager_client_mtu_exch_send(uint8_t con_idx);
-
+/**
+ ****************************************************************************************
+ * \brief Read attribute value by handle.
+ *
+ * \param[in]  con_idx                 Connection index.
+ * \param[in]  handle                  Handle of attribute to read.
+ *
+ ****************************************************************************************
+ */
 void gatt_manager_client_read(uint8_t con_idx,uint16_t handle);
 
 /** @}*/
