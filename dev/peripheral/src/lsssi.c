@@ -32,7 +32,8 @@ static void ssi_config_it(SSI_HandleTypeDef *hssi,bool tx,bool rx)
 {
     hssi->REG->DMACR = 0;
     hssi->REG->TXFTLR = SSI_TX_FIFO_DEPTH/2;
-    hssi->REG->RXFTLR = hssi->Rx_Env.Interrupt.Count > SSI_RX_FIFO_DEPTH ? 0 : hssi->Rx_Env.Interrupt.Count - 1;
+    //hssi->REG->RXFTLR = hssi->Rx_Env.Interrupt.Count > SSI_RX_FIFO_DEPTH ? 0 : hssi->Rx_Env.Interrupt.Count - 1;
+    hssi->REG->RXFTLR = 0; //rx full -> rx overflow issue workaround
     hssi->REG->IMR = FIELD_BUILD(SSI_MSTIM,1) | FIELD_BUILD(SSI_RXFIM,rx)|
         FIELD_BUILD(SSI_RXOIM,1) | FIELD_BUILD(SSI_RXUIM,1) | FIELD_BUILD(SSI_TXOIM,1) |
         FIELD_BUILD(SSI_TXEIM,tx);
@@ -134,7 +135,8 @@ static void ssi_tx_empty_isr(SSI_HandleTypeDef *hssi)
 {
     if(hssi->Tx_Env.Interrupt.Count)
     {
-        while(REG_FIELD_RD(hssi->REG->SR,SSI_TFNF))
+        //while(REG_FIELD_RD(hssi->REG->SR,SSI_TFNF))
+        while(hssi->REG->TXFLR<SSI_TX_FIFO_DEPTH - 1) //rx full -> rx overflow issue workaround
         {
             if(hssi->Init.ctrl.data_frame_size <= DFS_32_8_bits)
             {

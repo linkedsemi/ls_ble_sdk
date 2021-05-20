@@ -32,6 +32,10 @@ static void SSI_Receive_DMA_Callback(void *hdma,uint32_t param,uint8_t DMA_chann
 
 static void ssi_dma_config(SSI_HandleTypeDef *hssi,void *TX_Data,void *RX_Data,uint16_t Count)
 {
+    hssi->REG->IMR = FIELD_BUILD(SSI_MSTIM,1) | FIELD_BUILD(SSI_RXFIM,0)|
+        FIELD_BUILD(SSI_RXOIM,1) | FIELD_BUILD(SSI_RXUIM,1) | FIELD_BUILD(SSI_TXOIM,1) |
+        FIELD_BUILD(SSI_TXEIM,0);
+    hssi->REG->SSIENR = SSI_Enabled;
     uint32_t tx_data_end_ptr = (uint32_t)TX_Data;
     uint32_t rx_data_end_ptr = (uint32_t)RX_Data;
     uint8_t data_size;
@@ -92,46 +96,36 @@ static void ssi_dma_config(SSI_HandleTypeDef *hssi,void *TX_Data,void *RX_Data,u
         HAL_DMA_Channel_Config_Set(hssi->DMAC_Instance,hssi->Rx_Env.DMA.DMA_Channel,false,&prim);
         HAL_DMA_Channel_Start_IT(hssi->DMAC_Instance,hssi->Rx_Env.DMA.DMA_Channel,HAL_SSI_RX_DMA_Handshake_Get(hssi),(uint32_t)hssi);
     }
-}
-
-static void ssi_enable(SSI_HandleTypeDef *hssi)
-{
-    hssi->REG->SSIENR = SSI_Enabled;    
     hssi->REG->SER = hssi->Hardware_CS_Mask ? hssi->Hardware_CS_Mask : 0xff;
 }
 
 HAL_StatusTypeDef HAL_SSI_Transmit_DMA(SSI_HandleTypeDef *hssi,void *Data,uint16_t Count)
 {
-    ssi_dma_config(hssi,Data,NULL,Count);
     ssi_ctrlr0_set(hssi,Motorola_SPI,Transmit_Only);
     hssi->REG->DMACR = SSI_TDMAE_MASK;
     hssi->REG->DMATDLR = 2;
-    ssi_enable(hssi);
+    ssi_dma_config(hssi,Data,NULL,Count);
     return HAL_OK;
 }
 
-
-
 HAL_StatusTypeDef HAL_SSI_Receive_DMA(SSI_HandleTypeDef *hssi,void *Data,uint16_t Count)
 {
-    ssi_dma_config(hssi,NULL,Data,Count);
     ssi_ctrlr0_set(hssi,Motorola_SPI,Receive_Only);
     hssi->REG->CTRLR1 = Count - 1;
     hssi->REG->DMACR = SSI_RDMAE_MASK;
     hssi->REG->DMARDLR = 1;
-    ssi_enable(hssi);
+    ssi_dma_config(hssi,NULL,Data,Count);
     hssi->REG->DR = 0;
     return HAL_OK;
 }
 
 HAL_StatusTypeDef HAL_SSI_TransmitReceive_DMA(SSI_HandleTypeDef *hssi,void *TX_Data,void *RX_Data,uint16_t Count)
 {
-    ssi_dma_config(hssi,TX_Data,RX_Data,Count);
     ssi_ctrlr0_set(hssi,Motorola_SPI,Transmit_and_Receive);
     hssi->REG->DMACR = SSI_TDMAE_MASK|SSI_RDMAE_MASK;
     hssi->REG->DMATDLR = 2;
     hssi->REG->DMARDLR = 1;
-    ssi_enable(hssi);
+    ssi_dma_config(hssi,TX_Data,RX_Data,Count);
     return HAL_OK;
 }
 
