@@ -42,7 +42,7 @@ HAL_StatusTypeDef HAL_LSCRYPT_DeInit(void);
  *  \param[in] key_size Key Size
  *  \return status 
  */
-HAL_StatusTypeDef HAL_LSCRYPT_AES_Key_Config(uint32_t *key,enum aes_key_type key_size);
+HAL_StatusTypeDef HAL_LSCRYPT_AES_Key_Config(const uint32_t *key,enum aes_key_type key_size);
 
 /** \brief LSCRYPT AES ECB Encrypt (Block Mode)
  *  \param[in] plaintext Input data
@@ -50,7 +50,7 @@ HAL_StatusTypeDef HAL_LSCRYPT_AES_Key_Config(uint32_t *key,enum aes_key_type key
  *  \param[out] ciphertext Output data
  *  \return status 
  */
-HAL_StatusTypeDef HAL_LSCRYPT_AES_ECB_Encrypt(uint8_t *plaintext,uint32_t length,uint8_t *ciphertext);
+HAL_StatusTypeDef HAL_LSCRYPT_AES_ECB_Encrypt(const uint8_t *plaintext,uint32_t length,uint8_t *ciphertext);
 
 /** \brief LSCRYPT AES ECB Decrypt (Block Mode)
  *  \param[in] ciphertext Input data
@@ -58,7 +58,7 @@ HAL_StatusTypeDef HAL_LSCRYPT_AES_ECB_Encrypt(uint8_t *plaintext,uint32_t length
  *  \param[out] plaintext Output data
  *  \return status 
  */
-HAL_StatusTypeDef HAL_LSCRYPT_AES_ECB_Decrypt(uint8_t *ciphertext,uint32_t length,uint8_t *plaintext);
+HAL_StatusTypeDef HAL_LSCRYPT_AES_ECB_Decrypt(const uint8_t *ciphertext,uint32_t length,uint8_t *plaintext);
 
 /** \brief LSCRYPT AES CBC Encrypt (Block Mode)
  *  \param[in] iv Initial vector
@@ -67,7 +67,7 @@ HAL_StatusTypeDef HAL_LSCRYPT_AES_ECB_Decrypt(uint8_t *ciphertext,uint32_t lengt
  *  \param[out] ciphertext Output data
  *  \return status 
  */
-HAL_StatusTypeDef HAL_LSCRYPT_AES_CBC_Encrypt(uint32_t iv[4],uint8_t *plaintext,uint32_t length,uint8_t *ciphertext);
+HAL_StatusTypeDef HAL_LSCRYPT_AES_CBC_Encrypt(const uint32_t iv[4],const uint8_t *plaintext,uint32_t length,uint8_t *ciphertext);
 
 /** \brief LSCRYPT AES CBC Decrypt (Block Mode)
  *  \param[in] iv Initial vector
@@ -76,7 +76,7 @@ HAL_StatusTypeDef HAL_LSCRYPT_AES_CBC_Encrypt(uint32_t iv[4],uint8_t *plaintext,
  *  \param[out] plaintext Output data
  *  \return status 
  */
-HAL_StatusTypeDef HAL_LSCRYPT_AES_CBC_Decrypt(uint32_t iv[4],uint8_t *ciphertext,uint32_t length,uint8_t *plaintext);
+HAL_StatusTypeDef HAL_LSCRYPT_AES_CBC_Decrypt(const uint32_t iv[4],const uint8_t *ciphertext,uint32_t length,uint8_t *plaintext);
 
 /** \brief LSCRYPT AES ECB Encrypt (Interrupt Mode)
  *  \param[in] plaintext Input data
@@ -84,7 +84,7 @@ HAL_StatusTypeDef HAL_LSCRYPT_AES_CBC_Decrypt(uint32_t iv[4],uint8_t *ciphertext
  *  \param[out] ciphertext Output data
  *  \return status 
  */
-HAL_StatusTypeDef HAL_LSCRYPT_AES_ECB_Encrypt_IT(uint8_t *plaintext,uint32_t length,uint8_t *ciphertext);
+HAL_StatusTypeDef HAL_LSCRYPT_AES_ECB_Encrypt_IT(const uint8_t *plaintext,uint32_t length,uint8_t *ciphertext);
 
 /** \brief LSCRYPT AES ECB Decrypt (Interrupt Mode)
  *  \param[in] ciphertext Input data
@@ -92,7 +92,7 @@ HAL_StatusTypeDef HAL_LSCRYPT_AES_ECB_Encrypt_IT(uint8_t *plaintext,uint32_t len
  *  \param[out] plaintext Output data
  *  \return status 
  */
-HAL_StatusTypeDef HAL_LSCRYPT_AES_ECB_Decrypt_IT(uint8_t *ciphertext,uint32_t length,uint8_t *plaintext);
+HAL_StatusTypeDef HAL_LSCRYPT_AES_ECB_Decrypt_IT(const uint8_t *ciphertext,uint32_t length,uint8_t *plaintext);
 
 /** \brief LSCRYPT AES CBC Encrypt (Interrupt Mode)
  *  \param[in] iv Initial vector
@@ -101,7 +101,7 @@ HAL_StatusTypeDef HAL_LSCRYPT_AES_ECB_Decrypt_IT(uint8_t *ciphertext,uint32_t le
  *  \param[out] ciphertext Output data
  *  \return status 
  */
-HAL_StatusTypeDef HAL_LSCRYPT_AES_CBC_Encrypt_IT(uint32_t iv[4],uint8_t *plaintext,uint32_t length,uint8_t *ciphertext);
+HAL_StatusTypeDef HAL_LSCRYPT_AES_CBC_Encrypt_IT(const uint32_t iv[4],const uint8_t *plaintext,uint32_t length,uint8_t *ciphertext);
 
 /** \brief LSCRYPT AES CBC Decrypt (Interrupt Mode)
  *  \param[in] iv Initial vector
@@ -110,7 +110,7 @@ HAL_StatusTypeDef HAL_LSCRYPT_AES_CBC_Encrypt_IT(uint32_t iv[4],uint8_t *plainte
  *  \param[out] plaintext Output data
  *  \return status 
  */
-HAL_StatusTypeDef HAL_LSCRYPT_AES_CBC_Decrypt_IT(uint32_t iv[4],uint8_t *ciphertext,uint32_t length,uint8_t *plaintext);
+HAL_StatusTypeDef HAL_LSCRYPT_AES_CBC_Decrypt_IT(const uint32_t iv[4],const uint8_t *ciphertext,uint32_t length,uint8_t *plaintext);
 
 /** Callback function that will be invoked in the interrupt context when AES operation is complete.
  *  Overwrite this function to get notification of completion of AES operation.
