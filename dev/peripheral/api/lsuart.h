@@ -6,6 +6,16 @@
 #include "sdk_config.h"
 #include "reg_base_addr.h"
 
+
+/** \addtogroup PERIPHERAL
+ *  @{
+ */
+
+/** \addtogroup LSUART
+ *  @{
+ */
+
+
 /// LSUART Macro for Register Access
 #ifdef UART1_BASE_ADDR
 #define UART1 ((reg_uart_t *)UART1_BASE_ADDR)
@@ -26,17 +36,35 @@
 /// Baud rate calculation
 #define UART_BUADRATE_ENUM_GEN(BAUD)  ((((UART_CLOCK<<4)/BAUD) +8)>>4)
 
-#define UART_NOPARITY       0x0     /// Parity diable
-#define UART_ODDPARITY      0x1     /// Parity Odd
-#define UART_EVENPARITY     0x3     /// Parity Even
+/**
+  * @brief UART parity type
+  */
+typedef enum
+{
+    UART_NOPARITY             = 0x00U,    /*!< Parity diable*/
+    UART_ODDPARITY             = 0x01U,    /*!< Parity Odd*/
+    UART_EVENPARITY              = 0x03U   /*!< Parity Even*/
+} app_uart_paritytype;
 
-#define UART_BYTESIZE5      0X0     /// Byte size 5 bits
-#define UART_BYTESIZE6      0X1     /// Byte size 6 bits
-#define UART_BYTESIZE7      0X2     /// Byte size 7 bits
-#define UART_BYTESIZE8      0X3     /// Byte size 8 bits
+/**
+  * @brief UART bytesize type
+  */
+typedef enum
+{
+    UART_BYTESIZE5             = 0x00U,    /*!< Byte size 5 bits*/
+    UART_BYTESIZE6             = 0x01U,    /*!< Byte size 6 bits*/
+    UART_BYTESIZE7              = 0x02U,  /*!< Byte size 7 bits*/
+    UART_BYTESIZE8             = 0x03U    /*!< Byte size 8 bits*/
+} app_uart_bytesizetype;
 
-#define UART_STOPBITS1      0x0     /// Stop 1 bits
-#define UART_STOPBITS2      0x1     /// Stop 2 bits
+/**
+  * @brief UART stopbit type
+  */
+typedef enum
+{
+    UART_STOPBITS1             = 0x00U,    /*!< Stop 1 bits*/
+    UART_STOPBITS2             = 0x01U,    /*!< Stop 2 bits*/
+} app_uart_stopbittype;
 
 /// Baud rate setting
 typedef enum
@@ -62,20 +90,16 @@ typedef enum
     UART_BAUDRATE_2000000= UART_BUADRATE_ENUM_GEN(2000000),
 }app_uart_baudrate_t;
 
-/** @defgroup UART_Exported_Types UART Exported Types
-  * @{
-  */
-
-/**
-  * @brief UART Init Structure definition
-  */
 typedef struct
 {
     app_uart_baudrate_t BaudRate;
 
-    uint8_t     WordLength:2, /*!< config uart byte size */
-               StopBits:1,    /*!< config uart stop bits */
-               Parity:2,      /*!< config uart parity type */
+    uint8_t     WordLength:2, /*!< config uart byte size 
+                              This parameter can be a value of @ref app_uart_bytesizetype*/
+               StopBits:1,    /*!< config uart stop bits.
+                              This parameter can be a value of @ref app_uart_stopbittype  */
+               Parity:2,      /*!< config uart parity type. 
+                              This parameter can be a value of @ref app_uart_paritytype  */
                MSBEN:1,       /*!< config uart msb or lsb */
                HwFlowCtl:1;   /*!< Specifies whether the hardware flow control mode is enabled or disabled. */             
 } UART_InitTypeDef;
@@ -100,13 +124,19 @@ typedef enum
                                                     Value is allowed for RxState only */
 } HAL_UART_StateTypeDef;
 
-/// UART DMA TX RX Environment
+
+/**
+  * @brief  UART DMA TX RX Environment
+  */
+
 struct UartDMAEnv
 {
     uint8_t                       DMA_Channel;
 };
 
-/// UART Interrupt TX Environment
+/**
+  * @brief  UART Interrupt TX Environment
+  */
 struct UartInterruptEnv
 {
     uint8_t                       *pBuffPtr;      /*!< Pointer to UART Tx transfer Buffer */
@@ -271,6 +301,10 @@ void HAL_UART_DMA_TxCpltCallback(UART_HandleTypeDef *huart);
   */
 void HAL_UART_DMA_RxCpltCallback(UART_HandleTypeDef *huart);
 
+/** @}*/
+
+
+/** @}*/
 
 #endif // _LSUART_H_
 

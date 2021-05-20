@@ -9,5 +9,5 @@ PERIPHERAL API
     lsssi
     lspdm
     lsrtc
-    uart
+    lsuart
     
