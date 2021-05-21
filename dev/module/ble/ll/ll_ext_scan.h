@@ -63,6 +63,7 @@ struct ll_ext_scan_env
             uint8_t filter_dup;
         }scan;
         struct {
+            uint32_t conn_req_end_time;
             struct conn_req_data_env conn_req_data;
             struct ext_create_con_param param;
             uint8_t conn_req_sent;

@@ -15,6 +15,13 @@ enum secondary_adv_evt_status
     SECONDARY_ADV_EVT_ANCHOR_UPDATED = 0x2,
 };
 
+enum conn_req_status
+{
+    NO_CONN_REQ,
+    CONN_REQ_FROM_PRIM_EVT,
+    CONN_REQ_FROM_SECOND_EVT,
+};
+
 struct adv_data_scan_rsp_data
 {
     struct co_list adv_list;
@@ -30,16 +37,17 @@ struct adv_set_env
     struct sync_env *periodic;
     timer_t duration_timer;
     uint32_t secondary_anchor;
+    uint32_t conn_req_end_time;
     struct adv_data_scan_rsp_data data_list[2];
     struct le_ext_adv_param ext_param;
     struct bd_addr rand_addr;
     struct adv_evt_rx_data rx;
     //uint8_t skip_cnt;
+    enum conn_req_status connection_requesting;
     uint8_t max_evt;
     uint8_t completed_evts;
     uint8_t secondary_status;
     bool adv_timeout;
-    bool connection_requesting;
     bool scan_requested;
     uint8_t current_adv;
     uint8_t adv_update;

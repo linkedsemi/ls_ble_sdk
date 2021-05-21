@@ -431,7 +431,7 @@ struct ll_conn_env *get_ll_conn_env_by_idx(uint16_t idx);
 
 void ll_hci_rx_air_tx_start(struct ll_conn_env *env,struct hci_acl_air_tx_data *buf);
 
-void ll_conn_env_init(struct ll_conn_env *env,bool master,struct conn_req_lldata *lldata,uint32_t conn_req_end_time,bool csa2);
+void ll_conn_env_init(struct ll_conn_env *env,bool master,struct conn_req_lldata *lldata,uint32_t conn_req_end_time,bool csa2,enum ble_phy phy);
 
 void conn_evt_end_handler(struct ll_evt *evt);
 
