@@ -204,7 +204,7 @@ static void lvl2_lvl3_io_retention(reg_lsgpio_t *gpiox)
             pull |= IO_PULL_DOWN << (2*i);
         }
     }
-    gpiox->PUPD = gpiox->PUPD & ~mask | pull;
+    gpiox->PUPD = (gpiox->PUPD & ~mask) | pull;
 }
 
 void ble_wkup_status_set(bool status)

@@ -41,30 +41,32 @@
 #define XIP_MODE_BITS 0x20
 
 #define DUMMY_BYTE_VAL 0x3c
-static struct lsqspi_instance lsqspi_inst;
-static bool flash_writing;
-static bool flash_xip_status;
+
+struct spi_flash_status
+{
+    bool writing;
+    bool xip;
+}flash_stat;
 
 XIP_BANNED void spi_flash_xip_status_set(bool xip)
 {
-    flash_xip_status = xip;
+    flash_stat.xip = xip;
 }
 
 XIP_BANNED void spi_flash_writing_status_set(bool writing)
 {
-    flash_writing = writing;
+    flash_stat.writing = writing;
 }
 
 XIP_BANNED void spi_flash_drv_var_init(bool xip,bool writing)
 {
-    lsqspi_inst.reg = LSQSPI;
     spi_flash_xip_status_set(xip);
     spi_flash_writing_status_set(writing);
 }
 
 XIP_BANNED void spi_flash_init()
 {
-    lsqspi_init(&lsqspi_inst);
+    lsqspi_init();
 }
 
 XIP_BANNED static void quad_io_read_dummy(uint8_t opcode_en,uint8_t mode_bits)
@@ -83,7 +85,7 @@ XIP_BANNED static void quad_io_read_dummy(uint8_t opcode_en,uint8_t mode_bits)
     param.size = sizeof(dummy);
     param.mode_bits = mode_bits;
     param.quad_data = true;
-    lsqspi_stig_read_data(&lsqspi_inst,&param);
+    lsqspi_stig_read_data(&param);
     #ifndef FLASH_PROG_ALGO
     LS_RAM_ASSERT(dummy == DUMMY_BYTE_VAL);
     #endif
@@ -92,7 +94,7 @@ XIP_BANNED static void quad_io_read_dummy(uint8_t opcode_en,uint8_t mode_bits)
 
 XIP_BANNED void spi_flash_xip_start()
 {
-    if(flash_xip_status)
+    if(flash_stat.xip)
     {
         return;
     }
@@ -105,36 +107,36 @@ XIP_BANNED void spi_flash_xip_start()
     direct_read_param.quad_data = 1;
     direct_read_param.mode_bits_en = 1;
     direct_read_param.mode_bits = XIP_MODE_BITS;
-    lsqspi_direct_read_config(&lsqspi_inst,&direct_read_param);
-    flash_xip_status = true;
+    lsqspi_direct_read_config(&direct_read_param);
+    flash_stat.xip = true;
     exit_critical(cpu_stat);
 }
 
 XIP_BANNED void spi_flash_xip_stop()
 {
-    if(flash_xip_status == false)
+    if(flash_stat.xip == false)
     {
         return;
     }
     uint32_t cpu_stat = enter_critical();
     quad_io_read_dummy(0,0);
-    flash_xip_status = false;
+    flash_stat.xip = false;
     exit_critical(cpu_stat);
 }
 
 XIP_BANNED static void spi_flash_write_enable()
 {
-    lsqspi_stig_send_command(&lsqspi_inst,WRITE_ENABLE_OPCODE);
+    lsqspi_stig_send_command(WRITE_ENABLE_OPCODE);
 }
 
 XIP_BANNED void spi_flash_read_status_register_0(uint8_t *status_reg_0)
 {
-    lsqspi_stig_read_register(&lsqspi_inst,READ_STATUS_REGISTER_0_OPCODE,status_reg_0,sizeof(uint8_t));
+    lsqspi_stig_read_register(READ_STATUS_REGISTER_0_OPCODE,status_reg_0,sizeof(uint8_t));
 }
 
 XIP_BANNED void spi_flash_read_status_register_1(uint8_t *status_reg_1)
 {
-    lsqspi_stig_read_register(&lsqspi_inst,READ_STATUS_REGISTER_1_OPCODE,status_reg_1,sizeof(uint8_t));
+    lsqspi_stig_read_register(READ_STATUS_REGISTER_1_OPCODE,status_reg_1,sizeof(uint8_t));
 }
 
 XIP_BANNED static bool spi_flash_write_in_process()
@@ -160,10 +162,10 @@ static void flash_writing_critical(void (*func)(void *),void *param)
     uint32_t cpu_stat = enter_critical();
     spi_flash_write_enable();
     func(param);
-    flash_writing = true;
+    flash_stat.writing = true;
     exit_critical(cpu_stat);
     spi_flash_write_status_check();
-    flash_writing = false;
+    flash_stat.writing = false;
 }
 #else
 NOINLINE XIP_BANNED static void flash_reading_critical(void (*func)(void *),void *param)
@@ -183,13 +185,13 @@ XIP_BANNED static void flash_writing_critical(void (*func)(void *),void *param)
     func(param);
     uint32_t writing_end_time = systick_get_value();
     DELAY_US(500);
-    flash_writing = true;
+    flash_stat.writing = true;
     exit_critical(cpu_stat);
     systick_poll_timeout(writing_end_time,func == do_spi_flash_prog_func ? 1000*SDK_HCLK_MHZ : 6900*SDK_HCLK_MHZ,NULL);
     cpu_stat = enter_critical();
     spi_flash_write_status_check();
     exit_critical(cpu_stat);
-    flash_writing = false;
+    flash_stat.writing = false;
     spi_flash_xip_start();
 }
 
@@ -202,10 +204,10 @@ XIP_BANNED static void flash_writing_critical(void (*func)(void *),void *param)
     spi_flash_xip_stop();
     spi_flash_write_enable();
     func(param);
-    flash_writing = true;
+    flash_stat.writing = true;
     exit_critical(cpu_stat);
     spi_flash_write_status_check();
-    flash_writing = false;
+    flash_stat.writing = false;
     spi_flash_xip_start();
 }
 #endif
@@ -216,7 +218,7 @@ XIP_BANNED static void flash_writing_critical(void (*func)(void *),void *param)
 
 XIP_BANNED static void do_spi_flash_write_status_reg_func(void * param)
 {
-    lsqspi_stig_write_register(&lsqspi_inst,WRITE_STATUS_REGISTER_OPCODE,param, sizeof(uint16_t));
+    lsqspi_stig_write_register(WRITE_STATUS_REGISTER_OPCODE,param, sizeof(uint16_t));
 }
 
 XIP_BANNED void spi_flash_write_status_register(uint16_t status)
@@ -226,7 +228,7 @@ XIP_BANNED void spi_flash_write_status_register(uint16_t status)
 
 XIP_BANNED static void do_spi_flash_prog_func(void *param)
 {
-    lsqspi_stig_write_data(&lsqspi_inst, param);
+    lsqspi_stig_write_data( param);
 }
 
 void do_spi_flash_program(uint32_t offset,uint8_t *data,uint16_t length,bool quad)
@@ -264,7 +266,7 @@ struct flash_erase_param
 XIP_BANNED static void do_spi_flash_erase_func(void *param)
 {
     struct flash_erase_param *erase_param = param;
-    lsqspi_stig_write_register(&lsqspi_inst,erase_param->opcode, erase_param->addr, 3);
+    lsqspi_stig_write_register(erase_param->opcode, erase_param->addr, 3);
 }
 
 void do_spi_flash_erase(uint32_t offset,uint8_t opcode)
@@ -289,7 +291,7 @@ void spi_flash_sector_erase(uint32_t offset)
 
 XIP_BANNED static void do_spi_flash_chip_erase_func(void *param)
 {
-    lsqspi_stig_send_command(&lsqspi_inst,CHIP_ERASE_OPCODE);
+    lsqspi_stig_send_command(CHIP_ERASE_OPCODE);
 }
 
 void do_spi_flash_chip_erase()
@@ -304,7 +306,7 @@ void spi_flash_chip_erase()
 
 XIP_BANNED static void do_spi_flash_read_func(void *param)
 {
-    lsqspi_stig_read_data(&lsqspi_inst,param);
+    lsqspi_stig_read_data(param);
 }
 
 void do_spi_flash_read(void *param)
@@ -349,12 +351,12 @@ void spi_flash_fast_read(uint32_t offset, uint8_t * data, uint16_t length)
 
 XIP_BANNED void spi_flash_deep_power_down()
 {
-    lsqspi_stig_send_command(&lsqspi_inst, DEEP_POWER_DOWN_OPCODE);
+    lsqspi_stig_send_command( DEEP_POWER_DOWN_OPCODE);
 }
 
 XIP_BANNED void spi_flash_release_from_deep_power_down()
 {
-    lsqspi_stig_send_command(&lsqspi_inst,RELEASE_FROM_DEEP_POWER_DOWN_OPCODE);
+    lsqspi_stig_send_command(RELEASE_FROM_DEEP_POWER_DOWN_OPCODE);
 }
 
 struct flash_read_reg_param
@@ -367,7 +369,7 @@ struct flash_read_reg_param
 XIP_BANNED static void do_spi_flash_read_reg_func(void *param)
 {
     struct flash_read_reg_param *ptr = param;
-    lsqspi_stig_read_register(&lsqspi_inst,ptr->opcode,ptr->buf,ptr->length);
+    lsqspi_stig_read_register(ptr->opcode,ptr->buf,ptr->length);
 }
 
 void do_spi_flash_read_reg(void *param)
@@ -403,7 +405,7 @@ void spi_flash_read_unique_id(uint8_t unique_serial_id[16])
 
 XIP_BANNED static void do_spi_flash_erase_security_area_func(void *param)
 {
-    lsqspi_stig_write_register(&lsqspi_inst,ERASE_SECURITY_AREA_OPCODE,param,3);
+    lsqspi_stig_write_register(ERASE_SECURITY_AREA_OPCODE,param,3);
 }
 
 void do_spi_flash_erase_security_area(uint8_t idx)
@@ -422,7 +424,7 @@ void spi_flash_erase_security_area(uint8_t idx)
 
 XIP_BANNED static void do_spi_flash_program_security_area_func(void *param)
 {
-    lsqspi_stig_write_data(&lsqspi_inst, param);
+    lsqspi_stig_write_data( param);
 }
 
 void do_spi_flash_program_security_area(uint8_t idx,uint16_t addr,uint8_t *data,uint16_t length)
@@ -448,7 +450,7 @@ void spi_flash_program_security_area(uint8_t idx,uint16_t addr,uint8_t *data,uin
 
 XIP_BANNED static void do_spi_flash_read_security_area_func(void *param)
 {
-    lsqspi_stig_read_data(&lsqspi_inst, param);
+    lsqspi_stig_read_data( param);
 }
 
 void do_spi_flash_read_security_area(uint8_t idx,uint16_t addr,uint8_t *data,uint16_t length)
@@ -475,8 +477,8 @@ void spi_flash_read_security_area(uint8_t idx,uint16_t addr,uint8_t *data,uint16
 
 XIP_BANNED void spi_flash_software_reset()
 {
-    lsqspi_stig_send_command(&lsqspi_inst,RESET_EN_OPCODE);
-    lsqspi_stig_send_command(&lsqspi_inst,RESET_OPCODE);
+    lsqspi_stig_send_command(RESET_EN_OPCODE);
+    lsqspi_stig_send_command(RESET_OPCODE);
 }
 
 XIP_BANNED void spi_flash_qe_status_read_and_set()
@@ -492,22 +494,22 @@ XIP_BANNED void spi_flash_qe_status_read_and_set()
 
 XIP_BANNED void spi_flash_prog_erase_suspend()
 {
-    lsqspi_stig_send_command(&lsqspi_inst,PROG_ERASE_SUSPEND);
+    lsqspi_stig_send_command(PROG_ERASE_SUSPEND);
 }
 
 XIP_BANNED void spi_flash_prog_erase_resume()
 {
-    lsqspi_stig_send_command(&lsqspi_inst,PROG_ERASE_RESUME);
+    lsqspi_stig_send_command(PROG_ERASE_RESUME);
 }
 
 XIP_BANNED bool spi_flash_writing_busy()
 {
-    return flash_writing;
+    return flash_stat.writing;
 }
 
 XIP_BANNED bool spi_flash_xip_status_get()
 {
-    return flash_xip_status;
+    return flash_stat.xip;
 }
 
 

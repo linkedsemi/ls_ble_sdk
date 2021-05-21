@@ -6,11 +6,6 @@
 
 #define LSQSPI ((reg_lsqspi_t *)LSQSPI_BASE_ADDR)
 
-struct lsqspi_instance
-{
-    reg_lsqspi_t *reg;
-};
-
 struct lsqspi_direct_read_config_param
 {
     uint8_t opcode;
@@ -42,19 +37,19 @@ struct lsqspi_stig_rd_wr_param
     bool quad_data;
 };
 
-void lsqspi_init(struct lsqspi_instance *inst);
+void lsqspi_init(void);
 
-void lsqspi_direct_read_config(struct lsqspi_instance *inst,struct lsqspi_direct_read_config_param *param);
+void lsqspi_direct_read_config(struct lsqspi_direct_read_config_param *param);
 
-void lsqspi_stig_write_data(struct lsqspi_instance *inst,struct lsqspi_stig_rd_wr_param *param);
+void lsqspi_stig_write_data(struct lsqspi_stig_rd_wr_param *param);
 
-void lsqspi_stig_read_data(struct lsqspi_instance *inst,struct lsqspi_stig_rd_wr_param *param);
+void lsqspi_stig_read_data(struct lsqspi_stig_rd_wr_param *param);
 
-void lsqspi_stig_write_register(struct lsqspi_instance *inst,uint8_t opcode,uint8_t *data,uint8_t length);
+void lsqspi_stig_write_register(uint8_t opcode,uint8_t *data,uint8_t length);
 
-void lsqspi_stig_send_command(struct lsqspi_instance *inst,uint8_t opcode);
+void lsqspi_stig_send_command(uint8_t opcode);
 
-void lsqspi_stig_read_register(struct lsqspi_instance *inst,uint8_t opcode,uint8_t *data,uint8_t length);
+void lsqspi_stig_read_register(uint8_t opcode,uint8_t *data,uint8_t length);
 
 #endif
 
