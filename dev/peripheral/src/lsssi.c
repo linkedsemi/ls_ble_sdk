@@ -38,6 +38,7 @@ static void ssi_config_it(SSI_HandleTypeDef *hssi,bool tx,bool rx)
         FIELD_BUILD(SSI_RXOIM,1) | FIELD_BUILD(SSI_RXUIM,1) | FIELD_BUILD(SSI_TXOIM,1) |
         FIELD_BUILD(SSI_TXEIM,tx);
     hssi->REG->SSIENR = SSI_Enabled;
+    hssi->REG->SER = hssi->Hardware_CS_Mask ? hssi->Hardware_CS_Mask : 0xff;
 }
 
 HAL_StatusTypeDef HAL_SSI_Transmit_IT(SSI_HandleTypeDef *hssi,void *Data,uint16_t Count)
@@ -58,7 +59,6 @@ HAL_StatusTypeDef HAL_SSI_Receive_IT(SSI_HandleTypeDef *hssi,void *Data,uint16_t
     ssi_ctrlr0_set(hssi,Motorola_SPI,Receive_Only);
     hssi->REG->CTRLR1 = Count - 1;
     ssi_config_it(hssi,false,true);
-    hssi->REG->SER = hssi->Hardware_CS_Mask ? hssi->Hardware_CS_Mask : 0xff;
     hssi->REG->DR = 0;
     return HAL_OK;
 }
@@ -93,7 +93,7 @@ __attribute__((weak)) void HAL_SSI_TxRxCpltCallback(SSI_HandleTypeDef *hssi){}
 
 static void ssi_rx_full_isr(SSI_HandleTypeDef *hssi)
 {
-    while(REG_FIELD_RD(hssi->REG->SR,SSI_RFNE))
+    do
     {
         if(hssi->Init.ctrl.data_frame_size <= DFS_32_8_bits)
         {
@@ -109,11 +109,8 @@ static void ssi_rx_full_isr(SSI_HandleTypeDef *hssi)
             hssi->Rx_Env.Interrupt.Data += 4;
         }
         --hssi->Rx_Env.Interrupt.Count;
-    }
-    if(hssi->Rx_Env.Interrupt.Count)
-    {
-        hssi->REG->RXFTLR = hssi->Rx_Env.Interrupt.Count > SSI_RX_FIFO_DEPTH ? 0 : hssi->Rx_Env.Interrupt.Count -1;
-    }else
+    }while(REG_FIELD_RD(hssi->REG->SR,SSI_RFNE));
+    if(hssi->Rx_Env.Interrupt.Count == 0)
     {
         ssi_rx_done(hssi,HAL_SSI_RxCpltCallback,HAL_SSI_TxRxCpltCallback);
     }
@@ -135,9 +132,7 @@ static void ssi_tx_empty_isr(SSI_HandleTypeDef *hssi)
 {
     if(hssi->Tx_Env.Interrupt.Count)
     {
-        //while(REG_FIELD_RD(hssi->REG->SR,SSI_TFNF))
-        while(hssi->REG->TXFLR<SSI_TX_FIFO_DEPTH - 1) //rx full -> rx overflow issue workaround
-        {
+        do{
             if(hssi->Init.ctrl.data_frame_size <= DFS_32_8_bits)
             {
                 hssi->REG->DR = *(uint8_t *)hssi->Tx_Env.Interrupt.Data;
@@ -152,12 +147,7 @@ static void ssi_tx_empty_isr(SSI_HandleTypeDef *hssi)
                 hssi->Tx_Env.Interrupt.Data += 4;
             }
             --hssi->Tx_Env.Interrupt.Count;
-            if(hssi->Tx_Env.Interrupt.Count==0) break;
-        }
-        if(REG_FIELD_RD(hssi->REG->SR,SSI_BUSY) == SSI_Idle_or_Disabled)
-        {
-            hssi->REG->SER = hssi->Hardware_CS_Mask ? hssi->Hardware_CS_Mask : 0xff;
-        }
+        }while(REG_FIELD_RD(hssi->REG->SR,SSI_TFNF)&&hssi->Tx_Env.Interrupt.Count);
     }else{
         if(hssi->REG->TXFLR)
         {
