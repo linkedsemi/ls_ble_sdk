@@ -1,0 +1,3 @@
+Import('app_build')
+SConscript(dirs = 'ssi_it',exports=['app_build'])
+SConscript(dirs = 'ssi_dma',exports=['app_build'])

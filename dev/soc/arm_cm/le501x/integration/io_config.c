@@ -52,6 +52,14 @@ static gpio_pin_t pdm_clk;
 static gpio_pin_t pdm_data0;
 static gpio_pin_t pdm_data1;
 
+/* ssi io init */
+static gpio_pin_t ssi_clk;
+static gpio_pin_t ssi_nss0;
+static gpio_pin_t ssi_nss1;
+static gpio_pin_t ssi_dq0;
+static gpio_pin_t ssi_dq1;
+static gpio_pin_t ssi_dq2;
+static gpio_pin_t ssi_dq3;
 
 reg_lsgpio_t* GPIO_GetPort(uint8_t Pin_port)
 {
@@ -203,6 +211,101 @@ void spi2_mosi_io_deinit(void)
 void spi2_miso_io_deinit(void)
 {
     set_gpio_mode((gpio_pin_t *)&spi2_miso);
+}
+
+void ssi_clk_io_init(uint8_t clk)
+{
+    *(uint8_t *)&ssi_clk = clk;
+    spi_clk_io_cfg(clk);
+    af_io_init((gpio_pin_t *)&clk,AF_SPI1_SCK);
+}
+
+void ssi_nss0_io_init(uint8_t nss0)
+{
+    *(uint8_t *)&ssi_nss0 = nss0;
+    spi_nss_io_cfg(nss0);
+    af_io_init((gpio_pin_t *)&nss0,AF_SPI1_NSS0);
+}
+
+void ssi_nss1_io_init(uint8_t nss1)
+{
+    *(uint8_t *)&ssi_nss1 = nss1;
+    spi_nss_io_cfg(nss1);
+    af_io_init((gpio_pin_t *)&nss1,AF_SPI1_NSS0);    
+}
+
+void ssi_dq0_io_init(uint8_t dq0)
+{
+    *(uint8_t *)&ssi_dq0 = dq0;
+    spi_mosi_io_cfg(dq0);
+    af_io_init((gpio_pin_t *)&dq0,AF_SPI1_DQ0);
+}
+
+void ssi_dq1_io_init(uint8_t dq1)
+{
+
+    *(uint8_t *)&ssi_dq1 = dq1;
+    spi_miso_io_cfg(dq1);
+    af_io_init((gpio_pin_t *)&dq1,AF_SPI1_DQ1); 
+}
+
+void ssi_dq2_io_init(uint8_t dq2)
+{
+
+    *(uint8_t *)&ssi_dq2 = dq2;
+    spi_miso_io_cfg(dq2);
+    af_io_init((gpio_pin_t *)&dq2,AF_SPI1_DQ2); 
+}
+
+void ssi_dq3_io_init(uint8_t dq3)
+{
+
+    *(uint8_t *)&ssi_dq3 = dq3;
+    spi_miso_io_cfg(dq3);
+    af_io_init((gpio_pin_t *)&dq3,AF_SPI1_DQ3); 
+}
+
+void ssi_io_deinit(void)
+{
+	set_gpio_mode((gpio_pin_t *)&ssi_clk);
+	set_gpio_mode((gpio_pin_t *)&ssi_nss0);
+	set_gpio_mode((gpio_pin_t *)&ssi_dq0);
+	set_gpio_mode((gpio_pin_t *)&ssi_dq1);
+}
+
+void ssi_clk_io_deinit(void)
+{
+    set_gpio_mode((gpio_pin_t *)&ssi_clk);
+}
+
+void ssi_nss0_io_deinit(void)
+{
+    set_gpio_mode((gpio_pin_t *)&ssi_nss0);
+}
+
+void ssi_nss1_io_deinit(void)
+{
+    set_gpio_mode((gpio_pin_t *)&ssi_nss1);
+}
+
+void ssi_dq0_io_deinit(void)
+{
+    set_gpio_mode((gpio_pin_t *)&ssi_dq0);
+}
+
+void ssi_dq1_io_deinit(void)
+{
+    set_gpio_mode((gpio_pin_t *)&ssi_dq1);
+}
+
+void ssi_dq2_io_deinit(void)
+{
+    set_gpio_mode((gpio_pin_t *)&ssi_dq2);
+}
+
+void ssi_dq3_io_deinit(void)
+{
+    set_gpio_mode((gpio_pin_t *)&ssi_dq3);
 }
 
 void uart1_io_init(uint8_t txd,uint8_t rxd)

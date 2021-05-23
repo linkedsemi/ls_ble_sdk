@@ -9,3 +9,4 @@ if env['IC'] == 'le501x':
     SConscript(dirs = 'pdm',exports=['app_build'])
     SConscript(dirs = 'i2c',exports=['app_build'])
     SConscript(dirs = 'crypt',exports=['app_build'])
+    SConscript(dirs = 'ssi',exports=['app_build'])
