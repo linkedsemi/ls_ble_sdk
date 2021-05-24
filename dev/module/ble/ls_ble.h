@@ -257,6 +257,7 @@ enum prf_id
 {
     PRF_DIS_SERVER,
     PRF_MESH,
+    PRF_LS_MESH,
     PRF_FOTA_SERVER,
     PRF_HID,
     PRF_BASS,

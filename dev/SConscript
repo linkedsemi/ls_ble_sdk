@@ -29,7 +29,7 @@ if env['IC']== 'le501x':
     else:
         env['FW_LIB'] = ble_lib['FW_LIB']
     if mesh_lib.get('FW_MESH_HEX') is None:
-        env['FW_MESH_HEX'] = File('#dev/soc/arm_cm/le501x/bin/fw_with_mesh.hex')
+        env['FW_MESH_HEX'] = File('#dev/soc/arm_cm/le501x/bin/fw_with_sig_mesh.hex')
     else:
         env['FW_MESH_HEX'] = mesh_lib['FW_MESH_HEX'] 
     if mesh_lib.get('MESH_LIB') is None:

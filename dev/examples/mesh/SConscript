@@ -2,3 +2,4 @@ Import('app_build','image_build','env')
 if env['IC'] == 'le501x':
     SConscript(dirs = 'sig_mesh',exports=['app_build'])
     SConscript(dirs = 'genie_mesh',exports=['app_build'])
+    SConscript(dirs = 'ls_mesh',exports=['app_build'])

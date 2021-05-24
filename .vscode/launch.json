@@ -809,7 +809,7 @@
                 "monitor flash breakpoints = 0",
                 "monitor reset",
                 "load", 
-                //"add-symbol-file build/fw.elf",                
+           //      "add-symbol-file build/le501x/mesh_stack.elf",                  
             ]
         },
 
@@ -824,7 +824,7 @@
             "interface": "swd",
             "preAttachCommands":[
                 "monitor flash breakpoints = 0",
-                //"add-symbol-file build/fw.elf",  
+                // "add-symbol-file build/le501x/mesh_stack.elf",    
             ]
         },
         {
@@ -841,7 +841,7 @@
                 "monitor flash breakpoints = 0",
                 "monitor reset",
                 "load", 
-                //"add-symbol-file build/fw.elf",                
+            //    "add-symbol-file build/le501x/mesh_stack.elf",                
             ]
         },
         {
@@ -855,7 +855,7 @@
             "interface": "swd",
             "preAttachCommands":[
                 "monitor flash breakpoints = 0",
-                //"add-symbol-file build/fw.elf",  
+               // "add-symbol-file build/le501x/mesh_stack.elf",    
             ]
         },
         {
@@ -863,16 +863,16 @@
             "request": "launch",
             "servertype": "jlink",
             "cwd": "${workspaceRoot}",
-            "executable": "./build/le501x/examples/sig_mesh.elf",
-            "name": "Debug LE501X LS_SIG_MESH",
+            "executable": "./build/le501x/examples/tmall_mesh_gatt_glp.elf",
+            "name": "Debug LE501X TMALL_MESH_GATT_GLP",
             "device": "LE501X",
             "interface": "swd",
             "runToMain": false,
             "preLaunchCommands" :[
                 "monitor flash breakpoints = 0",
                 "monitor reset",
-                "load", 
-                //"add-symbol-file build/fw.elf",                
+                "load",    
+            //    "add-symbol-file build/le501x/mesh_stack.elf",                
             ]
         },
         {
@@ -880,13 +880,107 @@
             "request": "attach",
             "servertype": "jlink",
             "cwd": "${workspaceRoot}",
-            "executable": "./build/le501x/examples/sig_mesh.elf",
-            "name": "Attach LS_SIG_MESH",
+            "executable": "./build/le501x/examples/tmall_mesh_gatt_glp.elf",
+            "name": "Attach TMALL_MESH_GATT_GLP",
             "device": "LE501X",
             "interface": "swd",
             "preAttachCommands":[
                 "monitor flash breakpoints = 0",
-                //"add-symbol-file build/fw.elf",  
+                // "add-symbol-file build/le501x/mesh_stack.elf",    
+            ]
+        },
+        {
+            "type": "cortex-debug",
+            "request": "launch",
+            "servertype": "jlink",
+            "cwd": "${workspaceRoot}",
+            "executable": "./build/le501x/examples/sig_mesh_provee.elf",
+            "name": "Debug LS_SIG_MESH_PROVEE",
+            "device": "LE501X",
+            "interface": "swd",
+            "runToMain": false,
+            "preLaunchCommands" :[
+                "monitor flash breakpoints = 0",
+                "monitor reset",
+                "load", 
+             //   "add-symbol-file build/le501x/mesh_stack.elf",                    
+            ]
+        },
+        {
+            "type": "cortex-debug",
+            "request": "attach",
+            "servertype": "jlink",
+            "cwd": "${workspaceRoot}",
+            "executable": "./build/le501x/examples/sig_mesh_provee.elf",
+            "name": "Attach LS_SIG_MESH_PROVEE",
+            "device": "LE501X",
+            "interface": "swd",
+            "preAttachCommands":[
+                "monitor flash breakpoints = 0",
+                // "add-symbol-file build/le501x/mesh_stack.elf", 
+            ]
+        },
+        {
+            "type": "cortex-debug",
+            "request": "launch",
+            "servertype": "jlink",
+            "cwd": "${workspaceRoot}",
+            "executable": "./build/le501x/examples/sig_mesh_provee_auto_prov.elf",
+            "name": "Debug LS_SIG_MESH_PROVEE_AUTO_PROV",
+            "device": "LE501X",
+            "interface": "swd",
+            "runToMain": false,
+            "preLaunchCommands" :[
+                "monitor flash breakpoints = 0",
+                "monitor reset",
+                "load", 
+            //    "add-symbol-file build/le501x/mesh_stack.elf",                    
+            ]
+        },
+        {
+            "type": "cortex-debug",
+            "request": "attach",
+            "servertype": "jlink",
+            "cwd": "${workspaceRoot}",
+            "executable": "./build/le501x/examples/sig_mesh_provee_auto_prov.elf",
+            "name": "Attach LS_SIG_MESH_PROVEE_AUTO_PROV",
+            "device": "LE501X",
+            "interface": "swd",
+            "preAttachCommands":[
+                "monitor flash breakpoints = 0",
+                // "add-symbol-file build/le501x/mesh_stack.elf", 
+            ]
+        },
+        ,
+        {
+            "type": "cortex-debug",
+            "request": "launch",
+            "servertype": "jlink",
+            "cwd": "${workspaceRoot}",
+            "executable": "./build/le501x/examples/ls_mesh.elf",
+            "name": "Debug LE501X_LS_MESH",
+            "device": "LE501X",
+            "interface": "swd",
+            "runToMain": false,
+            "preLaunchCommands" :[
+                "monitor flash breakpoints = 0",
+                "monitor reset",
+                "load", 
+ //               "add-symbol-file build/le501x/fw.elf",                
+            ]
+        },
+        {
+            "type": "cortex-debug",
+            "request": "attach",
+            "servertype": "jlink",
+            "cwd": "${workspaceRoot}",
+            "executable": "./build/le501x/examples/ls_mesh.elf",
+            "name": "Attach LE501X_LS_MESH",
+            "device": "LE501X",
+            "interface": "swd",
+            "preAttachCommands":[
+                "monitor flash breakpoints = 0",
+ //               "add-symbol-file build/le501x/fw.elf",  
             ]
         },
         {

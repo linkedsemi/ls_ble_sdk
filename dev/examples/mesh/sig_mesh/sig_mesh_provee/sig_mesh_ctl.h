@@ -67,6 +67,23 @@ enum MESH_MDL_CLI_CFG
     MESH_CMDL_CFG_IDX_LIGHTC_XYL,
 };
 
+enum MESH_VENDORS_MDL_CFG
+{
+    /// ************ Vendor Server ************
+    MESH_MDL_CFG_VENDORS_MIN = 0x1100,
+    /// Vendor Server
+    MESH_MDL_CFG_VENDORS_INFO = MESH_MDL_CFG_VENDORS_MIN,
+};
+
+enum MESH_VENDORC_MDL_CFG
+{
+    /// ************ Vendor Client ************
+    MESH_MDL_CFG_VENDORC_MIN = 0x1200,
+    /// Vendor Client
+    MESH_MDL_CFG_VENDORC_INFO = MESH_MDL_CFG_VENDORC_MIN,
+};
+
+
 // Generic OnOff Set
 struct mesh_generic_onoff_set
 {
@@ -160,14 +177,18 @@ struct mesh_vendor_model_indication
 enum SIGMESH_MODEL_DEF
 {
     MODEL0_GENERIC_ONOFF_SVC,
-    MODEL1_GENERIC_LVL_SVC,
-    MODEL2_GENERIC_LVL_SVC,
-    MODEL3_GENERIC_ONOFF_CLI,
-    MODEL4_GENERIC_LVL_CLI,
-    MODEL5_GENERIC_ONOFF_SVC,
+    MODEL1_GENERIC_LEVEL_SVC,
+    MODEL2_VENDOR_MODEL_SVC,
+
+    MODEL0_GENERIC_ONOFF_CLI,
+    MODEL1_GENERIC_LEVEL_CLI,
+    MODEL2_VENDOR_MODEL_CLI,
     USR_MODEL_MAX_NUM
 };
+#define RECORD_KEY1 1
+#define RECORD_KEY2 2
+
+
 extern struct mesh_model_info model_env;
-void mesh_send_custom_adv(uint16_t duration,uint8_t *adv_data,uint8_t adv_data_length);
 void sig_mesh_mdl_state_upd_hdl(struct model_state_upd* msg);
 #endif // _SIG_MESH_CTL_H_

@@ -12,8 +12,8 @@
 #include <string.h>
 
 #define TIMx   LSGPTIMB
-#define LIGHT_LED_1                  (PA01)
-#define LIGHT_LED_2                  (PB08)
+#define LIGHT_LED_1                  (PB08)
+#define LIGHT_LED_2                  (PA01)
 #define LIGHT_LED_3                  (PB09)
 #define LIGHT_BUTTON_1               (PA07)
 #define LIGHT_BUTTON_2               (PB15)

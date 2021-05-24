@@ -79,6 +79,7 @@ static void light_control(bool lightness_flag, uint16_t const led_id)
     else
     {
         light_tim_cfg.Pulse = (*led_level);
+        LOG_I("led_level=%d",light_tim_cfg.Pulse);
         
         HAL_TIM_PWM_ConfigChannel(&light_tim_hdl, &light_tim_cfg, channel_id); 
         HAL_TIM_PWM_Start(&light_tim_hdl, channel_id);
@@ -89,6 +90,7 @@ void ls_mesh_light_set_lightness(uint16_t level, uint16_t const led_id)
 {
     uint8_t *onoff_state;
     uint16_t *led_level;
+ 
 
     if (led_id != LIGHT_LED_1)
     {
@@ -138,25 +140,17 @@ uint16_t ls_mesh_light_get_lightness(uint16_t const led_id)
 	return (led_id == ls_mesh_light_state[0].led_idx)?(ls_mesh_light_state[0].level):((led_id == ls_mesh_light_state[1].led_idx)?(ls_mesh_light_state[1].level):(ls_mesh_light_state[2].level));
 }
 
-void HAL_TIM_PWM_MspInit(TIM_HandleTypeDef *htim)
-{
-    /*##-1- Enable peripherals and GPIO Clocks #################################*/
-    /* TIMx Peripheral clock enable */
-    REG_FIELD_WR(RCC->APB1EN, RCC_GPTIMB1, 1);
-    /* Enable all GPIO Channels Clock requested */
-    /* Configure PA00, PA01 for PWM output*/
-    gptimb1_ch1_io_init(LIGHT_LED_1,true,0);
-	gptimb1_ch2_io_init(LIGHT_LED_2,true,0);
-    gptimb1_ch3_io_init(LIGHT_LED_3,true,0);
-}
-
 void ls_mesh_pwm_init(void)
 {
     uint16_t level_t = 0x5FF;
     light_tim_hdl.Instance = TIMx;
+
+    gptimb1_ch1_io_init(LIGHT_LED_1,true,0);
+	gptimb1_ch2_io_init(LIGHT_LED_2,true,0);
+    gptimb1_ch3_io_init(LIGHT_LED_3,true,0);
   
-    light_tim_hdl.Init.Prescaler = 0;
-    light_tim_hdl.Init.Period = 0xffff -1;
+    light_tim_hdl.Init.Prescaler = 15;
+    light_tim_hdl.Init.Period = 0xfffe;
     light_tim_hdl.Init.ClockDivision = 0;
     light_tim_hdl.Init.CounterMode = TIM_COUNTERMODE_UP;
     light_tim_hdl.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;

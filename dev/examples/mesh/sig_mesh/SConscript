@@ -1,10 +1,3 @@
 Import('app_build')
-src = [
-    'main.c',
-    'sig_mesh_ctl.c',
-    'sig_light_cfg.c'
-]
-inc = [
-    '.'
-]
-app_build('sig_mesh',src,inc,mesh=True)
+SConscript(dirs = 'sig_mesh_provee',exports=['app_build'])
+SConscript(dirs = 'sig_mesh_provee_auto_prov',exports=['app_build'])

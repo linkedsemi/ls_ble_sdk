@@ -10,8 +10,8 @@ typedef uint8_t SIGMESH_NodeInfo_TypeDef;
 #define MESH_AUTH_DATA_LEN (16)
 #define MAX_MESH_MODEL_NB (14)
 #define MAX_AUTO_PROV_MESH_MODEL_NB (10)
-//#define MAX_MESH_MODEL_MSG_BUFFER      (380)
-#define MAX_MESH_MODEL_MSG_BUFFER (60)
+#define MAX_MESH_MODEL_MSG_BUFFER      (380)
+//#define MAX_MESH_MODEL_MSG_BUFFER   (60)
 
 #define UPADTE_GLP_STOP_TYPE 0xfe
 #define UPADTE_GLP_STOP_TIMEOUT_TYPE 0xfd
@@ -25,6 +25,9 @@ typedef uint8_t SIGMESH_NodeInfo_TypeDef;
 #define LIGHTS_CTL_SERVER                (0x1303)
 #define LIGHTS_HSL_SERVER                (0x1307)
 #define VENDOR_TMALL_SERVER              (0x01A80000)
+#define VENDOR_USER_SERVER               (0x0002093A)
+#define VENDOR_USER_CLIENT               (0x0003093A)
+        
         
 //Generic OnOff        
 #define GENERIC_ONOFF_GET                (0x0182)
@@ -53,7 +56,7 @@ typedef uint8_t SIGMESH_NodeInfo_TypeDef;
 #define LIGHT_CTL_SET_UNACK              (0x5F82)
 #define LIGHT_CTL_STATUS                 (0x6082)
 
-// Vendor        
+// tmall Vendor        
 #define APP_MESH_VENDOR_SET              (0x0001A8d1)
 #define APP_MESH_VENDOR_SET_UNAK         (0x0001A8d2)
 #define APP_MESH_VENDOR_STATUES          (0x0001A8d3)
@@ -61,36 +64,40 @@ typedef uint8_t SIGMESH_NodeInfo_TypeDef;
 #define APP_MESH_VENDOR_CONFIRMATION     (0x0001A8d5)
 #define APP_MESH_VENDOR_TRANSPARENT_MSG  (0x0001A8cf)
 
+// linkedsemi Vendor        
+#define APP_LS_SIG_MESH_VENDOR_SET       (0x00093Ac0)
+
 #define VENDOR_OPCODE_LEN (3)
 
 enum mesh_evt_type
 {
     MESH_ACTIVE_ENABLE = 0,
-    MESH_ACTIVE_DISABLE = 1,
-    MESH_ACTIVE_REGISTER_MODEL = 2,
-    MESH_ACTIVE_MODEL_PUBLISH = 3,
-    MESH_ACTIVE_MODEL_GROUP_MEMBERS = 4,
-    MESH_ACTIVE_MODEL_RSP_SENT = 5,
-    MESH_ACTIVE_LPN_START = 6,
-    MESH_ACTIVE_LPN_STOP = 7,
-    MESH_ACTIVE_LPN_SELECT_FRIEND = 8,
-    MESH_ACTIVE_PROXY_CTL = 9,
-    MESH_ACTIVE_STORAGE_LOAD = 10,
-    MESH_ACTIVE_STORAGE_SAVE = 11,
-    MESH_ACTIVE_STORAGE_CONFIG = 12,
-    MESH_GET_PROV_INFO = 13,
-    MESH_GET_PROV_AUTH_INFO = 14,
-    MESH_REPORT_ATTENTION_STATE = 15,
-    MESH_REPOPT_PROV_RESULT = 16,
-    MESH_ACCEPT_MODEL_INFO = 17,
-    MESH_RSP_MODEL_INFO = 18,
-    MESH_REPORT_TIMER_STATE = 19,
-    MESH_GENIE_PROV_COMP = 20,
-    MESH_ADV_REPORT = 21,
-    MESH_STATE_UPD_IND = 22,
-    MESH_ACTIVE_GLP_START = 23,
-    MESH_ACTIVE_GLP_STOP = 24,
-    MESH_ACTIVE_AUTO_PROV =25,
+    MESH_ACTIVE_DISABLE,
+    MESH_ACTIVE_REGISTER_MODEL,
+    MESH_ACTIVE_MODEL_PUBLISH,
+    MESH_ACTIVE_MODEL_GROUP_MEMBERS,
+    MESH_ACTIVE_MODEL_RSP_SENT,
+    MESH_ACTIVE_LPN_START,
+    MESH_ACTIVE_LPN_STOP,
+    MESH_ACTIVE_LPN_OFFER,
+    MESH_ACTIVE_LPN_STATUS, 
+    MESH_ACTIVE_PROXY_CTL,
+    MESH_ACTIVE_STORAGE_LOAD,
+    MESH_ACTIVE_STORAGE_SAVE,
+    MESH_ACTIVE_STORAGE_CONFIG,
+    MESH_GET_PROV_INFO,
+    MESH_GET_PROV_AUTH_INFO,
+    MESH_REPORT_ATTENTION_STATE,
+    MESH_REPOPT_PROV_RESULT,
+    MESH_ACCEPT_MODEL_INFO,
+    MESH_RSP_MODEL_INFO,
+    MESH_REPORT_TIMER_STATE,
+    MESH_GENIE_PROV_COMP,
+    MESH_ADV_REPORT,
+    MESH_STATE_UPD_IND,
+    MESH_ACTIVE_GLP_START,
+    MESH_ACTIVE_GLP_STOP,
+    MESH_ACTIVE_AUTO_PROV,
 };
 
 /// Mesh Supported Features
@@ -103,6 +110,7 @@ enum mesh_feature
     EN_MSG_API = 0x00010000,
     EN_PB_GATT = 0x00020000,
     EN_DYN_BCN_INTV = 0x00040000,
+    EN_PROVER = 0x00080000,
 };
 
 enum mesh_provisioned_state
@@ -225,6 +233,28 @@ enum mesh_state_idx
     MESH_STATE_LIGHT_XYL_XY_RANGE
 };
 
+/// Receive window factor values
+enum lpn_rx_window_factor
+{
+    LPN_RX_WINDOW_FACTOR_1   = 0,
+    LPN_RX_WINDOW_FACTOR_1_5,
+    LPN_RX_WINDOW_FACTOR_2,
+    LPN_RX_WINDOW_FACTOR_2_5,
+};
+
+/// Minimum cache size log values
+enum lpn_min_cache_size_log
+{
+    /// Prohibited
+    LPN_MIN_CACHE_SIZE_LOG_PROHIB = 0,
+    LPN_MIN_CACHE_SIZE_LOG_N2,
+    LPN_MIN_CACHE_SIZE_LOG_N4,
+    LPN_MIN_CACHE_SIZE_LOG_N8,
+    LPN_MIN_CACHE_SIZE_LOG_N16,
+    LPN_MIN_CACHE_SIZE_LOG_N32,
+    LPN_MIN_CACHE_SIZE_LOG_N64,
+    LPN_MIN_CACHE_SIZE_LOG_N128,
+};
 struct reqister_model_info
 {
     uint32_t model_id;
@@ -287,6 +317,15 @@ struct rsp_model_info
     uint8_t info[MAX_MESH_MODEL_MSG_BUFFER];
 };
 
+struct vendor_model_publish_message
+{
+    uint8_t ModelHandle;
+    uint8_t TxHandle;
+    uint32_t MsgOpcode;
+    uint16_t MsgLength;
+    uint8_t msg[MAX_MESH_MODEL_MSG_BUFFER]; 
+};
+
 struct model_cli_set_state_info
 {
     uint32_t state_1;
@@ -315,6 +354,31 @@ struct start_glp_info
     uint16_t SleepIntvlMs;
 };
 
+struct start_lpn_info
+{
+    uint8_t rx_window_factor;
+    uint8_t min_queue_size_log;
+    uint8_t rx_delay_ms;
+    uint16_t previous_addr;
+    uint32_t poll_timeout_100ms;
+    uint32_t poll_intv_ms;
+};
+
+ struct lpn_offer_info
+{
+    uint16_t friend_addr;
+    uint8_t  friend_rx_window;
+    uint8_t  friend_queue_size;
+    uint8_t  friend_subs_list_size;
+    int8_t   friend_rssi;
+};
+
+struct lpn_status_info
+{
+    uint16_t lpn_status;
+    uint16_t friend_addr;
+};
+
 struct model_rx_info
 {
     uint8_t ModelHandle;
@@ -329,11 +393,12 @@ struct model_rx_info
 
 struct model_state_upd
 {
+    uint8_t elmt_idx;
+        /// State identifier 
+    uint16_t state_id;
+    uint16_t source_addr;
     uint32_t state;
     uint32_t trans_time_ms;
-    /// State identifier 
-    uint16_t state_id;
-    uint8_t elmt_idx;
 };
 
 struct report_mesh_prov_result_info
@@ -359,7 +424,9 @@ struct model_id_info
 {
     uint8_t element_id;
     uint8_t model_lid;
+    uint8_t vendor_model_role;
     uint16_t sig_model_cfg_idx;
+    uint16_t vendor_model_cfg_idx;
     uint32_t model_id;
 };
 
@@ -377,12 +444,19 @@ struct mesh_publish_info_ind
     uint16_t addr;
 };
 
+struct mesh_auto_prov_model_info
+{
+    bool publish_flag;
+    bool subs_flag;
+    uint32_t model_id;
+};
+
 struct mesh_auto_prov_info
 {
     uint16_t unicast_addr;
     uint8_t model_nb;
     uint16_t group_addr;
-    uint32_t model_id[MAX_AUTO_PROV_MESH_MODEL_NB];
+    struct mesh_auto_prov_model_info model_info[MAX_AUTO_PROV_MESH_MODEL_NB];
     uint8_t app_key[16];
     uint8_t net_key[16];
 };
@@ -401,6 +475,8 @@ union ls_sig_mesh_evt_u {
     struct mesh_model_info sig_mdl_info;
     struct mesh_publish_info_ind mesh_publish_info;
     struct mesh_auto_prov_info mesh_auto_prov_param;
+    struct lpn_offer_info lpn_offer_info;
+    struct lpn_status_info lpn_status_info;
 };
 
 struct ls_sig_mesh_cfg
@@ -432,20 +508,32 @@ void ls_sig_mesh_platform_reset(void);
 void set_prov_param(struct mesh_prov_info *param);
 void set_prov_auth_info(struct mesh_prov_auth_info *param);
 void model_subscribe(uint8_t const ModelHandle, uint16_t const Addr);
+void model_get_subscribe_list(uint8_t  ModelHandle, uint8_t *add_list, bool uuid_flag);
+uint16_t  model_get_subscribe_listSize(uint8_t  ModelHandle);
 void rsp_model_info_ind(struct rsp_model_info *param);
 void mesh_model_client_set_state_handler(struct model_cli_set_state_info *param);
 void mesh_model_client_tx_message_handler(struct model_cli_trans_info *param);
+void mesh_vendor_model_publish_message(struct vendor_model_publish_message *msg);
 void TIMER_Set(uint8_t TimerID, uint32_t DelayMS);
 void TIMER_Cancel(uint8_t TimerID);
 void SIGMESH_UnbindAll(void);
 void stop_tx_unprov_beacon(void);
 void start_tx_unprov_beacon(struct bcn_start_unprov_param *param);
 void ls_sig_mesh_con_set_scan_rsp_data(uint8_t *scan_rsp_data, uint8_t *scan_rsp_data_len);
+void app_mesh_enable_mesh(void);
+void app_mesh_disable_mesh(void);
 void start_ls_sig_mesh_gatt(void);
 void stop_ls_sig_mesh_gatt(void);
 void ls_sig_mesh_proxy_adv_ctl(uint8_t enable);
 void start_glp_handler(struct start_glp_info *param);
 void stop_glp_handler(void);
+void start_lpn_handler(struct start_lpn_info *param);
+void stop_lpn_handler(void);
+void ls_sig_mesh_disable(void);
+void ls_sig_mesh_enable(void);
+void lnp_select_friend_handler(uint16_t friend_addr);
 void ls_sig_mesh_auto_prov_handler(struct mesh_auto_prov_info const *param, bool const auto_prov_mesh_flag);
 void prov_succeed_src_addr_ind(uint16_t src);
+void ls_sig_mesh_set_proxy_con_interval(uint16_t *interval_ms);
+void ls_sig_mesh_set_pb_gatt_con_interval(uint16_t *interval_slot);
 #endif //(_LS_SIG_MESH_H_
