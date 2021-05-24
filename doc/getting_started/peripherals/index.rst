@@ -11,4 +11,5 @@
     rtc
     pdm
     adc
+    crypt
     

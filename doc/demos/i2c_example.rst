@@ -1,7 +1,7 @@
 IIC设备使用示例
 =================
 
-例程路径：<install_file>/dev/examples/i2c_test
+例程路径：<install_file>/dev/examples/peripheral/i2c
 
 操作步骤:
 -----------------

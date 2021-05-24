@@ -14,3 +14,4 @@
    pdm_example
    spi_example
    ble_uart_server
+   crypt_example
