@@ -16,6 +16,7 @@ import subprocess, os
 
 read_the_docs_build = os.environ.get('READTHEDOCS', None) == 'True'
 
+subprocess.call('mkdir _build',shell=True)
 subprocess.call('doxygen', shell=True)
    
 
