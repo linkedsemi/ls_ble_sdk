@@ -883,6 +883,7 @@ void io_cfg_disable(uint8_t pin)
 {
     gpio_pin_t *x = (gpio_pin_t *)&pin;
     reg_lsgpio_t *gpiox = GPIO_GetPort(x->port);
+    gpiox->OE &= ~(1<< x->num);
     gpiox->IE &= ~(1<< x->num);
 }
 
