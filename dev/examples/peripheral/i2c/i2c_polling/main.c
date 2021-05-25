@@ -1,5 +1,4 @@
 #include "lsi2c.h"
-#include "le501x.h"
 #include "platform.h"
 #include "io_config.h"
 #include <string.h>
@@ -28,10 +27,8 @@ static uint16_t Buffercmp(uint8_t* pBuff1, uint8_t* pBuff2, uint16_t Length);
   */
 int main(void)
 {
-	int ii;
   /* system init app     */
   sys_init_none();
-  __enable_irq();
   /* Configure the GPIO AF */
   /* SDA-------------PB12 */	
   /* SCL-------------PB13 */	
@@ -70,7 +67,7 @@ int main(void)
       Error_Handler();
     }
   }
-	for(ii=0;ii<100;ii++)
+	for(uint32_t i=0;i<100;i++)
 		DELAY_US(500);
 	
   while(HAL_I2C_Master_Transmit(&I2cHandle, (uint16_t)I2C_ADDRESS, (uint8_t*)aTxBuffer, 2, 1000)!= HAL_OK)

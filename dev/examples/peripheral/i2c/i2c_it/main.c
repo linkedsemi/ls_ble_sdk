@@ -1,5 +1,4 @@
 #include "lsi2c.h"
-#include "le501x.h"
 #include "platform.h"
 #include "io_config.h"
 #include <string.h>
@@ -42,14 +41,12 @@ static uint16_t Buffercmp(uint8_t* pBuff1, uint8_t* pBuff2, uint16_t Length);
   */
 int main(void)
 {
-	int ii;
   /* system init app     */
   sys_init_none();
-  __enable_irq();
   /* Configure the GPIO AF */
   /* SDA-------------PB12 */	
   /* SCL-------------PB13 */	
-	iic1_io_init( PB13, PB12);
+  iic1_io_init( PB13, PB12);
 
 	
   /*##-1- Configure the I2C peripheral ######################################*/
@@ -82,7 +79,7 @@ int main(void)
 
 	while(Com_Sta == txing);
 	
-	for(ii=0;ii<100;ii++)
+	for(uint32_t i=0;i<100;i++)
 		DELAY_US(500);
 
 	Com_Sta = txaddr;
