@@ -184,6 +184,7 @@ static uint8_t *next_connect_addr;
 static uint8_t scan_obj_hdl = 0xff;
 static uint8_t init_obj_hdl = 0xff;
 static uint8_t init_status = INIT_IDLE; 
+static uint8_t dev_addr_type = 0;          /*  0:Public, 1:Private */
 
 static void ls_uart_client_init(void);
 static void ls_uart_client_service_dis(uint8_t con_idx);
@@ -395,7 +396,7 @@ static void start_init(uint8_t *peer_addr)
         .supervision_to = 200,
 
         .peer_addr = &peer_dev_addr_str,
-        .peer_addr_type = 1,
+        .peer_addr_type = dev_addr_type,
         .type = DIRECT_CONNECTION,
     };
     dev_manager_start_init(init_obj_hdl,&init_param);
@@ -856,6 +857,7 @@ static void dev_manager_callback(enum dev_evt_type type,union dev_evt_u *evt)
         {
             if (init_obj_hdl != 0xff && init_status == INIT_IDLE)
             {
+                dev_addr_type = evt->adv_report.adv_addr_type;
                 next_connect_addr = (uint8_t*)&peer_slave_addr0[0];
                 dev_manager_stop_scan(scan_obj_hdl);
             }   
