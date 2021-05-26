@@ -32,6 +32,8 @@ void tinyfs_test()
     rslt = tinyfs_write(dir0,RECORD_KEY4,RECORD4,sizeof(RECORD4));
     rslt = tinyfs_write(dir1,RECORD_KEY6,RECORD6,sizeof(RECORD6));
     rslt = tinyfs_write(dir3,RECORD_KEY5,RECORD5,sizeof(RECORD5));
+
+    tinyfs_write_through();
     
     //
 #endif
@@ -49,5 +51,7 @@ void tinyfs_test()
     rslt = tinyfs_del_record(dir1,RECORD_KEY3);
     rslt = tinyfs_del_dir(dir0,false);
     rslt = tinyfs_del_dir(dir0,true);
+    
+    tinyfs_write_through();
 }
 
