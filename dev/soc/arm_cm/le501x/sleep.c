@@ -178,33 +178,39 @@ NOINLINE XIP_BANNED static void cpu_flash_deep_sleep_and_recover()
     spi_flash_xip_start();
 }
 
+XIP_BANNED uint32_t io_retention_pull(uint32_t idx,uint16_t oe,uint16_t ie,uint16_t dout,uint32_t pupd)
+{
+    if((1<<idx) & oe)
+    {
+        if((1<<idx) & dout)
+        {
+            return IO_PULL_UP<<(2*idx);
+        }else
+        {
+            return IO_PULL_DOWN<<(2*idx);
+        }
+    }else if(((1<<idx) & ie)==0)
+    {
+        return IO_PULL_DOWN<<(2*idx);
+    }else
+    {
+        return pupd&(0x3<<(2*idx));
+    }
+}
+
 static void lvl2_lvl3_io_retention(reg_lsgpio_t *gpiox)
 {
     uint16_t oe = gpiox->OE;
     uint16_t ie = gpiox->IE;
     uint16_t dout = gpiox->DOUT;
+    uint32_t pupd = gpiox->PUPD;
     uint32_t pull = 0;
-    uint32_t mask = 0;
     uint8_t i;
     for(i=0;i<16;++i)
     {
-        if(1<<i & oe)
-        {
-            mask |= 3<<(2*i);
-            if(1<<i & dout)
-            {
-                pull |= IO_PULL_UP <<(2*i);
-            }else
-            {
-                pull |= IO_PULL_DOWN << (2*i);
-            }
-        }else if((1<<i & ie)==0)
-        {
-            mask |= 3<<(2*i);
-            pull |= IO_PULL_DOWN << (2*i);
-        }
+        pull |= io_retention_pull(i,oe,ie,dout,pupd);
     }
-    gpiox->PUPD = (gpiox->PUPD & ~mask) | pull;
+    gpiox->PUPD = pull;
 }
 
 void ble_wkup_status_set(bool status)
@@ -261,7 +267,13 @@ XIP_BANNED void enter_deep_sleep_mode_lvl2_lvl3(struct deep_sleep_wakeup *wakeup
     lvl2_lvl3_mode_prepare(wakeup);
     spi_flash_xip_stop();
     spi_flash_deep_power_down();
-    LSGPIOC->PUPD = 0xAAAA555A;
+    uint16_t c_oe = LSGPIOC->OE;
+    uint16_t c_ie = LSGPIOC->IE;
+    uint16_t c_dout = LSGPIOC->DOUT;
+    uint32_t c_pupd = LSGPIOC->PUPD;
+    uint32_t pull0 = io_retention_pull(0,c_oe, c_ie, c_dout, c_pupd);
+    uint32_t pull1 = io_retention_pull(1,c_oe, c_ie, c_dout, c_pupd);
+    LSGPIOC->PUPD = 0x5550|pull1|pull0;
     __WFI();
     while(1);
 }
