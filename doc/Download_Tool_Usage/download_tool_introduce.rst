@@ -7,9 +7,9 @@
 
 上位机烧录软件可以从百度网盘里面下载：
 
-链接：https://pan.baidu.com/s/1jisGXHonzePPIqtgnifUOA
+链接：https://pan.baidu.com/s/1-K3I05Q1nqbUYAt-7_443Q
 
-提取码：fr1a 
+提取码：3we6  
 
 ++++++++++++
 1.1 文件说明
@@ -43,7 +43,10 @@
 2.1.3 下载配置
 >>>>>>>>>>>>>>>>>>>>>>>>>
 
-[DOWNLOAD]: 配置默认波特率和是否需要下载MAC地址，``BAUDRATE=6`` 表示默认波特率为460800; ``BLE_ADDR=0`` 时，表示启动烧录软件默认不烧录MAC地址，``BLE_ADDR=1`` 时，默认选择烧录MAC地址。
+[DOWNLOAD]: 
+    | 配置默认波特率和是否需要下载MAC地址，``BAUDRATE=6`` 表示默认波特率为460800; 
+    | ``BLE_ADDR=0`` 时，表示启动烧录软件默认不烧录MAC地址，``BLE_ADDR=1`` 时，默认选择烧录MAC地址;
+    | ``TG7121B_TRIPLE_STORAGE = 0`` 时，表示为 LE5010 芯片烧录，``TG7121B_TRIPLE_STORAGE = 1`` 时，表示 TG7121B 芯片烧录。
 
 ++++++++++++
 2.2 下载操作
