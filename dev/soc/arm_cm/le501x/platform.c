@@ -52,6 +52,7 @@ static void bb_mem_clr(void)
 static void irq_priority()
 {
     __NVIC_SetPriority(SVCall_IRQn,2);
+    __NVIC_SetPriority(SysTick_IRQn, 1);
     NVIC->IP[0] = IRQ_NVIC_PRIO(EXTI_IRQn,3) | IRQ_NVIC_PRIO(WWDT_IRQn,3) | IRQ_NVIC_PRIO(LPWKUP_IRQn,3) | IRQ_NVIC_PRIO(BLE_IRQn,1);
     NVIC->IP[1] = IRQ_NVIC_PRIO(RTC_IRQn,3) | IRQ_NVIC_PRIO(DMA_IRQn,3) | IRQ_NVIC_PRIO(QSPI_IRQn,3) | IRQ_NVIC_PRIO(ECC_IRQn,3);
     NVIC->IP[2] = IRQ_NVIC_PRIO(CACHE_IRQn,3) | IRQ_NVIC_PRIO(TRNG_IRQn,3) | IRQ_NVIC_PRIO(IWDT_IRQn,3) | IRQ_NVIC_PRIO(CRYPT_IRQn,3);
@@ -341,8 +342,10 @@ void sys_init_none()
     analog_init();
     spi_flash_drv_var_init(true,false);
     cpu_sleep_recover_init();
+    calc_acc_init();
     mac_init();
     io_init();
+    systick_start();
     LOG_INIT();
 }
 
@@ -571,4 +574,24 @@ uint32_t get_app_image_base()
 uint32_t get_fota_image_base()
 {
     return config_word_get(FOTA_IMAGE_BASE_OFFSET);
+}
+
+__attribute__((weak)) uint32_t __aeabi_uidiv(uint32_t r0,uint32_t r1)
+{
+    return (uint32_t)idiv_acc(r0,r1,false);
+}
+
+__attribute__((weak)) int32_t __aeabi_idiv(int32_t r0,int32_t r1)
+{
+    return (int32_t)(0xffffffff&idiv_acc(r0,r1,true));
+}
+
+__attribute__((weak)) uint64_t __aeabi_uidivmod(uint32_t r0,uint32_t r1)
+{
+    return idiv_acc(r0,r1,false);    
+}
+
+__attribute__((weak)) int64_t __aeabi_idivmod(int32_t r0,int32_t r1)
+{
+    return (int64_t)idiv_acc(r0,r1,true);
 }

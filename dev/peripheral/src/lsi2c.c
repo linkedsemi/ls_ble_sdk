@@ -1010,7 +1010,7 @@ static bool i2c_flag_poll(va_list va)
 
 static HAL_StatusTypeDef I2C_WaitOnFlagUntilTimeout(I2C_HandleTypeDef *hi2c, uint32_t Flag, FlagStatus Status, uint32_t Timeout, uint32_t Tickstart)
 {
-    uint32_t timeout = Timeout * SDK_PCLK_MHZ * 1000;
+    uint32_t timeout = SYSTICK_MS2TICKS(Timeout);
 
     /* Wait until flag is set */
     if (Timeout != HAL_MAX_DELAY)
@@ -1055,7 +1055,7 @@ static bool i2c_CR2flag_poll(va_list va)
 
 static HAL_StatusTypeDef I2C_WaitOnMasterAddressFlagUntilTimeout(I2C_HandleTypeDef *hi2c, uint32_t Flag, uint32_t Timeout, uint32_t Tickstart)
 {
-    uint32_t timeout = Timeout * SDK_PCLK_MHZ * 1000;
+    uint32_t timeout = SYSTICK_MS2TICKS(Timeout);
 
     /* Check for the Timeout */
     if (Timeout != HAL_MAX_DELAY)
@@ -1109,7 +1109,7 @@ static bool i2c_flagandnack_poll(va_list va)
 
 static HAL_StatusTypeDef I2C_WaitOnTXEFlagUntilTimeout(I2C_HandleTypeDef *hi2c, uint32_t Timeout, uint32_t Tickstart)
 {
-    uint32_t timeout = Timeout * SDK_PCLK_MHZ * 1000;
+    uint32_t timeout = SYSTICK_MS2TICKS(Timeout);
 
     /* Wait until flag is set */
     if (Timeout != HAL_MAX_DELAY)
@@ -1178,7 +1178,7 @@ static bool i2c_flagandstop_poll(va_list va)
 
 static HAL_StatusTypeDef I2C_WaitOnRXNEFlagUntilTimeout(I2C_HandleTypeDef *hi2c, uint32_t Timeout, uint32_t Tickstart)
 {
-    uint32_t timeout = Timeout * SDK_PCLK_MHZ * 1000;
+    uint32_t timeout = SYSTICK_MS2TICKS(Timeout);
 
     if (Timeout != HAL_MAX_DELAY)
     {

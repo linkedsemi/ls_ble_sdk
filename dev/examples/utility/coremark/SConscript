@@ -1,0 +1,16 @@
+
+Import('app_build','env')
+src = [
+    'core_list_join.c',
+    'core_main.c',
+    'core_matrix.c',
+    'core_portme.c',
+    'core_state.c',
+    'core_util.c',
+]
+inc = [
+    '.'
+]
+
+if not 'mdk' in env['TOOLS']:
+    app_env,app_target = app_build('coremark',src,inc,ble=False)

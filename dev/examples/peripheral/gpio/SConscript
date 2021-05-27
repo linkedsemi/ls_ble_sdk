@@ -6,4 +6,4 @@ src = [
 inc = [
     '.'
 ]
-app_build('gpio_test',src,inc)
+app_build('gpio_test',src,inc,ble=False)

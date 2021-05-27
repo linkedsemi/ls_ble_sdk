@@ -1,6 +1,8 @@
 #include "systick.h"
 #include "arm_math.h"
 #include "compile_flag.h"
+#include "sdk_config.h"
+#include "common.h"
 typedef struct
 {
   volatile uint32_t CTRL;                   /*!< Offset: 0x000 (R/W)  SysTick Control and Status Register */
@@ -43,80 +45,32 @@ typedef struct
 #define SysTick_BASE        (SCS_BASE +  0x0010UL)                    /*!< SysTick Base Address */
 #define SysTick             ((SysTick_Type   *)     SysTick_BASE  )   /*!< SysTick configuration struct */
 
-XIP_BANNED void systick_start()
+static uint32_t total_ticks;
+
+XIP_BANNED void SysTick_Handler()
 {
-    SysTick->CTRL = 0;
-    SysTick->LOAD = 0xffffff;
-    SysTick->VAL = 0;
-    SysTick->CTRL = SysTick_CTRL_CLKSOURCE_Msk | SysTick_CTRL_ENABLE_Msk;
+    total_ticks += 1;
+}
+
+void systick_start()
+{
+    total_ticks = 0;
+    SysTick->LOAD  = (uint32_t)(SDK_HCLK_MHZ*1000000/SYSTICK_RATE_HZ - 1UL);
+    SysTick->VAL   = 0UL;
+    SysTick->CTRL  = SysTick_CTRL_CLKSOURCE_Msk |
+                     SysTick_CTRL_TICKINT_Msk   |
+                     SysTick_CTRL_ENABLE_Msk;
 }
 
 XIP_BANNED uint32_t systick_get_value()
 {
-    return SysTick->VAL;
-}
-
-XIP_BANNED int32_t systick_time_diff(uint32_t a,uint32_t b)
-{
-    uint32_t diff = (b-a) &0xffffff;
-    if(diff&0x800000)
-    {
-        return diff|0xff000000;
-    }else
-    {
-        return diff;
-    }
-}
-
-enum wrapping_status
-{
-    COUNTING_TOP_HALF,
-    COUNTING_BOTTOM_HALF,
-};
-
-XIP_BANNED static bool wrapping_check(uint32_t start_tick,enum wrapping_status *stat)
-{
-    uint32_t current = systick_get_value();
-    bool wrap = false;
-    if(systick_time_diff(current,start_tick)>=0)
-    {
-        if(*stat == COUNTING_BOTTOM_HALF)
-        {
-            *stat = COUNTING_TOP_HALF;
-            wrap = true;
-        }
-    }else
-    {
-        if(*stat == COUNTING_TOP_HALF)
-        {
-            *stat = COUNTING_BOTTOM_HALF;
-        }
-    }
-    return wrap;
+    return total_ticks;
 }
 
 XIP_BANNED bool systick_poll_timeout(uint32_t start_tick,uint32_t timeout,bool (*poll)(va_list),...)
 {
-    uint32_t end = 0xffffff - start_tick + timeout;
-    uint8_t i = end>>24;
-    uint32_t end_tick = 0xffffff - (end & 0xffffff);
     va_list ap;
-    enum wrapping_status wrap_stat = COUNTING_TOP_HALF;
-    while(i)
-    {
-        if(poll)
-        {
-            va_start(ap,poll);
-            if(poll(ap))
-            {
-                return false;
-            }
-        }
-        if(wrapping_check(start_tick,&wrap_stat))
-        {
-            i -= 1;
-        }
-    }
+    uint32_t end_tick = start_tick + timeout;
     do{
         if(poll)
         {
@@ -126,6 +80,6 @@ XIP_BANNED bool systick_poll_timeout(uint32_t start_tick,uint32_t timeout,bool (
                 return false;
             }
         }
-    }while(systick_get_value()>end_tick);
+    }while(time_diff(systick_get_value(),end_tick)<0);
     return true;
 }

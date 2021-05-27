@@ -72,7 +72,7 @@ static bool uart_flag_poll(va_list va)
 
 HAL_StatusTypeDef HAL_UART_Transmit(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size, uint32_t Timeout)
 {
-    uint32_t timeout = Timeout * SDK_PCLK_MHZ * 1000;
+    uint32_t timeout = SYSTICK_MS2TICKS(Timeout);
     uint32_t tickstart = systick_get_value();
     /* Check that a Tx process is not already ongoing */
     if (huart->gState == HAL_UART_STATE_READY)
@@ -125,7 +125,7 @@ HAL_StatusTypeDef HAL_UART_Transmit(UART_HandleTypeDef *huart, uint8_t *pData, u
 HAL_StatusTypeDef HAL_UART_Receive(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size, uint32_t Timeout)
 {
 
-    uint32_t timeout = Timeout * SDK_PCLK_MHZ * 1000;
+    uint32_t timeout = SYSTICK_MS2TICKS(Timeout);
     uint32_t tickstart = systick_get_value();
 
     /* Check that a Rx process is not already ongoing */

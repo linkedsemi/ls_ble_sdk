@@ -57,6 +57,8 @@
         "adc_msp.h": "c",
         "lscrypt_msp.h": "c",
         "lscrypt.h": "c",
+        "core_portme.h": "c",
+        "sdk_config.h": "c"
     },
     "editor.detectIndentation": false,
     "restructuredtext.confPath": "${workspaceFolder}\\doc",
