@@ -1,12 +1,5 @@
 #ifndef LL_SCHED_H_
 #define LL_SCHED_H_
-#include "fifo.h"
-
-struct ll_sched_env
-{
-    void (*func)(void *);
-    void *param;
-};
 
 void ll_invoke(void (*func)(void *),void *param);
 

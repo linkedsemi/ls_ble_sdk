@@ -13,6 +13,7 @@ src = [
     'rom_patch.c',
     'stack_var.c',
     'lscache_msp.c',
+    'i2c_msp.c',
 ]
 inc = [
     '.',

@@ -33,6 +33,8 @@ void dcdc_switch_to_pfm();
 
 void dcdc_switch_to_bypass();
 
-#define DELAY_US(a) arm_cm_delay_asm((a)*(SDK_HCLK_MHZ/4))
+void irq_priority(void);
+
+#define DELAY_US(a) arm_cm_delay_asm((a)*SDK_HCLK_MHZ/5)
 
 #endif

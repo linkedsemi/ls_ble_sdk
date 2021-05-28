@@ -10,9 +10,13 @@
 #define LS_ASSERT(e) 
 #define LS_RAM_ASSERT(e) 
 #else
-#if ROM_CODE == 1 && !defined(BOOT_ROM)
+#if ROM_CODE == 1 
+#if defined(BOOT_ROM)
+#define LS_ASSERT(e) if(!(e)) while(1);
+#else
 extern void (*stack_assert_asm_fn)(uint32_t,uint32_t,uint32_t);
-#define LS_ASSERT(e) if(!(e)) stack_assert_asm_fn(1,0,0) 
+#define LS_ASSERT(e) if(!(e)) stack_assert_asm_fn(1,0,0)
+#endif
 #define LS_RAM_ASSERT(e) LS_ASSERT(e)
 #else
 #define LS_ASSERT(e) ((e)? (void)0 : ls_assert(#e,__FILE__,__LINE__))

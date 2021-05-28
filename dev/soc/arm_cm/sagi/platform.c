@@ -28,7 +28,7 @@ __attribute__((weak)) void SystemInit(){
     SCB->VTOR = (uint32_t)ISR_VECTOR_ADDR;
 }
 
-static void irq_priority()
+void irq_priority()
 {
     __NVIC_SetPriority(SVCall_IRQn,1);
     __NVIC_SetPriority(PendSV_IRQn,7);

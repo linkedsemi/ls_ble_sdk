@@ -9,6 +9,7 @@ src = [
     'platform.c',
     'io_config.c',
     'lsqspi_msp.c',
+    'i2c_msp.c',
 ]
 inc = [
     '.',

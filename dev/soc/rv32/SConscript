@@ -3,6 +3,7 @@ Import('env')
 src = [
     'int_call_asm.S',
     'swint_handler.c',
+    'systick.c',
 ]
 inc = [
     '.',

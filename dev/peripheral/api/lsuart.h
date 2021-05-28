@@ -167,7 +167,10 @@ typedef struct __UART_HandleTypeDef
 
 } UART_HandleTypeDef;
 
-HAL_StatusTypeDef HAL_UART_AutoBaudRate_Detect(UART_HandleTypeDef *huart,uint8_t mode);
+HAL_StatusTypeDef HAL_UART_AutoBaudRate_Detect(UART_HandleTypeDef *huart,uint8_t mode,uint8_t *detect_byte);
+
+void HAL_UART_BaudRateDetectCpltCallback(UART_HandleTypeDef *huart,uint8_t detect_byte);
+
 HAL_StatusTypeDef HAL_UART_AutoBaudRate_Detect_IT(UART_HandleTypeDef * huart,uint8_t mode);
 
 /* operation functions *******************************************************/

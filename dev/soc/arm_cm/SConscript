@@ -9,11 +9,16 @@ inc = [
     '.',
     'cmsis',
 ]
-if env['IC']!= 'le501x':
+if env['IC'] == 'sagi':
     sagi_src,sagi_inc,sagi_start_src = SConscript(dirs='sagi',exports = ['env'])
     src_files = File(src + ['instructions.c']) + sagi_src
     inc_dirs = Dir(inc) + sagi_inc
     start_files = sagi_start_src
+elif env['IC'] == 'gemini':
+    gemini_src,gemini_inc,gemini_start_src = SConscript(dirs='gemini',exports = ['env'])
+    src_files = File(src) + gemini_src
+    inc_dirs = Dir(inc) + gemini_inc
+    start_files = gemini_start_src
 else:
     le501x_src,le501x_inc,le501x_start_src = SConscript(dirs='le501x',exports = ['env'])
     src_files = File(src) + le501x_src

@@ -15,6 +15,9 @@
 #ifdef I2C2_BASE_ADDR
 #define I2C2 ((reg_i2c_t *)I2C2_BASE_ADDR)
 #endif
+#ifdef I2C3_BASE_ADDR
+#define I2C3 ((reg_i2c_t *)I2C3_BASE_ADDR)
+#endif
 
 #define HAL_I2C_ERROR_NONE              0x00000000U    /*!< No error              */
 #define HAL_I2C_ERROR_BERR              0x00000001U    /*!< BERR error            */

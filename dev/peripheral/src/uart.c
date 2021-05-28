@@ -342,6 +342,23 @@ __attribute__((weak)) void UART_EndTransmit_IT_DMA(UART_HandleTypeDef *huart){}
 
 __attribute__((weak)) void UART_Transmit_IT_DMA(UART_HandleTypeDef *huart){}
 
+__attribute__((weak)) void HAL_UART_BaudRateDetectCpltCallback(UART_HandleTypeDef *huart,uint8_t detect_byte){}
+
+static uint8_t UART_AutoBaudRate_Detect_End(UART_HandleTypeDef *huart)
+{
+    huart->UARTX->ICR = UART_ABE_MASK;
+    REG_FIELD_WR(huart->UARTX->MCR,UART_MCR_ABREN,0);
+    REG_FIELD_WR(huart->UARTX->LCR,UART_LCR_BRWEN,0);
+    return huart->UARTX->RBR;
+}
+
+static void UART_BaudRate_Detect_IT(UART_HandleTypeDef *huart)
+{
+    huart->UARTX->IDR = UART_IT_RXRD;
+    uint8_t detect_byte = UART_AutoBaudRate_Detect_End(huart);
+    HAL_UART_BaudRateDetectCpltCallback(huart,detect_byte);
+}
+
 void HAL_UARTx_IRQHandler(UART_HandleTypeDef *huart)
 {
     uint32_t isrflags   = huart->UARTX->IFM;  
@@ -375,7 +392,12 @@ void HAL_UARTx_IRQHandler(UART_HandleTypeDef *huart)
     /* UART in mode Receive ------------------------------------------------*/
     if ((isrflags & UART_IT_RXRD) != 0) 
     {
-        UART_Receive_IT(huart);
+        if(REG_FIELD_RD(huart->UARTX->RIF,UART_ABE))
+        {
+            UART_BaudRate_Detect_IT(huart);
+        }else{
+            UART_Receive_IT(huart);
+        }
     }
     if ((status_reg & 0x02) != 0)
     {
@@ -383,19 +405,27 @@ void HAL_UARTx_IRQHandler(UART_HandleTypeDef *huart)
     }
 }
 
-HAL_StatusTypeDef HAL_UART_AutoBaudRate_Detect(UART_HandleTypeDef *huart,uint8_t mode)
+static void UART_AutoBaudRate_Detect_Start(UART_HandleTypeDef *huart,uint8_t mode)
 {
     REG_FIELD_WR(huart->UARTX->LCR,UART_LCR_BRWEN,1);
     MODIFY_REG(huart->UARTX->MCR, UART_MCR_ABRMOD_MASK | UART_MCR_ABREN_MASK, mode<<UART_MCR_ABRMOD_POS | 1<<UART_MCR_ABREN_POS);
-    while(REG_FIELD_RD(huart->UARTX->RIF, UART_ABE)==0);
-    huart->UARTX->ICR = UART_ABE_MASK;
-    while(REG_FIELD_RD(huart->UARTX->SR,UART_SR_BUSY));
-    REG_FIELD_WR(huart->UARTX->MCR,UART_MCR_ABREN,0);
-    REG_FIELD_WR(huart->UARTX->LCR,UART_LCR_BRWEN,0);
+}
+
+HAL_StatusTypeDef HAL_UART_AutoBaudRate_Detect(UART_HandleTypeDef *huart,uint8_t mode,uint8_t *detect_byte)
+{
+    UART_AutoBaudRate_Detect_Start(huart,mode);
+    while(REG_FIELD_RD(huart->UARTX->SR,UART_SR_RFNE)==false);
+    *detect_byte = UART_AutoBaudRate_Detect_End(huart);
     return HAL_OK;
 }
 
-HAL_StatusTypeDef HAL_UART_AutoBaudRate_Detect_IT(UART_HandleTypeDef * huart,uint8_t mode);
+HAL_StatusTypeDef HAL_UART_AutoBaudRate_Detect_IT(UART_HandleTypeDef * huart,uint8_t mode)
+{
+    UART_AutoBaudRate_Detect_Start(huart,mode);
+    REG_FIELD_WR(huart->UARTX->FCR,UART_FCR_RXTL,UART_FIFO_RL_1);
+    huart->UARTX->IER = UART_IT_RXRD;
+    return HAL_OK;
+}
 
 
 

@@ -6,10 +6,10 @@
 #include "ll_conn.h"
 #include "ll_hci.h"
 #include "ll_env.h"
-#include "ll_sched.h"
 #include "white_list.h"
 #include "per_adv_list.h"
 #include "adv_report_cache.h"
+#include "async_call.h"
 #define ADV_SETS_NUM 3
 #define LL_CONNECTION_MAX 5
 #define SCAN_RX_BUF_NUM (10)
@@ -64,8 +64,8 @@ DEF_LINKED_BUF(aes_128_calc_env_buf, struct aes_128_calc_env, AES_128_CALC_ENV_B
 extern linked_buffer_t *aes_128_calc_env_buf_ptr;
 
 //ll_sched
-DEF_FIFO(ll_sched_fifo,struct ll_sched_env,LL_SCHED_BUF_NUM);
-DEF_FIFO(swint2_post_fifo,struct ll_sched_env,SWINT_POST_BUF_NUM);
+DEF_FIFO(ll_sched_fifo,struct async_call_param,LL_SCHED_BUF_NUM);
+DEF_FIFO(swint2_post_fifo,struct async_call_param,SWINT_POST_BUF_NUM);
 extern struct fifo_env *ll_sched_fifo_ptr;
 extern struct fifo_env *swint2_post_fifo_ptr;
 
