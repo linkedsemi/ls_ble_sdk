@@ -13,7 +13,7 @@ void sys_init_itf()
 
 void flash_swint_set()
 {
-    csi_vic_set_pending_irq(SWINT3_IRQn);
+    SWINT_SET_INLINE_ASM(SWINT3_IRQn);
 }
 
 void clk_switch(void)
