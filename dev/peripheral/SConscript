@@ -2,6 +2,7 @@ Import('env')
 src = [
     'src/lsqspi.c',
     'src/spi_flash.c',
+    
     'src/uart.c',
     'src/lscache.c',
     'src/lsi2c.c',
@@ -21,7 +22,12 @@ if env['IC'] == 'le501x':
     'src/lsspi.c',
     'src/lspis.c',
     'src/lscrypt.c',
-]
+    'src/spi_flash_lsqspi.c'
+    ]
+elif env['IC'] == 'gemini':
+    src += [
+    'src/spi_flash_lsqspiv2.c',
+    ]
 else:
     src += [
     'src/lspatch.c'

@@ -17,7 +17,7 @@ int main_flash()
     spi_flash_qe_status_read_and_set();
     spi_flash_read_status_register_0(&status[0]);
     spi_flash_read_status_register_1(&status[1]);
-    spi_flash_write_status_register(status[1]<<8|status[0]&~4<<2);
+    //spi_flash_write_status_register(status[1]<<8|status[0]&~4<<2);
 //    spi_flash_sector_erase(0x2000);
 //    spi_flash_chip_erase();
 //    for(uint32_t i=0;i<1024;i+=4)
@@ -35,35 +35,11 @@ int main_flash()
 
 #include "reg_rcc.h"
 #include "field_manipulate.h"
-static void switch_to_rc32k()
-{
-    REG_FIELD_WR(RCC->CFG, RCC_SYSCLK_SW, 2);
-    REG_FIELD_WR(RCC->CFG, RCC_CKCFG, 1);
-}
-
-static void switch_to_pll64m()
-{
-    REG_FIELD_WR(RCC->CFG, RCC_SYSCLK_SW, 4);
-    REG_FIELD_WR(RCC->CFG, RCC_CKCFG, 1);
-}
-
-static void switch_to_xo16m()
-{
-    REG_FIELD_WR(RCC->CFG, RCC_SYSCLK_SW, 1);
-    REG_FIELD_WR(RCC->CFG, RCC_CKCFG, 1);
-}
-
-static void rc24m_switch_to_pll64m()
-{
-    switch_to_rc32k();
-    switch_to_pll64m();
-}
-
 int main()
 {
  
     //rc24m_switch_to_pll64m();
     systick_start();
-    main_flash();
+    //main_flash();
     while(1);
 }

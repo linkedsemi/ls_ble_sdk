@@ -24,9 +24,9 @@
         }\
     }while(0)
 
-void spi_flash_program_operation(uint32_t offset,uint8_t *data,uint16_t length,bool quad)
+void spi_flash_program_operation(uint32_t offset,uint8_t *data,uint16_t length,uint8_t multi_type)
 {
-    FLASH_EXECUTE_NO_RETVAL(do_spi_flash_program,offset,data,length,quad);
+    FLASH_EXECUTE_NO_RETVAL(do_spi_flash_program,offset,data,length,multi_type);
 }
 
 void spi_flash_erase_operation(uint32_t offset,uint8_t opcode)

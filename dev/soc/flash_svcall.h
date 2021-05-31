@@ -3,7 +3,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-void spi_flash_program_operation(uint32_t offset,uint8_t *data,uint16_t length,bool quad);
+void spi_flash_program_operation(uint32_t offset,uint8_t *data,uint16_t length,uint8_t multi_type);
 
 void spi_flash_erase_operation(uint32_t offset,uint8_t opcode);
 
