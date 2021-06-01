@@ -57,9 +57,9 @@ struct ll_ext_scan_env
             timer_t duration;
             timer_t period;
             struct ext_scan_param param;
+            struct bd_addr scannable_adv_addr;
             bool duration_timeout;
             uint8_t scan_rsp_receiving;
-            uint8_t scan_rsp_pdu_type;
             uint8_t filter_dup;
         }scan;
         struct {
@@ -69,6 +69,7 @@ struct ll_ext_scan_env
             uint8_t conn_req_sent;
         }init;
     }u;
+    struct adv_scan_header_lsb prim_adv_header_lsb;
     uint8_t current_phy_idx;
     uint8_t scanning;
     uint8_t initiating;

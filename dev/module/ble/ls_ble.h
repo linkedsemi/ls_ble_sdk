@@ -187,6 +187,14 @@ struct legacy_adv_obj_param
     struct legacy_adv_prop prop;
 };
 
+struct ext_adv_obj_param
+{
+    struct legacy_adv_obj_param legacy_adv_obj;
+    uint8_t max_skip;
+    uint8_t phy;
+    uint8_t adv_sid;
+};
+
 enum scan_type
 {
     GENERAL_DISCOVERABLE,
@@ -739,6 +747,8 @@ uint8_t dev_manager_svc_set_value(uint16_t handle, uint16_t length, uint8_t *val
 uint8_t dev_manager_svc_get_value(uint16_t handle, uint8_t *value, uint16_t *length);
 
 void dev_manager_create_legacy_adv_object(struct legacy_adv_obj_param *p_param);
+
+void dev_manager_create_ext_adv_object(struct ext_adv_obj_param *p_param);
 
 void dev_manager_create_scan_object(enum gap_own_addr_type own_addr_type);
 

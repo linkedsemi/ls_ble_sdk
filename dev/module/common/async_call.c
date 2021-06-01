@@ -2,8 +2,8 @@
 #include "ls_dbg.h"
 #include "compile_flag.h"
 
-__attribute__((weak)) uint32_t (*enter_critical_fn)(void);
-__attribute__((weak)) void (*exit_critical_fn)(uint32_t);
+extern uint32_t (*enter_critical_fn)(void);
+extern void (*exit_critical_fn)(uint32_t);
 
 ROM_SYMBOL void async_call(void (*func)(void *),void *param,struct fifo_env *fifo)
 {
@@ -14,6 +14,7 @@ ROM_SYMBOL void async_call(void (*func)(void *),void *param,struct fifo_env *fif
     bool not_full = dword_fifo_put(fifo, &env);
     exit_critical_fn(cpu_stat);
     LS_ASSERT(not_full);
+    (void)(not_full);
 }
 
 ROM_SYMBOL bool async_process(struct fifo_env *fifo)

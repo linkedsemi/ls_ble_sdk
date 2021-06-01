@@ -112,6 +112,8 @@ XIP_BANNED void spi_flash_write_status_register(uint16_t status)
     flash_writing_critical(do_spi_flash_write_status_reg_func,&status);
 }
 
+__attribute__((weak)) void spi_flash_dual_io_read(uint32_t offset,uint8_t *data,uint16_t length){}
+
 void spi_flash_multi_io_read(uint32_t offset,uint8_t *data,uint16_t length)
 {
     if(spi_flash_dual_mode_get())
