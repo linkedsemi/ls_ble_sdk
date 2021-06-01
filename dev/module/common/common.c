@@ -22,7 +22,7 @@ ROM_SYMBOL void memcpy32(uint32_t *dest, const uint32_t *src, uint32_t size_word
     }
 }
 
-ROM_SYMBOL int32_t time_diff(uint32_t time0,uint32_t time1)
+ROM_SYMBOL XIP_BANNED int32_t time_diff(uint32_t time0,uint32_t time1)
 {
     int32_t diff = time0 - time1;
     return diff;
