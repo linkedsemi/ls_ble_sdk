@@ -12,4 +12,6 @@
     pdm
     adc
     crypt
+    spi
+    
     
