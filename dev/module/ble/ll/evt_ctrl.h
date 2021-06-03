@@ -83,6 +83,8 @@ void whiten_init_config(uint8_t whiten_init);
 
 uint32_t mac_sleep_swint(void);
 
+void ble_timer2_irq_clr(void);
+
 void ble_timer2_irq2_unmask(void);
 
 void ble_timer2_irq2_mask(void);
