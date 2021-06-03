@@ -192,4 +192,6 @@ void ll_buf_init()
     per_adv_list_init();
     white_list_buf_init();
     sw_timer_buf_init();
+    conn_data_max_len = CONN_DATA_MAX_LEN;
+    tx_data_buf_num = HCI_ACL_DATA_RX_BUFFER_NUM;
 }

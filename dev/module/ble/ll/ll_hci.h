@@ -104,6 +104,8 @@ bool hci_le_rd_rem_feats_cmd_cmp_evt_write(uint8_t status,uint16_t conhdl,struct
 
 bool hci_le_ltk_request_evt_write(uint16_t conhdl,struct rand_nb *rand,uint16_t ediv);
 
+bool hci_le_data_len_chg_evt_write(uint16_t conhdl,void *data_length_env);
+
 bool hci_le_adv_report_evt_write(uint8_t data_length,void(* evt_param_fill)(struct hci_le_adv_report_evt *, va_list),void *rx);
 
 bool hci_le_phy_upd_cmp_evt_write(void (*evt_param_fill)(struct hci_le_phy_upd_cmp_evt *,va_list),void *conn);

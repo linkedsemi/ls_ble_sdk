@@ -32,7 +32,8 @@ elif env['IC'] == 'gemini':
 else:
     src += [
     'src/lsqspi.c',
-    'src/lspatch.c'
+    'src/spi_flash_lsqspi.c',
+    'src/lspatch.c',
     ]
 
 if env['IC'] != 'taurus' and env['IC'] == 'le501x':

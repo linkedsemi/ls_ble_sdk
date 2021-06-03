@@ -1518,6 +1518,20 @@ struct hci_le_ltk_request_evt
     uint16_t            ediv;
 }__attribute__((packed));
 
+struct hci_le_data_len_chg_evt
+{
+    ///Connection handle
+    uint16_t            conhdl;
+    ///The maximum number of payload octets in TX
+    uint16_t            max_tx_octets;
+    ///The maximum time that the local Controller will take to TX
+    uint16_t            max_tx_time;
+    ///The maximum number of payload octets in RX
+    uint16_t            max_rx_octets;
+    ///The maximum time that the local Controller will take to RX
+    uint16_t            max_rx_time;
+}__attribute__((packed));
+
 struct hci_le_rd_local_p256_public_key_cmp_evt
 {
     ///Status of received command
