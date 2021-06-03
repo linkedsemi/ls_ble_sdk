@@ -1,6 +1,7 @@
 Import('app_build','image_build','env')
-SConscript(dirs = 'ble',exports=['app_build','image_build','env'])
-SConscript(dirs = 'mesh',exports=['app_build','image_build','env'])
+if env['IC'] != 'gemini':
+    SConscript(dirs = 'ble',exports=['app_build','image_build','env'])
+    SConscript(dirs = 'mesh',exports=['app_build','image_build','env'])
 SConscript(dirs = 'peripheral',exports=['app_build','image_build','env'])
 SConscript(dirs = 'utility',exports=['app_build','image_build','env'])
 

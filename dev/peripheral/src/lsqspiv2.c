@@ -1,6 +1,8 @@
 #include "lsqspiv2.h"
 #include "lsqspiv2_msp.h"
 #include "compile_flag.h"
+#include "field_manipulate.h"
+#include "spi_flash_int.h"
 #define LSQSPIV2_FIFO_DEPTH 8
 
 XIP_BANNED void lsqspiv2_init(void)
@@ -50,7 +52,7 @@ XIP_BANNED static void read_data_from_fifo(struct lsqspiv2_stg_cfg *cfg)
 {
     while(LSQSPIV2->FIFO_FLVL==0);
     uint32_t rx = LSQSPIV2->FIFO_RDAT;
-    uint8_t *head = (uint32_t *)cfg->data;
+    uint8_t *head = (uint8_t *)cfg->data;
     switch(cfg->dat_ctrl.dat_offset)
     {
     case 1:
@@ -65,7 +67,7 @@ XIP_BANNED static void read_data_from_fifo(struct lsqspiv2_stg_cfg *cfg)
     default:
     break;
     }
-    uint32_t *rx_ptr = head;
+    uint32_t *rx_ptr = (uint32_t *)head;
     uint16_t rx_remain;
     if(cfg->dat_ctrl.dat_offset)
     {
@@ -86,7 +88,7 @@ XIP_BANNED static void read_data_from_fifo(struct lsqspiv2_stg_cfg *cfg)
     {
         while(LSQSPIV2->FIFO_FLVL==0);
         rx = LSQSPIV2->FIFO_RDAT;
-        uint8_t *tail = (uint8_t *)cfg->rx_ptr;
+        uint8_t *tail = (uint8_t *)rx_ptr;
         switch(rx_remain)
         {
         case 3:
@@ -107,10 +109,12 @@ XIP_BANNED static void read_data_from_fifo(struct lsqspiv2_stg_cfg *cfg)
 XIP_BANNED void lsqspiv2_stg_read_write(struct lsqspiv2_stg_cfg *cfg)
 {
     REG_FIELD_WR(LSQSPIV2->QSPI_CTRL1,LSQSPIV2_MODE_DAC,0);
-    LSQSPIV2->STG_CTRL = *(uint32_t *)&cfg->ctrl;
+    uint32_t *ctrl = (uint32_t *)&cfg->ctrl;
+    LSQSPIV2->STG_CTRL = *ctrl;
     LSQSPIV2->STG_CA_HIGH = cfg->ca_high;
     LSQSPIV2->STG_CA_LOW = cfg->ca_low;
-    LSQSPIV2->STG_DAT_CTRL = *(uint32_t *)&cfg->dat_ctrl;
+    uint32_t *dat_ctrl = (uint32_t *)&cfg->dat_ctrl;
+    LSQSPIV2->STG_DAT_CTRL = *dat_ctrl;
     LSQSPIV2->STG_REQ_T = 1;
     if(cfg->dat_ctrl.dat_en == 0)
     {
@@ -167,7 +171,7 @@ XIP_BANNED void lsqspiv2_stg_read_register(uint8_t opcode,uint8_t *data,uint8_t 
     cfg.dat_ctrl.dat_en = 1;
     cfg.dat_ctrl.dat_bytes = length - 1;
     cfg.dat_ctrl.dat_dir = READ_FROM_FLASH;
-    cfg.dat_ctrl.dat_offset = data&0x3;
+    cfg.dat_ctrl.dat_offset = (uint32_t)data&0x3;
     cfg.dat_ctrl.reserved0 = 0;
     cfg.dat_ctrl.reserved1 = 0;
     cfg.data = data;
@@ -192,7 +196,7 @@ XIP_BANNED void lsqspiv2_stg_write_register(uint8_t opcode,uint8_t *data,uint8_t
     cfg.dat_ctrl.dat_en = 1;
     cfg.dat_ctrl.dat_bytes = length - 1;
     cfg.dat_ctrl.dat_dir = WRITE_TO_FLASH;
-    cfg.dat_ctrl.dat_offset = data&0x3;
+    cfg.dat_ctrl.dat_offset = (uint32_t)data&0x3;
     cfg.dat_ctrl.reserved0 = 0;
     cfg.dat_ctrl.reserved1 = 0;
     cfg.data = data;

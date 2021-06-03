@@ -12,7 +12,7 @@ env['SDK_STARTUP_SRC'] = startup_src
 
 ble_lib = {}
 mesh_lib = {}
-if not 'mdk' in env['TOOLS']:
+if not 'mdk' in env['TOOLS'] and env['IC'] != 'gemini':
     stack_env = env.Clone()
     stack = SConscript(dirs='stack',exports=['stack_env'],must_exist=False)
     if not stack is None:
@@ -36,6 +36,8 @@ if env['IC']== 'le501x':
         env['MESH_LIB'] = File('#dev/soc/arm_cm/le501x/bin/libmesh.o')
     else:
         env['MESH_LIB'] = mesh_lib['MESH_LIB']
+elif env['IC'] == 'gemini':
+    env['ROM_SYM'] = None
 else:
     env['FW_LIB'] = ble_lib['FW_LIB']
     env['ROM_SYM'] = ble_lib['ROM_SYM']
@@ -87,7 +89,7 @@ def app_build(app_name,src,inc,linkscript = '',ble = True,mesh = False):
             if mesh or ble:
                 print(stack_hex.srcnode().path)
                 app_env['STACK_HEX_PATH'] = stack_hex.srcnode().path
-    else:
+    elif env['IC'] != 'gemini':
         app_env.Append(LINKFLAGS = ' -Wl,-R,' + File(app_env['ROM_SYM'][0]).path)
         app_env.Depends(app_target,app_env['ROM_SYM'])
         app_hex = app_env.Command('#build/$IC/examples/'+app_name+'.hex',app_target,Action('$OBJCOPY -O ihex $SOURCES $TARGET'))

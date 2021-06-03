@@ -25,7 +25,7 @@ XIP_BANNED static void spi_flash_quad_xip_mode_enter()
     cfg.ca_low = 0x20<<24;
     cfg.dat_ctrl.dat_en = 1;
     cfg.dat_ctrl.dat_dir = READ_FROM_FLASH;
-    cfg.dat_ctrl.dat_offset = &dummy&0x3;
+    cfg.dat_ctrl.dat_offset = (uint32_t)&dummy&0x3;
     cfg.dat_ctrl.dat_bytes = 0;
     cfg.dat_ctrl.reserved0 = 0;
     cfg.dat_ctrl.reserved1 = 0;
@@ -55,7 +55,7 @@ XIP_BANNED static void spi_flash_dual_xip_mode_enter()
     cfg.ca_low = 0x20<<24;
     cfg.dat_ctrl.dat_en = 1;
     cfg.dat_ctrl.dat_dir = READ_FROM_FLASH;
-    cfg.dat_ctrl.dat_offset = &dummy&0x3;
+    cfg.dat_ctrl.dat_offset = (uint32_t)&dummy&0x3;
     cfg.dat_ctrl.dat_bytes = 0;
     cfg.dat_ctrl.reserved0 = 0;
     cfg.dat_ctrl.reserved1 = 0;
@@ -105,7 +105,7 @@ XIP_BANNED static void spi_flash_quad_xip_mode_exit()
     cfg.ca_low = 0x0<<24;
     cfg.dat_ctrl.dat_en = 1;
     cfg.dat_ctrl.dat_dir = READ_FROM_FLASH;
-    cfg.dat_ctrl.dat_offset = &dummy&0x3;
+    cfg.dat_ctrl.dat_offset = (uint32_t)&dummy&0x3;
     cfg.dat_ctrl.dat_bytes = 0;
     cfg.dat_ctrl.reserved0 = 0;
     cfg.dat_ctrl.reserved1 = 0;
@@ -135,7 +135,7 @@ XIP_BANNED static void spi_flash_dual_xip_mode_exit()
     cfg.ca_low = 0x0<24;
     cfg.dat_ctrl.dat_en = 1;
     cfg.dat_ctrl.dat_dir = READ_FROM_FLASH;
-    cfg.dat_ctrl.dat_offset = &dummy&0x3;
+    cfg.dat_ctrl.dat_offset = (uint32_t)&dummy&0x3;
     cfg.dat_ctrl.dat_bytes = 0;
     cfg.dat_ctrl.reserved0 = 0;
     cfg.dat_ctrl.reserved1 = 0;
@@ -216,11 +216,11 @@ void do_spi_flash_program(uint32_t offset,uint8_t *data,uint16_t length,uint8_t 
         opcode = QUAD_PAGE_PROGRAM_OPCODE;
     break;
     }
-    cfg.ca_high = opcode << 24 | idx<<12 | addr;
+    cfg.ca_high = opcode << 24 | offset;
     cfg.dat_ctrl.dat_en = 1;
     cfg.dat_ctrl.dat_bytes = length - 1;
     cfg.dat_ctrl.dat_dir = WRITE_TO_FLASH;
-    cfg.dat_ctrl.dat_offset = data&0x3;
+    cfg.dat_ctrl.dat_offset = (uint32_t)data&0x3;
     cfg.dat_ctrl.reserved0 = 0;
     cfg.dat_ctrl.reserved1 = 0;
     cfg.data = data;
@@ -250,15 +250,15 @@ static void spi_flash_read_loop(struct lsqspiv2_stg_cfg *cfg,uint8_t opcode,uint
         cfg->ca_high = opcode << 24 | offset;
         if(length>4096)
         {
-            cfg.dat_ctrl.dat_bytes = 4095;
+            cfg->dat_ctrl.dat_bytes = 4095;
             length -= 4096;
             offset += 4096;
         }else{
-            cfg.dat_ctrl.dat_bytes = length - 1;
+            cfg->dat_ctrl.dat_bytes = length - 1;
             length = 0;
         }
         spi_flash_read_operation(&cfg);
-        cfg.data += 4096;
+        cfg->data += 4096;
     }
 }
 
@@ -279,7 +279,7 @@ void spi_flash_quad_io_read(uint32_t offset, uint8_t * data, uint16_t length)
     cfg.ca_low = 0<<24;
     cfg.dat_ctrl.dat_en = 1;
     cfg.dat_ctrl.dat_dir = READ_FROM_FLASH;
-    cfg.dat_ctrl.dat_offset = data&0x3;
+    cfg.dat_ctrl.dat_offset = (uint32_t)data&0x3;
     cfg.dat_ctrl.reserved0 = 0;
     cfg.dat_ctrl.reserved1 = 0;
     cfg.dat_ctrl.dat_bytes = 0;
@@ -304,7 +304,7 @@ void spi_flash_dual_io_read(uint32_t offset,uint8_t *data,uint16_t length)
     cfg.ca_low = 0<<24;
     cfg.dat_ctrl.dat_en = 1;
     cfg.dat_ctrl.dat_dir = READ_FROM_FLASH;
-    cfg.dat_ctrl.dat_offset = data&0x3;
+    cfg.dat_ctrl.dat_offset = (uint32_t)data&0x3;
     cfg.dat_ctrl.reserved0 = 0;
     cfg.dat_ctrl.reserved1 = 0;
     cfg.dat_ctrl.dat_bytes = 0;
@@ -329,7 +329,7 @@ void spi_flash_fast_read(uint32_t offset, uint8_t * data, uint16_t length)
     cfg.ca_low = 0<<24;
     cfg.dat_ctrl.dat_en = 1;
     cfg.dat_ctrl.dat_dir = READ_FROM_FLASH;
-    cfg.dat_ctrl.dat_offset = data&0x3;
+    cfg.dat_ctrl.dat_offset = (uint32_t)data&0x3;
     cfg.dat_ctrl.reserved0 = 0;
     cfg.dat_ctrl.reserved1 = 0;
     cfg.dat_ctrl.dat_bytes = 0;
@@ -371,7 +371,7 @@ void spi_flash_read_unique_id(uint8_t unique_serial_id[16])
     cfg.ca_low = 0<<24;
     cfg.dat_ctrl.dat_en = 1;
     cfg.dat_ctrl.dat_dir = READ_FROM_FLASH;
-    cfg.dat_ctrl.dat_offset = unique_serial_id&0x3;
+    cfg.dat_ctrl.dat_offset = (uint32_t)unique_serial_id&0x3;
     cfg.dat_ctrl.reserved0 = 0;
     cfg.dat_ctrl.reserved1 = 0;
     cfg.dat_ctrl.dat_bytes = 15;
@@ -408,7 +408,7 @@ void do_spi_flash_program_security_area(uint8_t idx,uint16_t addr,uint8_t *data,
     cfg.dat_ctrl.dat_en = 1;
     cfg.dat_ctrl.dat_bytes = length - 1;
     cfg.dat_ctrl.dat_dir = WRITE_TO_FLASH;
-    cfg.dat_ctrl.dat_offset = data&0x3;
+    cfg.dat_ctrl.dat_offset = (uint32_t)data&0x3;
     cfg.dat_ctrl.reserved0 = 0;
     cfg.dat_ctrl.reserved1 = 0;
     cfg.data = data;
@@ -439,7 +439,7 @@ void do_spi_flash_read_security_area(uint8_t idx,uint16_t addr,uint8_t *data,uin
     cfg.dat_ctrl.dat_en = 1;
     cfg.dat_ctrl.dat_bytes = length - 1;
     cfg.dat_ctrl.dat_dir = READ_FROM_FLASH;
-    cfg.dat_ctrl.dat_offset = data&0x3;
+    cfg.dat_ctrl.dat_offset = (uint32_t)data&0x3;
     cfg.dat_ctrl.reserved0 = 0;
     cfg.dat_ctrl.reserved1 = 0;
     cfg.data = data;

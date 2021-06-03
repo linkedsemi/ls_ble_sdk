@@ -26,6 +26,12 @@
 #ifdef UART3_BASE_ADDR
 #define UART3 ((reg_uart_t *)UART3_BASE_ADDR)
 #endif
+#ifdef UART4_BASE_ADDR
+#define UART4 ((reg_uart_t *)UART4_BASE_ADDR)
+#endif
+#ifdef UART5_BASE_ADDR
+#define UART5 ((reg_uart_t *)UART5_BASE_ADDR)
+#endif
 
 #if FPGA 
 #define UART_CLOCK   16000000

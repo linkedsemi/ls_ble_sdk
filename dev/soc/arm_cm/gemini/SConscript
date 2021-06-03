@@ -1,0 +1,24 @@
+Import("env")
+src = [
+    'lsqspiv2_msp.c',
+    'uart_msp.c',
+    'platform.c',
+    'cpu.c',
+    'io_config.c',
+    'i2c_msp.c',
+    'compiler/$COMPILER/sleep_asm.S',
+    'compiler/$COMPILER/svcall_asm.S',
+    'compiler/$COMPILER/delay_asm.S',
+]
+inc = [
+    '.',
+]
+start_src = [
+    'compiler/$COMPILER/startup_asm.S',
+    'startup.c',
+]
+src_files = File(env.subst(src))
+inc_dirs = Dir(inc)
+start_files = File(env.subst(start_src))
+env['LINKSCRIPT'] = File("link_script.txt")
+Return("src_files","inc_dirs","start_files")

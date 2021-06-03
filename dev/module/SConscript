@@ -23,7 +23,7 @@ src = [
     'adpcm/adpcm.c',
 ]
 
-if env['IC'] != 'le501x':
+if env['IC'] != 'le501x' and env['IC'] != 'gemini':
     src += ['ble/ll_buf.c']
 
 inc = [

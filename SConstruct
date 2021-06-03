@@ -4,6 +4,7 @@ plf ={
     'le501x': ('arm_cm','cortex-m0'),
     'sagi': ('arm_cm','cortex-m3'),
     'taurus': ('rv32','e902'),
+    'gemini': ('arm_cm','cortex-m4')
 }
 ic = ARGUMENTS.get('ic','le501x')
 base_arch,cpu = plf[ic]
@@ -22,10 +23,8 @@ env["OPERATION"] = operation
 env.VariantDir('build/$IC', '.',duplicate=0)
 
 if env['IC'] == 'le501x':
-    env['CPU'] = 'cortex-m0'
     env['STACK_BIN_OUTPUT_DIR'] = Dir('#dev/soc/arm_cm/le501x/bin/')
 elif env['IC'] == 'sagi':
-    env['CPU'] = 'cortex-m3'
     env['STACK_BIN_OUTPUT_DIR'] = Dir('#dev/soc/arm_cm/sagi/bin/')
 elif env['IC'] == 'taurus':
     env['ARCH'] = 'rv32emc'
