@@ -9,6 +9,16 @@
 #include "i2c_misc.h"
 #include "reg_base_addr.h"
 
+
+/** \addtogroup PERIPHERAL
+ *  @{
+ */
+
+/** \addtogroup LSI2C
+ *  @{
+ */
+
+/// LSI2C Macro for Register Access
 #ifdef I2C1_BASE_ADDR
 #define I2C1 ((reg_i2c_t *)I2C1_BASE_ADDR)
 #endif
@@ -19,6 +29,9 @@
 #define I2C3 ((reg_i2c_t *)I2C3_BASE_ADDR)
 #endif
 
+/** @defgroup SPI_Error_Code SPI Error Code
+  * @{
+  */
 #define HAL_I2C_ERROR_NONE              0x00000000U    /*!< No error              */
 #define HAL_I2C_ERROR_BERR              0x00000001U    /*!< BERR error            */
 #define HAL_I2C_ERROR_ARLO              0x00000002U    /*!< ARLO error            */
@@ -28,10 +41,42 @@
 #define HAL_I2C_ERROR_TIMEOUT           0x00000020U    /*!< Timeout Error         */
 #define HAL_I2C_ERROR_SIZE              0x00000040U    /*!< Size Management error */
 #define HAL_I2C_ERROR_DMA_PARAM         0x00000080U    /*!< DMA Parameter Error   */
+/**
+  * @}
+  */
+
+
+/**
+ *  @defgroup I2C_addressing_mode I2C addressing mode.
+ */
+#define I2C_ADDRESSINGMODE_7BIT         0x00000000U             /*!< 7bits addressing mode   */
+#define I2C_ADDRESSINGMODE_10BIT        I2C_OAR1_OA1MODE_MASK   /*!< 10bits addressing mode   */
+
+/**
+ *  @defgroup I2C_dual_addressing_mode  I2C dual addressing mode.
+ */
+#define I2C_DUALADDRESS_DISABLE        0x00000000U              /*!< Disable I2C dual addressing mode   */
+#define I2C_DUALADDRESS_ENABLE         I2C_OAR2_OA2EN_MASK      /*!< Enable I2C dual addressing mode   */
+
+/**
+ *  @defgroup I2C_general_call_addressing_mode I2C general call addressing mode.
+ */
+#define I2C_GENERALCALL_DISABLE        0x00000000U              /*!< Disable I2C general call addressing mode   */
+#define I2C_GENERALCALL_ENABLE         I2C_CR1_GCEN_MASK        /*!< Enable I2C general call addressing mode   */
+
+/**
+ *  @defgroup I2C_nostretch_mode I2C nostretch mode.
+ */ 
+#define I2C_NOSTRETCH_DISABLE          0x00000000U              /*!< Disable I2C nostretch mode.   */
+#define I2C_NOSTRETCH_ENABLE           I2C_CR1_NOSTRETCH_MASK   /*!< Disable I2C nostretch mode.   */
+
+ /**
+  * @brief  SPI Configuration Structure definition
+  */
 typedef struct
 {
   uint32_t ClockSpeed;       /*!< Specifies the clock frequency.
-                                  This parameter must be set to a value lower than 400kHz */
+                                  This parameter must be set to a value lower than 1MHz */
 
   uint32_t OwnAddress1;      /*!< Specifies the first device own address.
                                   This parameter can be a 7-bit or 10-bit address. */
@@ -50,10 +95,10 @@ typedef struct
 
   uint32_t NoStretchMode;    /*!< Specifies if nostretch mode is selected.
                                   This parameter can be a value of @ref I2C_nostretch_mode */
-
 } I2C_InitTypeDef;
+
 /**
- *  @brief I2C_handle_Structure_definition I2C handle Structure definition.
+ *  @brief I2C DMA Environment.
  */
  struct I2cDMAEnv
 {
@@ -61,12 +106,18 @@ typedef struct
     uint8_t                       DMA_Channel;
 };
 
+/**
+ *  @brief I2C Interrupt Environment.
+ */
 struct I2cInterruptEnv
 {
-    uint8_t                       *pBuffPtr;      /*!< Pointer to UART Tx transfer Buffer */
-    uint16_t                      XferCount;      /*!< UART Tx Transfer Counter           */
+    uint8_t                       *pBuffPtr;      /*!< Pointer to I2C transfer Buffer */
+    uint16_t                      XferCount;      /*!< I2C Transfer Counter           */
 };
 
+/**
+ *  @brief I2C_handle_Structure_definition I2C handle Structure definition.
+ */
 typedef struct __I2C_HandleTypeDef
 {
   reg_i2c_t                	*Instance;      /*!< I2C registers base address               */
@@ -101,26 +152,8 @@ typedef struct __I2C_HandleTypeDef
 
   uint32_t              EventCount;     /*!< I2C Event counter                        */
 } I2C_HandleTypeDef;
-/**
- *  @brief I2C_addressing_mode I2C addressing mode.
- */
-#define I2C_ADDRESSINGMODE_7BIT         0x00000000U
-#define I2C_ADDRESSINGMODE_10BIT        I2C_OAR1_OA1MODE_MASK
-/**
- *  @brief I2C_dual_addressing_mode  I2C dual addressing mode.
- */
-#define I2C_DUALADDRESS_DISABLE        0x00000000U
-#define I2C_DUALADDRESS_ENABLE         I2C_OAR2_OA2EN_MASK
-/**
- *  @brief I2C_general_call_addressing_mode I2C general call addressing mode.
- */
-#define I2C_GENERALCALL_DISABLE        0x00000000U
-#define I2C_GENERALCALL_ENABLE         I2C_CR1_GCEN_MASK
-/**
- *  @brief I2C_nostretch_mode I2C nostretch mode.
- */
-#define I2C_NOSTRETCH_DISABLE          0x00000000U
-#define I2C_NOSTRETCH_ENABLE           I2C_CR1_NOSTRETCH_MASK
+
+
 /**
   ****************************************************************************************
   * @brief  Initializes the I2C according to the specified parameters

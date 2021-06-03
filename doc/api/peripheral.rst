@@ -10,4 +10,6 @@ PERIPHERAL API
     lspdm
     lsrtc
     lsuart
+    lsspi
+    lsi2c
     
