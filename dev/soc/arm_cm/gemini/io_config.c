@@ -3,6 +3,8 @@
 #include "per_func_mux.h"
 #include "gemini.h"
 #include "platform.h"
+#include "reg_v33_rg.h"
+#include "reg_sysc_awo.h"
 gpio_pin_t uart1_txd;
 gpio_pin_t uart1_rxd;
 gpio_pin_t iic1_scl;
@@ -26,7 +28,7 @@ void io_init(void)
 
 void io_cfg_output(uint8_t pin)
 {
-
+    
 }
 
 void io_cfg_input(uint8_t pin)
