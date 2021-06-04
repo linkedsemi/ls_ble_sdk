@@ -12,7 +12,7 @@ ROM_SYMBOL void sw_fifo_init(struct fifo_env *ptr,void *buf,uint16_t length)
     ptr->length = length;
 }
 
-ROM_SYMBOL bool sw_fifo_full(struct fifo_env *ptr)
+ROM_SYMBOL LL_PKT_ISR bool sw_fifo_full(struct fifo_env *ptr)
 {
     return abs(ptr->wr_idx - ptr->rd_idx) == ptr->length;
 }
@@ -32,7 +32,7 @@ ROM_SYMBOL uint16_t sw_fifo_element_amount(struct fifo_env *ptr)
     return ptr->wr_idx-ptr->rd_idx;
 }
 
-ROM_SYMBOL bool dword_fifo_put(struct fifo_env *ptr,void *data)
+ROM_SYMBOL LL_PKT_ISR bool dword_fifo_put(struct fifo_env *ptr,void *data)
 {
     if(sw_fifo_full(ptr))
     {

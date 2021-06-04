@@ -1,4 +1,5 @@
 #include "circular_doubly_linked_list.h"
+#include "compile_flag.h"
 
 void cdll_init(struct cdll *list)
 {
@@ -22,7 +23,7 @@ void cdll_push_back(struct cdll *list,struct cdll_hdr *hdr)
 	}
 }
 
-struct cdll_hdr *cdll_pop_front(struct cdll *list)
+LL_PKT_ISR struct cdll_hdr *cdll_pop_front(struct cdll *list)
 {
 	if(list->first)
 	{
@@ -117,7 +118,7 @@ void cdll_insert(struct cdll *list,struct cdll_hdr *hdr,bool (*cmp)(struct cdll_
 	}
 }
 
-struct cdll_hdr *cdll_first(struct cdll *list)
+LL_PKT_ISR struct cdll_hdr *cdll_first(struct cdll *list)
 {
 	return list->first;
 }

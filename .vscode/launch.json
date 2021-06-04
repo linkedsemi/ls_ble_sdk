@@ -54,6 +54,14 @@
             "args":["build/examples/sbl.bin","0x18000000","bin/info_sbl.hex"]
         },
         {
+            "name": "Python: rv asm call graph",
+            "type": "python",
+            "request": "launch",
+            "program": "tools/asm_file_call_graph.py",
+            "console": "integratedTerminal",
+            "args":["build/taurus/stack.asm","0x400000","0x500000"]
+        },
+        {
             "type": "cortex-debug",
             "request": "launch",
             "servertype": "jlink",

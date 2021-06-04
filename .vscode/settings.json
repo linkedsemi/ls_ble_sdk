@@ -61,7 +61,9 @@
         "sdk_config.h": "c",
         "exception_isr.h": "c",
         "flash_svcall_int.h": "c",
-        "core_rv32.h": "c"
+        "core_rv32.h": "c",
+        "ll_sched.h": "c",
+        "cpu.h": "c"
     },
     "editor.detectIndentation": false,
     "restructuredtext.confPath": "${workspaceFolder}\\doc",

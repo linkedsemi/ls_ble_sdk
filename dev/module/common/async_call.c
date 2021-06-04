@@ -5,7 +5,7 @@
 extern uint32_t (*enter_critical_fn)(void);
 extern void (*exit_critical_fn)(uint32_t);
 
-ROM_SYMBOL void async_call(void (*func)(void *),void *param,struct fifo_env *fifo)
+ROM_SYMBOL LL_PKT_ISR void async_call(void (*func)(void *),void *param,struct fifo_env *fifo)
 {
     struct async_call_param env;
     env.func = func;

@@ -25,7 +25,7 @@ ROM_SYMBOL void linked_buf_init(linked_buffer_t *ptr,uint16_t element_size,uint1
     }
 }
 
-ROM_SYMBOL struct co_list_hdr * linked_buf_alloc(linked_buffer_t *ptr)
+ROM_SYMBOL LL_PKT_ISR struct co_list_hdr * linked_buf_alloc(linked_buffer_t *ptr)
 {
     struct co_list_hdr *hdr = co_list_pop_front(&ptr->allocatable);
     if(hdr)
@@ -36,7 +36,7 @@ ROM_SYMBOL struct co_list_hdr * linked_buf_alloc(linked_buffer_t *ptr)
     return hdr;
 }
 
-static bool linked_buf_hdl_sanity_check(linked_buffer_t *buf_hdl,uint8_t *ptr)
+LL_PKT_ISR static bool linked_buf_hdl_sanity_check(linked_buffer_t *buf_hdl,uint8_t *ptr)
 {
     if((ptr-buf_hdl->buf)%buf_hdl->element_size)
     {
@@ -50,7 +50,7 @@ static bool linked_buf_hdl_sanity_check(linked_buffer_t *buf_hdl,uint8_t *ptr)
 
 }
 
-ROM_SYMBOL uint8_t linked_buf_release(linked_buffer_t *ptr,struct co_list_hdr * hdr)
+ROM_SYMBOL LL_PKT_ISR uint8_t linked_buf_release(linked_buffer_t *ptr,struct co_list_hdr * hdr)
 {
     LINKED_BUF_ASSERT(linked_buf_hdl_sanity_check(ptr,(uint8_t *)hdr));
     uint16_t idx = linked_buf_get_elem_idx(ptr,hdr);
@@ -63,14 +63,14 @@ ROM_SYMBOL uint8_t linked_buf_release(linked_buffer_t *ptr,struct co_list_hdr * 
     return ptr->ref_cnt[idx];
 }
 
-ROM_SYMBOL uint16_t linked_buf_get_elem_idx(linked_buffer_t *ptr,struct co_list_hdr *hdr)
+ROM_SYMBOL LL_PKT_ISR uint16_t linked_buf_get_elem_idx(linked_buffer_t *ptr,struct co_list_hdr *hdr)
 {
     uint8_t *elem = (uint8_t *)hdr;
     LINKED_BUF_ASSERT((elem-(uint8_t *)ptr->buf)%ptr->element_size==0);
     return (elem-(uint8_t *)ptr->buf)/ptr->element_size;
 }
 
-ROM_SYMBOL struct co_list_hdr *linked_buf_get_elem_by_idx(linked_buffer_t *ptr,uint16_t idx)
+ROM_SYMBOL LL_PKT_ISR struct co_list_hdr *linked_buf_get_elem_by_idx(linked_buffer_t *ptr,uint16_t idx)
 {
     return (struct co_list_hdr *)&ptr->buf[ptr->element_size*idx];
 }
@@ -80,7 +80,7 @@ ROM_SYMBOL uint16_t linked_buf_available_size(linked_buffer_t *ptr)
     return co_list_size(&ptr->allocatable);
 }
 
-ROM_SYMBOL bool linked_buf_is_allocatable(linked_buffer_t *ptr)
+ROM_SYMBOL LL_PKT_ISR bool linked_buf_is_allocatable(linked_buffer_t *ptr)
 {
     return co_list_pick(&ptr->allocatable)? true : false;
 }
