@@ -169,7 +169,7 @@ ADC是Analog-to-Digital Converter的缩写。指模/数转换器或者模拟/数
         -  规则组转换数据寄存器(ADC_RDR)
  
         -  注入组转换数据寄存器((ADC_JDRx)： *Raw Converted Data +
-           JnjectOffset*
+           InjectOffset*
  
 （2） 扫描模式(ScanConvMode)
  

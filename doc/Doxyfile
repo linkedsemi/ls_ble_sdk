@@ -8,6 +8,7 @@ INPUT                  = ../dev/peripheral/api/spi_flash.h \
                          ../dev/peripheral/api/lsuart.h \
                          ../dev/peripheral/api/lsspi.h \
                          ../dev/peripheral/api/lsi2c.h \
+                         ../dev/peripheral/api/io_config.h \
                          ../dev/module/ble/ls_ble.h
 
 GENERATE_XML           = YES

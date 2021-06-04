@@ -16,9 +16,8 @@
  */
 
 
-/// LSUART Macro for Register Access
 #ifdef UART1_BASE_ADDR
-#define UART1 ((reg_uart_t *)UART1_BASE_ADDR)
+#define UART1 ((reg_uart_t *)UART1_BASE_ADDR) /*!< LSUART Macro for Register Access*/
 #endif
 #ifdef UART2_BASE_ADDR
 #define UART2 ((reg_uart_t *)UART2_BASE_ADDR)
