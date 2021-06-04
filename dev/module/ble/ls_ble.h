@@ -336,12 +336,14 @@ struct ble_stack_cfg
     bool private_addr;
     bool controller_privacy;
 };
-
+/**
+  * @brief Length of UUID
+  */
 enum uuid_length
 {
-    UUID_LEN_16BIT = 0,
-    UUID_LEN_32BIT,
-    UUID_LEN_128BIT,
+    UUID_LEN_16BIT = 0,                  /*!< 16bits UUID*/
+    UUID_LEN_32BIT,                      /*!< 32bits UUID*/
+    UUID_LEN_128BIT,                     /*!< 128bits UUID*/
 };
 
 struct char_properties
@@ -575,156 +577,196 @@ struct gap_set_pkt_size
     uint16_t pkt_size;
 };
 
+/**
+  * @brief GATT event types.
+  * @note  Event types include request/done/indication or other messages sent to applications 
+  * by stack.
+  */
 enum gatt_evt_type
 {
-    SERVER_READ_REQ = 0,
-    SERVER_WRITE_REQ,
-    SERVER_NOTIFICATION_DONE,
-    SERVER_INDICATION_DONE,
+    SERVER_READ_REQ = 0,               /*!< Read request for server*/
+    SERVER_WRITE_REQ,                  /*!< write request for server*/
+    SERVER_NOTIFICATION_DONE,          /*!< Send notification done for server*/
+    SERVER_INDICATION_DONE,            /*!< Send indication done for server*/
 
-    CLIENT_RECV_NOTIFICATION,
-    CLIENT_RECV_INDICATION,
-    CLIENT_PRIMARY_SVC_DIS_IND,       // Primary service discovery indication
-    CLIENT_INCL_SVC_DIS_IND,          // Included service discovery indication
-    CLIENT_CHAR_DIS_BY_UUID_IND,      // Characteristic discovery by UUID indication 
-    CLIENT_CHAR_DESC_DIS_BY_UUID_IND, // Characteristic descriptor discovery by UUID indication
-    CLIENT_RD_CHAR_VAL_BY_UUID_IND,   // Read characteristic value by UUID indication
-    CLIENT_WRITE_WITH_RSP_DONE,             // Write response indication
-    CLIENT_WRITE_NO_RSP_DONE,          // Write with no response indication
+    CLIENT_RECV_NOTIFICATION,          /*!< Receive notification for client*/
+    CLIENT_RECV_INDICATION,            /*!< Receive indication for client*/
+    CLIENT_PRIMARY_SVC_DIS_IND,        /*!< Primary service discovery indication for client*/
+    CLIENT_INCL_SVC_DIS_IND,           /*!< Included service discovery indication for client*/
+    CLIENT_CHAR_DIS_BY_UUID_IND,       /*!< Characteristic discovery by UUID indication for client*/ 
+    CLIENT_CHAR_DESC_DIS_BY_UUID_IND,  /*!< Characteristic descriptor discovery by UUID indication for client*/
+    CLIENT_RD_CHAR_VAL_BY_UUID_IND,    /*!< Read characteristic value by UUID indication for client*/
+    CLIENT_WRITE_WITH_RSP_DONE,        /*!<  Write response indication for client*/
+    CLIENT_WRITE_NO_RSP_DONE,          /*!<  Write with no response indication for client*/
 
-    MTU_CHANGED_INDICATION,
+    MTU_CHANGED_INDICATION,            /*!<  MTU exchange indication for client & server*/
     GATT_EVT_MAX
 };
-
+/**
+  * @brief Service set values status.
+  */
 enum svc_set_value_status
 {
-    SVC_SET_VAL_NO_ERROR,
-    SVC_SET_VAL_NOT_SUPPORTED,
-    SVC_SET_VAL_INVALID_HANDLE,
-    SVC_SET_VAL_INVALID_OFFSET,
-    SVC_SET_VAL_INVALID_LENGTH,
+    SVC_SET_VAL_NO_ERROR,              /*!< No error*/
+    SVC_SET_VAL_NOT_SUPPORTED,         /*!< Action not supported*/
+    SVC_SET_VAL_INVALID_HANDLE,        /*!< Invalid handle*/
+    SVC_SET_VAL_INVALID_OFFSET,        /*!< Invalid offset*/
+    SVC_SET_VAL_INVALID_LENGTH,        /*!< Invalid length*/
 };
-
-enum svc_get_value_status
+/**
+  * @brief Service get values status.
+  */
+enum svc_get_value_status   
 {
-    SVC_GET_VAL_NO_ERROR,
-    SVC_GET_VAL_NOT_SUPPORTED,
-    SVC_GET_VAL_INVALID_HANDLE,
-    SVC_GET_VAL_APP_ERROR,
+    SVC_GET_VAL_NO_ERROR,              /*!< No error*/
+    SVC_GET_VAL_NOT_SUPPORTED,         /*!< Action not supported*/
+    SVC_GET_VAL_INVALID_HANDLE,        /*!< Invalid handle*/
+    SVC_GET_VAL_APP_ERROR,             /*!< Application or profile error*/
 };
-
+/**
+  * @brief GATT service environment.
+  */
 struct gatt_svc_env
 {
-    void *hdr;
-    uint16_t start_hdl;
-    uint8_t att_num;
+    void *hdr;                         /*!< Pointer to next gatt_svc_env*/
+    uint16_t start_hdl;                /*!< Start handle of the service*/
+    uint8_t att_num;                   /*!< Attributes number in the service*/
 };
-
+/**
+  * @brief GATT read request.
+  */
 struct gatt_server_read_req
 {
-    struct gatt_svc_env const *svc;
-    uint8_t att_idx;
+    struct gatt_svc_env const *svc;    /*!< Pointer to serice containing the attribute to read*/
+    uint8_t att_idx;                   /*!< Attribute index*/
 };
 
+/**
+  * @brief GATT write request.
+  */
 struct gatt_server_write_req
 {
-    struct gatt_svc_env const *svc;
-    uint8_t const *value;
-    uint8_t *return_status;
-    uint16_t offset;
-    uint16_t length;
-    uint8_t att_idx;
+    struct gatt_svc_env const *svc;    /*!< Pointer to serice containing the attribute to read*/
+    uint8_t const *value;              /*!< Pointer to value to write*/
+    uint8_t *return_status;            /*!< Return status*/
+    uint16_t offset;                   /*!< Offset at which the data has to be written*/
+    uint16_t length;                   /*!< Length of data to write*/
+    uint8_t att_idx;                   /*!< Attribute index*/
 };
-
+/**
+  * @brief Send notify/indicate done on GATT server.
+  */
 struct gatt_server_notify_indicate_done
 {
-    uint16_t transaction_id;
-    uint8_t status;
+    uint16_t transaction_id;           /*!< Index of transaction*/
+    uint8_t status;                    /*!< Status of notifiy/indicate done*/
 };
-
+/**
+  * @brief Received notify/indicate on GATT client.
+  */
 struct gatt_client_recv_notify_indicate
 {
-    uint16_t handle;
-    uint16_t length;
-    uint8_t const *value;
+    uint16_t handle;                   /*!< Handle of notification/indication*/
+    uint16_t length;                   /*!< Length of notification/indication*/
+    uint8_t const *value;              /*!< Pointer to value in notification/indication*/
 };
-
+/**
+  * @brief MTU exchange indicate.
+  */
 struct gatt_mtu_changed_indicate
 {
-    uint16_t mtu;
+    uint16_t mtu;                      /*!< MTU received*/
 };
-
+/**
+  * @brief Range of GATT handles.
+  */
 struct gatt_handle_range
 {
-    uint16_t begin_handle;
-    uint16_t end_handle;
+    uint16_t begin_handle;             /*!< Start handle*/
+    uint16_t end_handle;               /*!< End handle*/
 };
-
+/**
+  * @brief Service discovery indicate for GATT client.
+  */
 struct gatt_client_svc_disc_indicate
 {
-    const uint8_t *uuid;
-    struct gatt_handle_range handle_range;  
-    enum uuid_length uuid_len;
+    const uint8_t *uuid;                         /*!< UUID of the service*/
+    struct gatt_handle_range handle_range;       /*!< Handle range of the service*/
+    enum uuid_length uuid_len;                   /*!< Length of the service UUID*/
 };
-
+/**
+  * @brief Included service discovery indicate for GATT client.
+  */
 struct gatt_client_svc_disc_include_indicate
 {
-    const uint8_t *uuid;
-    struct gatt_handle_range handle_range;
-    uint16_t attr_handle;
-    enum uuid_length uuid_len;
+    const uint8_t *uuid;                          /*!< UUID of the service*/
+    struct gatt_handle_range handle_range;        /*!< Handle range of the service*/
+    uint16_t attr_handle;                         /*!< Attribute handle of included service*/
+    enum uuid_length uuid_len;                    /*!< Length of the service UUID*/
 };
-
+/**
+  * @brief Characteristic discovery indicate for GATT client.
+  */
 struct gatt_client_disc_char_indicate
 {
-    const uint8_t *uuid;
-    uint16_t attr_handle;
-    uint16_t pointer_handle;
-    uint8_t properties;
-    enum uuid_length uuid_len;
+    const uint8_t *uuid;                          /*!< UUID of the characteristic*/
+    uint16_t attr_handle;                         /*!< Attribute handle of characteristic*/
+    uint16_t pointer_handle;                      /*!< Pointer attribute handle to UUID*/
+    uint8_t properties;                           /*!< Properities of the characteristic*/
+    enum uuid_length uuid_len;                    /*!< Length of the service UUID*/
 };
-
+/**
+  * @brief Characteristic descriptro discovery indicate for GATT client.
+  */
 struct gatt_client_disc_char_desc_indicate
 {
-    const uint8_t *uuid;
-    uint16_t attr_handle;
-    enum uuid_length uuid_len;
+    const uint8_t *uuid;                          /*!< UUID of the descriptor*/
+    uint16_t attr_handle;                         /*!< Attribute handle of descriptor*/
+    enum uuid_length uuid_len;                    /*!< Length of the service UUID*/
 };
-
+/**
+  * @brief Read indication.
+  */
 struct gatt_read_indicate
 {
-    uint8_t const *value;
-    uint16_t handle;
-    uint16_t offset;
-    uint16_t length;
+    uint8_t const *value;                         /*!< Pointer to the value read*/
+    uint16_t handle;                              /*!< Attribute handle*/
+    uint16_t offset;                              /*!< Offset at which the data has to be written*/
+    uint16_t length;                              /*!< Length of value*/
 };
-
+/**
+  * @brief Response for write request.
+  */
 struct gatt_write_rsp
 {
-    uint16_t transaction_id;
-    uint8_t status;
+    uint16_t transaction_id;                      /*!< Index of transaction*/
+    uint8_t status;                               /*!< Status of write*/
 };
-
+/**
+  * @brief Response for write command.
+  */
 struct gatt_write_no_rsp
 {
-    uint16_t transaction_id;
-    uint8_t status;
+    uint16_t transaction_id;                      /*!< Index of transaction*/
+    uint8_t status;                               /*!< Status of write*/
 };
-
+/**
+  * @brief Union definition for GATT events.
+  */
 union gatt_evt_u
 {
-    struct gatt_server_read_req server_read_req;
-    struct gatt_server_write_req server_write_req;
-    struct gatt_server_notify_indicate_done server_notify_indicate_done;
-    struct gatt_client_recv_notify_indicate client_recv_notify_indicate;
-    struct gatt_mtu_changed_indicate mtu_changed_ind;
-    struct gatt_client_svc_disc_indicate client_svc_disc_indicate;
-    struct gatt_client_svc_disc_include_indicate client_svc_disc_include_indicate;
-    struct gatt_client_disc_char_indicate client_disc_char_indicate;
-    struct gatt_client_disc_char_desc_indicate client_disc_char_desc_indicate;
-    struct gatt_read_indicate client_read_indicate;
-    struct gatt_write_rsp client_write_rsp;
-    struct gatt_write_no_rsp client_write_no_rsp;
+    struct gatt_server_read_req server_read_req;                                         /*!< GATT server read request.*/
+    struct gatt_server_write_req server_write_req;                                       /*!< GATT server write request.*/
+    struct gatt_server_notify_indicate_done server_notify_indicate_done;                 /*!< GATT server send notify/indicate done.*/           
+    struct gatt_client_recv_notify_indicate client_recv_notify_indicate;                 /*!< GATT client receive notify/indicate.*/
+    struct gatt_mtu_changed_indicate mtu_changed_ind;                                    /*!< MTU exchange indication.*/
+    struct gatt_client_svc_disc_indicate client_svc_disc_indicate;                       /*!< GATT client service discovery indicate.*/
+    struct gatt_client_svc_disc_include_indicate client_svc_disc_include_indicate;       /*!< GATT client included service discovery indicate.*/
+    struct gatt_client_disc_char_indicate client_disc_char_indicate;                     /*!< GATT client characteristic discovery indicate.*/
+    struct gatt_client_disc_char_desc_indicate client_disc_char_desc_indicate;           /*!< GATT client characteristic descriptor discovery indicate.*/
+    struct gatt_read_indicate client_read_indicate;                                      /*!< GATT client read indicate.*/
+    struct gatt_write_rsp client_write_rsp;                                              /*!< GATT client write request response.*/
+    struct gatt_write_no_rsp client_write_no_rsp;                                        /*!< GATT client write command response.*/
 };
 
 uint8_t *adv_data_pack(uint8_t *buf,uint8_t field_nums,...);
@@ -936,7 +978,7 @@ void gatt_manager_client_cccd_enable(uint8_t con_idx,uint16_t handle,bool notifi
  *
  * \param[in]  con_idx                 Connection index.
  * \param[in]  uuid                    Pointer of uuid to be discovered.
- * \param[in]  uuid_len                Length of uuid.
+ * \param[in]  uuid_len                Length of uuid in units of ::uuid_length.
  * \param[in]  start_hdl               Start handle of the range to search.
  * \param[in]  end_hdl                 End handle of the range to search.
  *
@@ -949,7 +991,7 @@ void gatt_manager_client_svc_discover_by_uuid(uint8_t con_idx,uint8_t *uuid,enum
  *
  * \param[in]  con_idx                 Connection index.
  * \param[in]  uuid                    Pointer of uuid to be discovered.
- * \param[in]  uuid_len                Length of uuid.
+ * \param[in]  uuid_len                Length of uuid in units of ::uuid_length.
  * \param[in]  start_hdl               Start handle of the range to search.
  * \param[in]  end_hdl                 End handle of the range to search.
  *
