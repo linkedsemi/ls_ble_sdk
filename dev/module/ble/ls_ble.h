@@ -12,45 +12,7 @@
 #define INVALID_PEER_ID (0xff)
 
 #define BLE_ADDR_LEN 6
-#define BLE_KEY_LEN 16
-
-/**defgroup BLE_GAP_IO_CAPS GAP IO Capabilities**/
-#define BLE_GAP_IO_CAPS_DISPLAY_ONLY      0x0   /**< Display Only. */
-#define BLE_GAP_IO_CAPS_DISPLAY_YESNO     0x1   /**< Display and Yes/No entry. */
-#define BLE_GAP_IO_CAPS_KEYBOARD_ONLY     0x2   /**< Keyboard Only. */
-#define BLE_GAP_IO_CAPS_NONE              0x3   /**< No I/O capabilities. */
-#define BLE_GAP_IO_CAPS_KEYBOARD_DISPLAY  0x4   /**< Keyboard and Display. */
-
-/**defgroup SEC_AUTH_FLAG  SEC Auth Flag**/
-#define AUTH_NONE               0                 /**< No auth requirement. */
-#define AUTH_BOND              (1 << 0)           /**< Bond flag. */
-#define AUTH_MITM              (1 << 2)           /**< MITM flag. */
-#define AUTH_SEC_CON           (1 << 3)           /**< Security connection flag. */
-#define AUTH_KEY_PRESS_NOTIFY  (1 << 4)           /**< Key press notify flag. */
-#define AUTH_ALL               (AUTH_BOND | AUTH_MITM | AUTH_SEC_CON | AUTH_KEY_PRESS_NOTIFY)  /**< All authentication flags are on. */
-
-/**defgroup SEC_KEY_DIST_FLAG  SEC Key Distribution Flag**/
-#define KDIST_NONE      0            /**< No key needs to be distributed. */
-#define KDIST_ENCKEY   (1 << 0)      /**< Distribute encryption and master identification info. */
-#define KDIST_IDKEY    (1 << 1)      /**< Distribute identity and address info. */
-#define KDIST_SIGNKEY  (1 << 2)      /**< Distribute signing info. */
-#define KDIST_ALL      (KDIST_ENCKEY | KDIST_IDKEY | KDIST_SIGNKEY)  /**< Distribute all info. */
-
-/**defgroup SEC mode and level**/
-#define SEC_MODE1_LEVEL1  0x00    /**< No security is needed. */
-#define SEC_MODE1_LEVEL2  0x01    /**< Encrypted link is required. Unnecessary: MITM and SC. */
-#define SEC_MODE1_LEVEL3  0x02    /**< Encrypted link is required. Necessary: MITM; unnecessary: SC. */
-#define SEC_MODE1_LEVEL4  0x03    /**< Encrypted link is required. Necessary: MITM and SC. */
-#define SEC_MODE2_LEVEL1  0x04    /**< Data signing is required. Unnecessary: MITM and SC. */
-#define SEC_MODE2_LEVEL2  0x05    /**< Data signing is required. Necessary: MITM; unnecessary: SC. */
-
-/**defgroup SEC Parameter**/
-#define OOB_DATA_FLAG                     0x0                               /**< Indicate whether OOB is supported. */
-#define AUTHREQ                           (AUTH_MITM | AUTH_BOND)           /**< Set the auth. */
-#define KEY_SIZE                          0x10                              /**< Indicate the supported maximum LTK size (range: 7-16). */
-#define INIT_KEY_DIST                     (KDIST_ENCKEY | KDIST_IDKEY)      /**< Set the initial key distribution. */
-#define RESP_KEY_DIST                     (KDIST_ENCKEY | KDIST_IDKEY)      /**< Set the response key distribution. */
-#define passkey_number                    {'1','2','3','4','5','6'}         /**< Set the passkey,size(6). */
+#define BLE_KEY_LEN 16                  /*!< The length of the paired temporary key*/
 
 enum gap_own_addr_type
 {
@@ -442,23 +404,88 @@ struct gap_conn_param_updated
     ///Supervision timeout
     uint16_t            sup_to;
 };
-
+/**
+  * @brief SEC OOB value.
+  */
 struct gap_sc_oob
 {
-    /// Confirm Value
-    uint8_t conf[BLE_KEY_LEN];
-    /// Random Number
-    uint8_t rand[BLE_KEY_LEN];
+    uint8_t conf[BLE_KEY_LEN];              /*!< Confirm Value*/
+    uint8_t rand[BLE_KEY_LEN];              /*!< Random Number*/
 };
-
+/**
+  * @brief Slave Authentication mask.
+  */
+enum gap_slave_auth_mask
+{
+    GAP_SLAVE_AUTH_NONE           = 0,                   /*!< No Flag set*/
+    GAP_SLAVE_AUTH_BOND           = (1 << 0),            /*!< Bond authentication*/
+    GAP_SLAVE_AUTH_MITM           = (1 << 2),            /*!< Man In the middle protection*/
+    GAP_SLAVE_AUTH_SEC_CON        = (1 << 3),            /*!< Secure Connection*/
+    GAP_SLAVE_AUTH_KEY_NOTIF      = (1 << 4)             /*!< Key Notification*/
+};
+/**
+  * @brief Slave Authentication Requirements.
+  */
+enum gap_slave_auth
+{
+    GAP_SLAVE_AUTH_REQ_NO_MITM_NO_BOND  = (GAP_SLAVE_AUTH_NONE),                                                    /*!< No MITM No Bonding*/
+    GAP_SLAVE_AUTH_REQ_NO_MITM_BOND     = (GAP_SLAVE_AUTH_BOND),                                                    /*!< No MITM Bonding*/
+    GAP_SLAVE_AUTH_REQ_MITM_NO_BOND     = (GAP_SLAVE_AUTH_MITM),                                                    /*!< MITM No Bonding*/
+    GAP_SLAVE_AUTH_REQ_MITM_BOND        = (GAP_SLAVE_AUTH_MITM | GAP_SLAVE_AUTH_BOND),                              /*!< MITM and Bonding*/
+    GAP_SLAVE_AUTH_REQ_SEC_CON_NO_BOND  = (GAP_SLAVE_AUTH_SEC_CON | GAP_SLAVE_AUTH_MITM),                           /*!< SEC_CON and No Bonding*/
+    GAP_SLAVE_AUTH_REQ_SEC_CON_BOND     = (GAP_SLAVE_AUTH_SEC_CON | GAP_SLAVE_AUTH_MITM | GAP_SLAVE_AUTH_BOND),     /*!< SEC_CON and Bonding*/
+};
+/**
+  * @brief Defgroup BLE_GAP_IO_CAPS GAP IO Capabilities.
+  */
+enum gap_io_caps
+{
+    BLE_GAP_IO_CAPS_DISPLAY_ONLY,           /*!< Display Only*/
+    BLE_GAP_IO_CAPS_DISPLAY_YESNO,          /*!< Display and Yes/No entry*/
+    BLE_GAP_IO_CAPS_KEYBOARD_ONLY,          /*!< Keyboard Only*/
+    BLE_GAP_IO_CAPS_NONE,                   /*!< No I/O capabilities*/
+    BLE_GAP_IO_CAPS_KEYBOARD_DISPLAY,       /*!< Keyboard and Display*/
+};
+/**
+  * @brief Defgroup SEC_OOB_FLAG  OOB Data Flag.
+  */
+enum gap_pair_oob
+{
+    BLE_GAP_OOB_DISABLE,                    /*!< OOB Authentication data not present*/
+    BLE_GAP_OOB_ENABLE,                     /*!< OOB Authentication data from remote device present*/
+};
+/**
+  * @brief Defgroup SEC_AUTH_FLAG  SEC Auth Flag.
+  */
+enum gap_pair_auth
+{
+    AUTH_NONE              =  0,           /*!< No auth requirement*/
+    AUTH_BOND              = (1 << 0),     /*!< Bond flag*/
+    AUTH_MITM              = (1 << 2),     /*!< MITM flag*/
+    AUTH_SEC_CON           = (1 << 3),     /*!< Security connection flag*/
+    AUTH_KEY_PRESS_NOTIFY  = (1 << 4),     /*!< Key press notify flag*/
+};
+/**
+  * @brief Defgroup SEC_KEY_DIST_FLAG  SEC Key Distribution Flag.
+  */
+enum gap_key_dist
+{
+    KDIST_NONE             =  0,           /*!< No auth requirement*/
+    KDIST_ENCKEY           = (1 << 0),     /*!< Bond flag*/
+    KDIST_IDKEY            = (1 << 2),     /*!< MITM flag*/
+    KDIST_SIGNKEY          = (1 << 3),     /*!< Security connection flag*/
+};
+/**
+  * @brief Set security parameter.
+  */
 struct pair_feature
 {
-    uint8_t iocap;
-    uint8_t oob;
-    uint8_t auth;
-    uint8_t key_size;
-    uint8_t ikey_dist;
-    uint8_t rkey_dist;
+    uint8_t iocap;                          /*!< Set the IO capability, This parameter can be a value of @ref gap_io_caps*/
+    uint8_t oob;                            /*!< Indicate whether OOB is supported, This parameter can be a value of @ref gap_pair_oob*/
+    uint8_t auth;                           /*!< Set the auth, This parameter can be a value of @ref gap_pair_auth*/
+    uint8_t key_size;                       /*!< Indicate the supported maximum LTK size (range: 7-16), This parameter can be a value of @ref gap_io_caps*/
+    uint8_t ikey_dist;                      /*!< Set the initial key distribution, This parameter can be a value of @ref gap_key_dist*/
+    uint8_t rkey_dist;                      /*!< Set the response key distribution, This parameter can be a value of @ref gap_key_dist*/
 };
 
 struct gap_connected
@@ -821,25 +848,89 @@ uint8_t dev_manager_update_adv_interval(uint8_t adv_handle, uint32_t new_intv_mi
 void gap_manager_init(void (*evt_cb)(enum gap_evt_type,union gap_evt_u *,uint8_t));
 
 void gap_manager_disconnect(uint8_t con_idx,uint8_t reason);
-
+/**
+ ****************************************************************************************
+ * \brief The master starts the bonding process
+ * 
+ * \param[in]  con_idx           Connection ID number.
+ * \param[in]  pair_feat         Pairing parameter setting, This parameter can be a value of @ref pair_feature.
+ ****************************************************************************************
+ */
 void gap_manager_master_bond(uint8_t con_idx, struct pair_feature * pair_feat);
-
+/**
+ ****************************************************************************************
+ * \brief The master starts the secure connection process
+ * 
+ * \param[in]  con_idx           Connection ID number.
+ ****************************************************************************************
+ */
 void gap_manager_master_encrypt(uint8_t con_idx);
-
+/**
+ ****************************************************************************************
+ * \brief Initiate an encryption request from the slave. 
+ * 
+ * \param[in]  con_idx           Connection ID number.
+ * \param[in]  auth              SEC Auth param, This parameter can be a value of @ref gap_slave_auth
+ ****************************************************************************************
+ */
 void gap_manager_slave_security_req(uint8_t con_idx, uint8_t auth);
-
+/**
+ ****************************************************************************************
+ * \brief The slave exchange pairs information.
+ * 
+ * \param[in]  con_idx           Connection ID number.
+ * \param[in]  accept            Whether to save master pairing information,value(0 or 1).
+ * \param[in]  feat              Pairing parameter setting, This parameter can be a value of @ref pair_feature.
+ ****************************************************************************************
+ */
 void gap_manager_slave_pair_response_send(uint8_t con_idx,uint8_t accept,struct pair_feature *feat);
-
+/**
+ ****************************************************************************************
+ * \brief Master and slave pair key input. 
+ * 
+ * \param[in]  con_idx           Connection ID number.
+ * \param[in]  passkey           Connect the key, This parameter can be a value of @ref gap_pin_str.
+ ****************************************************************************************
+ */
 void gap_manager_passkey_input(uint8_t con_idx,struct gap_pin_str *passkey);
-
+/**
+ ****************************************************************************************
+ * \brief Verify that the key is the same in numerical comparison mode(Only for LE Secure Connections). 
+ * 
+ * \param[in]  con_idx           Connection ID number.
+ * \param[in]  equal             Numeric comparison results.
+ ****************************************************************************************
+ */
 void gap_manager_numeric_compare_set(uint8_t con_idx,bool equal);
-
+/**
+ ****************************************************************************************
+ * \brief Set the security oob of the specified connection. 
+ * 
+ * \param[in]  con_idx           Connection ID number.
+ * \param[in]  sc_oob            SEC OOB value, This parameter can be a value of @ref gap_sc_oob.
+ ****************************************************************************************
+ */
 void gap_manager_sc_oob_set(uint8_t con_idx,struct gap_sc_oob *sc_oob);
-
+/**
+ ****************************************************************************************
+ * \brief Set the security oob of the specified connection. 
+ * 
+ * \param[in]  con_idx           Connection ID number.
+ * \param[in]  key               Pairing Temporary Key value.
+ * \param[in]  BLE_KEY_LEN       The length of the paired temporary key, This parameter can be a value of @ref BLE_KEY_LEN.
+ ****************************************************************************************
+ */
 void gap_manager_tk_set(uint8_t con_idx,uint8_t key[BLE_KEY_LEN]);
 
 uint8_t gap_manager_get_role(uint8_t con_idx);
-
+/**
+ ****************************************************************************************
+ * \brief Gets the security level of the specified connection. 
+ * 
+ * \param[in]  con_idx           Connection ID number.
+ * \return The security level of the specified connection.
+ ****************************************************************************************
+ */
 uint8_t gap_manager_get_sec_lvl(uint8_t con_idx);
 
 void gap_manager_get_peer_addr(uint8_t conidx,struct ble_addr *addr);
@@ -849,13 +940,38 @@ void gap_manager_get_identity_addr(uint8_t peer_id,struct ble_addr *addr);
 void gap_manager_update_conn_param(uint8_t con_idx,struct gap_update_conn_param *p_param);
 
 void gap_manager_set_pkt_size(uint8_t con_idx, struct gap_set_pkt_size *p_param);
-
+/**
+ ****************************************************************************************
+ * \brief Deletes the bound device information. 
+ * 
+ * \param[in]  peer_id           Pairing ID number.
+ ****************************************************************************************
+ */
 void gap_manager_delete_bonding(uint8_t peer_id);
-
+/**
+ ****************************************************************************************
+ * \brief Gets the pairing ID of the bound device. 
+ * 
+ * \param[in]  link_id           Connection ID number.
+ * \return The pairing ID of the bound device.
+ ****************************************************************************************
+ */
 uint8_t gap_manager_get_bonding_peer_id(uint8_t link_id);
-
+/**
+ ****************************************************************************************
+ * \brief Gets the number of bound devices. 
+ * 
+ * \return The number of bound devices.
+ ****************************************************************************************
+ */
 uint8_t gap_manager_get_bonded_dev_num(void);
-
+/**
+ ****************************************************************************************
+ * \brief Gets the RSSI value of the specified connected device. 
+ * 
+ * \param[in]  link_id           Connection ID number.
+ ****************************************************************************************
+ */
 void gap_manager_get_peer_rssi(uint8_t link_id);
 /**
  ****************************************************************************************

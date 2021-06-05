@@ -12,4 +12,6 @@ PERIPHERAL API
     lsuart
     lsspi
     lsi2c
+    lstrng
+    lsiwdg
     

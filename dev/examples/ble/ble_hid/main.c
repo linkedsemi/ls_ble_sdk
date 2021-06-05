@@ -13,6 +13,7 @@
 #include "io_config.h"
 #include "SEGGER_RTT.h"
 #include "tinyfs.h"
+#include "main.h"
 
 #define APP_HID_DEV_NAME ("LS_HID_Demo")
 #define APP_HID_DEV_NAME_LEN (sizeof(APP_HID_DEV_NAME))

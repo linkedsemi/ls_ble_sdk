@@ -18,6 +18,7 @@
 #include "adpcm.h"
 #include "lsdmac.h"
 #include "lspdm.h"
+#include "main.h"
 
 #define APP_HID_DEV_NAME ("BLE_HID_DIC_DEMO")
 #define APP_HID_DEV_NAME_LEN (sizeof(APP_HID_DEV_NAME) - 1)
