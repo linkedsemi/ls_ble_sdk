@@ -472,8 +472,8 @@ enum gap_key_dist
 {
     KDIST_NONE             =  0,           /*!< No auth requirement*/
     KDIST_ENCKEY           = (1 << 0),     /*!< Bond flag*/
-    KDIST_IDKEY            = (1 << 2),     /*!< MITM flag*/
-    KDIST_SIGNKEY          = (1 << 3),     /*!< Security connection flag*/
+    KDIST_IDKEY            = (1 << 1),     /*!< MITM flag*/
+    KDIST_SIGNKEY          = (1 << 2),     /*!< Security connection flag*/
 };
 /**
   * @brief Set security parameter.
