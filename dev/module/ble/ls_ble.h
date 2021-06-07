@@ -470,10 +470,10 @@ enum gap_pair_auth
   */
 enum gap_key_dist
 {
-    KDIST_NONE             =  0,           /*!< No auth requirement*/
-    KDIST_ENCKEY           = (1 << 0),     /*!< Bond flag*/
-    KDIST_IDKEY            = (1 << 1),     /*!< MITM flag*/
-    KDIST_SIGNKEY          = (1 << 2),     /*!< Security connection flag*/
+    KDIST_NONE             =  0,           /*!< No key needs to be distributed*/
+    KDIST_ENCKEY           = (1 << 0),     /*!< Distribute encryption and master identification info*/
+    KDIST_IDKEY            = (1 << 1),     /*!< Distribute identity and address info*/
+    KDIST_SIGNKEY          = (1 << 2),     /*!< Distribute signing info*/
 };
 /**
   * @brief Set security parameter.
