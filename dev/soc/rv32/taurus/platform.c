@@ -2,6 +2,9 @@
 #include "core_rv32.h"
 #include "swint_call_asm.h"
 #include "field_manipulate.h"
+#include "systick.h"
+#include "cpu.h"
+#include "log.h"
 
 __attribute__((weak)) void SystemInit(){}
 
@@ -54,4 +57,46 @@ void irq_priority()
     csi_vic_set_prio(SWINT2_IRQn,7);
     csi_vic_set_prio(SWINT3_IRQn,7);
 
+}
+
+void sys_init_none()
+{
+    enable_global_irq();
+    LOG_INIT();
+    systick_start();
+}
+
+int
+_close (int fildes)
+{
+  return -1;
+}
+
+int
+_fstat (int          fildes,
+        void *st)
+{
+  return -1;
+}
+
+int
+_isatty (int file)
+{
+  return 0;
+}
+
+int
+_read (int   file,
+        char *ptr,
+        int   len)
+{
+  return -1;
+}
+
+int
+_lseek (int   file,
+        int   ptr,
+        int   dir)
+{
+  return -1;
 }

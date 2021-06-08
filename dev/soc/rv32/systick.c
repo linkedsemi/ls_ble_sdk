@@ -21,8 +21,8 @@ void systick_start(void)
     total_ticks = 0;
     rv_set_int_isr(RV_TIME_IRQ_IDX,SysTick_Handler);
     CORET->MTIMECMP = SDK_HCLK_MHZ*1000000/SYSTICK_RATE_HZ + CORET->MTIME;
-    uint32_t mie = __get_MIE();
-    __set_MIE(mie|0x8);
+    csi_vic_clear_pending_irq(RV_TIME_IRQ_IDX);
+    csi_vic_enable_irq(RV_TIME_IRQ_IDX);
 }
 
 XIP_BANNED uint32_t systick_get_value(void)

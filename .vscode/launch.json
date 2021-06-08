@@ -29,6 +29,29 @@
 
         },
         {
+            "name": "TAURUS COREMARK",
+            "type": "gdb",
+            "request": "attach",
+            "target": "172.28.240.1:1025",
+            "executable": "build/taurus/examples/coremark.elf",
+            "cwd": "${workspaceFolder}",
+            "remote": true,
+            "gdbpath": "riscv64-unknown-elf-gdb",
+            "debugger_args": ["-iex \"set arch riscv:rv32\""],
+            "autorun": [
+                "set output-radix 16",
+                "load",
+                "monitor sreset -c 2",
+                "flushregs",
+                "interrupt",
+                "set $pc = 0x400000"
+                //"i all-reg"
+                
+            ],
+            //"printCalls":true,
+            //"showDevDebugOutput":true,
+        },
+        {
             "name": "TAURUS FLASH PROG",
             "type": "gdb",
             "request": "attach",

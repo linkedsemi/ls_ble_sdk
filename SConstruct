@@ -37,7 +37,7 @@ if env['BASE_ARCH'] == 'rv32':
     env['LD_ARCH_FLAGS'] = ' -mccrt '
 else:
     env['ARCH_FLAGS'] = ' -mabi=aapcs -mthumb -mcpu=$CPU -mno-unaligned-access -fshort-enums -fshort-wchar '
-    env['LD_ARCH_FLAGS'] = ' -Wl,--no-wchar-size-warning -Wl,--no-enum-size-warning -specs=nosys.specs '
+    env['LD_ARCH_FLAGS'] = ' -Wl,--no-wchar-size-warning -Wl,--no-enum-size-warning '
 
 if 'mdk' in env['TOOLS']:
     env['COMPILER'] = 'armcc'
@@ -48,7 +48,7 @@ else:
     env['CFLAGS'] = '-std=c11 ${C_CXX_FLAGS}'
     env['CXXFLAGS'] = '${C_CXX_FLAGS} -fno-exceptions '
     env['ASFLAGS'] = '${AS_ARCH_FLAGS} -g '
-    env['LINKFLAGS'] = '${ARCH_FLAGS} -Os -g -specs=nano.specs -T ${LINKSCRIPT} -Wl,-Map=${TARGET.base}.map -Wl,--cref ${LD_ARCH_FLAGS} '
+    env['LINKFLAGS'] = '${ARCH_FLAGS} -Os -g -specs=nosys.specs -specs=nano.specs -T ${LINKSCRIPT} -Wl,-Map=${TARGET.base}.map -Wl,--cref ${LD_ARCH_FLAGS} '
     env['GC_OPTION'] = ' -Wl,--gc-sections '
 
 env['CPPDEFINES'] = ['-D{}'.format(env['IC'].upper())]
