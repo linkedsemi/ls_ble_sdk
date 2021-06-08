@@ -210,12 +210,22 @@ void io_exti_callback(uint8_t pin);
 void set_gpio_mode(gpio_pin_t *pin);
 
 /**
-  * @brief Set pin mux function to qspi 
+  * @brief Init IO for SPI Flash (CS CLK DQ0 DQ1)
+  */
+void spi_flash_io_init(void);
+
+/**
+  * @brief DeInit SPI Flash IO
+  */
+void spi_flash_io_deinit(void);
+
+/**
+  * @brief Init IO for QSPI Flash (CS CLK DQ0 DQ1 DQ2 DQ3)
   */
 void qspi_flash_io_init(void);
 
 /**
-  * @brief clear pin mux function
+  * @brief DeInit QSPI Flash IO
   */
 void qspi_flash_io_deinit(void);
 

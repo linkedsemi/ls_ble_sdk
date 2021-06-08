@@ -212,14 +212,24 @@ void uart1_io_deinit(void)
     per_func_disable(pin2func_io((gpio_pin_t *)&uart1_rxd));
 }
 
+void spi_flash_io_init(void)
+{
+    REG_FIELD_WR(SYSC_AWO->PIN_SEL0,SYSC_AWO_QSPI_EN,0xf);
+}
+
+void spi_flash_io_deinit(void)
+{
+    REG_FIELD_WR(SYSC_AWO->PIN_SEL0,SYSC_AWO_QSPI_EN,0x0);
+}
+
 void qspi_flash_io_init(void)
 {
-
+    REG_FIELD_WR(SYSC_AWO->PIN_SEL0,SYSC_AWO_QSPI_EN,0x3f);
 }
 
 void qspi_flash_io_deinit(void)
 {
-
+    REG_FIELD_WR(SYSC_AWO->PIN_SEL0,SYSC_AWO_QSPI_EN,0x0);
 }
 
 void uart2_io_init(uint8_t txd,uint8_t rxd);
