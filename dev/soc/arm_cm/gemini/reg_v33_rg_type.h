@@ -2,6 +2,8 @@
 #define REG_V33_RG_TYPE_H_
 #include <stdint.h>
 
+#define V33_RG ((reg_v33_rg_t *)0x4000F000)
+
 typedef struct
 {
     volatile uint32_t SFT_CTRL00; //0x0

@@ -2,6 +2,8 @@
 #define REG_SYSC_AWO_TYPE_H_
 #include <stdint.h>
 
+#define SYSC_AWO ((reg_sysc_awo_t *)0x4000D000)
+
 typedef struct
 {
     volatile uint32_t LOCK;
@@ -12,7 +14,7 @@ typedef struct
     volatile uint32_t AE;
     volatile uint32_t FIR;
     volatile uint32_t DIN;
-}awo_io_reg_t;
+}reg_lsgpio_t;
 
 typedef struct
 {
@@ -30,7 +32,7 @@ typedef struct
     volatile uint32_t PIN_SEL1; //0x44
     volatile uint32_t PIN_SEL2; //0x48
     volatile uint32_t RESERVED4[5];
-    awo_io_reg_t IO[4];      // 0x60
+    reg_lsgpio_t IO[4];      // 0x60
     volatile uint32_t RESERVED5[1];
     volatile uint32_t DBG_ACK; //0xe4
     volatile uint32_t ANA_STAT; //0xe8

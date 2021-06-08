@@ -1,10 +1,14 @@
+#include <stddef.h>
 #include "io_config.h"
 #include "field_manipulate.h"
 #include "per_func_mux.h"
 #include "gemini.h"
 #include "platform.h"
-#include "reg_v33_rg.h"
-#include "reg_sysc_awo.h"
+#include "reg_v33_rg_type.h"
+#include "reg_sysc_per.h"
+#include "reg_sysc_awo_type.h"
+#include "ls_dbg.h"
+
 gpio_pin_t uart1_txd;
 gpio_pin_t uart1_rxd;
 gpio_pin_t iic1_scl;
@@ -12,7 +16,11 @@ gpio_pin_t iic1_sda;
 
 __attribute__((weak)) void io_exti_callback(uint8_t pin){}
 
-
+static void exti_io_handler(uint8_t port,uint8_t num)
+{
+    uint8_t pin = port<<4 | num;
+    io_exti_callback(pin);
+}
 
 void EXTI_Handler(void)
 {
@@ -21,19 +29,30 @@ void EXTI_Handler(void)
 
 void io_init(void)
 {
-    //TODO
+    SYSC_AWO->IO[0].IE_OD = 0;
+    SYSC_AWO->IO[0].OE_DOT= 0;
+    SYSC_AWO->IO[1].IE_OD = 0;
+    SYSC_AWO->IO[1].OE_DOT = 0;
+    SYSC_AWO->IO[2].IE_OD = 0;
+    SYSC_AWO->IO[2].OE_DOT = 0;
+    SYSC_AWO->IO[3].IE_OD = 0;
+    SYSC_AWO->IO[3].OE_DOT = 0;
     arm_cm_set_int_isr(EXT_IRQn,EXTI_Handler);
     __NVIC_EnableIRQ(EXT_IRQn);
 }
 
+
 void io_cfg_output(uint8_t pin)
 {
-    
+    gpio_pin_t *x = (gpio_pin_t *)&pin;
+    SYSC_AWO->IO[x->port].OE_DOT |= 1<<16<<x->num;
 }
 
 void io_cfg_input(uint8_t pin)
 {
-
+    gpio_pin_t *x = (gpio_pin_t *)&pin;
+    SYSC_AWO->IO[x->port].OE_DOT &= ~(1<<16<<x->num);
+    SYSC_AWO->IO[x->port].IE_OD &= ~(1<<16<<x->num); 
 }
 
 void io_write_pin(uint8_t pin,uint8_t val)
@@ -49,49 +68,67 @@ void io_write_pin(uint8_t pin,uint8_t val)
 
 void io_set_pin(uint8_t pin)
 {
-
+    gpio_pin_t *x = (gpio_pin_t *)&pin;
+    SYSC_AWO->IO[x->port].OE_DOT |= 1<<x->num;
 }
 
 void io_clr_pin(uint8_t pin)
 {
-
+    gpio_pin_t *x = (gpio_pin_t *)&pin;
+    SYSC_AWO->IO[x->port].OE_DOT &= ~(1<<x->num);
 }
 
 void io_toggle_pin(uint8_t pin)
 {
-
+    gpio_pin_t *x = (gpio_pin_t *)&pin;
+    SYSC_AWO->IO[x->port].OE_DOT ^= 1<<x->num;
 }
 
 uint8_t io_get_output_val(uint8_t pin)
 {
-    return 0;
+    gpio_pin_t *x = (gpio_pin_t *)&pin;
+    return SYSC_AWO->IO[x->port].OE_DOT >> x->num & 0x1;
 }
 
 uint8_t io_read_pin(uint8_t pin)
 {
-    return 0;
+    gpio_pin_t *x = (gpio_pin_t *)&pin;
+    return SYSC_AWO->IO[x->port].DIN >> x->num & 0x1;
 }
 
 void io_pull_write(uint8_t pin,io_pull_type_t pull)
 {
+    gpio_pin_t *x = (gpio_pin_t *)&pin;
     switch(pull)
     {
     case IO_PULL_DISABLE:
-
+        SYSC_AWO->IO[x->port].PUPD &= ~(1<<16<<x->num | 1<<x->num);
     break;
     case IO_PULL_UP:
-
+        MODIFY_REG(SYSC_AWO->IO[x->port].PUPD,1<<16<<x->num,1<<x->num);
     break;
     case IO_PULL_DOWN:
-
+        MODIFY_REG(SYSC_AWO->IO[x->port].PUPD,1<<x->num,1<<16<<x->num);
     break;
     }
 }
 
 io_pull_type_t io_pull_read(uint8_t pin)
 {
-    return 0;
+    gpio_pin_t *x = (gpio_pin_t *)&pin;
+    if((SYSC_AWO->IO[x->port].PUPD>>x->num)&0x1)
+    {
+        return IO_PULL_DOWN;
+    }else if((SYSC_AWO->IO[x->port].PUPD>>x->num>>16)&0x1)
+    {
+        return IO_PULL_UP;
+    }else
+    {
+        return IO_PULL_DISABLE;
+    }
 }
+
+
 
 void io_exti_config(uint8_t pin,exti_edge_t edge)
 {
@@ -117,12 +154,26 @@ static uint8_t pin2func_io(gpio_pin_t *x)
 
 static void per_func_enable(uint8_t func_io_num,uint8_t per_func)
 {
+    MODIFY_REG(SYSC_PER->FUNC_SEL[func_io_num/4],0xff<<8*(func_io_num%4),per_func<<8*(func_io_num%4));
+    if(func_io_num >= 32)
+    {
+        SYSC_AWO->PIN_SEL2 |= 1<<(func_io_num-32);
+    }else
+    {
+        SYSC_AWO->PIN_SEL1 |= 1<<func_io_num;
+    }
 
 }
 
 static void per_func_disable(uint8_t func_io_num)
 {
-
+    if(func_io_num >= 32)
+    {
+        SYSC_AWO->PIN_SEL2 &= ~(1<<(func_io_num-32));
+    }else
+    {
+        SYSC_AWO->PIN_SEL1 &= ~(1<<func_io_num);
+    }
 }
 
 static void iic_io_cfg(uint8_t scl,uint8_t sda)
