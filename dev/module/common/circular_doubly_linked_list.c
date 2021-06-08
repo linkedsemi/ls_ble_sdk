@@ -107,7 +107,7 @@ void cdll_insert(struct cdll *list,struct cdll_hdr *hdr,bool (*cmp)(struct cdll_
 		{
 			ptr = ptr->next;
 		}
-	}while(ptr==list->first);
+	}while(ptr!=list->first);
 	if(ptr==list->first)
 	{
 		ptr->prev->next = hdr;

@@ -4,7 +4,11 @@
 #if (ROM_CODE==1 || BOOT_RAM==1)
 #define ROM_SYMBOL
 #define XIP_BANNED 
+#if defined(BOOT_ROM)
+#define LL_PKT_ISR 
+#else
 #define LL_PKT_ISR __attribute((section(".ll_pkt_isr")))
+#endif
 #else
 #define ROM_SYMBOL __attribute__((weak))
 #define XIP_BANNED __attribute__((section(".xip_banned")))
