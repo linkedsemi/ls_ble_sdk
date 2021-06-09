@@ -77,6 +77,29 @@ typedef struct
 #define PC08 ((uint8_t)0X28)   /*!< GPIOC08 selected */     
 #define PC09 ((uint8_t)0X29)   /*!< GPIOC09 selected */    
 #define PC10 ((uint8_t)0X2A)   /*!< GPIOC10 selected */    
+#define PC11 ((uint8_t)0X2B)   /*!< GPIOC11 selected */    
+#define PC12 ((uint8_t)0X2C)   /*!< GPIOC12 selected */     
+#define PC13 ((uint8_t)0X2D)   /*!< GPIOC13 selected */    
+#define PC14 ((uint8_t)0X2E)   /*!< GPIOC14 selected */    
+#define PC15 ((uint8_t)0X2F)   /*!< GPIOC15 selected */   
+//lsgpiod
+#define PD00 ((uint8_t)0X30)   /*!< GPIOD00 selected */     
+#define PD01 ((uint8_t)0X31)   /*!< GPIOD01 selected */      
+#define PD02 ((uint8_t)0X32)   /*!< GPIOD02 selected */     
+#define PD03 ((uint8_t)0X33)   /*!< GPIOD03 selected */     
+#define PD04 ((uint8_t)0X34)   /*!< GPIOD04 selected */     
+#define PD05 ((uint8_t)0X35)   /*!< GPIOD05 selected */     
+#define PD06 ((uint8_t)0X36)   /*!< GPIOD06 selected */      
+#define PD07 ((uint8_t)0X37)   /*!< GPIOD07 selected */      
+#define PD08 ((uint8_t)0X38)   /*!< GPIOD08 selected */     
+#define PD09 ((uint8_t)0X39)   /*!< GPIOD09 selected */    
+#define PD10 ((uint8_t)0X3A)   /*!< GPIOD10 selected */    
+#define PD11 ((uint8_t)0X3B)   /*!< GPIOD11 selected */    
+#define PD12 ((uint8_t)0X3C)   /*!< GPIOD12 selected */     
+#define PD13 ((uint8_t)0X3D)   /*!< GPIOD13 selected */    
+#define PD14 ((uint8_t)0X3E)   /*!< GPIOD14 selected */    
+#define PD15 ((uint8_t)0X3F)   /*!< GPIOD15 selected */   
+
 /**
   * @brief GPIO Init
   */
