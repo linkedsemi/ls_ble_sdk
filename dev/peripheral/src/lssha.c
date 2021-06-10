@@ -63,6 +63,7 @@ static void sha_data_config()
         }
     }else
     {
+        bool last = sha_padding_length<=SHA_PADDING_MOD;
         while(sha_remain_length>=sizeof(uint32_t))
         {
             LSSHA->FIFO_DAT = get_uint32_t(sha_data_ptr);
@@ -85,25 +86,34 @@ static void sha_data_config()
         }
         sha_remain_length = 0;
         LS_ASSERT(sha_padding_length%4==0);
-        if(sha_padding_length>SHA_PADDING_MOD - 3)
-        {
-            //TODO BUGFIX
-            LSSHA->FIFO_DAT = 0;
-            LSSHA->FIFO_DAT = 0;
-            sha_padding_length -= SHA_DATA_LENGTH_SIZE;
-        }else
+        if(last)
         {
             while(sha_padding_length)
             {
                 LSSHA->FIFO_DAT = 0;
                 sha_padding_length -= sizeof(uint32_t);
             }
-        }
-        if(sha_padding_length==0)
+            if(sha_padding_length==0)
+            {
+                LSSHA->FIFO_DAT = 0;
+                LSSHA->FIFO_DAT = (sha_data_bits&0xff)<<24|(sha_data_bits&0xff00)<<8
+                    |(sha_data_bits&0xff0000)>>8|(sha_data_bits&0xff000000)>>24;
+            }
+        }else
         {
-            LSSHA->FIFO_DAT = 0;
-            LSSHA->FIFO_DAT = (sha_data_bits&0xff)<<24|(sha_data_bits&0xff00)<<8
-                |(sha_data_bits&0xff0000)>>8|(sha_data_bits&0xff000000)>>24;
+            switch(sha_padding_length)
+            {
+            case SHA_BLOCK_SIZE:
+                LSSHA->FIFO_DAT = 0;
+            //no break;
+            case SHA_BLOCK_SIZE - sizeof(uint32_t):
+                LSSHA->FIFO_DAT = 0;
+                sha_padding_length = SHA_PADDING_MOD;
+            break;
+            default:
+                LS_ASSERT(0);
+            break;
+            }
         }
     }
     LSSHA->INTR_C = SHA_FSM_EMPT_INTR_MASK;
