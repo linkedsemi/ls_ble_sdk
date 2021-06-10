@@ -49,4 +49,5 @@
 
 #define LSCRYPT_BASE_ADDR (0x40008000)
 
+#define LSSHA_BASE_ADDR (0x4000E400)
 #endif

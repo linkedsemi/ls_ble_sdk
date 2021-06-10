@@ -5,7 +5,7 @@
 #include "gemini.h"
 #include "platform.h"
 #include "reg_v33_rg_type.h"
-#include "reg_sysc_per.h"
+#include "reg_sysc_per_type.h"
 #include "reg_sysc_awo_type.h"
 #include "ls_dbg.h"
 

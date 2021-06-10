@@ -1,7 +1,7 @@
 #ifndef LSQSPIV2_CONFIG_H_
 #define LSQSPIV2_CONFIG_H_
 
-#define QSPI_CLK_CYCLE 0
+#define QSPI_CLK_CYCLE 1
 #define QSPI_CS_INTERVAL 4
 #define QSPI_CS_HOLD 2
 #define QSPI_CS_SETUP 2

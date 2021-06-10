@@ -64,7 +64,11 @@
         "core_rv32.h": "c",
         "ll_sched.h": "c",
         "cpu.h": "c",
-        "reg_v33_rg_type.h": "c"
+        "reg_v33_rg_type.h": "c",
+        "lsqspiv2_msp.h": "c",
+        "reg_sysc_cpu_type.h": "c",
+        "gemini.h": "c",
+        "sha_msp.h": "c"
     },
     "editor.detectIndentation": false,
     "restructuredtext.confPath": "${workspaceFolder}\\doc",

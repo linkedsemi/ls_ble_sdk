@@ -14,7 +14,7 @@ XIP_BANNED static void spi_flash_quad_xip_mode_enter()
     cfg.ctrl.sw_en = 1;
     cfg.ctrl.mw_wid = QUAD_WIRE;
     cfg.ctrl.hz_cyc = 4;
-    cfg.ctrl.mw_cyc = 11;
+    cfg.ctrl.mw_cyc = 15;
     cfg.ctrl.mw_en = 1;
     cfg.ctrl.reserved0 = 0;
     cfg.ctrl.reserved1 = 0;
@@ -44,7 +44,7 @@ XIP_BANNED static void spi_flash_dual_xip_mode_enter()
     cfg.ctrl.sw_en = 1;
     cfg.ctrl.mw_wid = DUAL_WIRE;
     cfg.ctrl.hz_cyc = 4;
-    cfg.ctrl.mw_cyc = 11;
+    cfg.ctrl.mw_cyc = 15;
     cfg.ctrl.mw_en = 1;
     cfg.ctrl.reserved0 = 0;
     cfg.ctrl.reserved1 = 0;
@@ -94,7 +94,7 @@ XIP_BANNED static void spi_flash_quad_xip_mode_exit()
     cfg.ctrl.sw_en = 0;
     cfg.ctrl.mw_wid = QUAD_WIRE;
     cfg.ctrl.hz_cyc = 4;
-    cfg.ctrl.mw_cyc = 11;
+    cfg.ctrl.mw_cyc = 15;
     cfg.ctrl.mw_en = 1;
     cfg.ctrl.reserved0 = 0;
     cfg.ctrl.reserved1 = 0;
@@ -257,7 +257,7 @@ static void spi_flash_read_loop(struct lsqspiv2_stg_cfg *cfg,uint8_t opcode,uint
             cfg->dat_ctrl.dat_bytes = length - 1;
             length = 0;
         }
-        spi_flash_read_operation(&cfg);
+        spi_flash_read_operation(cfg);
         cfg->data += 4096;
     }
 }
@@ -269,7 +269,7 @@ void spi_flash_quad_io_read(uint32_t offset, uint8_t * data, uint16_t length)
     cfg.ctrl.sw_en = 1;
     cfg.ctrl.mw_wid = QUAD_WIRE;
     cfg.ctrl.hz_cyc = 4;
-    cfg.ctrl.mw_cyc = 11;
+    cfg.ctrl.mw_cyc = 15;
     cfg.ctrl.mw_en = 1;
     cfg.ctrl.reserved0 = 0;
     cfg.ctrl.reserved1 = 0;
@@ -315,7 +315,7 @@ void spi_flash_dual_io_read(uint32_t offset,uint8_t *data,uint16_t length)
 void spi_flash_fast_read(uint32_t offset, uint8_t * data, uint16_t length)
 {
     struct lsqspiv2_stg_cfg cfg;
-    cfg.ctrl.sw_cyc = 31;
+    cfg.ctrl.sw_cyc = 39;
     cfg.ctrl.sw_en = 1;
     cfg.ctrl.hz_cyc = 8;
     cfg.ctrl.mw_wid = SINGLE_WIRE;
@@ -356,7 +356,7 @@ XIP_BANNED void do_spi_flash_read_reg_func(void *param)
 void spi_flash_read_unique_id(uint8_t unique_serial_id[16])
 {
     struct lsqspiv2_stg_cfg cfg;
-    cfg.ctrl.sw_cyc = 31;
+    cfg.ctrl.sw_cyc = 39;
     cfg.ctrl.sw_en = 1;
     cfg.ctrl.hz_cyc = 8;
     cfg.ctrl.mw_wid = SINGLE_WIRE;
@@ -424,7 +424,7 @@ XIP_BANNED void do_spi_flash_read_security_area_func(void *param)
 void do_spi_flash_read_security_area(uint8_t idx,uint16_t addr,uint8_t *data,uint16_t length)
 {
     struct lsqspiv2_stg_cfg cfg;
-    cfg.ctrl.sw_cyc = 31;
+    cfg.ctrl.sw_cyc = 39;
     cfg.ctrl.sw_en = 1;
     cfg.ctrl.mw_wid = SINGLE_WIRE;
     cfg.ctrl.hz_cyc = 8;

@@ -4,7 +4,7 @@
 #include "gemini.h"
 #include "HAL_def.h"
 #include "platform.h"
-#include "reg_sysc_per.h"
+#include "reg_sysc_per_type.h"
 
 static UART_HandleTypeDef *UART_inst_env[5];
 

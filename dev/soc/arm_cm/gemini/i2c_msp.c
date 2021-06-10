@@ -3,7 +3,7 @@
 #include "gemini.h"
 #include "HAL_def.h"
 #include "platform.h"
-#include "reg_sysc_per.h"
+#include "reg_sysc_per_type.h"
 #include <stddef.h>
 
 static I2C_HandleTypeDef *i2c_inst_env[3];

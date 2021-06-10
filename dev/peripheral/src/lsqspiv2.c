@@ -52,30 +52,31 @@ XIP_BANNED static void read_data_from_fifo(struct lsqspiv2_stg_cfg *cfg)
 {
     while(LSQSPIV2->FIFO_FLVL==0);
     uint32_t rx = LSQSPIV2->FIFO_RDAT;
-    uint8_t *head = (uint8_t *)cfg->data;
-    switch(cfg->dat_ctrl.dat_offset)
-    {
-    case 1:
-        *head++ = rx>>8;
-    //no break;
-    case 2:
-        *head++ = rx>>16;
-    //no break;
-    case 3:
-        *head++ = rx>>24;
-    //no break;
-    default:
-    break;
-    }
-    uint32_t *rx_ptr = (uint32_t *)head;
-    uint16_t rx_remain;
+    uint32_t *rx_ptr;
     if(cfg->dat_ctrl.dat_offset)
     {
-        rx_remain = cfg->dat_ctrl.dat_bytes + 1 + 4 - cfg->dat_ctrl.dat_offset;
+        uint8_t *head = (uint8_t *)cfg->data;
+        switch(cfg->dat_ctrl.dat_offset)
+        {
+        case 1:
+            *head++ = rx>>8;
+        //no break;
+        case 2:
+            *head++ = rx>>16;
+        //no break;
+        case 3:
+            *head++ = rx>>24;
+        //no break;
+        default:
+        break;
+        }
+        rx_ptr = (uint32_t *)head;
     }else
     {
-        rx_remain = cfg->dat_ctrl.dat_bytes + 1;
+        rx_ptr = (uint32_t *)cfg->data;
+        *rx_ptr++ = rx;
     }
+    uint16_t rx_remain = cfg->dat_ctrl.dat_bytes + 1 - 4 + cfg->dat_ctrl.dat_offset;
     while(rx_remain>=4)
     {
         if(LSQSPIV2->FIFO_FLVL)
