@@ -27,12 +27,26 @@ if ic == 'le501x':
     crc_bytes = struct.pack("I",crc_rslt)
     sbl_data = sbl_data + crc_bytes
     info_head = struct.pack('IIHHIIIIIIIII',test_word0,test_word1,cap_delay,spi_clk,cfg_info,image_crypt,0xffffffff,0xffffffff,sbl_code_start,sbl_code_length,app_image_base,fota_image_base,data_storage_base)
-else :
+elif ic== 'sagi' :
     flash_base = 0x00800000
     code_offset = 0x1000
     sbl_code_length = len(sbl_data)
     sbl_code_start = flash_base+code_offset
     sbl_code_exec_addr = 0x401000
+    feature_mask = 0xffffffff
+    data_storage_base = 0x802000
+    data_storage_size = 0x3000
+    assert(data_storage_base >= sbl_code_start + sbl_code_length)
+    app_image_base = 0x805000
+    assert(app_image_base >= data_storage_base + data_storage_size)
+    fota_image_base = 0x83d000
+    info_head = struct.pack('IIIIIIIII',test_word0,test_word1,code_offset,sbl_code_length,sbl_code_exec_addr,feature_mask,data_storage_base,app_image_base,fota_image_base)  
+elif ic== 'gemini' :
+    flash_base = 0x00800000
+    code_offset = 0x1000
+    sbl_code_length = len(sbl_data)
+    sbl_code_start = flash_base+code_offset
+    sbl_code_exec_addr = 0x20001000
     feature_mask = 0xffffffff
     data_storage_base = 0x802000
     data_storage_size = 0x3000

@@ -4,7 +4,6 @@
 #include <string.h>
 #include <stdlib.h>
 #include "log.h"
-#include "lsdmac.h"
 
 #define BUF_SIZE 256
 

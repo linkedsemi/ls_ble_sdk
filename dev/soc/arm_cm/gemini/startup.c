@@ -1,5 +1,14 @@
-#include "ARMCM3.h"
+#include "gemini.h"
 #include "common.h"
+extern uint32_t __StackTop;
+#define NMI_Handler Default_Handler
+#define HardFault_Handler Default_Handler
+#define MemManage_Handler Default_Handler
+#define BusFault_Handler Default_Handler
+#define UsageFault_Handler Default_Handler
+#define PendSV_Handler Default_Handler
+#define DebugMon_Handler Default_Handler
+void Default_Handler(){while(1);}
 void SystemInit(void);
 void _start(void) __attribute__ ((noreturn));
 extern uint32_t __data_lma__;
@@ -26,7 +35,6 @@ void SVC_Handler(void);
 void DebugMon_Handler(void);
 void PendSV_Handler(void);
 void SysTick_Handler(void);
-
 
 __VECTOR_TABLE_ATTRIBUTE void const * const __isr_vector[IRQn_Max + 16]={
 &__StackTop        ,

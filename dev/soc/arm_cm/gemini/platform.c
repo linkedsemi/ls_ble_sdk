@@ -5,7 +5,7 @@
 #include "io_config.h"
 #include "spi_flash.h"
 #include "compile_flag.h"
-
+#include "reg_sysc_awo_type.h"
 
 #define ISR_VECTOR_ADDR ((uint32_t *)(0x20000000))
 

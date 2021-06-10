@@ -7,6 +7,7 @@ src = [
     'io_config.c',
     'i2c_msp.c',
     'sha_msp.c',
+    'lscache_msp.c',
     'compiler/$COMPILER/sleep_asm.S',
     'compiler/$COMPILER/svcall_asm.S',
     'compiler/$COMPILER/delay_asm.S',
@@ -21,5 +22,5 @@ start_src = [
 src_files = File(env.subst(src))
 inc_dirs = Dir(inc)
 start_files = File(env.subst(start_src))
-env['LINKSCRIPT'] = File("link_script.txt")
+env['LINKSCRIPT'] = File(env.subst("compiler/$COMPILER/link_script.txt"))
 Return("src_files","inc_dirs","start_files")
