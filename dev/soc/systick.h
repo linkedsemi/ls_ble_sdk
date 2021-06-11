@@ -19,4 +19,5 @@ uint32_t systick_get_value(void);
 
 bool systick_poll_timeout(uint32_t start_tick,uint32_t timeout,bool (*poll)(va_list),...);
 
+void systick_stop(void);
 #endif

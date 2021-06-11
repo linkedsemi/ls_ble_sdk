@@ -10,10 +10,10 @@
 #include "compile_flag.h"
 #include "ls_dbg.h"
 #include "platform.h"
-#ifndef FLASH_PROG_ALGO
-#define PUYA_SUSPEND_WORKAROUND 1
-#else
+#if (defined(FLASH_PROG_ALGO) || BOOT_RAM==1)
 #define PUYA_SUSPEND_WORKAROUND 0
+#else
+#define PUYA_SUSPEND_WORKAROUND 1
 #endif
 #if PUYA_SUSPEND_WORKAROUND
 #include "systick.h"

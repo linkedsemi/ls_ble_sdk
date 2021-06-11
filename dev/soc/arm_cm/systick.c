@@ -83,3 +83,8 @@ XIP_BANNED bool systick_poll_timeout(uint32_t start_tick,uint32_t timeout,bool (
     }while(time_diff(systick_get_value(),end_tick)<0);
     return true;
 }
+
+void systick_stop()
+{
+    SysTick->CTRL = 0;
+}
