@@ -15,6 +15,10 @@
 #define FLASH_PAGE_SIZE (256) 
 /// Flash Sector Size
 #define FLASH_SECTOR_SIZE (0x1000) 
+/// Status Register 1 SUS1 Mask
+#define STATUS_REG1_SUS1_MASK (0x80)
+/// Status Register 1 SUS2 Mask
+#define STATUS_REG1_SUS2_MASK (0x04)
 
 void spi_flash_dual_mode_set(bool dual);
 

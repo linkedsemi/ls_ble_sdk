@@ -406,11 +406,6 @@ uint32_t plf_get_reset_error()
     return reset_retain_ptr->reset_reason;
 }
 
-XIP_BANNED void flash_prog_erase_suspend_delay()
-{
-    DELAY_US(30);
-}
-
 __attribute__((weak)) void ble_isr(){}
 
 XIP_BANNED void BLE_Handler()
@@ -421,7 +416,10 @@ XIP_BANNED void BLE_Handler()
     {
         LS_RAM_ASSERT(xip == false);
         spi_flash_prog_erase_suspend();
-        flash_prog_erase_suspend_delay();
+        uint8_t status_reg1;
+        do{
+            spi_flash_read_status_register_1(&status_reg1);
+        }while((status_reg1&(STATUS_REG1_SUS1_MASK|STATUS_REG1_SUS2_MASK))==0);
     }
     if(xip == false)
     {
@@ -435,6 +433,7 @@ XIP_BANNED void BLE_Handler()
     if(flash_writing_status)
     {
         spi_flash_prog_erase_resume();
+        DELAY_US(8);
     }
 }
 

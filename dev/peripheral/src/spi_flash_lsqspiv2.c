@@ -14,7 +14,7 @@ XIP_BANNED static void spi_flash_quad_xip_mode_enter()
     cfg.ctrl.sw_en = 1;
     cfg.ctrl.mw_wid = QUAD_WIRE;
     cfg.ctrl.hz_cyc = 4;
-    cfg.ctrl.mw_cyc = 15;
+    cfg.ctrl.mw_cyc = 11;
     cfg.ctrl.mw_en = 1;
     cfg.ctrl.reserved0 = 0;
     cfg.ctrl.reserved1 = 0;
@@ -44,7 +44,7 @@ XIP_BANNED static void spi_flash_dual_xip_mode_enter()
     cfg.ctrl.sw_en = 1;
     cfg.ctrl.mw_wid = DUAL_WIRE;
     cfg.ctrl.hz_cyc = 4;
-    cfg.ctrl.mw_cyc = 15;
+    cfg.ctrl.mw_cyc = 11;
     cfg.ctrl.mw_en = 1;
     cfg.ctrl.reserved0 = 0;
     cfg.ctrl.reserved1 = 0;
@@ -94,7 +94,7 @@ XIP_BANNED static void spi_flash_quad_xip_mode_exit()
     cfg.ctrl.sw_en = 0;
     cfg.ctrl.mw_wid = QUAD_WIRE;
     cfg.ctrl.hz_cyc = 4;
-    cfg.ctrl.mw_cyc = 15;
+    cfg.ctrl.mw_cyc = 11;
     cfg.ctrl.mw_en = 1;
     cfg.ctrl.reserved0 = 0;
     cfg.ctrl.reserved1 = 0;
@@ -269,7 +269,7 @@ void spi_flash_quad_io_read(uint32_t offset, uint8_t * data, uint16_t length)
     cfg.ctrl.sw_en = 1;
     cfg.ctrl.mw_wid = QUAD_WIRE;
     cfg.ctrl.hz_cyc = 4;
-    cfg.ctrl.mw_cyc = 15;
+    cfg.ctrl.mw_cyc = 11;
     cfg.ctrl.mw_en = 1;
     cfg.ctrl.reserved0 = 0;
     cfg.ctrl.reserved1 = 0;
