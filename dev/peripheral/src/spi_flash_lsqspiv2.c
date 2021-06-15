@@ -43,8 +43,8 @@ XIP_BANNED static void spi_flash_dual_xip_mode_enter()
     cfg.ctrl.sw_cyc = 7;
     cfg.ctrl.sw_en = 1;
     cfg.ctrl.mw_wid = DUAL_WIRE;
-    cfg.ctrl.hz_cyc = 4;
-    cfg.ctrl.mw_cyc = 11;
+    cfg.ctrl.hz_cyc = 0;
+    cfg.ctrl.mw_cyc = 15;
     cfg.ctrl.mw_en = 1;
     cfg.ctrl.reserved0 = 0;
     cfg.ctrl.reserved1 = 0;
