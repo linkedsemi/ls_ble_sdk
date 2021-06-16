@@ -52,6 +52,11 @@ void spi_flash_read_status_register_0(uint8_t *status_reg_0);
  */
 void spi_flash_read_status_register_1(uint8_t *status_reg_1);
 
+/** \brief Check WIP Status
+ *  \return WIP status
+ */
+bool spi_flash_write_in_process(void);
+
 /** \brief Write Status Register 
  *  \param[in] status The value to write to Status Register
  */

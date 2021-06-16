@@ -419,7 +419,7 @@ XIP_BANNED void BLE_Handler()
         uint8_t status_reg1;
         do{
             spi_flash_read_status_register_1(&status_reg1);
-        }while((status_reg1&(STATUS_REG1_SUS1_MASK|STATUS_REG1_SUS2_MASK))==0);
+        }while(spi_flash_write_in_process()&&(status_reg1&(STATUS_REG1_SUS1_MASK|STATUS_REG1_SUS2_MASK))==0);
     }
     if(xip == false)
     {
