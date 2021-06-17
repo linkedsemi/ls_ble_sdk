@@ -183,7 +183,7 @@ HAL_StatusTypeDef HAL_I2C_DeInit(I2C_HandleTypeDef *hi2c);
   *                    in datasheet must be shifted to the left before calling the interface
   * @param  pData Pointer to data buffer
   * @param  Size Amount of data to be sent
-  * @param  Timeout Timeout duration
+  * @param  Timeout Timeout duration.note：when Timeout = HAL_MAX_DELAY，that means the timeout is not valid.
   *
   * @return HAL status            returned HAL_BUSY/HAL_OK/HAL_ERROR information
   ****************************************************************************************
@@ -198,7 +198,7 @@ HAL_StatusTypeDef HAL_I2C_Master_Transmit(I2C_HandleTypeDef *hi2c, uint16_t DevA
   *                    in datasheet must be shifted to the left before calling the interface
   * @param  pData Pointer to data buffer
   * @param  Size Amount of data to be sent
-  * @param  Timeout Timeout duration
+  * @param  Timeout Timeout duration。note：when Timeout = HAL_MAX_DELAY，that means the timeout is not valid.
   * @return HAL status            returned HAL_BUSY/HAL_OK/HAL_ERROR information
   ****************************************************************************************
   */

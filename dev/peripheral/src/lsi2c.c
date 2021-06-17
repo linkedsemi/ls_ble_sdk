@@ -1202,7 +1202,7 @@ static HAL_StatusTypeDef I2C_WaitOnRXNEFlagUntilTimeout(I2C_HandleTypeDef *hi2c,
     }
     else
     {
-        while (__HAL_I2C_GET_FLAG(hi2c, I2C_FLAG_STOPF) == RESET)
+        while (__HAL_I2C_GET_FLAG(hi2c, I2C_SR_RXNE_MASK) == RESET)
         {
                 /* Check if a NACK is detected */
             if (I2C_IsAcknowledgeFailed(hi2c) != HAL_OK)
