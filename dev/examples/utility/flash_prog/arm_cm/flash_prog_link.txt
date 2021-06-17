@@ -1,8 +1,6 @@
 
 SECTIONS
 {
-
-
 	PrgCode :
 	{
 		KEEP(*(.text.Init))
@@ -13,8 +11,7 @@ SECTIONS
 		KEEP(*(.text.ProgramPage))
 		KEEP(*(.text.Verify))
 		*(.text* .rodata*)
-		*(.xip_banned)
-
+        *(.got .got.plt)
 	}
 	PrgData :
 	{
@@ -22,7 +19,6 @@ SECTIONS
 		*(.bss*)
 		*(COMMON)
 	}
-	
 	DevDscr : 
 	{
 		KEEP(*(DevDscr))

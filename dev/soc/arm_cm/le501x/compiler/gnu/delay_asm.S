@@ -1,7 +1,10 @@
     .syntax unified
     .arch armv6-m
-
+#if (ROM_CODE==1 || BOOT_RAM==1 || defined(FLASH_PROG_ALGO))
+    .section .text.arm_cm_delay_asm,"x"
+#else
     .section .xip_banned,"x"
+#endif
     .thumb
     .thumb_func
     .align 1
