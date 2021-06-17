@@ -251,7 +251,7 @@ static void rf_reg_init()
                | FIELD_BUILD(RF_PA_VB_TARGET,0xf)
                | FIELD_BUILD(RF_LDO_START_CNT,3)
                | FIELD_BUILD(RF_PA_STEP_SET,5);
-     RF->REG54 = FIELD_BUILD(RF_AFC_MIN_CNT,24)
+    RF->REG54 = FIELD_BUILD(RF_AFC_MIN_CNT,24)
                 | FIELD_BUILD(RF_AFC_MAX_CNT,0x30)
                 | FIELD_BUILD(RF_GAIN_MAX_CNT,0x10)
                 | FIELD_BUILD(RF_EN_PLL_CNT,0x4);
@@ -279,15 +279,15 @@ static void rf_reg_init()
        switch (package_id)
        {
            case 0x1603:
-            REG_FIELD_WR(SYSCFG->ANACFG1, SYSCFG_XO16M_CAP_TRIM, 0x7); 
-            REG_FIELD_WR(RF->REG2C,RF_PLL_GAIN_CAL_TH,0x25);
-            REG_FIELD_WR(RF->REG50,RF_PA_STEP_SET,0x2);
+           REG_FIELD_WR(SYSCFG->ANACFG1, SYSCFG_XO16M_CAP_TRIM, 0x7);
+           REG_FIELD_WR(RF->REG2C, RF_PLL_GAIN_CAL_TH, 0x25);
+           REG_FIELD_WR(RF->REG50, RF_PA_STEP_SET, 0x2);
            break;
            case 0x3202:
            case 0x4803:
-            REG_FIELD_WR(SYSCFG->ANACFG1, SYSCFG_XO16M_CAP_TRIM, 0x9);
-            REG_FIELD_WR(RF->REG2C,RF_PLL_GAIN_CAL_TH,0x22);
-            REG_FIELD_WR(RF->REG50,RF_PA_STEP_SET,0x4); 
+           REG_FIELD_WR(SYSCFG->ANACFG1, SYSCFG_XO16M_CAP_TRIM, 0x9);
+           REG_FIELD_WR(RF->REG2C,RF_PLL_GAIN_CAL_TH,0x22);
+           REG_FIELD_WR(RF->REG50,RF_PA_STEP_SET,0x4); 
            break;
            default:
            break;
