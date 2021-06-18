@@ -26,5 +26,6 @@ if not 'mdk' in env['TOOLS']:
     flash_prog_env,flash_prog_target = image_build('flash_prog',env.subst(src),env.subst(inc),ld_file)
     flash_prog_env.Append(CPPDEFINES = ['GLOBAL_OUTPUT_LVL=0', 'FLASH_PROG_ALGO'])
     if env['BASE_ARCH'] == 'arm_cm':
+        flash_prog_env.Append(CFLAGS = ' -fPIE ')
         flash_prog_env.Append(LINKFLAGS = ' -nostartfiles -Wl,-n')
     flash_prog_env.AddPostAction(flash_prog_target,Copy('tools/prog/LinkedSemi/${IC}_flash_algo.elf','$TARGET'))

@@ -10,6 +10,9 @@
 #include "compile_flag.h"
 #include "ls_dbg.h"
 #include "platform.h"
+#if defined(FLASH_PROG_ALGO) && __arm__
+#define SPI_FLASH_C_MERGED
+#endif
 #if (defined(FLASH_PROG_ALGO) || BOOT_RAM==1)
 #define PUYA_SUSPEND_WORKAROUND 0
 #else

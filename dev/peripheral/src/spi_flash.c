@@ -1,4 +1,5 @@
 #include "spi_flash_int.h"
+#if !defined(SPI_FLASH_C_MERGED) || defined(SPI_FLASH_C_DESTINATION)
 struct spi_flash_status
 {
     bool writing;
@@ -234,4 +235,4 @@ XIP_BANNED bool spi_flash_xip_status_get()
     return flash_stat.xip;
 }
 
-
+#endif

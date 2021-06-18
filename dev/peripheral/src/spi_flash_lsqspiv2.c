@@ -1,5 +1,9 @@
 #include "spi_flash_int.h"
 #include "lsqspiv2.h"
+#ifdef SPI_FLASH_C_MERGED
+#define SPI_FLASH_C_DESTINATION
+#include "spi_flash.c"
+#endif
 
 XIP_BANNED void spi_flash_init()
 {
