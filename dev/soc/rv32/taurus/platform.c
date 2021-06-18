@@ -5,6 +5,7 @@
 #include "systick.h"
 #include "cpu.h"
 #include "log.h"
+#include "compile_flag.h"
 
 __attribute__((weak)) void SystemInit(){}
 
@@ -14,7 +15,7 @@ void sys_init_itf()
     
 }
 
-void flash_swint_set()
+XIP_BANNED void flash_swint_set()
 {
     SWINT_SET_INLINE_ASM(SWINT3_IRQn);
 }
@@ -66,37 +67,12 @@ void sys_init_none()
     systick_start();
 }
 
-int
-_close (int fildes)
-{
-  return -1;
-}
+int _close (int fildes){  return -1;}
 
-int
-_fstat (int          fildes,
-        void *st)
-{
-  return -1;
-}
+int _fstat (int fildes,void *st){  return -1;}
 
-int
-_isatty (int file)
-{
-  return 0;
-}
+int _isatty (int file){  return 0;}
 
-int
-_read (int   file,
-        char *ptr,
-        int   len)
-{
-  return -1;
-}
+int _read (int file,char *ptr,int len){  return -1;}
 
-int
-_lseek (int   file,
-        int   ptr,
-        int   dir)
-{
-  return -1;
-}
+int _lseek (int   file,int   ptr,int   dir){  return -1;}

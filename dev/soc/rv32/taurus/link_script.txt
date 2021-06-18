@@ -1,6 +1,7 @@
 MEMORY
 {
-  RAM (rwx) : ORIGIN = 0x400000, LENGTH = 0x10000
+    FLASH (rx) : ORIGIN = 0x800000, LENGTH = 0x80000
+    RAM (rwx) : ORIGIN = 0x400000, LENGTH = 0xd000
 }
 ENTRY(Reset_Handler)
 SECTIONS
@@ -25,59 +26,32 @@ SECTIONS
 		*(.dtors)
 
 		*(.eh_frame*)
-		*(.text* .rodata*)
-	}>RAM
-
-	__data_lma__ = ORIGIN(RAM);
-
+		*(.text* .srodata* .rodata*)
+		. = ALIGN(4);
+	}>FLASH
+    __data_lma__ = .;
 	.data :
 	{
-		. = ALIGN(4);
 		__data_start__ = .;
         *(.sdata*)
 		*(.data*)
 		*(.xip_banned)
+		*(vtable)
 		__data_end__ = ALIGN(4);
         _edata = __data_end__;
-	}>RAM
+	}>RAM AT>FLASH
 
-
-	
 	.bss (NOLOAD):
 	{
 		__bss_start__ = .;
         *(.sbss*)
 		*(.bss*)
-		*(COMMON)
 		*(SECTION_RTT)
 		__bss_end__ = ALIGN(4);
-	}>RAM
-
-	.heap (COPY):
-	{
-		__end__ = .;
         PROVIDE(_end = .);
 		PROVIDE(end = .);
-		*(.heap*)
-		__HeapLimit = .;
-	} > RAM
+	}>RAM
 
-	/* .stack_dummy section doesn't contains any symbols. It is only
-	 * used for linker to calculate size of stack sections, and assign
-	 * values to stack symbols later */
-	.stack_dummy (COPY):
-	{
-		*(.stack*)
-	} > RAM
-
-	/* Set stack top to end of RAM, and stack limit move down by
-	 * size of stack_dummy section */
 	__StackTop = ORIGIN(RAM) + LENGTH(RAM);
-	__StackLimit = __StackTop - SIZEOF(.stack_dummy);
-	PROVIDE(__stack = __StackTop);
-	PROVIDE(__global_pointer$ = __data_start__ + (4K / 2) );
-    
-	/* Check if data + heap + stack exceeds RAM limit */
-	ASSERT(__StackLimit >= __HeapLimit, "region RAM overflowed with stack")
-	
+	PROVIDE(__global_pointer$ = __data_start__ + (4K / 2) );	
 }
