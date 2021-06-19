@@ -28,6 +28,7 @@ static HAL_StatusTypeDef I2C_WaitOnMasterAddressFlagUntilTimeout(I2C_HandleTypeD
 static HAL_StatusTypeDef I2C_WaitOnTXEFlagUntilTimeout(I2C_HandleTypeDef *hi2c, uint32_t Timeout, uint32_t Tickstart);
 static HAL_StatusTypeDef I2C_WaitOnRXNEFlagUntilTimeout(I2C_HandleTypeDef *hi2c, uint32_t Timeout, uint32_t Tickstart);
 static HAL_StatusTypeDef I2C_IsAcknowledgeFailed(I2C_HandleTypeDef *hi2c);
+static HAL_StatusTypeDef I2C_WaitOnTCRFlagUntilTimeout(I2C_HandleTypeDef *hi2c, uint32_t Timeout, uint32_t Tickstart);
 
 static void I2C_MasterTransmit_TXE(I2C_HandleTypeDef *hi2c);
 static void I2C_MasterReceive_RXNE(I2C_HandleTypeDef *hi2c);
@@ -159,7 +160,7 @@ HAL_StatusTypeDef HAL_I2C_Master_Transmit(I2C_HandleTypeDef *hi2c, uint16_t DevA
 {
   /* Init tickstart for timeout management*/
   uint32_t tickstart = systick_get_value();
-
+  uint32_t TxCount=0;
   if (hi2c->State == HAL_I2C_STATE_READY)
   {
     /* Wait until BUSY flag is reset */
@@ -226,24 +227,35 @@ HAL_StatusTypeDef HAL_I2C_Master_Transmit(I2C_HandleTypeDef *hi2c, uint16_t DevA
 
         /* Increment Buffer pointer */
         hi2c->pBuffPtr++;
+        TxCount ++;
 
         /* Update counter */
         hi2c->XferCount--;
 			
         /* Updata NBYTES */			
-        if (__HAL_I2C_GET_FLAG(hi2c, I2C_FLAG_TCR) == SET)
-        {		
-            if(hi2c->XferCount > 0xFF)		
+        if((TxCount == 255)&&(hi2c->Instance->CR2 & I2C_CR2_RELOAD_MASK))	
+        {
+            /* Wait until TCR flag is set */
+            if (I2C_WaitOnTCRFlagUntilTimeout(hi2c, Timeout, tickstart) != HAL_OK)
             {
-                MODIFY_REG(hi2c->Instance->CR2, I2C_CR2_NBYTES_MASK, 0xFF0000);
+                __HAL_I2C_DISABLE(hi2c);
+                return HAL_ERROR;
             }
             else
-            {
-                MODIFY_REG(hi2c->Instance->CR2, I2C_CR2_NBYTES_MASK, (((uint32_t)hi2c->XferCount)<<I2C_CR2_NBYTES_POS));	
-                CLEAR_BIT(hi2c->Instance->CR2, I2C_CR2_RELOAD_MASK);
-            }	
-            __HAL_I2C_CLEAR_FLAG(hi2c, I2C_FLAG_TCR);		
-        }
+            {	
+                TxCount = 0;	
+                if(hi2c->XferCount > 0xFF)		
+                {
+                    MODIFY_REG(hi2c->Instance->CR2, I2C_CR2_NBYTES_MASK, 0xFF0000);
+                }
+                else
+                {
+                    MODIFY_REG(hi2c->Instance->CR2, I2C_CR2_NBYTES_MASK, (((uint32_t)hi2c->XferCount)<<I2C_CR2_NBYTES_POS));
+                    CLEAR_BIT(hi2c->Instance->CR2, I2C_CR2_RELOAD_MASK);
+                }	
+                __HAL_I2C_CLEAR_FLAG(hi2c, I2C_FLAG_TCR);		
+            }
+        }	
     }
 
     /* Generate Stop */
@@ -274,7 +286,7 @@ HAL_StatusTypeDef HAL_I2C_Master_Receive(I2C_HandleTypeDef *hi2c, uint16_t DevAd
 {
   /* Init tickstart for timeout management*/
   uint32_t tickstart = systick_get_value();
-
+  uint32_t RxCount=0;
   if (hi2c->State == HAL_I2C_STATE_READY)
   {
 	if (Size == 0U)
@@ -351,10 +363,11 @@ HAL_StatusTypeDef HAL_I2C_Master_Receive(I2C_HandleTypeDef *hi2c, uint16_t DevAd
 
         /* Increment Buffer pointer */
         hi2c->pBuffPtr++;
+		RxCount ++;
 
         /* Update counter */
         hi2c->XferCount--;
-				
+		
         if (hi2c->XferCount == 1U)
         {
             /* Disable NAck*/
@@ -363,19 +376,29 @@ HAL_StatusTypeDef HAL_I2C_Master_Receive(I2C_HandleTypeDef *hi2c, uint16_t DevAd
 			SET_BIT(hi2c->Instance->CR2, I2C_CR2_STOP_MASK);
 
         }				
-        /* Updata NBYTES */			
-        if (__HAL_I2C_GET_FLAG(hi2c, I2C_FLAG_TCR) == SET)
-        {		
-            if(hi2c->XferCount > 0xFF)		
+        /* Updata NBYTES */		
+        if((RxCount == 255)&&(hi2c->Instance->CR2 & I2C_CR2_RELOAD_MASK))	
+        {
+            /* Wait until TCR flag is set */
+            if (I2C_WaitOnTCRFlagUntilTimeout(hi2c, Timeout, tickstart) != HAL_OK)
             {
-                MODIFY_REG(hi2c->Instance->CR2, I2C_CR2_NBYTES_MASK, 0xFF0000);
+                __HAL_I2C_DISABLE(hi2c);
+                return HAL_ERROR;
             }
             else
-            {
-                MODIFY_REG(hi2c->Instance->CR2, I2C_CR2_NBYTES_MASK, (((uint32_t)hi2c->XferCount)<<I2C_CR2_NBYTES_POS));
-                CLEAR_BIT(hi2c->Instance->CR2, I2C_CR2_RELOAD_MASK);
-            }	
-            __HAL_I2C_CLEAR_FLAG(hi2c, I2C_FLAG_TCR);		
+            {	
+                RxCount = 0;	
+                if(hi2c->XferCount > 0xFF)		
+                {
+                    MODIFY_REG(hi2c->Instance->CR2, I2C_CR2_NBYTES_MASK, 0xFF0000);
+                }
+                else
+                {
+                    MODIFY_REG(hi2c->Instance->CR2, I2C_CR2_NBYTES_MASK, (((uint32_t)hi2c->XferCount)<<I2C_CR2_NBYTES_POS));
+                    CLEAR_BIT(hi2c->Instance->CR2, I2C_CR2_RELOAD_MASK);
+                }	
+                __HAL_I2C_CLEAR_FLAG(hi2c, I2C_FLAG_TCR);		
+            }
         }				
     }
 	CLEAR_BIT(hi2c->Instance->CR2, I2C_CR2_AUTOEND_MASK | I2C_CR2_RELOAD_MASK | I2C_CR2_NBYTES_MASK);
@@ -1239,6 +1262,41 @@ static HAL_StatusTypeDef I2C_IsAcknowledgeFailed(I2C_HandleTypeDef *hi2c)
     return HAL_ERROR;
   }
   return HAL_OK;
+}
+
+static HAL_StatusTypeDef I2C_WaitOnTCRFlagUntilTimeout(I2C_HandleTypeDef *hi2c, uint32_t Timeout, uint32_t Tickstart)
+{
+    uint32_t timeout = SYSTICK_MS2TICKS(Timeout);
+
+    if (Timeout != HAL_MAX_DELAY)
+    {
+        if(systick_poll_timeout(Tickstart,timeout,i2c_flagandstop_poll,hi2c,I2C_SR_TCR_MASK))
+        {
+            hi2c->PreviousState       = I2C_STATE_NONE;
+            hi2c->State               = HAL_I2C_STATE_READY;
+            hi2c->Mode                = HAL_I2C_MODE_NONE;
+            hi2c->ErrorCode           |= HAL_I2C_ERROR_TIMEOUT;
+
+            /* Process Unlocked */
+            __HAL_UNLOCK(hi2c);
+
+            return HAL_ERROR;
+        }
+        if(hi2c->ErrorCode == HAL_I2C_ERROR_BERR)
+        {
+            hi2c->ErrorCode |= HAL_I2C_ERROR_NONE;
+            return HAL_ERROR;
+        }
+    }
+    else
+    {
+        while (__HAL_I2C_GET_FLAG(hi2c, I2C_SR_TCR_MASK) == RESET)
+        {
+
+        }
+
+    }  
+    return HAL_OK;
 }
 
 
