@@ -240,7 +240,9 @@ HAL_StatusTypeDef HAL_I2C_Master_Transmit(I2C_HandleTypeDef *hi2c, uint16_t DevA
             else
             {
                 MODIFY_REG(hi2c->Instance->CR2, I2C_CR2_NBYTES_MASK, (((uint32_t)hi2c->XferCount)<<I2C_CR2_NBYTES_POS));	
-            }		
+                CLEAR_BIT(hi2c->Instance->CR2, I2C_CR2_RELOAD_MASK);
+            }	
+            __HAL_I2C_CLEAR_FLAG(hi2c, I2C_FLAG_TCR);		
         }
     }
 
@@ -369,7 +371,11 @@ HAL_StatusTypeDef HAL_I2C_Master_Receive(I2C_HandleTypeDef *hi2c, uint16_t DevAd
                 MODIFY_REG(hi2c->Instance->CR2, I2C_CR2_NBYTES_MASK, 0xFF0000);
             }
             else
-                MODIFY_REG(hi2c->Instance->CR2, I2C_CR2_NBYTES_MASK, (((uint32_t)hi2c->XferCount)<<I2C_CR2_NBYTES_POS));			
+            {
+                MODIFY_REG(hi2c->Instance->CR2, I2C_CR2_NBYTES_MASK, (((uint32_t)hi2c->XferCount)<<I2C_CR2_NBYTES_POS));
+                CLEAR_BIT(hi2c->Instance->CR2, I2C_CR2_RELOAD_MASK);
+            }	
+            __HAL_I2C_CLEAR_FLAG(hi2c, I2C_FLAG_TCR);		
         }				
     }
 	CLEAR_BIT(hi2c->Instance->CR2, I2C_CR2_AUTOEND_MASK | I2C_CR2_RELOAD_MASK | I2C_CR2_NBYTES_MASK);
