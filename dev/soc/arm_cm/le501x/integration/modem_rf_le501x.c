@@ -9,12 +9,17 @@
 #define RF_PWR_TBL_SIZE            (8)
 
 #define PLL_GAIN_CAL_FRQ_DIS0  20
+#define FLASH_SECURITY_AREA_INDEX_1 1
+#define SECURITY_AREA_PACKAGEID_OFFSET 0x24 
+
+static uint16_t package_id=0;
 
 uint8_t   pll_int_vtxd_ext;
 struct {
     uint8_t ldo_tx_trim:3,
             ldo_rx_trim:3;
 }rf_ret;
+
 
 // Power table
 static const int8_t RF_TX_PW_CONV_TBL[RF_PWR_TBL_SIZE] =
@@ -132,16 +137,16 @@ static void rf_reg_init()
                | FIELD_BUILD(RF_TX_RATE,0)
                | FIELD_BUILD(RF_CF_BW08M_ADJ,0)
                | FIELD_BUILD(RF_TX_DATA_TST_EN,0)
-               | FIELD_BUILD(RF_PA_VCAS_RES_ADJ,1)
+               | FIELD_BUILD(RF_PA_VCAS_RES_ADJ,0)  
                | FIELD_BUILD(RF_PA_GAIN,0xf)
                | FIELD_BUILD(RF_PA_TANK_Q_ADJ,0)
-               | FIELD_BUILD(RF_EN_PA_IBX2,0);
-    RF->REG0C = FIELD_BUILD(RF_PA_TANK_TUNE,1)
+               | FIELD_BUILD(RF_EN_PA_IBX2,1);  
+    RF->REG0C = FIELD_BUILD(RF_PA_TANK_TUNE,1)  
                | FIELD_BUILD(RF_EN_RSSI_Q,1)
                | FIELD_BUILD(RF_EN_RSSI_I,1)
-               | FIELD_BUILD(RF_PA_VB1_ADJ,0)
-               | FIELD_BUILD(RF_PA_VB2_ADJ,0)
-               | FIELD_BUILD(RF_PA_PTAT_ADJ,1)
+               | FIELD_BUILD(RF_PA_VB1_ADJ,0xf)  
+               | FIELD_BUILD(RF_PA_VB2_ADJ,0xf)  
+               | FIELD_BUILD(RF_PA_PTAT_ADJ,0)  
                | FIELD_BUILD(RF_EN_PA_IPTAT,1)
                | FIELD_BUILD(RF_PA_BG_ADJ,4)
                | FIELD_BUILD(RF_EN_PA_IBG,1)
@@ -225,7 +230,7 @@ static void rf_reg_init()
                | FIELD_BUILD(RF_PLL_FBDIV_RST_EXT,0)
                | FIELD_BUILD(RF_PLL_PS_CNT_RST_SEL,0)
                | FIELD_BUILD(RF_AGC_TEST_S,0)
-               | FIELD_BUILD(RF_PA_MN_TUNE,5)
+               | FIELD_BUILD(RF_PA_MN_TUNE,0)
                | FIELD_BUILD(RF_PLL_GAIN_CAL_TH,0x22)
                | FIELD_BUILD(RF_PLL_VTXD_EXT,pll_int_vtxd_ext)
                | FIELD_BUILD(RF_PLL_VTXD_EXT_EN,0)
@@ -272,9 +277,6 @@ static void rf_reg_init()
                | FIELD_BUILD(RF_INT_VTXD_CHN_THR0,0xc)
                | FIELD_BUILD(RF_INT_VTXD_EXT2,pll_int_vtxd_ext)
                | FIELD_BUILD(RF_INT_VTXD_EXT1,pll_int_vtxd_ext);
-
-    uint16_t package_id=0;
-    spi_flash_read_security_area(1, 0x24,(void *)&package_id, sizeof(uint16_t));
 
        switch (package_id)
        {
@@ -385,6 +387,7 @@ void modem_rf_reinit()
 void modem_rf_init()
 {
     RCC->APB1EN |= 1<<RCC_RF_POS | 1<<RCC_MDM2_POS;
+    spi_flash_read_security_area(FLASH_SECURITY_AREA_INDEX_1, SECURITY_AREA_PACKAGEID_OFFSET,(void *)&package_id, sizeof(uint16_t));
     rf_reg_retention();
     modem_rf_reinit();
     pll_cal_testreg_init();
