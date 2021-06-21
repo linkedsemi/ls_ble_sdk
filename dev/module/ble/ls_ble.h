@@ -413,29 +413,6 @@ struct gap_sc_oob
     uint8_t rand[BLE_KEY_LEN];              /*!< Random Number*/
 };
 /**
-  * @brief Slave Authentication mask.
-  */
-enum gap_slave_auth_mask
-{
-    GAP_SLAVE_AUTH_NONE           = 0,                   /*!< No Flag set*/
-    GAP_SLAVE_AUTH_BOND           = (1 << 0),            /*!< Bond authentication*/
-    GAP_SLAVE_AUTH_MITM           = (1 << 2),            /*!< Man In the middle protection*/
-    GAP_SLAVE_AUTH_SEC_CON        = (1 << 3),            /*!< Secure Connection*/
-    GAP_SLAVE_AUTH_KEY_NOTIF      = (1 << 4)             /*!< Key Notification*/
-};
-/**
-  * @brief Slave Authentication Requirements.
-  */
-enum gap_slave_auth
-{
-    GAP_SLAVE_AUTH_REQ_NO_MITM_NO_BOND  = (GAP_SLAVE_AUTH_NONE),                                                    /*!< No MITM No Bonding*/
-    GAP_SLAVE_AUTH_REQ_NO_MITM_BOND     = (GAP_SLAVE_AUTH_BOND),                                                    /*!< No MITM Bonding*/
-    GAP_SLAVE_AUTH_REQ_MITM_NO_BOND     = (GAP_SLAVE_AUTH_MITM),                                                    /*!< MITM No Bonding*/
-    GAP_SLAVE_AUTH_REQ_MITM_BOND        = (GAP_SLAVE_AUTH_MITM | GAP_SLAVE_AUTH_BOND),                              /*!< MITM and Bonding*/
-    GAP_SLAVE_AUTH_REQ_SEC_CON_NO_BOND  = (GAP_SLAVE_AUTH_SEC_CON | GAP_SLAVE_AUTH_MITM),                           /*!< SEC_CON and No Bonding*/
-    GAP_SLAVE_AUTH_REQ_SEC_CON_BOND     = (GAP_SLAVE_AUTH_SEC_CON | GAP_SLAVE_AUTH_MITM | GAP_SLAVE_AUTH_BOND),     /*!< SEC_CON and Bonding*/
-};
-/**
   * @brief Defgroup BLE_GAP_IO_CAPS GAP IO Capabilities.
   */
 enum gap_io_caps
@@ -500,34 +477,44 @@ struct gap_disconnected
 {
     uint8_t reason;
 };
-
+/**
+  * @brief Set master security parameter.
+  */
 struct gap_master_pair_req
 {
-    uint8_t auth;
+    uint8_t auth;                           /*!< Set the auth, This parameter can be a value of @ref gap_pair_auth*/
 };
-
+/**
+  * @brief Set slave security parameter.
+  */
 struct gap_slave_security_req
 {
-    uint8_t auth;
+    uint8_t auth;                           /*!< Set the auth, This parameter can be a value of @ref gap_pair_auth*/
 };
-
+/**
+  * @brief Parameter of pairing completion.
+  */
 struct gap_pair_done
 {
-    bool succeed;
+    bool succeed;                          /*!< The value indicates a successful pairing,Successful pairing is "true" and unsuccessful pairing is "false"*/
     union{
-        uint8_t auth;
-        uint8_t fail_reason;
+        uint8_t auth;                      /*!< Pairing level achieved, This parameter can be a value of @ref gap_pair_auth*/
+        uint8_t fail_reason;               /*!< The reasons for the failure of the pairing*/
     }u;
 };
-
+/**
+  * @brief Failed to encrypt the parameter.
+  */
 struct gap_encrypt_fail
 {
-    uint8_t reason;
+    uint8_t reason;                        /*!< The reason for encryption failure*/
 };
-
+/**
+  * @brief Encryption completed security parameters.
+  */
 struct gap_encrypt_done
 {
-    uint8_t auth;
+    uint8_t auth;                          /*!< Pairing level achieved, This parameter can be a value of @ref gap_pair_auth*/
 };
 
 struct gap_pin_str
@@ -535,15 +522,19 @@ struct gap_pin_str
     char pin[6];
     char str_pad;
 };
-
+/**
+  * @brief SEC passkey entry value.
+  */
 struct gap_display_passkey
 {
-    struct gap_pin_str passkey;
+    struct gap_pin_str passkey;              /**< Passkey entry value (000000~999999),This parameter can be a value of @ref gap_pin_str */
 };
-
+/**
+  * @brief SEC number comparison value.
+  */
 struct gap_numeric_compare
 {
-    struct gap_pin_str number;
+    struct gap_pin_str number;              /**< Number comparison value (000000~999999),This parameter can be a value of @ref gap_pin_str */
 };
 
 struct gap_dev_info_dev_name
@@ -564,10 +555,12 @@ struct gap_dev_info_slave_pref_param
     uint16_t slave_latency;
     uint16_t conn_timeout;
 };
-
+/**
+  * @brief The RSSI value of the current connection.
+  */
 struct gap_dev_info_peer_rssi
 {
-    int8_t rssi;
+    int8_t rssi;                            /**< The RSSI value of the current connection(master or slave) */
 };
 
 union gap_evt_u
@@ -870,7 +863,7 @@ void gap_manager_master_encrypt(uint8_t con_idx);
  * \brief Initiate an encryption request from the slave. 
  * 
  * \param[in]  con_idx           Connection ID number.
- * \param[in]  auth              SEC Auth param, This parameter can be a value of @ref gap_slave_auth
+ * \param[in]  auth              SEC Auth param, This parameter can be a value of @ref gap_slave_security_req
  ****************************************************************************************
  */
 void gap_manager_slave_security_req(uint8_t con_idx, uint8_t auth);
