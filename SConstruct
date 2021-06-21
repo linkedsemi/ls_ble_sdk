@@ -48,7 +48,7 @@ else:
     env['CFLAGS'] = '-std=c11 ${C_CXX_FLAGS}'
     env['CXXFLAGS'] = '${C_CXX_FLAGS} -fno-exceptions '
     env['ASFLAGS'] = '${AS_ARCH_FLAGS} -g '
-    env['LINKFLAGS'] = '${ARCH_FLAGS} -Os -g -specs=nosys.specs -specs=nano.specs -T ${LINKSCRIPT} -Wl,-Map=${TARGET.base}.map -Wl,--cref ${LD_ARCH_FLAGS} '
+    env['LINKFLAGS'] = '${ARCH_FLAGS} -g -specs=nosys.specs -specs=nano.specs -T ${LINKSCRIPT} -Wl,-Map=${TARGET.base}.map -Wl,--cref ${LD_ARCH_FLAGS} '
     env['GC_OPTION'] = ' -Wl,--gc-sections '
 
 env['CPPDEFINES'] = ['-D{}'.format(env['IC'].upper())]

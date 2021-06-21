@@ -1,5 +1,5 @@
 
-Import('image_build','env')
+Import('app_build','image_build','env')
 src = [
     'core_list_join.c',
     'core_main.c',
@@ -13,4 +13,5 @@ inc = [
 ]
 
 if not 'mdk' in env['TOOLS']:
-    app_env,app_target = image_build('coremark',src,inc,env.subst('$IC/ram_link.txt'))
+    app_env,app_target = app_build('coremark',src,inc,ble=False) #run in flash
+    #app_env,app_target = image_build('coremark',src,inc,env.subst('$IC/ram_link.txt')) #run in ram

@@ -5,16 +5,16 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "TAURUS HOST TEST",
+            "name": "TAURUS COREMARK CPPDBG",
             "type": "cppdbg",
             "request": "launch",
-            "program": "build/examples/host_test.elf",
+            "program": "build/taurus/examples/coremark.elf",
             "args": [],
             "stopAtEntry": true,
             "cwd": "${workspaceFolder}",
             "externalConsole": false,
             "MIMode": "gdb",
-            "miDebuggerPath": "riscv-none-embed-gdb",
+            "miDebuggerPath": "riscv64-unknown-elf-gdb",
             "setupCommands": [
                 {
                     "description": "为 gdb 启用整齐打印",
@@ -23,7 +23,7 @@
                 }
             ],
             "miDebuggerServerAddress": "localhost:1025",
-            //"debugServerPath": "D:\\C-Sky\\CSkyDebugServer\\bin\\DebugServerConsole.exe",
+            "debugServerPath": "D:\\C-Sky\\CSkyDebugServer\\bin\\DebugServerConsole.exe",
             //"serverStarted": "DebuggerServer$"
             "launchCompleteCommand": "None",
 
@@ -32,7 +32,7 @@
             "name": "TAURUS COREMARK",
             "type": "gdb",
             "request": "attach",
-            "target": "172.28.240.1:1025",
+            "target": "localhost:1025",
             "executable": "build/taurus/examples/coremark.elf",
             "cwd": "${workspaceFolder}",
             "remote": true,
@@ -1236,6 +1236,39 @@
                 "monitor memU32 0x40021410 = 0x5fa0001",
                 "monitor reg sp = (0x0)",
                 "monitor reg pc = (0x4)",
+            ]
+        },
+        {
+            "type": "cortex-debug",
+            "request": "launch",
+            "servertype": "jlink",
+            "cwd": "${workspaceRoot}",
+            "executable": "./build/sagi/examples/coremark.elf",
+            "name": "Debug SAGI COREMARK RAM",
+            "device": "SAGI",
+            "interface": "swd",
+            "runToMain": true,
+            "preLaunchCommands" :[
+                "monitor reset",
+                "load",
+            ],
+            "postLaunchCommands" :[
+                "monitor reset",
+                "monitor reg sp = (0x400000)",
+                "monitor reg pc = (0x400004)",
+            ]
+        },
+        {
+            "type": "cortex-debug",
+            "request": "attach",
+            "servertype": "jlink",
+            "cwd": "${workspaceRoot}",
+            "executable": "./build/sagi/examples/coremark.elf",
+            "name": "Attach SAGI COREMARK",
+            "device": "SAGI",
+            "interface": "swd",
+            "preAttachCommands":[
+                "monitor flash breakpoints = 0",
             ]
         },
     ]

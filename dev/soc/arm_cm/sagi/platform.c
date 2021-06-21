@@ -10,8 +10,8 @@
 #include "spi_flash.h"
 #include "compile_flag.h"
 #include "reg_v33_rg.h"
-
-
+#include "log.h"
+#include "systick.h"
 void modem_rf_init(void);
 #define ISR_VECTOR_ADDR ((uint32_t *)(0x400000))
 
@@ -101,6 +101,7 @@ void pll_enable()
         REG_FIELD_WR(SYSC_AWO->PD_AWO_ANA0,SYSC_AWO_AWO_EN_DPLL,1);
         DELAY_US(100);
     }
+    MODIFY_REG(SYSC_AWO->PD_AWO_CLK_CTRL,SYSC_AWO_CLK_SEL_QSPI_MASK,4<<SYSC_AWO_CLK_SEL_QSPI_POS);
 }
 XIP_BANNED bool clk_check();
 #if (SDK_HCLK_MHZ==16)
@@ -308,6 +309,8 @@ void sys_init_none()
     analog_init();
     spi_flash_drv_var_init(true,false);
     io_init();
+    LOG_INIT();
+    systick_start();
 }
 
 void platform_reset(uint32_t error)
