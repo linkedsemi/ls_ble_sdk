@@ -23,6 +23,16 @@ elif env['IC'] == 'sagi':
     bram_env.Append(LINKFLAGS = ' -T ' + File('brom.sym').srcnode().path + ' -static-pie -nostartfiles')
     bram_env.Depends(bram_target,[bram_env['LINKSCRIPT'],File('brom.sym')])
     bram_bin = bram_env.Command('#dev/soc/arm_cm/sagi/bin/bram.bin',bram_target,Action('$OBJCOPY -O binary $SOURCE $TARGET'))
+elif env['IC'] == 'taurus':
+    src = [
+        'boot_taurus_ram.c',
+    ]
+    bram_env.Append(CFLAGS = ' ')
+    bram_env['LINKSCRIPT'] = File('bram.ld')
+    bram_target = bram_env.Program('#build/$IC/boot_ram/bram',env['SDK_SRC'] + src,OBJPREFIX = 'boot_ram-')
+    bram_env.Append(LINKFLAGS = ' -T ' + File('brom.sym').srcnode().path + ' -static-pie -nostartfiles')
+    bram_env.Depends(bram_target,[bram_env['LINKSCRIPT'],File('brom.sym')])
+    bram_bin = bram_env.Command('#dev/soc/arm_cm/sagi/bin/bram.bin',bram_target,Action('$OBJCOPY -O binary $SOURCE $TARGET'))
 elif env['IC'] == 'le501x':
     src = ['boot_ram_le501x.c']
     bram_env['LINKSCRIPT'] = File('bram_le501x.ld')
