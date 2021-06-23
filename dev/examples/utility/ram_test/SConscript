@@ -10,4 +10,4 @@ inc = [
 ]
 
 if not 'mdk' in env['TOOLS']:
-    app_env,app_target = image_build('ram_test',src,inc,'ram_link.txt')
+    app_env,app_target = image_build('ram_test',src,inc,env.subst('$IC/ram_link.txt'))

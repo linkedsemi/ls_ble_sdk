@@ -1,15 +1,14 @@
 #include "spi_flash.h"
 #include "spi_flash_int.h"
-#include "le501x.h"
 #include <string.h>
 #include <stdlib.h>
-uint8_t test_buf[1024];
-uint8_t dst[1024];
-uint8_t status[2];
+#include "field_manipulate.h"
+#include "cpu.h"
 
 int main_flash()
 {
-    __disable_irq();
+    uint8_t status[2];
+    disable_global_irq();
     spi_flash_drv_var_init(false,false);
     spi_flash_init();
     spi_flash_software_reset();
@@ -33,13 +32,9 @@ int main_flash()
 }
 
 
-#include "reg_rcc.h"
-#include "field_manipulate.h"
 int main()
 {
- 
-    //rc24m_switch_to_pll64m();
-    systick_start();
+
     //main_flash();
     while(1);
 }
