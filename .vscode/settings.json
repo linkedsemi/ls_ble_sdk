@@ -68,7 +68,8 @@
         "lsqspiv2_msp.h": "c",
         "reg_sysc_cpu_type.h": "c",
         "gemini.h": "c",
-        "sha_msp.h": "c"
+        "sha_msp.h": "c",
+        "io_config.h": "c"
     },
     "editor.detectIndentation": false,
     "restructuredtext.confPath": "${workspaceFolder}\\doc",

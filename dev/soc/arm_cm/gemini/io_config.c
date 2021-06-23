@@ -16,7 +16,7 @@ gpio_pin_t iic1_sda;
 
 __attribute__((weak)) void io_exti_callback(uint8_t pin){}
 
-static void exti_io_handler(uint8_t port,uint8_t num)
+static void exti_io_handler(uint8_t port,uint8_t num,uint8_t edge)
 {
     uint8_t pin = port<<4 | num;
     io_exti_callback(pin);
@@ -24,6 +24,24 @@ static void exti_io_handler(uint8_t port,uint8_t num)
 
 void EXTI_Handler(void)
 {
+    uint8_t port,i;
+    uint32_t int_stat = V33_RG->GPIO_INTR;
+    for(i=0;i<16;i++)
+    {
+        if (1<<i & int_stat)
+        {
+            port = V33_RG->GPIO_SEL>>(2*i);
+            exti_io_handler(port,i,INT_EDGE_RISING);
+        }
+    }
+    for(i=16;i<32;i++)
+    {
+        if (1<<i & int_stat)
+        {
+            port = V33_RG->GPIO_SEL>>(2*(i-16));
+            exti_io_handler(port,i,INT_EDGE_FALLING);
+        }
+    }
 
 }
 
@@ -132,12 +150,21 @@ io_pull_type_t io_pull_read(uint8_t pin)
 
 void io_exti_config(uint8_t pin,exti_edge_t edge)
 {
-
+    gpio_pin_t *x = (gpio_pin_t *)&pin;
+    if(edge == INT_EDGE_FALLING)
+    {
+        V33_RG->EXTI_CTRL0 = (x->num+16);
+    }
+    else
+    {
+        V33_RG->EXTI_CTRL0 = x->num;
+    }
 }
 
 void io_exti_enable(uint8_t pin,bool enable)
 {
-
+    gpio_pin_t *x = (gpio_pin_t *)&pin;
+    V33_RG->GPIO_SEL = x->port >> (x->num*2);
 }
 
 static void uart_io_cfg(uint8_t txd,uint8_t rxd)

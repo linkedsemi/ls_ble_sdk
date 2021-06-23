@@ -8,6 +8,7 @@ src = [
     'i2c_msp.c',
     'sha_msp.c',
     'lscache_msp.c',
+    'sleep.c',
     'compiler/$COMPILER/sleep_asm.S',
     'compiler/$COMPILER/svcall_asm.S',
     'compiler/$COMPILER/delay_asm.S',

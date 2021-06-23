@@ -1,5 +1,5 @@
 Import('app_build','image_build','env')
-SConscript(dirs = 'uart',exports=['app_build'])
+SConscript(dirs = 'uart',exports=['app_build','env'])
 SConscript(dirs = 'gpio',exports=['app_build'])
 if env['IC'] == 'le501x':
     SConscript(dirs = 'adc',exports=['app_build'])

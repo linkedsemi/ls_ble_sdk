@@ -1,40 +1,126 @@
-#include "spi_flash.h"
-#include "spi_flash_int.h"
+#include "ls_ble.h"
+#include "platform.h"
+#include "lsuart.h"
+#include "io_config.h"
 #include <string.h>
-#include <stdlib.h>
-#include "field_manipulate.h"
-#include "cpu.h"
+UART_HandleTypeDef UART_Config2;
 
-int main_flash()
+static uint8_t recv_cmd;
+
+enum cmd_type
 {
-    uint8_t status[2];
-    disable_global_irq();
-    spi_flash_drv_var_init(false,false);
-    spi_flash_init();
-    spi_flash_software_reset();
- //   spi_flash_write_status_register(0);
-    spi_flash_qe_status_read_and_set();
-    spi_flash_read_status_register_0(&status[0]);
-    spi_flash_read_status_register_1(&status[1]);
-    //spi_flash_write_status_register(status[1]<<8|status[0]&~4<<2);
-//    spi_flash_sector_erase(0x2000);
-//    spi_flash_chip_erase();
-//    for(uint32_t i=0;i<1024;i+=4)
-//    {
-//        *(uint32_t *)&test_buf[i] = rand();
-//    }
-//    spi_flash_quad_page_program(0,test_buf,256);
-//    spi_flash_quad_io_read(0,dst,sizeof(dst));
-//    spi_flash_xip_start();
-
-//    memcpy(test_buf,(void *)0x18002000,sizeof(test_buf));
-    while(1);
+    MEM32_WRITE = 0x0,
+    MEM32_READ = 0x1,
+    MEM_BULK_WRITE = 0x2,
+    MEM_BULK_READ = 0x3,
+    PROGRAM_GO = 0x4,
+    FLASH_CHIP_ERASE = 0x5,
+    FLASH_READ_STATUS_REG_0 = 0x6,
+    FLASH_READ_STATUS_REG_1 = 0x7,
+    FLASH_WRITE_STATUS_REG = 0x8,
+    FLASH_QUAD_PAGE_PROGRAM = 0x9,
+    FLASH_PAGE_PROGRAM = 0xa,
+    FLASH_SECTOR_ERASE = 0xb,
+    FLASH_QUAD_IO_READ = 0xc,
+    FLASH_FAST_READ = 0xd,
+    FLASH_DEEP_POWER_DOWN = 0xe,
+    FLASH_RELEASE_FROM_DEEP_POWER_DOWN = 0xf,
+    FLASH_READ_JEDEC_ID = 0x10,
+    FLASH_READ_UNIQUE_ID = 0x11,
+    FLASH_ERASE_SECURITY_AREA = 0x12,
+    FLASH_PROGRAM_SECURITY_AREA = 0x13,
+    FLASH_READ_SECURITY_AREA = 0x14,
+    FLASH_SOFTWARE_RESET = 0x15,
+    INVALID_COMMAND = 0xff,
+};
+enum response_status
+{
+    RESPONSE_STATUS_NO_ERROR = 0x0,
+    RESPONSE_STATUS_ERROR = 0x1,
+    RESPONSE_STATUS_FEATURE_DISABLED = 0x2,
+    
+};
+uint8_t timerout_buff[8] = {'t','i','m','e','r','o','u','t'};
+void uart_read(uint8_t *buf,uint16_t length)
+{
+   uint8_t sta = HAL_UART_Receive(&UART_Config2, buf, 4, 10000);
+   if (sta == HAL_TIMEOUT)
+   {
+       HAL_UART_Transmit(&UART_Config2, timerout_buff, 8, 1000);
+   }
 }
 
+void uart_write(uint8_t *buf,uint16_t length)
+{
+    HAL_UART_Transmit(&UART_Config2, buf, length, 1000);
+}
+
+static void uart_write_word(uint32_t word)
+{
+    uart_write((void *)&word,sizeof(word));
+}
+
+static uint32_t uart_read_word()
+{
+    uint32_t read_data;
+    uart_read((void *)&read_data,sizeof(read_data));
+    return read_data;
+}
+
+static void uart_write_byte(uint8_t byte)
+{
+    uart_write(&byte,sizeof(byte));
+}
+
+uint32_t addr;
+uint32_t data ;
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
+{
+    if(huart == &UART_Config2)
+    {
+        switch (recv_cmd)
+        {
+        case MEM32_WRITE:
+            addr = uart_read_word();
+            data = uart_read_word();
+            *(uint32_t *)addr = data;
+            uart_write_byte(MEM32_WRITE);
+            uart_write_byte(RESPONSE_STATUS_NO_ERROR);
+            break;
+        case MEM32_READ:
+            addr = uart_read_word();
+            data = *(uint32_t *)addr;
+            uart_write_byte(MEM32_READ);
+            uart_write_byte(RESPONSE_STATUS_NO_ERROR);
+            uart_write_word(data);
+        break;
+        default:
+            break;
+        }
+        HAL_UART_Receive_IT(&UART_Config2, &recv_cmd, 1);
+    }
+}
+
+static void uart_test_init(void)
+{
+    uart1_io_init(PB00,PB01);
+    UART_Config2.UARTX = UART1;
+    UART_Config2.Init.BaudRate = UART_BAUDRATE_115200;
+    UART_Config2.Init.MSBEN = 0;
+    UART_Config2.Init.Parity = UART_NOPARITY;
+    UART_Config2.Init.StopBits = UART_STOPBITS1;
+    UART_Config2.Init.WordLength = UART_BYTESIZE8;
+    HAL_UART_Init(&UART_Config2);
+    HAL_UART_Receive_IT(&UART_Config2, &recv_cmd, 1);
+}
 
 int main()
 {
 
     //main_flash();
+    *(uint32_t *)0x5001a000 = 0x5555;
+    sys_init_none();
+    uart_test_init();
     while(1);
+    return 0;
 }
