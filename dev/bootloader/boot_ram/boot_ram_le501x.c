@@ -296,7 +296,7 @@ void boot_ram_start(uint32_t exec_addr)
     REG_FIELD_WR(SYSCFG->PMU_WKUP, SYSCFG_LP_WKUP_CLR,1);
     DELAY_US(200);
     SYSCFG->PMU_PWR = 0;
-    systick_start();
+    // systick_start();
     spi_flash_drv_var_init(false,false);
     spi_flash_init();
     spi_flash_qe_status_read_and_set();

@@ -10,21 +10,14 @@
 #include <string.h>
 #include "co_math.h"
 #include "io_config.h"
-#include "prf_fotas.h"
+#include "fota_svc_server.h"
 #include "SEGGER_RTT.h"
 
-#define UART_SERVER_WITH_OTA 0
-
-#if UART_SERVER_WITH_OTA == 1
-#define UART_SVC_ADV_NAME "LS Uart Server ota prf"
-#else
-#define UART_SVC_ADV_NAME "LS Uart Server"
-#endif
-#define UART_SERVER_MAX_MTU  247
+#define UART_SVC_ADV_NAME "LS Uart Server OTA svc"
 #define UART_SERVER_MTU_DFT  23
 #define UART_SERVER_MAX_DATA_LEN (uart_server_mtu - 3)
-#define UART_SVC_RX_MAX_LEN (UART_SERVER_MAX_MTU - 3)
-#define UART_SVC_TX_MAX_LEN (UART_SERVER_MAX_MTU - 3)
+#define UART_SVC_RX_MAX_LEN (USER_MAX_MTU - 3)
+#define UART_SVC_TX_MAX_LEN (USER_MAX_MTU - 3)
 #define UART_SVC_BUFFER_SIZE (1024)
 
 #define UART_SERVER_TIMEOUT 50 // timer units: ms
@@ -91,6 +84,8 @@ static const struct svc_decl ls_uart_server_svc =
     .uuid_len = UUID_LEN_128BIT,
 };
 static struct gatt_svc_env ls_uart_server_svc_env;
+
+
 static uint8_t connect_id = 0xff; 
 static uint8_t uart_server_rx_byte;
 static uint8_t uart_server_buf[UART_SVC_BUFFER_SIZE];
@@ -117,61 +112,6 @@ static void ls_uart_server_send_notification(void);
 static void start_adv(void);
 static void ls_uart_server_data_length_update(uint8_t con_idx);
 
-#if UART_SERVER_WITH_OTA == 1
-#if FW_ECC_VERIFY
-extern const uint8_t fotas_pub_key[64];
-bool fw_signature_check(struct fw_digest *digest,struct fota_signature *signature)
-{
-    return uECC_verify(fotas_pub_key, digest->data, sizeof(digest->data), signature->data, uECC_secp256r1());
-}
-#else
-bool fw_signature_check(struct fw_digest *digest,struct fota_signature *signature)
-{
-    return true;
-}
-#endif
-
-static void prf_fota_server_callback(enum fotas_evt_type type,union fotas_evt_u *evt,uint8_t con_idx)
-{
-    switch(type)
-    {
-    case FOTAS_START_REQ_EVT:
-    {
-        // ota_settings_write(SINGLE_FOREGROUND); 
-        ota_settings_write(DOUBLE_FOREGROUND); 
-        enum fota_start_cfm_status status;
-        if(fw_signature_check(evt->fotas_start_req.digest, evt->fotas_start_req.signature))
-        {
-            status = FOTA_REQ_ACCEPTED;
-        }else
-        {
-            status = FOTA_REQ_REJECTED;
-        }
-        prf_fotas_start_confirm(con_idx, status);
-    }break;
-    case FOTAS_FINISH_EVT:
-        if(evt->fotas_finish.integrity_checking_result)
-        {
-            if(evt->fotas_finish.new_image->base != get_app_image_base())
-            {
-                ota_copy_info_set(evt->fotas_finish.new_image);
-            }
-            else
-            {
-                ota_settings_erase();
-            }
-            platform_reset(RESET_OTA_SUCCEED);
-        }else
-        {
-            platform_reset(RESET_OTA_FAILED);
-        }
-    break;
-    default:
-        LS_ASSERT(0);
-    break;
-    }
-}
-#endif
 static void ls_uart_server_init(void)
 {
     uart_server_timer_inst = builtin_timer_create(ls_uart_server_timer_cb);
@@ -263,7 +203,6 @@ static void ls_uart_server_write_req_ind(uint8_t att_idx, uint8_t con_idx, uint1
         LS_ASSERT(length == 2);
         memcpy(&cccd_config, value, length);
     }
-    
 }
 static void ls_uart_server_send_notification(void)
 {
@@ -319,15 +258,32 @@ static void gatt_manager_callback(enum gatt_evt_type type,union gatt_evt_u *evt,
     {
     case SERVER_READ_REQ:
         LOG_I("read req");
-        ls_uart_server_read_req_ind(evt->server_read_req.att_idx, con_idx);
+        if (evt->server_read_req.svc == &ls_uart_server_svc_env)
+        {
+            ls_uart_server_read_req_ind(evt->server_read_req.att_idx, con_idx);
+        }
+        else
+        {
+            ls_ota_server_read_req_ind(evt->server_read_req.att_idx, con_idx);
+        }
     break;
     case SERVER_WRITE_REQ:
         LOG_I("write req");
-        ls_uart_server_write_req_ind(evt->server_write_req.att_idx, con_idx, evt->server_write_req.length, evt->server_write_req.value);
+        if (evt->server_read_req.svc == &ls_uart_server_svc_env)
+        {
+            ls_uart_server_write_req_ind(evt->server_write_req.att_idx, con_idx, evt->server_write_req.length, evt->server_write_req.value);
+        }
+        else
+        {
+            ls_ota_server_write_req_ind(&evt->server_write_req, con_idx);
+        }
     break;
     case SERVER_NOTIFICATION_DONE:
         uart_server_ntf_done = true;
         LOG_I("ntf done");
+    break;
+    case SERVER_INDICATION_DONE:
+        LOG_I("ind done");
     break;
     case MTU_CHANGED_INDICATION:
         uart_server_mtu = evt->mtu_changed_ind.mtu;
@@ -335,7 +291,7 @@ static void gatt_manager_callback(enum gatt_evt_type type,union gatt_evt_u *evt,
         ls_uart_server_data_length_update(con_idx);
     break;
     default:
-        LOG_I("Event not handled!");
+        LOG_I("Event not handled! %d", type);
         break;
     }
 }
@@ -386,22 +342,7 @@ static void create_highduty_adv_obj(void)
     };
     dev_manager_create_legacy_adv_object(&adv_param);
 }*/
-#if UART_SERVER_WITH_OTA == 1
-static void prf_added_handler(struct profile_added_evt *evt)
-{
-    LOG_I("profile:%d, start handle:0x%x\n",evt->id,evt->start_hdl);
-    switch(evt->id)
-    {
-    case PRF_FOTA_SERVER:
-        prf_fota_server_callback_init(prf_fota_server_callback);
-        create_adv_obj();
-    break;
-    default:
 
-    break;
-    }
-}
-#endif
 static void dev_manager_callback(enum dev_evt_type type,union dev_evt_u *evt)
 {
     switch(type)
@@ -429,18 +370,22 @@ static void dev_manager_callback(enum dev_evt_type type,union dev_evt_u *evt)
     }
     break;
     case SERVICE_ADDED:
-        gatt_manager_svc_register(evt->service_added.start_hdl, UART_SVC_ATT_NUM, &ls_uart_server_svc_env);
-        #if UART_SERVER_WITH_OTA == 1
-        dev_manager_prf_fota_server_add(NO_SEC);
-        #else
-        create_adv_obj();
-        #endif
+    {
+        static uint8_t svc_added_flag = 0;
+        LS_ASSERT(svc_added_flag < 2);
+        if (0 == svc_added_flag)
+        {
+            gatt_manager_svc_register(evt->service_added.start_hdl, UART_SVC_ATT_NUM, &ls_uart_server_svc_env);
+            fotas_add_service();
+            svc_added_flag++;
+        }
+        else if (1 == svc_added_flag)
+        {
+            fotas_register_svc(evt->service_added.start_hdl);
+            create_adv_obj();
+        }
+    }
     break;
-    #if UART_SERVER_WITH_OTA == 1
-    case PROFILE_ADDED:
-        prf_added_handler(&evt->profile_added);
-    break;
-    #endif
     case ADV_OBJ_CREATED:
         LS_ASSERT(evt->obj_created.status == 0);
         adv_obj_hdl = evt->obj_created.handle;

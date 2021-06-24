@@ -1,0 +1,9 @@
+Import('app_build')
+src = [
+    'main.c',
+    'fota_svc_server.c'
+]
+inc = [
+    '.'
+]
+app_build('ble_fota_server',src,inc)
