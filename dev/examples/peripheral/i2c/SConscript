@@ -1,3 +1,4 @@
 Import('app_build')
 SConscript(dirs = 'i2c_polling',exports=['app_build'])
+SConscript(dirs = 'i2c_mem_polling',exports=['app_build'])
 SConscript(dirs = 'i2c_it',exports=['app_build'])

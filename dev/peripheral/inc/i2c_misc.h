@@ -70,13 +70,15 @@ typedef enum
 #define __HAL_I2C_GET_IT_SOURCE(__HANDLE__, __INTERRUPT__) ((((__HANDLE__)->Instance->IVS & (__INTERRUPT__)) == (__INTERRUPT__)) ? SET : RESET)
 #define __HAL_I2C_GET_CR2_FLAG(__HANDLE__, __INTERRUPT__)  ((((__HANDLE__)->Instance->CR2 & (__INTERRUPT__)) == (__INTERRUPT__)) ? SET : RESET)
 #define __HAL_I2C_GET_FLAG(__HANDLE__, __FLAG__) (((((__HANDLE__)->Instance->SR) & (__FLAG__)) == (__FLAG__)) ? SET : RESET)
-#define __HAL_I2C_CLEAR_FLAG(__HANDLE__, __FLAG__)      SET_BIT((__HANDLE__)->Instance->CFR, (__FLAG__))
+#define __HAL_I2C_CLEAR_FLAG(__HANDLE__, __FLAG__)    SET_BIT((__HANDLE__)->Instance->CFR, (__FLAG__))
 #define __HAL_I2C_CLEAR_IF(__HANDLE__, __FLAG__)      SET_BIT((__HANDLE__)->Instance->ICR, (__FLAG__))
-#define __HAL_I2C_CLEAR_ADDRFLAG(__HANDLE__)     SET_BIT((__HANDLE__)->Instance->CFR, I2C_CFR_ADDRCF_MASK)   
-#define __HAL_I2C_CLEAR_STOPFLAG(__HANDLE__)     SET_BIT((__HANDLE__)->Instance->CFR, I2C_CFR_STOPCF_MASK) 
-#define __HAL_I2C_CLEAR_SR(__HANDLE__)     SET_BIT((__HANDLE__)->Instance->CFR, 0x3F38) 
+#define __HAL_I2C_CLEAR_ADDRFLAG(__HANDLE__)          SET_BIT((__HANDLE__)->Instance->CFR, I2C_CFR_ADDRCF_MASK)   
+#define __HAL_I2C_CLEAR_STOPFLAG(__HANDLE__)          SET_BIT((__HANDLE__)->Instance->CFR, I2C_CFR_STOPCF_MASK) 
+#define __HAL_I2C_CLEAR_SR(__HANDLE__)                SET_BIT((__HANDLE__)->Instance->CFR, 0x3F38) 
 #define __HAL_I2C_ENABLE(__HANDLE__)                  SET_BIT((__HANDLE__)->Instance->CR1, I2C_CR1_PE_MASK)
 #define __HAL_I2C_DISABLE(__HANDLE__)                 CLEAR_BIT((__HANDLE__)->Instance->CR1, I2C_CR1_PE_MASK)
+#define I2C_MEM_ADD_MSB(__ADDRESS__)                  ((uint8_t)((uint16_t)(((uint16_t)((__ADDRESS__) & (uint16_t)0xFF00)) >> 8)))
+#define I2C_MEM_ADD_LSB(__ADDRESS__)                  ((uint8_t)((uint16_t)((__ADDRESS__) & (uint16_t)0x00FF)))
 
 #define I2C_MIN_PCLK_FREQ_STANDARD       400000U      /*!< 400 kHz                     */
 #define I2C_MIN_PCLK_FREQ_FAST           1000000U     /*!< 1 MHz                     */
@@ -90,6 +92,8 @@ typedef enum
                                    ((CALL) == I2C_GENERALCALL_ENABLE))
 #define IS_I2C_NO_STRETCH(STRETCH) (((STRETCH) == I2C_NOSTRETCH_DISABLE) || \
                                     ((STRETCH) == I2C_NOSTRETCH_ENABLE))
+#define IS_I2C_MEMADD_SIZE(SIZE) (((SIZE) == I2C_MEMADD_SIZE_8BIT) || \
+                                  ((SIZE) == I2C_MEMADD_SIZE_16BIT))
 
 #define IS_I2C_CLOCK_SPEED(SPEED) (((SPEED) > 1000U) && ((SPEED) <= 400000U))
 #define IS_I2C_OWN_ADDRESS1(ADDRESS1) (((ADDRESS1) & 0xFFFFFC00U) == 0U)
