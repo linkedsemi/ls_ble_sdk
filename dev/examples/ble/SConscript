@@ -3,7 +3,7 @@ SConscript(dirs = 'host_test',exports=['app_build'])
 SConscript(dirs = 'ble_dis',exports=['app_build'])
 if env['IC'] == 'le501x':
     SConscript(dirs = 'fota',exports=['app_build','env'])
-    SConscript(dirs = 'ble_fota_server',exports=['app_build','env'])
+    SConscript(dirs = 'ble_fota_server',exports=['app_build'])
     SConscript(dirs = 'ble_uart_server',exports=['app_build'])
     SConscript(dirs = 'ble_uart_server_mult_link',exports=['app_build'])
     SConscript(dirs = 'ble_master_slave_combine',exports=['app_build'])
