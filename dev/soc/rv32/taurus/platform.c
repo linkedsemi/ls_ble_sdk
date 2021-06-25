@@ -6,6 +6,8 @@
 #include "cpu.h"
 #include "log.h"
 #include "compile_flag.h"
+#include "reg_sysc_awo.h"
+#include "platform.h"
 
 __attribute__((weak)) void SystemInit(){}
 
@@ -60,11 +62,38 @@ void irq_priority()
 
 }
 
+static bool lock_check()
+{
+    if(REG_FIELD_RD(SYSC_AWO->ANA_STAT,SYSC_AWO_DPLL_LOCK)==0)
+    {
+        return false;
+    }
+    DELAY_US(1000);
+    return REG_FIELD_RD(SYSC_AWO->ANA_STAT,SYSC_AWO_DPLL_LOCK);
+}
+
+
+void pll_enable()
+{
+    while(lock_check()==false)
+    {
+        REG_FIELD_WR(SYSC_AWO->PD_AWO_ANA0,SYSC_AWO_AWO_EN_DPLL,0);
+        SYSC_AWO->PD_AWO_ANA0 |= SYSC_AWO_AWO_DPLL_SEL_REF_24M_MASK | SYSC_AWO_AWO_EN_QCLK_MASK | SYSC_AWO_AWO_EN_DPLL_16M_RF_MASK | SYSC_AWO_AWO_EN_DPLL_128M_RF_MASK | SYSC_AWO_AWO_EN_DPLL_128M_EXT_MASK;
+        REG_FIELD_WR(SYSC_AWO->PD_AWO_ANA0,SYSC_AWO_AWO_EN_DPLL,1);
+        REG_FIELD_WR(SYSC_AWO->PD_AWO_ANA0,SYSC_AWO_AWO_EN_DPLL,0);
+        REG_FIELD_WR(SYSC_AWO->PD_AWO_ANA0,SYSC_AWO_AWO_DPLL_SEL_REF_24M,0);
+        REG_FIELD_WR(SYSC_AWO->PD_AWO_ANA0,SYSC_AWO_AWO_EN_DPLL,1);
+        DELAY_US(10000);
+    }
+    MODIFY_REG(SYSC_AWO->PD_AWO_CLK_CTRL,SYSC_AWO_CLK_SEL_QSPI_MASK,4<<SYSC_AWO_CLK_SEL_QSPI_POS);
+}
+
 void sys_init_none()
 {
     enable_global_irq();
     LOG_INIT();
     systick_start();
+    pll_enable();
 }
 
 int _close (int fildes){  return -1;}
