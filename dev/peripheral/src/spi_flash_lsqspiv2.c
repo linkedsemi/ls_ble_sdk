@@ -105,7 +105,7 @@ XIP_BANNED static void spi_flash_quad_xip_mode_exit()
     cfg.ctrl.reserved2 = 0;
     cfg.ctrl.reserved3 = 0;
     cfg.ctrl.reserved4 = 0;
-    cfg.ca_high = QUAD_IO_READ_OPCODE<<24;
+    cfg.ca_high = 0;
     cfg.ca_low = 0x0<<24;
     cfg.dat_ctrl.dat_en = 1;
     cfg.dat_ctrl.dat_dir = READ_FROM_FLASH;
@@ -135,7 +135,7 @@ XIP_BANNED static void spi_flash_dual_xip_mode_exit()
     cfg.ctrl.reserved2 = 0;
     cfg.ctrl.reserved3 = 0;
     cfg.ctrl.reserved4 = 0;
-    cfg.ca_high = DUAL_IO_READ_OPCODE<<24;
+    cfg.ca_high = 0;
     cfg.ca_low = 0x0<24;
     cfg.dat_ctrl.dat_en = 1;
     cfg.dat_ctrl.dat_dir = READ_FROM_FLASH;
