@@ -281,6 +281,7 @@ XIP_BANNED void enter_deep_sleep_mode_lvl2_lvl3(struct deep_sleep_wakeup *wakeup
 void deep_sleep()
 {
     NVIC->ICER[0] = ~(1<<LPWKUP_IRQn);
+    systick_stop();
     cpu_flash_deep_sleep_and_recover();
     rco_freq_counting_config();
     wkup_ble();
