@@ -10,7 +10,6 @@
       <TargetName>ARMCM0</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
-      <pCCUsed>5060750::V5.06 update 6 (build 750)::ARMCC</pCCUsed>
       <uAC6>0</uAC6>
       <TargetOption>
         <TargetCommonOption>
@@ -337,7 +336,7 @@
               <MiscControls>--c99 -O2</MiscControls>
               <Define></Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\..\..\module\crc;..\..\..\..\module\debug;..\..\..\..\module\debug\RTT;..\..\..\..\module\static_buffer;..\..\..\..\module\tinyfs;..\..\..\..\module\tinycrypt\lib\include;..\..\..\..\module\ble;..\..\..\..\module\ble\prf;..\..\..\..\module\ble\ll;..\..\..\..\module\common;..\..\..\..\module\adpcm;..\..\..\..\peripheral\ecc;..\..\..\..\peripheral\api;..\..\..\..\peripheral\inc;..\..\..\..\soc\arm_cm;..\..\..\..\soc\arm_cm\cmsis;..\..\..\..\soc\arm_cm\le501x;..\..\..\..\soc\arm_cm\le501x\integration;..\..\..\..\soc;..\..\..\..;..</IncludePath>
+              <IncludePath>..\..\..\..\module\crc;..\..\..\..\module\debug;..\..\..\..\module\debug\RTT;..\..\..\..\module\static_buffer;..\..\..\..\module\tinyfs;..\..\..\..\module\tinycrypt\lib\include;..\..\..\..\module\ble;..\..\..\..\module\ble\prf;..\..\..\..\module\ble\ll;..\..\..\..\module\common;..\..\..\..\module\adpcm;..\..\..\..\peripheral\ecc;..\..\..\..\peripheral\api;..\..\..\..\peripheral\inc;..\..\..\..\soc\arm_cm;..\..\..\..\soc\arm_cm\cmsis;..\..\..\..\soc\arm_cm\le501x;..\..\..\..\soc\arm_cm\le501x\integration;..\..\..\..\soc;..\..\..\..;..;</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -355,7 +354,7 @@
               <MiscControls></MiscControls>
               <Define></Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\..\..\module\crc;..\..\..\..\module\debug;..\..\..\..\module\debug\RTT;..\..\..\..\module\static_buffer;..\..\..\..\module\tinyfs;..\..\..\..\module\tinycrypt\lib\include;..\..\..\..\module\ble;..\..\..\..\module\ble\prf;..\..\..\..\module\ble\ll;..\..\..\..\module\common;..\..\..\..\module\adpcm;..\..\..\..\peripheral\ecc;..\..\..\..\peripheral\api;..\..\..\..\peripheral\inc;..\..\..\..\soc\arm_cm;..\..\..\..\soc\arm_cm\cmsis;..\..\..\..\soc\arm_cm\le501x;..\..\..\..\soc\arm_cm\le501x\integration;..\..\..\..\soc;..\..\..\..;..</IncludePath>
+              <IncludePath>..\..\..\..\module\crc;..\..\..\..\module\debug;..\..\..\..\module\debug\RTT;..\..\..\..\module\static_buffer;..\..\..\..\module\tinyfs;..\..\..\..\module\tinycrypt\lib\include;..\..\..\..\module\ble;..\..\..\..\module\ble\prf;..\..\..\..\module\ble\ll;..\..\..\..\module\common;..\..\..\..\module\adpcm;..\..\..\..\peripheral\ecc;..\..\..\..\peripheral\api;..\..\..\..\peripheral\inc;..\..\..\..\soc\arm_cm;..\..\..\..\soc\arm_cm\cmsis;..\..\..\..\soc\arm_cm\le501x;..\..\..\..\soc\arm_cm\le501x\integration;..\..\..\..\soc;..\..\..\..;..;</IncludePath>
             </VariousControls>
           </Aads>
           <LDads>
@@ -717,6 +716,11 @@
               <FilePath>..\..\..\..\soc\arm_cm\le501x\integration\modem_rf_le501x.c</FilePath>
             </File>
             <File>
+              <FileName>modem_rf_le501x_24g.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\soc\arm_cm\le501x\integration\modem_rf_le501x_24g.c</FilePath>
+            </File>
+            <File>
               <FileName>platform.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\soc\arm_cm\le501x\platform.c</FilePath>
@@ -796,11 +800,5 @@
       </Groups>
     </Target>
   </Targets>
-
-  <RTE>
-    <apis/>
-    <components/>
-    <files/>
-  </RTE>
 
 </Project>

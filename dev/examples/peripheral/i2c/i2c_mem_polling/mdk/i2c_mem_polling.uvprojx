@@ -183,8 +183,6 @@
             <hadXRAM>0</hadXRAM>
             <uocXRam>0</uocXRam>
             <RvdsVP>0</RvdsVP>
-            <RvdsMve>0</RvdsMve>
-            <RvdsCdeCp>0</RvdsCdeCp>
             <hadIRAM2>0</hadIRAM2>
             <hadIROM2>0</hadIROM2>
             <StupSel>8</StupSel>
@@ -351,7 +349,7 @@
             <NoWarn>0</NoWarn>
             <uSurpInc>0</uSurpInc>
             <useXO>0</useXO>
-            <ClangAsOpt>1</ClangAsOpt>
+            <uClangAs>0</uClangAs>
             <VariousControls>
               <MiscControls></MiscControls>
               <Define></Define>
@@ -706,6 +704,11 @@
               <FileName>modem_rf_le501x.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\soc\arm_cm\le501x\integration\modem_rf_le501x.c</FilePath>
+            </File>
+            <File>
+              <FileName>modem_rf_le501x_24g.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\soc\arm_cm\le501x\integration\modem_rf_le501x_24g.c</FilePath>
             </File>
             <File>
               <FileName>platform.c</FileName>
