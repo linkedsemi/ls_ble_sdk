@@ -41,7 +41,7 @@ enum ll_evt_start_type htimer_test_evt_start(struct ll_evt *evt);
 
 enum ll_evt_transition_type htimer_test_tx_end(struct ll_evt *evt);
 
-struct pkt_info htimer_test_evt_header_rx(struct ll_evt *evt);
+uint8_t htimer_test_evt_header_rx(struct ll_evt *evt,bool third_byte);
 
 enum ll_evt_transition_type htimer_test_evt_rx_end(struct ll_evt *evt);
 

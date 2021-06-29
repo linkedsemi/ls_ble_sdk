@@ -2,6 +2,7 @@
 #define LL_CONN_H_
 #include <stdint.h>
 #include <stdbool.h>
+#include <string.h>
 #include "ll_evt.h"
 #include "co_list.h"
 #include "linked_async_framework.h"
@@ -393,9 +394,10 @@ struct ll_conn_env{
     uint8_t nesn;
     uint8_t sn;
     uint8_t encrypted;
+    uint8_t slv_tx_encrypt;
     uint8_t master;
-    uint8_t peer_version_valid:1,
-            peer_features_valid:1;
+    uint8_t peer_version_valid;
+    uint8_t peer_features_valid;
 };
 
 extern uint16_t conn_data_max_len;
@@ -441,7 +443,7 @@ enum ll_evt_start_type htimer_conn_evt_start(struct ll_evt *evt);
 
 enum ll_evt_transition_type htimer_conn_evt_rx_end(struct ll_evt *evt);
 
-struct pkt_info htimer_conn_evt_header_rx(struct ll_evt *evt);
+uint8_t htimer_conn_evt_header_rx(struct ll_evt *evt,bool third_byte);
 
 enum ll_evt_transition_type htimer_conn_tx_end(struct ll_evt *evt);
 

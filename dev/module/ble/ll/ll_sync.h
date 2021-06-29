@@ -95,7 +95,7 @@ enum ll_evt_transition_type htimer_sync_evt_tx_end(struct ll_evt *evt);
 
 enum ll_evt_transition_type htimer_sync_evt_rx_end(struct ll_evt *evt);
 
-struct pkt_info htimer_sync_evt_header_rx(struct ll_evt *evt);
+uint8_t htimer_sync_evt_header_rx(struct ll_evt *evt,bool third_byte);
 
 enum ll_evt_transition_type htimer_sync_evt_sync_timeout(struct ll_evt *evt);
 

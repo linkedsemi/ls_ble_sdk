@@ -212,8 +212,8 @@ enum ble_feature
 struct aes_128_calc_env
 {
     struct co_list_hdr hdr;
+    uint32_t *key;
     uint8_t *data;
-    uint8_t *key;
     uint8_t *rslt;
     void (*callback)(void *);
     void *param;
@@ -289,7 +289,8 @@ uint8_t channel_select_algorithm_2(struct le_chnl_map *ch_map,uint32_t access_co
 
 void ll_aes_128_done(void *rslt);
 
-void ll_aes_128(uint8_t *key,uint8_t *plaintext,uint8_t *ciphertext,void (*callback)(void *),void *param);
+/* key pointer must be word aligned */
+void ll_aes_128(void *key,uint8_t *plaintext,uint8_t *ciphertext,void (*callback)(void *),void *param);
 
 
 #endif

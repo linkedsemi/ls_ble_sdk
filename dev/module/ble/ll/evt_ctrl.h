@@ -89,6 +89,6 @@ void ble_timer2_irq2_unmask(void);
 
 void ble_timer2_irq2_mask(void);
 
-void aes_128_start(uint8_t *data,uint8_t *key);
+void aes_128_start(uint8_t *data,uint32_t *key);
 #endif
 
