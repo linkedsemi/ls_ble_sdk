@@ -42,6 +42,8 @@ void sys_init_itf(void);
 
 void sys_init_none(void);
 
+void sys_init_24g(void);
+
 void irq_reinit(void);
 
 void uart_eif_read(uint8_t *bufptr, uint32_t size, void (*callback)(void *,uint8_t), void* dummy);

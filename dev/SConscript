@@ -28,6 +28,10 @@ if env['IC']== 'le501x':
         env['FW_LIB'] = File('#dev/soc/arm_cm/le501x/bin/libfw.o')
     else:
         env['FW_LIB'] = ble_lib['FW_LIB']
+    if ble_lib.get('PROP_24G_LIB') is None:
+        env['PROP_24G_LIB'] = File('#dev/soc/arm_cm/le501x/bin/prop_24g_lib.o')
+    else:
+        env['PROP_24G_LIB'] = ble_lib['PROP_24G_LIB']
     if mesh_lib.get('FW_MESH_HEX') is None:
         env['FW_MESH_HEX'] = File('#dev/soc/arm_cm/le501x/bin/fw_with_sig_mesh.hex')
     else:
@@ -65,12 +69,14 @@ def image_build(name,src,inc,linkscript = ''):
 
     return img_env,img_target
   
-def app_build(app_name,src,inc,linkscript = '',ble = True,mesh = False):
+def app_build(app_name,src,inc,linkscript = '',ble = True,mesh = False,prop_24g = False):
     app_env,app_target = image_build(app_name,src,inc,linkscript)
     if mesh:
         fw_lib = app_env['MESH_LIB']
     elif ble:
         fw_lib = app_env['FW_LIB']
+    elif prop_24g:
+        fw_lib = app_env['PROP_24G_LIB']
     if app_env['IC'] == 'le501x':
         if mesh:
             stack_hex = app_env['FW_MESH_HEX']
@@ -102,7 +108,7 @@ def app_build(app_name,src,inc,linkscript = '',ble = True,mesh = False):
         # app_env.Append(LINKFLAGS = ' -Wl,-R,' + File(app_env['ROM_SYM'][0]).path)
         # app_env.Depends(app_target,app_env['ROM_SYM'])
         app_hex = app_env.Command('#build/$IC/examples/'+app_name+'.hex',app_target,Action('$OBJCOPY -O ihex $SOURCES $TARGET'))
-    if mesh or ble:
+    if mesh or ble or prop_24g:
         app_env.Append(LIBS = [fw_lib])
     return app_env,app_target
 

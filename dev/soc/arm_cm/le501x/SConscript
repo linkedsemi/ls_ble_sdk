@@ -12,6 +12,7 @@ src = [
     'integration/adc_msp.c',
     'integration/i2c_msp.c',
     'integration/modem_rf_le501x.c',
+    'integration/modem_rf_le501x_24g.c',
     'integration/calc_acc.c',
     'integration/lscache_msp.c',
     'integration/io_config.c',

@@ -1,0 +1,9 @@
+Import('app_build')
+src = [
+    'app_prop_24g.c',
+    'app_user_24g.c'
+]
+inc = [
+    '.'
+]
+app_build('ls_prop_24g',src,inc, ble = False, prop_24g = True)
