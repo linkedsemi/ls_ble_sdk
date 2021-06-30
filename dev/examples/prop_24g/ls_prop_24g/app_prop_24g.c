@@ -7,6 +7,7 @@
 #include "log.h"
 #include "ls_dbg.h"
 
+#define VALID_TX_LEN_MAX 253
 // The macro means the function will be called in interrupts.
 #define __ISR
 
@@ -63,6 +64,7 @@ __ISR XIP_BANNED void app_prop_24g_rx_cb(const uint8_t *rx_buf, uint8_t *length)
 void RF_24g_Tx(uint8_t *txBuf, uint8_t txLen, void (*Tx_cmpt_cb)(void *), void *param)
 {
     LOG_I("RF_24g_Tx");
+    LS_ASSERT(txLen <= VALID_TX_LEN_MAX && txBuf != NULL);
     prop_24g_tx_env.dataptr = txBuf;
     *prop_24g_tx_env.length = txLen;
     prop_24g_tx_env.cb = Tx_cmpt_cb;
@@ -70,6 +72,7 @@ void RF_24g_Tx(uint8_t *txBuf, uint8_t txLen, void (*Tx_cmpt_cb)(void *), void *
 }
 void RF_24g_Rx(uint8_t *rxBuf, uint8_t *rxLen, void (*Rx_cmpt_cb)(void *), void *param)
 {
+    LS_ASSERT(rxLen != NULL && rxBuf != NULL);
     prop_24g_rx_env.dataptr = rxBuf;
     prop_24g_rx_env.length = rxLen;
     prop_24g_rx_env.cb = Rx_cmpt_cb;

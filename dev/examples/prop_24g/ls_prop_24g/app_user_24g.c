@@ -8,7 +8,7 @@
 #include "app_user_24g.h"
 #include "log.h"
 
-#define UART_24G_PAYLOAD_LEN_MAX 255
+#define UART_24G_PAYLOAD_LEN_MAX 253
 #define RF_CHANNEL_DEFAULT 2380
 
 #define UART_SYNC_BYTE  0xA5
