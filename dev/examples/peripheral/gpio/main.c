@@ -5,9 +5,9 @@
 void gpio_init(void)
 {
     io_cfg_output(PB09);   //PB09 config output
-    io_write_pin(PB09,0);  //PB09 write low power
+    io_write_pin(PB09,0);  //PB09 write low level
     io_cfg_output(PB10);   //PB10 config output
-    io_write_pin(PB10,1);  //PB10 write low power
+    io_write_pin(PB10,1);  //PB10 write high level
 }
  
 void exti_test(void)

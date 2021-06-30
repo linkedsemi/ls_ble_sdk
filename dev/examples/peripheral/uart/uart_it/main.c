@@ -22,7 +22,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 }
 static void uart_rx_test()
 {
-    HAL_UART_Receive_IT(&UART_Config,test_zone_a,10);
+    HAL_UART_Receive_IT(&UART_Config,test_zone_a,1);
 }
 
 static void uart_init(void)
@@ -38,7 +38,6 @@ static void uart_init(void)
 
 int main()
 {
-    io_clr_pin(PB02);
     sys_init_none();
     uart1_io_init(PB00,PB01);
     uart_init();

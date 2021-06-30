@@ -49,14 +49,6 @@ XIP_BANNED void after_wfi()
 
 XIP_BANNED void power_down_config()
 {
-    SYSC_AWO->IO[0].PUPD = 0xFFFF0000;
-    SYSC_AWO->IO[1].PUPD = 0xFFFF0000;
-    SYSC_AWO->IO[2].PUPD = 0xFFFF0000;
-    SYSC_AWO->IO[3].PUPD = 0xFFFF0000;
-    SYSC_AWO->IO[0].IE_OD = 0xFFFF0000;
-    SYSC_AWO->IO[1].IE_OD = 0xFFFF0000;
-    SYSC_AWO->IO[2].IE_OD = 0xFFFF0000;
-    SYSC_AWO->IO[3].IE_OD = 0xFFFF0000;
     V33_RG->SFT_CTRL03 = 0x0; 
     V33_RG->PWR_CTRL = FIELD_BUILD(V33_RG_LPLDO_PD_EN,1)
                           |FIELD_BUILD(V33_RG_HPLDO_PD_EN,1)
@@ -70,13 +62,28 @@ XIP_BANNED void power_down_config()
                           |FIELD_BUILD(V33_RG_HSI_PD_EN,1)
                           |FIELD_BUILD(V33_RG_HSE_PU_EN,1)
                           |FIELD_BUILD(V33_RG_LSE_PU_EN,1)
-                          |FIELD_BUILD(V33_RG_SRAM1_PD_EN,0)
-                          |FIELD_BUILD(V33_RG_SRAM2_PD_EN,0)
-                          |FIELD_BUILD(V33_RG_SRAM3_PD_EN,0)
-                          |FIELD_BUILD(V33_RG_SRAM4_PD_EN,0)
-                          |FIELD_BUILD(V33_RG_SRAM_DS_PU_EN,0)
+                          |FIELD_BUILD(V33_RG_SRAM1_PD_EN,1)
+                          |FIELD_BUILD(V33_RG_SRAM2_PD_EN,1)
+                          |FIELD_BUILD(V33_RG_SRAM3_PD_EN,1)
+                          |FIELD_BUILD(V33_RG_SRAM4_PD_EN,1)
+                          |FIELD_BUILD(V33_RG_SRAM_DS_PU_EN,1)
                           |FIELD_BUILD(V33_RG_RCO_BIAS_FC,0)
-                          |FIELD_BUILD(V33_RG_HPSW_PU_LATE,1);
+                          |FIELD_BUILD(V33_RG_HPSW_PU_LATE,1)
+                          |FIELD_BUILD(V33_RG_PD_GPIO_SEL,0);
+    V33_RG->MISC_CTRL1 = FIELD_BUILD(V33_RG_LATCH_GPIO,1)
+                          |FIELD_BUILD(V33_RG_PD_GPIO,0)
+                          |FIELD_BUILD(V33_RG_PD_ADC12,1)
+                          |FIELD_BUILD(V33_RG_PD_AMIC,1)
+                          |FIELD_BUILD(V33_RG_PD_TK,1)
+                          |FIELD_BUILD(V33_RG_PD_DAC12,1)
+                          |FIELD_BUILD(V33_RG_BAT_DTCT_EN,1);
+    V33_RG->MISC_CTRL1 = FIELD_BUILD(V33_RG_LATCH_GPIO,1)
+                          |FIELD_BUILD(V33_RG_PD_GPIO,1)
+                          |FIELD_BUILD(V33_RG_PD_ADC12,1)
+                          |FIELD_BUILD(V33_RG_PD_AMIC,1)
+                          |FIELD_BUILD(V33_RG_PD_TK,1)
+                          |FIELD_BUILD(V33_RG_PD_DAC12,1)
+                          |FIELD_BUILD(V33_RG_BAT_DTCT_EN,1);
 
     SCB->SCR = 0x01;
 }
@@ -99,7 +106,7 @@ XIP_BANNED void deep_sleep()
     cpu_flash_deep_sleep_and_recover();
 }
 
-static void lvl2_lvl3_mode_prepare()
+XIP_BANNED void lvl2_lvl3_mode_prepare()
 {
     power_down_config();
     REG_FIELD_WR(V33_RG->WKUP_CTRL,V33_RG_WKUP_MSK,0x08);
@@ -107,10 +114,10 @@ static void lvl2_lvl3_mode_prepare()
 
 XIP_BANNED void enter_deep_sleep_mode_lvl2_lvl3()
 {
-    lvl2_lvl3_mode_prepare();
-    SCB->SCR |= (1<<2);
     spi_flash_xip_stop();
     spi_flash_deep_power_down();
+    lvl2_lvl3_mode_prepare();
+    SCB->SCR |= (1<<2);
     __WFI();
     while(1);
 }
