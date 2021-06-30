@@ -8,401 +8,461 @@
  *  @{
  */
 
-#define INVALID_CON_IDX (0xff)
-#define INVALID_PEER_ID (0xff)
+#define INVALID_CON_IDX (0xff)          /*!< Invalid connection index*/
+#define INVALID_PEER_ID (0xff)          /*!< Invalid Peer ID*/
 
-#define BLE_ADDR_LEN 6
+#define BLE_ADDR_LEN 6                  /*!< BLE mac address length*/
 #define BLE_KEY_LEN 16                  /*!< The length of the paired temporary key*/
 
+/**
+  * @brief Own address type
+  */
 enum gap_own_addr_type
 {
-    PUBLIC_OR_RANDOM_STATIC_ADDR,
-    RESOLVABLE_PRIVATE_ADDR,
-    NON_RESOLVABLE_PRIVATE_ADDR,
+    PUBLIC_OR_RANDOM_STATIC_ADDR,       /*!< Public or random static address*/
+    RESOLVABLE_PRIVATE_ADDR,            /*!< Resolvable private address*/
+    NON_RESOLVABLE_PRIVATE_ADDR,        /*!< Non-resolvable private address*/
 };
-
+/**
+  * @brief Peer address type
+  */
 enum gap_peer_addr_type
 {
-    PUBLIC_ADDR,
-    RANDOM_ADDR,
+    PUBLIC_ADDR,                        /*!< Public address*/
+    RANDOM_ADDR,                        /*!< Random address*/
 };
-
+/**
+  * @brief Adv type definition
+  */
 enum gap_adv_type
 {
-    /// Flag
-    GAP_ADV_TYPE_FLAGS                      = 0x01,//!< GAP_ADV_TYPE_FLAGS
-    /// Use of more than 16 bits UUID
-    GAP_ADV_TYPE_MORE_16_BIT_UUID           = 0x02,//!< GAP_ADV_TYPE_MORE_16_BIT_UUID
-    /// Complete list of 16 bit UUID
-    GAP_ADV_TYPE_COMPLETE_LIST_16_BIT_UUID  = 0x03,//!< GAP_ADV_TYPE_COMPLETE_LIST_16_BIT_UUID
-    /// Use of more than 32 bit UUD
-    GAP_ADV_TYPE_MORE_32_BIT_UUID           = 0x04,//!< GAP_ADV_TYPE_MORE_32_BIT_UUID
-    /// Complete list of 32 bit UUID
-    GAP_ADV_TYPE_COMPLETE_LIST_32_BIT_UUID  = 0x05,//!< GAP_ADV_TYPE_COMPLETE_LIST_32_BIT_UUID
-    /// Use of more than 128 bit UUID
-    GAP_ADV_TYPE_MORE_128_BIT_UUID          = 0x06,//!< GAP_ADV_TYPE_MORE_128_BIT_UUID
-    /// Complete list of 128 bit UUID
-    GAP_ADV_TYPE_COMPLETE_LIST_128_BIT_UUID = 0x07,//!< GAP_ADV_TYPE_COMPLETE_LIST_128_BIT_UUID
-    /// Shortened device name
-    GAP_ADV_TYPE_SHORTENED_NAME             = 0x08,//!< GAP_ADV_TYPE_SHORTENED_NAME
-    /// Complete device name
-    GAP_ADV_TYPE_COMPLETE_NAME              = 0x09,//!< GAP_ADV_TYPE_COMPLETE_NAME
-    /// Transmit power
-    GAP_ADV_TYPE_TRANSMIT_POWER             = 0x0A,//!< GAP_ADV_TYPE_TRANSMIT_POWER
-    /// Class of device
-    GAP_ADV_TYPE_CLASS_OF_DEVICE            = 0x0D,//!< GAP_ADV_TYPE_CLASS_OF_DEVICE
-    /// Simple Pairing Hash C
-    GAP_ADV_TYPE_SP_HASH_C                  = 0x0E,//!< GAP_ADV_TYPE_SP_HASH_C
-    /// Simple Pairing Randomizer
-    GAP_ADV_TYPE_SP_RANDOMIZER_R            = 0x0F,//!< GAP_ADV_TYPE_SP_RANDOMIZER_R
-    /// Temporary key value
-    GAP_ADV_TYPE_TK_VALUE                   = 0x10,//!< GAP_ADV_TYPE_TK_VALUE
-    /// Out of Band Flag
-    GAP_ADV_TYPE_OOB_FLAGS                  = 0x11,//!< GAP_ADV_TYPE_OOB_FLAGS
-    /// Slave connection interval range
-    GAP_ADV_TYPE_SLAVE_CONN_INT_RANGE       = 0x12,//!< GAP_ADV_TYPE_SLAVE_CONN_INT_RANGE
-    /// Require 16 bit service UUID
-    GAP_ADV_TYPE_RQRD_16_BIT_SVC_UUID       = 0x14,//!< GAP_ADV_TYPE_RQRD_16_BIT_SVC_UUID
-    /// Require 32 bit service UUID
-    GAP_ADV_TYPE_RQRD_32_BIT_SVC_UUID       = 0x1F,//!< GAP_ADV_TYPE_RQRD_32_BIT_SVC_UUID
-    /// Require 128 bit service UUID
-    GAP_ADV_TYPE_RQRD_128_BIT_SVC_UUID      = 0x15,//!< GAP_ADV_TYPE_RQRD_128_BIT_SVC_UUID
-    /// Service data 16-bit UUID
-    GAP_ADV_TYPE_SERVICE_16_BIT_DATA        = 0x16,//!< GAP_ADV_TYPE_SERVICE_16_BIT_DATA
-    /// Service data 32-bit UUID
-    GAP_ADV_TYPE_SERVICE_32_BIT_DATA        = 0x20,//!< GAP_ADV_TYPE_SERVICE_32_BIT_DATA
-    /// Service data 128-bit UUID
-    GAP_ADV_TYPE_SERVICE_128_BIT_DATA       = 0x21,//!< GAP_ADV_TYPE_SERVICE_128_BIT_DATA
-    /// Public Target Address
-    GAP_ADV_TYPE_PUB_TGT_ADDR               = 0x17,//!< GAP_ADV_TYPE_PUB_TGT_ADDR
-    /// Random Target Address
-    GAP_ADV_TYPE_RAND_TGT_ADDR              = 0x18,//!< GAP_ADV_TYPE_RAND_TGT_ADDR
-    /// Appearance
-    GAP_ADV_TYPE_APPEARANCE                 = 0x19,//!< GAP_ADV_TYPE_APPEARANCE
-    /// Advertising Interval
-    GAP_ADV_TYPE_ADV_INTV                   = 0x1A,//!< GAP_ADV_TYPE_ADV_INTV
-    /// LE Bluetooth Device Address
-    GAP_ADV_TYPE_LE_BT_ADDR                 = 0x1B,//!< GAP_ADV_TYPE_LE_BT_ADDR
-    /// LE Role
-    GAP_ADV_TYPE_LE_ROLE                    = 0x1C,//!< GAP_ADV_TYPE_LE_ROLE
-    /// Simple Pairing Hash C-256
-    GAP_ADV_TYPE_SPAIR_HASH                 = 0x1D,//!< GAP_ADV_TYPE_SPAIR_HASH
-    /// Simple Pairing Randomizer R-256
-    GAP_ADV_TYPE_SPAIR_RAND                 = 0x1E,//!< GAP_ADV_TYPE_SPAIR_RAND
-    /// 3D Information Data
-    GAP_ADV_TYPE_3D_INFO                    = 0x3D,//!< GAP_ADV_TYPE_3D_INFO
-
-    /// Manufacturer specific data
-    GAP_ADV_TYPE_MANU_SPECIFIC_DATA         = 0xFF,//!< GAP_ADV_TYPE_MANU_SPECIFIC_DATA
+    GAP_ADV_TYPE_FLAGS                      = 0x01,        /*!< Flag*/
+    GAP_ADV_TYPE_MORE_16_BIT_UUID           = 0x02,        /*!< Use of more than 16 bits UUID*/
+    GAP_ADV_TYPE_COMPLETE_LIST_16_BIT_UUID  = 0x03,        /*!< Complete list of 16 bit UUID*/
+    GAP_ADV_TYPE_MORE_32_BIT_UUID           = 0x04,        /*!< Use of more than 32 bit UUD*/
+    GAP_ADV_TYPE_COMPLETE_LIST_32_BIT_UUID  = 0x05,        /*!< Complete list of 32 bit UUID*/
+    GAP_ADV_TYPE_MORE_128_BIT_UUID          = 0x06,        /*!< Use of more than 128 bit UUID*/
+    GAP_ADV_TYPE_COMPLETE_LIST_128_BIT_UUID = 0x07,        /*!< Complete list of 128 bit UUID*/
+    GAP_ADV_TYPE_SHORTENED_NAME             = 0x08,        /*!< Shortened device name*/
+    GAP_ADV_TYPE_COMPLETE_NAME              = 0x09,        /*!< Complete device name*/
+    GAP_ADV_TYPE_TRANSMIT_POWER             = 0x0A,        /*!< Transmit power*/
+    GAP_ADV_TYPE_CLASS_OF_DEVICE            = 0x0D,        /*!< Class of device*/
+    GAP_ADV_TYPE_SP_HASH_C                  = 0x0E,        /*!< Simple Pairing Hash C*/
+    GAP_ADV_TYPE_SP_RANDOMIZER_R            = 0x0F,        /*!< Simple Pairing Randomizer*/
+    GAP_ADV_TYPE_TK_VALUE                   = 0x10,        /*!< Temporary key value*/
+    GAP_ADV_TYPE_OOB_FLAGS                  = 0x11,        /*!< Out of Band Flag*/
+    GAP_ADV_TYPE_SLAVE_CONN_INT_RANGE       = 0x12,        /*!< Slave connection interval range*/
+    GAP_ADV_TYPE_RQRD_16_BIT_SVC_UUID       = 0x14,        /*!< Require 16 bit service UUID*/
+    GAP_ADV_TYPE_RQRD_32_BIT_SVC_UUID       = 0x1F,        /*!< Require 32 bit service UUID*/
+    GAP_ADV_TYPE_RQRD_128_BIT_SVC_UUID      = 0x15,        /*!< Require 128 bit service UUID*/
+    GAP_ADV_TYPE_SERVICE_16_BIT_DATA        = 0x16,        /*!< Service data 16-bit UUID*/
+    GAP_ADV_TYPE_SERVICE_32_BIT_DATA        = 0x20,        /*!< Service data 32-bit UUID*/
+    GAP_ADV_TYPE_SERVICE_128_BIT_DATA       = 0x21,        /*!< Service data 128-bit UUID*/
+    GAP_ADV_TYPE_PUB_TGT_ADDR               = 0x17,        /*!< Public Target Address*/
+    GAP_ADV_TYPE_RAND_TGT_ADDR              = 0x18,        /*!< Random Target Address*/
+    GAP_ADV_TYPE_APPEARANCE                 = 0x19,        /*!< Appearance*/
+    GAP_ADV_TYPE_ADV_INTV                   = 0x1A,        /*!< Advertising Interval*/
+    GAP_ADV_TYPE_LE_BT_ADDR                 = 0x1B,        /*!< LE Bluetooth Device Address*/
+    GAP_ADV_TYPE_LE_ROLE                    = 0x1C,        /*!< LE Role*/ 
+    GAP_ADV_TYPE_SPAIR_HASH                 = 0x1D,        /*!< Simple Pairing Hash C-256*/
+    GAP_ADV_TYPE_SPAIR_RAND                 = 0x1E,        /*!< Simple Pairing Randomizer R-256*/
+    GAP_ADV_TYPE_3D_INFO                    = 0x3D,        /*!< 3D Information Data*/
+        
+    GAP_ADV_TYPE_MANU_SPECIFIC_DATA         = 0xFF,        /*!< Manufacturer specific data*/
 };
-
+/**
+  * @brief Device address
+  */
 struct dev_addr
 {
-    uint8_t addr[BLE_ADDR_LEN];
+    uint8_t addr[BLE_ADDR_LEN];                    /*!< Address array*/
 };
-
+/**
+  * @brief BLE address structure
+  */
 struct ble_addr
 {
-    struct dev_addr addr;
-    uint8_t type;
+    struct dev_addr addr;                          /*!< Address value in form of ::dev_addr*/ 
+    uint8_t type;                                  /*!< Address type*/ 
 };
-
+/**
+  * @brief Type of security level.
+  */
 enum sec_lvl_type
 {
-    NO_SEC,
-    UNAUTH_SEC,
-    AUTH_SEC,
-    SEC_CON_SEC,
+    NO_SEC,                                        /*!< No security*/ 
+    UNAUTH_SEC,                                    /*!< Unauthenticated security*/ 
+    AUTH_SEC,                                      /*!< Authenticated security*/ 
+    SEC_CON_SEC,                                   /*!< Security connection*/ 
 };
-
+/**
+  * @brief Legacy adv properities.
+  */
 struct legacy_adv_prop
 {
-    uint8_t connectable:1,
-            scannable:1,
-            directed:1,
-            high_duty_cycle:1;
+    uint8_t connectable:1,                         /*!< Connectable property*/ 
+            scannable:1,                           /*!< Scannable property*/ 
+            directed:1,                            /*!< Directed property*/ 
+            high_duty_cycle:1;                     /*!< High duty cycle property*/ 
 };
-
+/**
+  * @brief ADV discovery mode.
+  */
 enum adv_disc_mode
 {
-    /// Mode in non-discoverable
-    ADV_MODE_NON_DISC = 0,
-    /// Mode in general discoverable
-    ADV_MODE_GEN_DISC,
-    /// Mode in limited discoverable
-    ADV_MODE_LIM_DISC,
-    /// Broadcast mode without presence of AD_TYPE_FLAG in advertising data
-    ADV_MODE_BEACON,
+    ADV_MODE_NON_DISC = 0,                         /*!< Mode in non-discoverable*/ 
+    ADV_MODE_GEN_DISC,                             /*!< Mode in general discoverable*/ 
+    ADV_MODE_LIM_DISC,                             /*!< Mode in limited discoverable*/ 
+    ADV_MODE_BEACON,                               /*!< Broadcast mode without presence of AD_TYPE_FLAG in advertising data*/ 
     ADV_MODE_MAX,
 };
-
-struct legacy_adv_obj_param
+/**
+  * @brief Legacy adv object parameters structure.
+  */
+struct legacy_adv_obj_param                        
 {
-    struct dev_addr *peer_addr;
-    uint16_t adv_intv_min;
-    uint16_t adv_intv_max;
-    enum gap_own_addr_type own_addr_type;
-    enum gap_peer_addr_type peer_addr_type;
-    uint8_t filter_policy;
-    uint8_t ch_map;
-    enum adv_disc_mode disc_mode;
-    struct legacy_adv_prop prop;
+    struct dev_addr *peer_addr;                    /*!< Peer address. Only valid for directed adv*/ 
+    uint16_t adv_intv_min;                         /*!< Minimum adv interval, in units of 625us*/ 
+    uint16_t adv_intv_max;                         /*!< Maximum adv interval, in units of 625us*/ 
+    enum gap_own_addr_type own_addr_type;          /*!< Own address type*/ 
+    enum gap_peer_addr_type peer_addr_type;        /*!< Peer address type*/ 
+    uint8_t filter_policy;                         /*!< Adv filter policy*/ 
+    uint8_t ch_map;                                /*!< Adv channel map. bit0: channel 37 enabled. bit1: channel 38 enabled. bit2: channel 39 enabled. */ 
+    enum adv_disc_mode disc_mode;                  /*!< Adv discovery mode*/ 
+    struct legacy_adv_prop prop;                   /*!< Legacy adv properities*/ 
 };
-
+/**
+  * @brief PHY type.
+  */
+enum phy_type
+{
+    PHY_TYPE_1M = 0,                               /*!< LE 1Mbps phy*/ 
+    PHY_TYPE_2M,                                   /*!< LE 2Mbps phy*/ 
+    PHY_TYPE_CODED,                                /*!< LE Coded phy*/ 
+};
+/**
+  * @brief Extended adv object parameters structure.
+  */
 struct ext_adv_obj_param
 {
-    struct legacy_adv_obj_param legacy_adv_obj;
-    uint8_t max_skip;
-    uint8_t phy;
-    uint8_t adv_sid;
+    struct legacy_adv_obj_param legacy_adv_obj;    /*!< Shared legacy adv parameters*/ 
+    uint8_t max_skip;                              /*!< Maximum number of advertising events the controller can skip before sending the
+                                                        AUX_ADV_IND packets. 0 means that AUX_ADV_IND PDUs shall be sent prior each
+                                                        advertising events*/
+    uint8_t phy;                                   /*!< Indicate on which PHY secondary advertising has to be performed. Refer to ::phy_type*/ 
+    uint8_t adv_sid;                               /*!< Adv set ID*/ 
 };
-
+/**
+  * @brief Scanning type.
+  */
 enum scan_type
 {
-    GENERAL_DISCOVERABLE,
-    LIMITED_DISCOVERABLE,
-    OBSERVER,
-    OBSERVER_WHITELIST,
-    CONNECTABLE,
-    CONNECTABLE_WHITELIST,
+    GENERAL_DISCOVERABLE,                          /*!< General discovery*/ 
+    LIMITED_DISCOVERABLE,                          /*!< Limited discovery*/               
+    OBSERVER,                                      /*!< Observer*/ 
+    OBSERVER_WHITELIST,                            /*!< Selective observer*/ 
+    CONNECTABLE,                                   /*!< Connectable discovery*/ 
+    CONNECTABLE_WHITELIST,                         /*!< Selective connectable discovery*/ 
 };
-
+/**
+  * @brief Scan filter duplicates policy.
+  */
+enum filter_dup_policy
+{
+    DUP_FILT_DIS = 0,                              /*!< Disable filtering of duplicated packets*/ 
+    DUP_FILT_EN,                                   /*!< Enable filtering of duplicated packets*/ 
+    DUP_FILT_EN_PERIOD,                            /*!< Enable filtering of duplicated packets, reset for each scan period*/ 
+};
+/**
+  * @brief Scanning parameters.
+  */
 struct start_scan_param
 {
-    uint16_t scan_intv;
-    uint16_t scan_window;
-    uint16_t duration;
-    uint16_t period;
-    enum scan_type type;
-    uint8_t active:1,
-            filter_duplicates:2;
+    uint16_t scan_intv;                            /*!< Scan intervals in units of 625us*/ 
+    uint16_t scan_window;                          /*!< Scan window in units of 625us*/ 
+    uint16_t duration;                             /*!< Scan duration in units of 10ms. 0 means the scan action will run continuously until app stop it*/ 
+    uint16_t period;                               /*!< Scan window in units of 625us*/ 
+    enum scan_type type;                           /*!< Scan type*/ 
+    uint8_t active:1,                              /*!< Active scan*/ 
+            filter_duplicates:2;                   /*!< Duplicate packet filtering policy. Refer to ::filter_dup_policy*/ 
 };
-
+/**
+  * @brief Initiating type.
+  */
 enum init_type
 {
-    DIRECT_CONNECTION,
-    AUTO_CONNECTION_WHITELIST,
+    DIRECT_CONNECTION,                              /*!< Direct connection establishment, establish a connection with an indicated device*/ 
+    AUTO_CONNECTION_WHITELIST,                      /*!< Automatic connection establishment, establish a connection with all devices whose address is present in the white list*/ 
 };
-
+/**
+  * @brief Start initiating parameters.
+  */
 struct start_init_param
 {
-    struct dev_addr *peer_addr;
-    uint16_t scan_intv;
-    uint16_t scan_window;
-    /// Timeout for automatic connection establishment (in unit of 10ms). Cancel the procedure if not all
-    /// indicated devices have been connected when the timeout occurs. 0 means there is no timeout
-    uint16_t conn_to;
-    /// Minimum value for the connection interval (in unit of 1.25ms). Shall be less than or equal to
-    /// conn_intv_max value. Allowed range is 7.5ms to 4s.
-    uint16_t conn_intv_min;
-    /// Maximum value for the connection interval (in unit of 1.25ms). Shall be greater than or equal to
-    /// conn_intv_min value. Allowed range is 7.5ms to 4s.
-    uint16_t conn_intv_max;
-    /// Slave latency. Number of events that can be missed by a connected slave device
-    uint16_t conn_latency;
-    /// Link supervision timeout (in unit of 10ms). Allowed range is 100ms to 32s
-    uint16_t supervision_to;
-    uint8_t peer_addr_type;
-    enum init_type type;
+    struct dev_addr *peer_addr;                     /*!< Peer device address*/ 
+    uint16_t scan_intv;                             /*!< Scan intervals in units of 625us*/ 
+    uint16_t scan_window;                           /*!< Scan window in units of 625us*/ 
+    uint16_t conn_to;                               /*!< Timeout for automatic connection establishment (in unit of 10ms). Cancel the procedure if not all indicated devices have been connected when the timeout occurs. 0 means there is no timeout*/ 
+    uint16_t conn_intv_min;                         /*!< Minimum value for the connection interval (in unit of 1.25ms). Shall be less than or equal to conn_intv_max value. Allowed range is 7.5ms to 4s*/ 
+    uint16_t conn_intv_max;                         /*!< Maximum value for the connection interval (in unit of 1.25ms). Shall be greater than or equal to conn_intv_min value. Allowed range is 7.5ms to 4s*/ 
+    uint16_t conn_latency;                          /*!< Slave latency. Number of events that can be missed by a connected slave device*/ 
+    uint16_t supervision_to;                        /*!< Link supervision timeout (in unit of 10ms). Allowed range is 100ms to 32s*/ 
+    uint8_t peer_addr_type;                         /*!< Address type for peer device. 0=public/1=private random*/
+    enum init_type type;                            /*!< Initiating type*/ 
 };
 
-
+/**
+  * @brief Type of events in device manager.
+  */
 enum dev_evt_type
 {
-    STACK_INIT,
-    STACK_READY,
-    PROFILE_ADDED,
-    SERVICE_ADDED,
-    ADV_OBJ_CREATED,
-    SCAN_OBJ_CREATED,
-    INIT_OBJ_CREATED,
-    ADV_STOPPED,
-    SCAN_STOPPED,
-    INIT_STOPPED,
-    OBJ_DELETED,
-    ADV_REPORT,
+    STACK_INIT,                                     /*!< Stack initialized event*/ 
+    STACK_READY,                                    /*!< Stack ready event*/ 
+    PROFILE_ADDED,                                  /*!< Profile added event*/ 
+    SERVICE_ADDED,                                  /*!< Service added event*/ 
+    ADV_OBJ_CREATED,                                /*!< Adv object created event*/ 
+    SCAN_OBJ_CREATED,                               /*!< Scan object created event*/ 
+    INIT_OBJ_CREATED,                               /*!< Initiate object created event*/ 
+    ADV_STOPPED,                                    /*!< Adv stopped event*/ 
+    SCAN_STOPPED,                                   /*!< Scan stopped event*/ 
+    INIT_STOPPED,                                   /*!< Initiate stopped event*/ 
+    OBJ_DELETED,                                    /*!< Object deleted event*/ 
+    ADV_REPORT,                                     /*!< Receive adv report event*/ 
 };
-
+/**
+  * @brief Profile IDs.
+  */
 enum prf_id
 {
-    PRF_DIS_SERVER,
-    PRF_MESH,
-    PRF_LS_MESH,
-    PRF_FOTA_SERVER,
-    PRF_HID,
-    PRF_BASS,
+    PRF_DIS_SERVER,                                 /*!< Device information service profile*/ 
+    PRF_MESH,                                       /*!< */ 
+    PRF_LS_MESH,                                    /*!< */ 
+    PRF_FOTA_SERVER,                                /*!< FOTA server service*/ 
+    PRF_HID,                                        /*!< HID profile*/ 
+    PRF_BASS,                                       /*!< Battery service profile*/ 
 };
-
+/**
+  * @brief Profile added event.
+  */
 struct profile_added_evt
 {
-    uint16_t start_hdl;
-    enum prf_id id;
-    
+    uint16_t start_hdl;                             /*!< Start handle of the profile*/ 
+    enum prf_id id;                                 /*!< Profile ID*/ 
 };
-
+/**
+  * @brief Service added event.
+  */
 struct service_added_evt
 {
-    uint16_t start_hdl;
-    uint8_t status;
+    uint16_t start_hdl;                             /*!< Start handle of the Service*/ 
+    uint8_t status;                                 /*!< Status of the service add action*/ 
 };
-
+/**
+  * @brief Object created event.
+  */
 struct obj_created_evt
 {
-    uint8_t handle;
-    uint8_t status;
+    uint8_t handle;                                 /*!< Handle of the created object*/ 
+    uint8_t status;                                 /*!< Status of object create action*/ 
 };
-
+/**
+  * @brief Object created event.
+  */
 struct stopped_evt
 {
-    uint8_t handle;
-    uint8_t reason;
+    uint8_t handle;                                 /*!< Handle of the stopped event*/ 
+    uint8_t reason;                                 /*!< Reason for stopped event*/ 
 };
-
+/**
+  * @brief Object deleted event.
+  */
 struct obj_deleted_evt
 {
-    uint8_t handle;
-    uint8_t status;
+    uint8_t handle;                                 /*!< Handle of the deleted object*/ 
+    uint8_t status;                                 /*!< Status of object delete action*/
 };
-
+/**
+  * @brief Advertising report type.
+  */
+enum adv_report_type
+{
+    REPORT_TYPE_ADV_EXT = 0,                        /*!< Extended advertising report*/ 
+    REPORT_TYPE_ADV_LEG,                            /*!< Legacy advertising report*/ 
+    REPORT_TYPE_SCAN_RSP_EXT,                       /*!< Extended scan response report*/ 
+    REPORT_TYPE_SCAN_RSP_LEG,                       /*!< Legacy scan response report*/ 
+    REPORT_TYPE_PER_ADV,                            /*!< Periodic advertising report*/ 
+};
+/**
+  * @brief Adv report information.
+  */
 struct adv_report_info
 {
-    uint8_t evt_type:3,
-            complete:1,
-            connectable:1,
-            scannable:1,
-            directed:1;    
+    uint8_t evt_type:3,                             /*!< Adv report type. Refer to ::adv_report_type*/ 
+            complete:1,                             /*!< Report is complete*/ 
+            connectable:1,                          /*!< Connectable advertising*/ 
+            scannable:1,                            /*!< Scannable advertising*/ 
+            directed:1;                             /*!< Directed advertising*/ 
 };
-
+/**
+  * @brief Adv report event.
+  */
 struct adv_report_evt
 {
-    uint8_t *data;
-    struct dev_addr *adv_addr;
-    uint16_t length;
-    uint8_t adv_addr_type;
-    int8_t rssi;
-    struct adv_report_info info;
+    uint8_t *data;                                  /*!< Adv data*/ 
+    struct dev_addr *adv_addr;                      /*!< Address of the device send the adv*/ 
+    uint16_t length;                                /*!< Adv report length*/ 
+    uint8_t adv_addr_type;                          /*!< Adv address type*/ 
+    int8_t rssi;                                    /*!< RSSI*/ 
+    struct adv_report_info info;                    /*!< Adv report information*/ 
 };
-
+/**
+  * @brief Device event union.
+  */
 union dev_evt_u
 {
-    struct profile_added_evt profile_added;
-    struct service_added_evt service_added;
-    struct obj_created_evt obj_created;
-    struct stopped_evt stopped;
-    struct obj_deleted_evt deleted;
-    struct adv_report_evt adv_report;
+    struct profile_added_evt profile_added;         /*!< Profile added event*/ 
+    struct service_added_evt service_added;         /*!< Service added event*/ 
+    struct obj_created_evt obj_created;             /*!< Object created event*/ 
+    struct stopped_evt stopped;                     /*!< Stopped event*/ 
+    struct obj_deleted_evt deleted;                 /*!< Object deleted event*/ 
+    struct adv_report_evt adv_report;               /*!< Adv report event*/ 
 };
-
+/**
+  * @brief BLE Stack configuration.
+  */
 struct ble_stack_cfg
 {
-    bool private_addr;
-    bool controller_privacy;
+    bool private_addr;                              /*!< Identity address type. 0: Public 1: Random*/ 
+    bool controller_privacy;                        /*!< Indicate if controller privacy is enabled*/ 
 };
 /**
   * @brief Length of UUID
   */
 enum uuid_length
 {
-    UUID_LEN_16BIT = 0,                  /*!< 16bits UUID*/
-    UUID_LEN_32BIT,                      /*!< 32bits UUID*/
-    UUID_LEN_128BIT,                     /*!< 128bits UUID*/
+    UUID_LEN_16BIT = 0,                             /*!< 16bits UUID*/
+    UUID_LEN_32BIT,                                 /*!< 32bits UUID*/
+    UUID_LEN_128BIT,                                /*!< 128bits UUID*/
 };
-
+/**
+  * @brief Characteristics properities.
+  */
 struct char_properties
 {
-    uint8_t broadcast:1,
-            rd_en:1,
-            wr_cmd:1,
-            wr_req:1,
-            ntf_en:1,
-            ind_en:1,            
-            wr_signed:1,
-            ext_prop:1;
+    uint8_t broadcast:1,                            /*!< Broadcast of characteristic value in Server Characteristic Configuration Descriptor enable*/
+            rd_en:1,                                /*!< Read request enable*/
+            wr_cmd:1,                               /*!< Write command enable*/
+            wr_req:1,                               /*!< Write request enable*/
+            ntf_en:1,                               /*!< Notification enable*/
+            ind_en:1,                               /*!< Indication enable*/
+            wr_signed:1,                            /*!< Write signed enable*/
+            ext_prop:1;                             /*!< Extended properities enable*/
 };
-
+/**
+  * @brief Service and attribute permissions definition.
+  */
+enum svc_att_perm
+{
+    PERM_NO_AUTH = 0,                           /*!< NON Authenticated*/
+    PERM_UNAUTH,                                /*!< Unauthenticated*/
+    PERM_AUTH,                                  /*!< Authenticated*/
+    PERM_SEC_CON,                               /*!< Security connection*/
+};
+/**
+  * @brief Characteristics permissions
+  */
 struct char_permissions
 {
-    uint8_t rd_perm:2,
-            wr_perm:2,
-            ind_perm:2,
-            ntf_perm:2;
+    uint8_t rd_perm:2,                              /*!< Read permission. Refer to ::svc_att_perm*/
+            wr_perm:2,                              /*!< Write permission. Refer to ::svc_att_perm*/
+            ind_perm:2,                             /*!< Indication permission. Refer to ::svc_att_perm*/
+            ntf_perm:2;                             /*!< Notification permission. Refer to ::svc_att_perm*/
 };
-
+/**
+  * @brief Attribute declaration.
+  */
 struct att_decl
 {
-    const uint8_t *uuid;
+    const uint8_t *uuid;                            /*!< UUID of the attribute*/
     struct{
-        uint16_t max_len:12,
-                eks:1,
-                uuid_len:2,
-                read_indication:1;        
+        uint16_t max_len:12,                        /*!< Maximum length supported by the attribute in units of byte*/
+                eks:1,                              /*!< 1 means Encryption key Size must be 16 bytes*/
+                uuid_len:2,                         /*!< Length of UUID. Refer to ::uuid_length*/
+                read_indication:1;                  /*!< Trigger Read Indication. 0 means data in database, 1 means read request will be forwarded to application*/
     }s;
-    struct char_permissions char_perm;
-    struct char_properties char_prop; 
+    struct char_permissions char_perm;              /*!< Characteristic permission*/
+    struct char_properties char_prop;               /*!< Characteristic properties*/
 };
-
+/**
+  * @brief Service declaration.
+  */
 struct svc_decl
 {
-    const uint8_t *uuid;
-    struct att_decl *att;
-    uint8_t nb_att;
-    uint8_t    sec_lvl:2,
-            uuid_len:2,
-            secondary:1;
+    const uint8_t *uuid;                            /*!< UUID of the service*/
+    struct att_decl *att;                           /*!< Attributes contained in the services*/
+    uint8_t nb_att;                                 /*!< Number of attributes contained in the services*/
+    uint8_t    sec_lvl:2,                           /*!< Security level. Refer to ::svc_att_perm*/
+            uuid_len:2,                             /*!< Length of UUID. Refer to ::uuid_length*/
+            secondary:1;                            /*!< 0 = Primary Service, 1 = Secondary Service*/
 };
-
+/**
+  * @brief GAP event types enumeration.
+  */
 enum gap_evt_type
 {
-    CONNECTED,
-    DISCONNECTED,
-    CONN_PARAM_REQ,
-    CONN_PARAM_UPDATED,
-    MASTER_PAIR_REQ,
-    SLAVE_SECURITY_REQ,
-    PAIR_DONE,
-    ENCRYPT_FAIL,
-    ENCRYPT_DONE,
-    DISPLAY_PASSKEY,
-    REQUEST_PASSKEY,
-    NUMERIC_COMPARE,
-    REQUEST_LEGACY_OOB,
-    REQUEST_SC_OOB,
-    GET_DEV_INFO_DEV_NAME,
-    GET_DEV_INFO_APPEARANCE,
-    GET_DEV_INFO_SLV_PRE_PARAM,
-    GET_DEV_INFO_PEER_RSSI,
+    CONNECTED,                                      /*!< Connected event*/
+    DISCONNECTED,                                   /*!< Disconnected event*/
+    CONN_PARAM_REQ,                                 /*!< Connection parameter request event*/
+    CONN_PARAM_UPDATED,                             /*!< Connection parameter updated event*/
+    MASTER_PAIR_REQ,                                /*!< Master pair request event*/
+    SLAVE_SECURITY_REQ,                             /*!< Slave security request event*/
+    PAIR_DONE,                                      /*!< Pair done event*/
+    ENCRYPT_FAIL,                                   /*!< Encryption fail event*/
+    ENCRYPT_DONE,                                   /*!< Encryption done event*/
+    DISPLAY_PASSKEY,                                /*!< Display passkey event*/
+    REQUEST_PASSKEY,                                /*!< Request passkey event*/
+    NUMERIC_COMPARE,                                /*!< Numeric compare event*/
+    REQUEST_LEGACY_OOB,                             /*!< Request legacy OOB event*/
+    REQUEST_SC_OOB,                                 /*!< Request security connection event*/
+    GET_DEV_INFO_DEV_NAME,                          /*!< Get device name of device information*/
+    GET_DEV_INFO_APPEARANCE,                        /*!< Get appearance Icon of device information*/
+    GET_DEV_INFO_SLV_PRE_PARAM,                     /*!< Get slave preferred parameters of device information*/
+    GET_DEV_INFO_PEER_RSSI,                         /*!< Get connection RSSI indication*/
 };
+/**
+  * @brief BLE roles enumeration.
+  */
 enum LS_BLE_ROLE
 {
-    LS_BLE_ROLE_MASTER,
-    LS_BLE_ROLE_SLAVE,
+    LS_BLE_ROLE_MASTER,                             /*!< Role of master*/
+    LS_BLE_ROLE_SLAVE,                              /*!< Role of slave*/
 };
+/**
+  * @brief Connection parameters structure.
+  */
 struct gap_conn_param
 {
-    /// Connection interval minimum
-    uint16_t intv_min;
-    /// Connection interval maximum
-    uint16_t intv_max;
-    /// Latency
-    uint16_t latency;
-    /// Supervision timeout
-    uint16_t time_out;
+    uint16_t intv_min;                              /*!< Connection interval minimum*/
+    uint16_t intv_max;                              /*!< Connection interval maximum*/
+    uint16_t latency;                               /*!< Latency*/
+    uint16_t time_out;                              /*!< Supervision timeout*/
 };
-
+/**
+  * @brief Connection parameters request.
+  */
 struct gap_conn_param_req
 {
-    struct gap_conn_param const *conn_param;
-    bool *accept;
+    struct gap_conn_param const *conn_param;        /*!< Connection parameters received*/
+    bool *accept;                                   /*!< True = accept, False = reject*/
 };
-
+/**
+  * @brief Connection parameters updated indication.
+  */
 struct gap_conn_param_updated
 {
-    ///Connection interval value
-    uint16_t            con_interval;
-    ///Connection latency value
-    uint16_t            con_latency;
-    ///Supervision timeout
-    uint16_t            sup_to;
+    uint16_t            con_interval;               /*!< Connection interval value*/
+    uint16_t            con_latency;                /*!< Connection latency value*/
+    uint16_t            sup_to;                     /*!< Supervision timeout*/
 };
 /**
   * @brief SEC OOB value.
@@ -411,6 +471,29 @@ struct gap_sc_oob
 {
     uint8_t conf[BLE_KEY_LEN];              /*!< Confirm Value*/
     uint8_t rand[BLE_KEY_LEN];              /*!< Random Number*/
+};
+/**
+  * @brief Slave Authentication mask.
+  */
+enum gap_slave_auth_mask
+{
+    GAP_SLAVE_AUTH_NONE           = 0,                   /*!< No Flag set*/
+    GAP_SLAVE_AUTH_BOND           = (1 << 0),            /*!< Bond authentication*/
+    GAP_SLAVE_AUTH_MITM           = (1 << 2),            /*!< Man In the middle protection*/
+    GAP_SLAVE_AUTH_SEC_CON        = (1 << 3),            /*!< Secure Connection*/
+    GAP_SLAVE_AUTH_KEY_NOTIF      = (1 << 4)             /*!< Key Notification*/
+};
+/**
+  * @brief Slave Authentication Requirements.
+  */
+enum gap_slave_auth
+{
+    GAP_SLAVE_AUTH_REQ_NO_MITM_NO_BOND  = (GAP_SLAVE_AUTH_NONE),                                                    /*!< No MITM No Bonding*/
+    GAP_SLAVE_AUTH_REQ_NO_MITM_BOND     = (GAP_SLAVE_AUTH_BOND),                                                    /*!< No MITM Bonding*/
+    GAP_SLAVE_AUTH_REQ_MITM_NO_BOND     = (GAP_SLAVE_AUTH_MITM),                                                    /*!< MITM No Bonding*/
+    GAP_SLAVE_AUTH_REQ_MITM_BOND        = (GAP_SLAVE_AUTH_MITM | GAP_SLAVE_AUTH_BOND),                              /*!< MITM and Bonding*/
+    GAP_SLAVE_AUTH_REQ_SEC_CON_NO_BOND  = (GAP_SLAVE_AUTH_SEC_CON | GAP_SLAVE_AUTH_MITM),                           /*!< SEC_CON and No Bonding*/
+    GAP_SLAVE_AUTH_REQ_SEC_CON_BOND     = (GAP_SLAVE_AUTH_SEC_CON | GAP_SLAVE_AUTH_MITM | GAP_SLAVE_AUTH_BOND),     /*!< SEC_CON and Bonding*/
 };
 /**
   * @brief Defgroup BLE_GAP_IO_CAPS GAP IO Capabilities.
@@ -464,57 +547,51 @@ struct pair_feature
     uint8_t ikey_dist;                      /*!< Set the initial key distribution, This parameter can be a value of @ref gap_key_dist*/
     uint8_t rkey_dist;                      /*!< Set the response key distribution, This parameter can be a value of @ref gap_key_dist*/
 };
-
+/**
+  * @brief Connected indication event structure.
+  */
 struct gap_connected
 {
-    uint16_t con_interval;
-    uint16_t con_latency;
-    uint16_t sup_to;
-    uint8_t peer_id;
+    uint16_t con_interval;                  /*!< Connection interval*/
+    uint16_t con_latency;                   /*!< Latency*/
+    uint16_t sup_to;                        /*!< Supervision timeout*/
+    uint8_t peer_id;                        /*!< Peer ID*/
+};
+/**
+  * @brief Disconnected indication event structure.
+  */
+struct gap_disconnected
+{
+    uint8_t reason;                         /*!< Reason for disconnection*/
 };
 
-struct gap_disconnected
+struct gap_master_pair_req
+{
+    uint8_t auth;
+};
+
+struct gap_slave_security_req
+{
+    uint8_t auth;
+};
+
+struct gap_pair_done
+{
+    bool succeed;
+    union{
+        uint8_t auth;
+        uint8_t fail_reason;
+    }u;
+};
+
+struct gap_encrypt_fail
 {
     uint8_t reason;
 };
-/**
-  * @brief Set master security parameter.
-  */
-struct gap_master_pair_req
-{
-    uint8_t auth;                           /*!< Set the auth, This parameter can be a value of @ref gap_pair_auth*/
-};
-/**
-  * @brief Set slave security parameter.
-  */
-struct gap_slave_security_req
-{
-    uint8_t auth;                           /*!< Set the auth, This parameter can be a value of @ref gap_pair_auth*/
-};
-/**
-  * @brief Parameter of pairing completion.
-  */
-struct gap_pair_done
-{
-    bool succeed;                          /*!< The value indicates a successful pairing,Successful pairing is "true" and unsuccessful pairing is "false"*/
-    union{
-        uint8_t auth;                      /*!< Pairing level achieved, This parameter can be a value of @ref gap_pair_auth*/
-        uint8_t fail_reason;               /*!< The reasons for the failure of the pairing*/
-    }u;
-};
-/**
-  * @brief Failed to encrypt the parameter.
-  */
-struct gap_encrypt_fail
-{
-    uint8_t reason;                        /*!< The reason for encryption failure*/
-};
-/**
-  * @brief Encryption completed security parameters.
-  */
+
 struct gap_encrypt_done
 {
-    uint8_t auth;                          /*!< Pairing level achieved, This parameter can be a value of @ref gap_pair_auth*/
+    uint8_t auth;
 };
 
 struct gap_pin_str
@@ -522,79 +599,85 @@ struct gap_pin_str
     char pin[6];
     char str_pad;
 };
-/**
-  * @brief SEC passkey entry value.
-  */
+
 struct gap_display_passkey
 {
-    struct gap_pin_str passkey;              /**< Passkey entry value (000000~999999),This parameter can be a value of @ref gap_pin_str */
+    struct gap_pin_str passkey;
 };
-/**
-  * @brief SEC number comparison value.
-  */
+
 struct gap_numeric_compare
 {
-    struct gap_pin_str number;              /**< Number comparison value (000000~999999),This parameter can be a value of @ref gap_pin_str */
+    struct gap_pin_str number;
 };
 
+/**
+  * @brief Get device name.
+  */
 struct gap_dev_info_dev_name
 {
-    uint16_t length;
-    uint8_t* value;
-};
-
-struct gap_dev_info_appearance
-{
-    uint16_t appearance;
-};
-
-struct gap_dev_info_slave_pref_param
-{
-    uint16_t con_intv_min;
-    uint16_t con_intv_max;
-    uint16_t slave_latency;
-    uint16_t conn_timeout;
+    uint16_t length;                                /*!< Length of device name*/
+    uint8_t* value;                                 /*!< Pointer to device name*/
 };
 /**
-  * @brief The RSSI value of the current connection.
+  * @brief Get appearance.
   */
+struct gap_dev_info_appearance
+{
+    uint16_t appearance;                            /*!< Device appearance icon*/
+};
+/**
+  * @brief Get slave preferred parameters.
+  */
+struct gap_dev_info_slave_pref_param
+{
+    uint16_t con_intv_min;                          /*!< Minimum connection interval*/
+    uint16_t con_intv_max;                          /*!< Maximum connection interval*/
+    uint16_t slave_latency;                         /*!< Slave latency*/
+    uint16_t conn_timeout;                          /*!< Supervision timeout*/
+};
 struct gap_dev_info_peer_rssi
 {
-    int8_t rssi;                            /**< The RSSI value of the current connection(master or slave) */
+    int8_t rssi;
 };
-
+/**
+  * @brief GAP event union definition.
+  */
 union gap_evt_u
 {
-    struct gap_connected connected;
-    struct gap_disconnected disconnected;
-    struct gap_conn_param_req conn_param_req;
-    struct gap_conn_param_updated conn_param_updated;
-    struct gap_master_pair_req master_pair_req;
-    struct gap_slave_security_req slave_security_req;
-    struct gap_pair_done pair_done;
-    struct gap_encrypt_fail encrypt_fail;
-    struct gap_encrypt_done encrypt_done;
-    struct gap_display_passkey display_passkey;
-    struct gap_numeric_compare numeric_compare;
-    struct gap_dev_info_dev_name get_dev_name;
-    struct gap_dev_info_appearance get_appearance;
-    struct gap_dev_info_slave_pref_param slv_pref_param;
-    struct gap_dev_info_peer_rssi peer_rssi;
+    struct gap_connected connected;                            /*!< Connected event*/
+    struct gap_disconnected disconnected;                      /*!< Disconnected event*/
+    struct gap_conn_param_req conn_param_req;                  /*!< Connection parameter request event*/
+    struct gap_conn_param_updated conn_param_updated;          /*!< Connection parameter updated event*/
+    struct gap_master_pair_req master_pair_req;                /*!< Master pair request event*/
+    struct gap_slave_security_req slave_security_req;          /*!< Slave security request event*/
+    struct gap_pair_done pair_done;                            /*!< Pair done event*/
+    struct gap_encrypt_fail encrypt_fail;                      /*!< Encryption fail event*/
+    struct gap_encrypt_done encrypt_done;                      /*!< Encryption done event*/
+    struct gap_display_passkey display_passkey;                /*!< Display passkey event*/
+    struct gap_numeric_compare numeric_compare;                /*!< Numeric comparison event*/
+    struct gap_dev_info_dev_name get_dev_name;                 /*!< Get device name*/
+    struct gap_dev_info_appearance get_appearance;             /*!< Get Get appearance*/
+    struct gap_dev_info_slave_pref_param slv_pref_param;       /*!< Get slave preferred parameters*/
+    struct gap_dev_info_peer_rssi peer_rssi;                   /*!< Get RSSI value of the current connection*/
 };
-
+/**
+  * @brief Connection parameter update.
+  */
 struct gap_update_conn_param
 {
-    uint16_t intv_min;
-    uint16_t intv_max;
-    uint16_t latency;
-    uint16_t sup_timeout;
-    uint16_t ce_len_min;
-    uint16_t ce_len_max;
+    uint16_t intv_min;                                         /*!< Mininum connection interval*/
+    uint16_t intv_max;                                         /*!< Maximum connection interval*/
+    uint16_t latency;                                          /*!< Latency*/
+    uint16_t sup_timeout;                                      /*!< Supervision timeout*/
+    uint16_t ce_len_min;                                       /*!< Mininum connection event length*/
+    uint16_t ce_len_max;                                       /*!< Maximum connection event length*/
 };
-
+/**
+  * @brief Set packet size in air.
+  */
 struct gap_set_pkt_size
 {
-    uint16_t pkt_size;
+    uint16_t pkt_size;                                         /*!< Packet size in bytes*/
 };
 
 /**
@@ -789,57 +872,256 @@ union gatt_evt_u
     struct gatt_write_no_rsp client_write_no_rsp;                                        /*!< GATT client write command response.*/
 };
 
+/**
+ ****************************************************************************************
+ * \brief Packing function for advertising data and scan response.
+ * Arguments passed to the function must follow the sequence of adv_type/data_buf/length.
+ * \param[in]  buf                Buffer contains packed data.
+ * \param[in]  field_nums         Number of adv data or scan response types.
+ * \return                        Packed data length in bytes.
+ ****************************************************************************************
+ */
 uint8_t *adv_data_pack(uint8_t *buf,uint8_t field_nums,...);
 #define ADV_DATA_PACK(buf,field_nums,...) (adv_data_pack((buf),(field_nums),__VA_ARGS__) - (buf))
 
+/**
+ ****************************************************************************************
+ * \brief Function for BLE initialization.
+ * 
+ ****************************************************************************************
+ */
 void ble_init(void);
-
+/**
+ ****************************************************************************************
+ * \brief Function for BLE event handling with an internal infinite loop.
+ * Any function behind ble_loop will never be executed.
+ * 
+ ****************************************************************************************
+ */
 void ble_loop(void);
-
+/**
+ ****************************************************************************************
+ * \brief Initialization of dev_manager.
+ * 
+ * \param[in]  cb                Callback function to handle all the dev_manager messages.
+ ****************************************************************************************
+ */
 void dev_manager_init(void (*cb)(enum dev_evt_type,union dev_evt_u *));
-
+/**
+ ****************************************************************************************
+ * \brief Initialization of dev_manager stack.
+ * 
+ * \param[in]  cfg               BLE stack configuration.
+ ****************************************************************************************
+ */
 void dev_manager_stack_init(struct ble_stack_cfg *cfg);
-
+/**
+ ****************************************************************************************
+ * \brief Initialization of dev_manager stack.
+ * 
+ * \param[out]  addr                 Pointer to identity address.
+ * \param[out]  random               Indicate if identity address is a public (False) or 
+ *                                   static private random (True) address.
+ ****************************************************************************************
+ */
 void dev_manager_get_identity_bdaddr(uint8_t *addr,bool *random);
-
+/**
+ ****************************************************************************************
+ * \brief Add service.
+ * 
+ * \param[in]   svc                 Pointer to service to added.
+ *
+ ****************************************************************************************
+ */
 void dev_manager_add_service(struct svc_decl *svc);
-
+/**
+ ****************************************************************************************
+ * \brief Set value for specified attribute.
+ * 
+ * \param[in]   handle              Attribute handle.
+ * \param[in]   length              Length of the value.
+ * \param[in]   value               Pointer to value to set.
+ * 
+ ****************************************************************************************
+ */
 uint8_t dev_manager_svc_set_value(uint16_t handle, uint16_t length, uint8_t *value);
-
+/**
+ ****************************************************************************************
+ * \brief Get value for specified attribute.
+ * 
+ * \param[in]   handle              Attribute handle.
+ * \param[out]  length              Length of the value.
+ * \param[out]  value               Pointer to value to get.
+ * 
+ ****************************************************************************************
+ */
 uint8_t dev_manager_svc_get_value(uint16_t handle, uint8_t *value, uint16_t *length);
-
+/**
+ ****************************************************************************************
+ * \brief Create legacy adv object.
+ * 
+ * \param[in]   p_param             Parameter for legacy adv object.
+ *
+ ****************************************************************************************
+ */
 void dev_manager_create_legacy_adv_object(struct legacy_adv_obj_param *p_param);
-
+/**
+ ****************************************************************************************
+ * \brief Create extended adv object.
+ * 
+ * \param[in]   p_param             Parameter for extended adv object.
+ *
+ ****************************************************************************************
+ */
 void dev_manager_create_ext_adv_object(struct ext_adv_obj_param *p_param);
-
+/**
+ ****************************************************************************************
+ * \brief Create scan object.
+ * 
+ * \param[in]   own_addr_type       Parameter for scan object.
+ *
+ ****************************************************************************************
+ */
 void dev_manager_create_scan_object(enum gap_own_addr_type own_addr_type);
-
+/**
+ ****************************************************************************************
+ * \brief Create initiate object.
+ * 
+ * \param[in]   own_addr_type       Own address type.
+ *
+ ****************************************************************************************
+ */
 void dev_manager_create_init_object(enum gap_own_addr_type own_addr_type);
-
+/**
+ ****************************************************************************************
+ * \brief Start advertising.
+ * 
+ * \param[in]   adv_handle                 Handle of adv object.
+ * \param[in]   adv_data                   Adv data.
+ * \param[in]   adv_data_length            Length of adv data.
+ * \param[in]   scan_rsp_data              Scan response data.
+ * \param[in]   scan_rsp_data_length       Length of Scan response data.
+ *
+ ****************************************************************************************
+ */
 void dev_manager_start_adv(uint8_t adv_handle,uint8_t *adv_data,uint8_t adv_data_length,uint8_t *scan_rsp_data,uint8_t scan_rsp_data_length);
-
+/**
+ ****************************************************************************************
+ * \brief Set duration of adv.
+ * 
+ * \param[in]   duration       Duration of adv activity(in unit of 10ms). 0 means that 
+ *                             advertising continues until the application disable it.
+ *
+ ****************************************************************************************
+ */
 void dev_manager_set_adv_duration(uint16_t duration);
-
+/**
+ ****************************************************************************************
+ * \brief Update advertising data or scan response data.
+ * 
+ * \param[in]   adv_handle                 Handle of adv object.
+ * \param[in]   adv_data                   Adv data.
+ * \param[in]   adv_data_length            Length of adv data.
+ * \param[in]   scan_rsp_data              Scan response data.
+ * \param[in]   scan_rsp_data_length       Length of Scan response data.
+ *
+ ****************************************************************************************
+ */
 void dev_manager_update_adv_data(uint8_t adv_handle,uint8_t *adv_data,uint8_t adv_data_length,uint8_t *scan_rsp_data,uint8_t scan_rsp_data_length);
-
+/**
+ ****************************************************************************************
+ * \brief Stop advertising.
+ * 
+ * \param[in]   adv_handle                 Handle of adv object.
+ *
+ ****************************************************************************************
+ */
 void dev_manager_stop_adv(uint8_t adv_handle);
-
+/**
+ ****************************************************************************************
+ * \brief Start scan.
+ * 
+ * \param[in]   p_param            Parameter for scan object.
+ * 
+ ****************************************************************************************
+ */
 void dev_manager_start_scan(uint8_t scan_handle, struct start_scan_param * param);
-
+/**
+ ****************************************************************************************
+ * \brief Stop scan.
+ * 
+ * \param[in]   scan_handle        Handle of scan object.
+ *
+ ****************************************************************************************
+ */
 void dev_manager_stop_scan(uint8_t scan_handle);
-
+/**
+ ****************************************************************************************
+ * \brief Start initiate.
+ * 
+ * \param[in]   init_handle         Handle of init object.
+ * \param[in]   p_param             Parameter for init object.
+ *
+ ****************************************************************************************
+ */
 void dev_manager_start_init(uint8_t init_handle, struct start_init_param * param);
-
+/**
+ ****************************************************************************************
+ * \brief Stop initiate.
+ * 
+ * \param[in]   init_handle         Handle of init object.
+ *
+ ****************************************************************************************
+ */
 void dev_manager_stop_init(uint8_t init_handle);
-
+/**
+ ****************************************************************************************
+ * \brief Delete activity.
+ * 
+ * \param[in]   obj_hdl             Handle of object to delete.
+ *
+ ****************************************************************************************
+ */
 void dev_manager_delete_activity(uint8_t obj_hdl);
-
+/**
+ ****************************************************************************************
+ * \brief Set mac address.
+ * 
+ * \param[in]   addr                Pointer to mac address to set.
+ *
+ ****************************************************************************************
+ */
 void dev_manager_set_mac_addr(uint8_t *addr);
-
+/**
+ ****************************************************************************************
+ * \brief Update adv interval. The new intervals will not be applied until the adv activity
+ *        is restarted.
+ * \param[in]  adv_handle         Handle of the adv activity to be updated.
+ * \param[in]  new_intv_min       Minimum new adv interval.
+ * \param[in]  new_intv_max       Maxmium new adv interval.
+ * \return                        Status of updating. 0 means NO_ERROR, otherwise means invalid
+ *                                handle of adv.
+ ****************************************************************************************
+ */
 uint8_t dev_manager_update_adv_interval(uint8_t adv_handle, uint32_t new_intv_min, uint32_t new_intv_max);
-
+/**
+ ****************************************************************************************
+ * \brief Initialization of gap_manager.
+ * 
+ * \param[in]  evt_cb             Callback function to handle all the gap_manager messages.
+ * 
+ ****************************************************************************************
+ */
 void gap_manager_init(void (*evt_cb)(enum gap_evt_type,union gap_evt_u *,uint8_t));
-
+/**
+ ****************************************************************************************
+ * \brief Disconnect specified connection.
+ * 
+ * \param[in]  con_idx            Connection ID number to disconnect.
+ * \param[in]  reason             Reason to disconnect.
+ * 
+ ****************************************************************************************
+ */
 void gap_manager_disconnect(uint8_t con_idx,uint8_t reason);
 /**
  ****************************************************************************************
@@ -863,7 +1145,7 @@ void gap_manager_master_encrypt(uint8_t con_idx);
  * \brief Initiate an encryption request from the slave. 
  * 
  * \param[in]  con_idx           Connection ID number.
- * \param[in]  auth              SEC Auth param, This parameter can be a value of @ref gap_slave_security_req
+ * \param[in]  auth              SEC Auth param, This parameter can be a value of @ref gap_slave_auth
  ****************************************************************************************
  */
 void gap_manager_slave_security_req(uint8_t con_idx, uint8_t auth);
@@ -914,7 +1196,15 @@ void gap_manager_sc_oob_set(uint8_t con_idx,struct gap_sc_oob *sc_oob);
  ****************************************************************************************
  */
 void gap_manager_tk_set(uint8_t con_idx,uint8_t key[BLE_KEY_LEN]);
-
+/**
+ ****************************************************************************************
+ * \brief Gets the role of the specified connection. 
+ * 
+ * \param[in]  con_idx           Connection ID number.
+ * \return                       Role of the connection. Refer to ::LS_BLE_ROLE.
+ * 
+ ****************************************************************************************
+ */
 uint8_t gap_manager_get_role(uint8_t con_idx);
 /**
  ****************************************************************************************
@@ -925,13 +1215,45 @@ uint8_t gap_manager_get_role(uint8_t con_idx);
  ****************************************************************************************
  */
 uint8_t gap_manager_get_sec_lvl(uint8_t con_idx);
-
-void gap_manager_get_peer_addr(uint8_t conidx,struct ble_addr *addr);
-
+/**
+ ****************************************************************************************
+ * \brief Gets the peer device address. 
+ * 
+ * \param[in]  con_idx           Connection ID number.
+ * \param[out] addr              Pointer to address.
+ * 
+ ****************************************************************************************
+ */
+void gap_manager_get_peer_addr(uint8_t con_idx,struct ble_addr *addr);
+/**
+ ****************************************************************************************
+ * \brief Gets peer identity device address. 
+ * 
+ * \param[in]  peer_id           Pairing ID number.
+ * \param[out] addr              Pointer to address.
+ * 
+ ****************************************************************************************
+ */
 void gap_manager_get_identity_addr(uint8_t peer_id,struct ble_addr *addr);
-
+/**
+ ****************************************************************************************
+ * \brief Update parameter for specified connection. 
+ * 
+ * \param[in]  con_idx           Connection ID number.
+ * \param[in]  p_param           Pointer to parameter to update.
+ * 
+ ****************************************************************************************
+ */
 void gap_manager_update_conn_param(uint8_t con_idx,struct gap_update_conn_param *p_param);
-
+/**
+ ****************************************************************************************
+ * \brief Update packet size in air for specified connection. 
+ * 
+ * \param[in]  con_idx           Connection ID number.
+ * \param[in]  p_param           Pointer to packet size parameter to set.
+ * 
+ ****************************************************************************************
+ */
 void gap_manager_set_pkt_size(uint8_t con_idx, struct gap_set_pkt_size *p_param);
 /**
  ****************************************************************************************
