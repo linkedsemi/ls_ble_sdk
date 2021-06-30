@@ -565,49 +565,66 @@ struct gap_disconnected
     uint8_t reason;                         /*!< Reason for disconnection*/
 };
 
+/**
+  * @brief Set master security parameter.
+  */
 struct gap_master_pair_req
 {
-    uint8_t auth;
+    uint8_t auth;                           /*!< Set the auth, This parameter can be a value of @ref gap_pair_auth*/
 };
-
+/**
+  * @brief Set slave security parameter.
+  */
 struct gap_slave_security_req
 {
-    uint8_t auth;
+    uint8_t auth;                           /*!< Set the auth, This parameter can be a value of @ref gap_pair_auth*/
 };
-
+/**
+  * @brief Parameter of pairing completion.
+  */
 struct gap_pair_done
 {
-    bool succeed;
+    bool succeed;                          /*!< The value indicates a successful pairing,Successful pairing is "true" and unsuccessful pairing is "false"*/
     union{
-        uint8_t auth;
-        uint8_t fail_reason;
+        uint8_t auth;                      /*!< Pairing level achieved, This parameter can be a value of @ref gap_pair_auth*/
+        uint8_t fail_reason;               /*!< The reasons for the failure of the pairing*/
     }u;
 };
-
+/**
+  * @brief Failed to encrypt the parameter.
+  */
 struct gap_encrypt_fail
 {
-    uint8_t reason;
+    uint8_t reason;                        /*!< The reason for encryption failure*/
 };
-
+/**
+  * @brief Encryption completed security parameters.
+  */
 struct gap_encrypt_done
 {
-    uint8_t auth;
+    uint8_t auth;                          /*!< Pairing level achieved, This parameter can be a value of @ref gap_pair_auth*/
 };
-
+/**
+  * @brief Passkey structure.
+  */
 struct gap_pin_str
 {
-    char pin[6];
-    char str_pad;
+    char pin[6];                           /*!< 6 decimal numbers as passkey*/
+    char str_pad;                          /*!< The byte behind pin used to store '\0'*/
 };
-
+/**
+  * @brief SEC passkey entry value.
+  */
 struct gap_display_passkey
 {
-    struct gap_pin_str passkey;
+    struct gap_pin_str passkey;              /**< Passkey entry value (000000~999999),This parameter can be a value of @ref gap_pin_str */
 };
-
+/**
+  * @brief SEC number comparison value.
+  */
 struct gap_numeric_compare
 {
-    struct gap_pin_str number;
+    struct gap_pin_str number;              /**< Number comparison value (000000~999999),This parameter can be a value of @ref gap_pin_str */
 };
 
 /**
@@ -635,9 +652,12 @@ struct gap_dev_info_slave_pref_param
     uint16_t slave_latency;                         /*!< Slave latency*/
     uint16_t conn_timeout;                          /*!< Supervision timeout*/
 };
+/**
+  * @brief The RSSI value of the current connection.
+  */
 struct gap_dev_info_peer_rssi
 {
-    int8_t rssi;
+    int8_t rssi;                            /**< The RSSI value of the current connection(master or slave) */
 };
 /**
   * @brief GAP event union definition.
