@@ -45,4 +45,9 @@ void HAL_TRNG_IRQHandler(void);
  */
 void HAL_TRNG_ReadyDataCallback(uint32_t random32bit);
 
+/** @}*/
+
+
+/** @}*/
+
 #endif

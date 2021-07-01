@@ -31,5 +31,10 @@ HAL_StatusTypeDef HAL_IWDG_Init(uint32_t LoadValue);
  */
 HAL_StatusTypeDef HAL_IWDG_Refresh(void);
 
+/** @}*/
+
+
+/** @}*/
+
 #endif 
 
