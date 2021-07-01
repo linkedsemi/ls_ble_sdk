@@ -14,4 +14,4 @@ PERIPHERAL API
     lsi2c
     lstrng
     lsiwdg
-    
+    lstimer
