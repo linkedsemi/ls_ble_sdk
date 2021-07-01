@@ -1,19 +1,22 @@
 TIMER 使用实例
 ==================
-例程路径：<install_file>/dev/examples/timer_test
 
 测试例程说明：
 ----------------
-#. 本例程演示了Timer相关比较常用到的4种场景，包括基本的定时功能、四个通道输出PWM、带死区嵌入的互补PWM波形输出以及输入捕获的功能。
+SDK提供了Timer常用到的4种场景：
 
-#. 例程中通过 ``TEST_CASE`` 宏来控制测试上述四个场景中的其中一种
+多通道输出PWM：<install_file>/dev/examples/peripheral/timer/Basic_PWM
+
+基本定时功能：<install_file>/dev/examples/peripheral/timer/Basic_TIM
+
+带死区嵌入的互补PWM输出：<install_file>/dev/examples/peripheral/timer/DTC_PWM
+
+输入捕获功能：<install_file>/dev/examples/peripheral/timer/Input_Capture
 
 多通道输出PWM
 >>>>>>>>>>>>>>>
 
 该例程演示了LSGPTIMB的四个通道输出PWM波形,频率4KHz，占空比不一样
-
-#. 将 ``TEST_CASE`` 宏写0，打开多通道输出PWM的功能
 
 #. 将编译出来的程序烧录到芯片中，运行程序
 
@@ -28,8 +31,6 @@ TIMER 使用实例
 
 该例程演示了基本定时器的功能，每250us会上一次定时器中断，我们在中断里面翻转了PA00 IO
 
-#. 将 ``TEST_CASE`` 宏写1，打开基本定时的测试功能
-
 #. 将编译出来的程序烧录到芯片中，运行程序
 
 #. 将芯片的PA00 IO接到逻辑分析仪或者示波器
@@ -40,8 +41,6 @@ TIMER 使用实例
 
 带死区嵌入的互补输出
 >>>>>>>>>>>>>>>>>>>>
-
-#. 将 ``TEST_CASE`` 宏写2，打开带死区嵌入的互补输出的测试功能
 
 #. 将编译出来的程序烧录到芯片中，运行程序
 
@@ -55,8 +54,6 @@ TIMER 使用实例
 >>>>>>>>>>>>>>>>>>
 
 该例程中我们选用的是LSGPTIMC的CH1,使用PA00这个GPIO来测量信号的脉宽，测试模块上PA00接一个按键，接到VDD，当按键按下的时候IO口会被拉高，这个时候我们可以利用定时器的输入捕获功能来测量按键按下的这段高电平的时间。另外按键按下和松开的时候也会Toggle PA01 GPIO.
-
-#. 将 ``TEST_CASE`` 宏写3，打开输入捕获的测试功能
 
 #. 将编译出来的程序烧录到芯片中，运行程序
 
