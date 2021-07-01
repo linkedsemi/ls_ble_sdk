@@ -14,4 +14,5 @@
    pdm_example
    spi_example
    ble_uart_server
+   ble_single_role
    crypt_example
