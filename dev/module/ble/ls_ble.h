@@ -1061,7 +1061,8 @@ void dev_manager_stop_adv(uint8_t adv_handle);
  ****************************************************************************************
  * \brief Start scan.
  * 
- * \param[in]   p_param            Parameter for scan object.
+ * \param[in]   scan_handle        Handle of scan object.
+ * \param[in]   param            Parameter for scan object.
  * 
  ****************************************************************************************
  */
@@ -1080,7 +1081,7 @@ void dev_manager_stop_scan(uint8_t scan_handle);
  * \brief Start initiate.
  * 
  * \param[in]   init_handle         Handle of init object.
- * \param[in]   p_param             Parameter for init object.
+ * \param[in]   param             Parameter for init object.
  *
  ****************************************************************************************
  */
@@ -1208,11 +1209,11 @@ void gap_manager_numeric_compare_set(uint8_t con_idx,bool equal);
 void gap_manager_sc_oob_set(uint8_t con_idx,struct gap_sc_oob *sc_oob);
 /**
  ****************************************************************************************
- * \brief Set the security oob of the specified connection. 
+ * \brief Set the security oob of the specified connection,
+ *        BLE_KEY_LEN The length of the paired temporary key. 
  * 
  * \param[in]  con_idx           Connection ID number.
  * \param[in]  key               Pairing Temporary Key value.
- * \param[in]  BLE_KEY_LEN       The length of the paired temporary key, This parameter can be a value of @ref BLE_KEY_LEN.
  ****************************************************************************************
  */
 void gap_manager_tk_set(uint8_t con_idx,uint8_t key[BLE_KEY_LEN]);
