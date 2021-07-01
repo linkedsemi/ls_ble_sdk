@@ -207,7 +207,7 @@ struct ll_evt
     uint8_t tx_pwr;
     uint8_t rx_rssi;
     bool rx_crc_valid;
-    bool rx_mic_valid;
+    bool rx_mic_error;
     bool anchor_valid;
 };
 

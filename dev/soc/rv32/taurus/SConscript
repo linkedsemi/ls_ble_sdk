@@ -10,6 +10,7 @@ src = [
     'io_config.c',
     'lsqspi_msp.c',
     'i2c_msp.c',
+    'lscache_msp.c',
 ]
 inc = [
     '.',

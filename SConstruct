@@ -29,7 +29,7 @@ elif env['IC'] == 'sagi':
 elif env['IC'] == 'taurus':
     env['ARCH'] = 'rv32emc'
     env['ABI'] = 'ilp32e'
-    env['STACK_BIN_OUTPUT_DIR'] = Dir('#dev/soc/arm_cm/taurus/bin/')
+    env['STACK_BIN_OUTPUT_DIR'] = Dir('#dev/soc/rv32/taurus/bin/')
 
 if env['BASE_ARCH'] == 'rv32':
     env['ARCH_FLAGS'] = ' -mabi=$ABI -march=$ARCH -mshorten-memrefs -mstrict-align -msave-restore -msmall-data-limit=0 -malign-data=natural '
@@ -44,7 +44,7 @@ if 'mdk' in env['TOOLS']:
     
 else:
     env['COMPILER'] = 'gnu'
-    env['C_CXX_FLAGS'] = '${ARCH_FLAGS} -Os -g -ffunction-sections -fdata-sections -fstrict-volatile-bitfields -fno-common -fno-optimize-sibling-calls -Wall'
+    env['C_CXX_FLAGS'] = '${ARCH_FLAGS} -Os -g -ffunction-sections -fdata-sections -fstrict-volatile-bitfields -fno-common -Wall'
     env['CFLAGS'] = '-std=c11 ${C_CXX_FLAGS}'
     env['CXXFLAGS'] = '${C_CXX_FLAGS} -fno-exceptions '
     env['ASFLAGS'] = '${AS_ARCH_FLAGS} -g '

@@ -59,8 +59,6 @@ void ll_set_rx_ptr(uint8_t *ptr,uint16_t max_length);
 
 void crypto_enable(struct ll_crypto_env *crypto,bool master,bool tx);
 
-void crypto_disable(void);
-
 uint32_t get_pkt_duration_us(enum ble_phy phy,uint16_t pdu_length,uint8_t cte_time,bool coded_125k);
 
 void ble_pkt_isr(void);
@@ -89,6 +87,6 @@ void ble_timer2_irq2_unmask(void);
 
 void ble_timer2_irq2_mask(void);
 
-void aes_128_start(uint8_t *data,uint32_t *key);
+void aes_128_req(uint8_t *data,uint8_t *key);
 #endif
 

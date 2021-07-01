@@ -8,8 +8,17 @@
 #include "compile_flag.h"
 #include "reg_sysc_awo.h"
 #include "platform.h"
+#include "spi_flash.h"
+#include "lscache.h"
 
-__attribute__((weak)) void SystemInit(){}
+__attribute__((weak)) void SystemInit(){
+    disable_global_irq();
+    spi_flash_drv_var_init(false,false);
+    spi_flash_init();
+    spi_flash_xip_start();
+    lscache_cache_enable(0);
+    enable_global_irq();
+}
 
 void sys_init_itf()
 {

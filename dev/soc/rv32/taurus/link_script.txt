@@ -6,11 +6,18 @@ MEMORY
 ENTRY(Reset_Handler)
 SECTIONS
 {
-	.text :
-	{
+    .text_ram :
+    {
         *(.text.Reset_Handler)
+        *(.text.SystemInit)
 		KEEP(*(.init))
 		KEEP(*(.fini))
+        *(STACK_CODE_RAM)
+
+    }>RAM
+	.text :
+	{
+
 
 		*crtbegin.o(.ctors)
 		*crtbegin?.o(.ctors)
@@ -53,5 +60,5 @@ SECTIONS
 	}>RAM
 
 	__StackTop = ORIGIN(RAM) + LENGTH(RAM);
-	PROVIDE(__global_pointer$ = __data_start__ + (4K / 2) );	
+	PROVIDE(__global_pointer$ = __bss_start__ + (4K / 2) );	
 }

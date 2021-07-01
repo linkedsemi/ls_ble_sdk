@@ -1,12 +1,12 @@
 #include "circular_doubly_linked_list.h"
 #include "compile_flag.h"
 
-void cdll_init(struct cdll *list)
+ROM_SYMBOL void cdll_init(struct cdll *list)
 {
 	list->first = NULL;
 }
 
-void cdll_push_back(struct cdll *list,struct cdll_hdr *hdr)
+ROM_SYMBOL void cdll_push_back(struct cdll *list,struct cdll_hdr *hdr)
 {
 	if(list->first)
 	{
@@ -23,7 +23,7 @@ void cdll_push_back(struct cdll *list,struct cdll_hdr *hdr)
 	}
 }
 
-LL_PKT_ISR struct cdll_hdr *cdll_pop_front(struct cdll *list)
+ROM_SYMBOL LL_PKT_ISR struct cdll_hdr *cdll_pop_front(struct cdll *list)
 {
 	if(list->first)
 	{
@@ -46,7 +46,7 @@ LL_PKT_ISR struct cdll_hdr *cdll_pop_front(struct cdll *list)
 	}
 }
 
-void cdll_extract(struct cdll *list,struct cdll_hdr *hdr)
+ROM_SYMBOL void cdll_extract(struct cdll *list,struct cdll_hdr *hdr)
 {
 	if(hdr->prev == hdr)
 	{
@@ -64,7 +64,7 @@ void cdll_extract(struct cdll *list,struct cdll_hdr *hdr)
 	hdr->prev = NULL;
 }
 
-void cdll_insert_before(struct cdll *list,struct cdll_hdr *ref_hdr,struct cdll_hdr *hdr_to_insert)
+ROM_SYMBOL void cdll_insert_before(struct cdll *list,struct cdll_hdr *ref_hdr,struct cdll_hdr *hdr_to_insert)
 {
     bool update_head = list->first == ref_hdr;
     ref_hdr->prev->next = hdr_to_insert;
@@ -77,7 +77,7 @@ void cdll_insert_before(struct cdll *list,struct cdll_hdr *ref_hdr,struct cdll_h
     }
 }
 
-void cdll_insert_after(struct cdll_hdr *ref_hdr,struct cdll_hdr *hdr_to_insert)
+ROM_SYMBOL void cdll_insert_after(struct cdll_hdr *ref_hdr,struct cdll_hdr *hdr_to_insert)
 {
     ref_hdr->next->prev = hdr_to_insert;
     hdr_to_insert->next = ref_hdr->next;
@@ -85,7 +85,7 @@ void cdll_insert_after(struct cdll_hdr *ref_hdr,struct cdll_hdr *hdr_to_insert)
     hdr_to_insert->prev = ref_hdr;
 }
 
-void cdll_insert(struct cdll *list,struct cdll_hdr *hdr,bool (*cmp)(struct cdll_hdr *,struct cdll_hdr *))
+ROM_SYMBOL void cdll_insert(struct cdll *list,struct cdll_hdr *hdr,bool (*cmp)(struct cdll_hdr *,struct cdll_hdr *))
 {
 	if(list->first==NULL)
 	{
@@ -118,22 +118,22 @@ void cdll_insert(struct cdll *list,struct cdll_hdr *hdr,bool (*cmp)(struct cdll_
 	}
 }
 
-LL_PKT_ISR struct cdll_hdr *cdll_first(struct cdll *list)
+ROM_SYMBOL LL_PKT_ISR struct cdll_hdr *cdll_first(struct cdll *list)
 {
 	return list->first;
 }
 
-struct cdll_hdr *cdll_next(struct cdll_hdr *hdr)
+ROM_SYMBOL struct cdll_hdr *cdll_next(struct cdll_hdr *hdr)
 {
 	return hdr->next;
 }
 
-struct cdll_hdr *cdll_prev(struct cdll_hdr *hdr)
+ROM_SYMBOL struct cdll_hdr *cdll_prev(struct cdll_hdr *hdr)
 {
 	return hdr->prev;
 }
 
-bool cdll_is_elem_linked(struct cdll_hdr *hdr)
+ROM_SYMBOL bool cdll_is_elem_linked(struct cdll_hdr *hdr)
 {
 	return hdr->next&&hdr->prev ? true : false;
 }

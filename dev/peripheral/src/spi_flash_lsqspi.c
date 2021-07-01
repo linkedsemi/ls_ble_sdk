@@ -258,3 +258,5 @@ XIP_BANNED void spi_flash_prog_erase_resume()
 {
     lsqspi_stig_send_command(PROG_ERASE_RESUME);
 }
+
+__attribute__((weak)) void spi_flash_dual_io_read(uint32_t offset,uint8_t *data,uint16_t length){}

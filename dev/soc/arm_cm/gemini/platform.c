@@ -14,6 +14,11 @@ __attribute__((weak)) void SystemInit(){
     SCB->VTOR = (uint32_t)ISR_VECTOR_ADDR;
 }
 
+void clk_switch()
+{
+
+}
+
 void irq_priority()
 {
 

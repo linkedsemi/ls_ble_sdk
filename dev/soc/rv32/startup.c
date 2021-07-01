@@ -11,6 +11,7 @@ extern uint32_t exception_entry;
 
 __attribute__ ((naked)) void Reset_Handler()
 {
+    __asm ("la gp,__global_pointer$": : );
     __set_MTVEC((uint32_t)&exception_entry);
     __set_MTVT((uint32_t)interrupt_vector);
     __set_SP((uint32_t)&__StackTop);
