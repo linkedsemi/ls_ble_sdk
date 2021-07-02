@@ -192,6 +192,7 @@ struct ll_evt
     struct cdll_hdr hdr;
     struct cdll resched;
     struct pkt_info (*tx_data_cfg)(struct ll_evt *);
+    void (*crypto_cfg)(struct ll_evt *);
     uint32_t access_address;
     uint32_t timestamp;
     uint32_t anchor;

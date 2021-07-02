@@ -57,7 +57,7 @@ void ble_tx_phy_ch_set(enum ble_phy phy,uint8_t ch,uint8_t tx_pwr,bool tx_coded_
 
 void ll_set_rx_ptr(uint8_t *ptr,uint16_t max_length);
 
-void crypto_enable(struct ll_crypto_env *crypto,bool master,bool tx);
+void conn_crypto_enable(struct ll_crypto_env *crypto,bool master,bool tx);
 
 uint32_t get_pkt_duration_us(enum ble_phy phy,uint16_t pdu_length,uint8_t cte_time,bool coded_125k);
 

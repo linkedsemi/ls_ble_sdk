@@ -891,14 +891,14 @@ void io_set_pin(uint8_t pin)
 {
     gpio_pin_t *x = (gpio_pin_t *)&pin;
     reg_lsgpio_t *gpiox = GPIO_GetPort(x->port);
-    gpiox->DOUT |= 1<< x->num;
+    gpiox->BSBR = 1<< x->num;
 }
 
 void io_clr_pin(uint8_t pin)
 {
     gpio_pin_t *x = (gpio_pin_t *)&pin;
     reg_lsgpio_t *gpiox = GPIO_GetPort(x->port);
-    gpiox->DOUT &= ~(1<< x->num);
+    gpiox->BSBR = 1<<(x->num+16);
 }
 
 void io_write_pin(uint8_t pin, uint8_t val)
@@ -926,14 +926,19 @@ uint8_t io_read_pin(uint8_t pin)
     reg_lsgpio_t *gpiox = GPIO_GetPort(x->port);
     uint8_t val = (gpiox->DIN >> x->num) & 0x1;
     return val;
-
 }
 
 void io_toggle_pin(uint8_t pin)
 {
     gpio_pin_t *x = (gpio_pin_t *)&pin;
     reg_lsgpio_t *gpiox = GPIO_GetPort(x->port);
-    gpiox->DOUT ^= 1<< x->num;
+    if(gpiox->DOUT & 1<< x->num)
+    {
+        gpiox->BSBR = 1<<(x->num+16);
+    }else
+    {
+        gpiox->BSBR = 1<< x->num;
+    }
 }
 
 void io_pull_write(uint8_t pin,io_pull_type_t pull)

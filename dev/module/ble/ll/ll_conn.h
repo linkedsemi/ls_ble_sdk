@@ -135,6 +135,12 @@ enum llcp_type
     LL_PHY_UPD_PROCEDURE,
 };
 
+enum conn_encryption_status
+{
+    CONN_TX_ENCRYPTED_MASK = 0x1,
+    CONN_RX_ENCRYPTED_MASK = 0x2,
+};
+
 struct ll_terminate_ind_ctrdata
 {
     uint8_t error_code;
@@ -393,8 +399,7 @@ struct ll_conn_env{
     uint8_t prev_rx_crc_valid;
     uint8_t nesn;
     uint8_t sn;
-    uint8_t encrypted;
-    uint8_t slv_tx_encrypt;
+    enum conn_encryption_status encrypted;
     uint8_t master;
     uint8_t peer_version_valid;
     uint8_t peer_features_valid;
