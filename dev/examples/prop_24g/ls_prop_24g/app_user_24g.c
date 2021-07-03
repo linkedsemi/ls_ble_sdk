@@ -8,13 +8,14 @@
 #include "app_user_24g.h"
 #include "log.h"
 
-#define UART_24G_PAYLOAD_LEN_MAX 253
+#define _ISR // The macro means the function will be called in interrupt.
+
 #define RF_CHANNEL_DEFAULT 2380
 
 #define UART_SYNC_BYTE  0xA5
 #define UART_SYNC_BYTE_LEN 1
 #define UART_LEN_LEN 1
-#define UART_24G_BUF_SIZE (UART_SYNC_BYTE_LEN + UART_LEN_LEN + UART_24G_PAYLOAD_LEN_MAX)
+#define UART_24G_BUF_SIZE (UART_SYNC_BYTE_LEN + UART_LEN_LEN + VALID_TX_LEN_MAX)
 
 enum uart_rx_status
 {
@@ -34,22 +35,21 @@ static UART_HandleTypeDef UART_Config;
 static void app_user_24g_rx(void);
 static void ls_uart_recv_restart(void);
 
-static void app_user_24g_tx_cb(void *param)
+_ISR static void app_user_24g_tx_cb(void *param)
 {
-    LOG_I("24g tx completed");
+    // LOG_I("24g tx completed");
     ls_uart_recv_restart();
+    app_user_24g_rx();
 }
-static void app_user_24g_rx_cb(void *param)
+_ISR static void app_user_24g_rx_cb(void *param)
 {
-    LOG_I("24g rx completed, length=%d", rf_rx_length);
-    uint32_t cpu_stat = enter_critical();
+    // LOG_I("24g rx completed, length=%d", rf_rx_length);
     if (!uart_tx_busy && rf_rx_length > 0)
     {
         uart_tx_busy = true;
         HAL_UART_Transmit_IT(&UART_Config, &uart_tx_buf[0], rf_rx_length);
         rf_rx_length = 0;
     }
-    exit_critical(cpu_stat);
 }
 
 static void ls_uart_init(void)
@@ -90,7 +90,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
         break;
     case UART_SYNC:
         len = uart_rx_buf[UART_SYNC_BYTE_LEN];
-        if (len > UART_24G_PAYLOAD_LEN_MAX)
+        if (len > VALID_TX_LEN_MAX)
         {
             LOG_I("Invalid length!");
             uart_state = UART_IDLE;
@@ -127,4 +127,17 @@ void app_user_24g_init(void)
     ls_uart_recv_restart();
     RF_24g_SetChannel(RF_CHANNEL_DEFAULT);
     app_user_24g_rx();
+}
+
+int main()
+{
+    extern void lib_fn_init(void);
+    lib_fn_init();
+    sys_init_24g();
+    RF_24g_Init();
+    app_user_24g_init();
+    while (1)
+    {
+        
+    }
 }

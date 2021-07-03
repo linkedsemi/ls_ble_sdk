@@ -5,6 +5,16 @@
 #ifndef _LS_24G_H_
 #define _LS_24G_H_
 
+#define VALID_TX_LEN_MAX 253
+
+enum prop_24g_status
+{
+    PROP_24G_NO_ERROR = 0,
+    PROP_24G_Invalid_status,
+    PROP_24G_Invalid_param,
+    PROP_24G_busy
+};
+
 enum prop_24g_state
 {
     PROP_24G_STATE_IDLE = 0,
@@ -32,12 +42,16 @@ struct prop_24g_tx_rx_cntl_env
     bool finished;
 };
 
+// Use this function in interrupt instead of memcpy!!!
+void memcpy_ram(void *dst, const void *src, uint32_t length);
+
 void RF_24g_Init(void);
 // void RF_24g_Start(void);
-// void RF_24g_Stop(void);
+// Only rx can be stopped!!!
+void RF_24g_Stop(void);
 void RF_24g_SetChannel(uint16_t channel);
 uint16_t RF_24g_GetChannel(void);
 void RF_24g_SetPower(enum prop_24g_tx_power_config tx_pwr_config);
-void RF_24g_Tx(uint8_t *txBuf, uint8_t txLen, void (*Tx_cmpt_cb)(void *), void *param);
-void RF_24g_Rx(uint8_t *rxBuf, uint8_t *rxLen, void (*Rx_cmpt_cb)(void *), void *param);
+enum prop_24g_status RF_24g_Tx(uint8_t *txBuf, uint8_t txLen, void (*Tx_cmpt_cb)(void *), void *param);
+enum prop_24g_status RF_24g_Rx(uint8_t *rxBuf, uint8_t *rxLen, void (*Rx_cmpt_cb)(void *), void *param);
 #endif
