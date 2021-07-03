@@ -1,4 +1,10 @@
 BLE API
 ===========
 
-.. doxygenfile:: ls_ble.h
+.. toctree::
+    
+    lsble
+    hid
+
+
+
