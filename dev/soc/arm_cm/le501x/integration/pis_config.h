@@ -1,6 +1,7 @@
 #ifndef PIS_CONFIG_H_
 #define PIS_CONFIG_H_
 
+/// PIS Source
 enum pis_src
 {
     ADC_AWD_UP = 0x4,
@@ -33,6 +34,7 @@ enum pis_src
     RTC_TRIG = 0x34,
 };
 
+/// PIS Destination
 enum pis_dst
 {
     ADC_REG_TRIG = 0x1,

@@ -15,3 +15,4 @@ PERIPHERAL API
     lstrng
     lsiwdg
     lstimer
+    lspis
