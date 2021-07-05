@@ -39,7 +39,7 @@ struct prop_24g_tx_rx_cntl_env
     void (*cb)(void*);
     void *param;
     uint8_t *length;
-    bool finished;
+    // bool finished;
 };
 
 // Use this function in interrupt instead of memcpy!!!

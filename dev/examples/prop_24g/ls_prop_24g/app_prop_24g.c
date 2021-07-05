@@ -10,10 +10,5 @@
 void lib_fn_init(void)
 {
     extern uint64_t (*idiv_acc_fn)(uint32_t,uint32_t,bool);
-    extern void (*exit_critical_fn)(uint32_t);
-    extern uint32_t (*enter_critical_fn)(void);
-
     idiv_acc_fn = idiv_acc;
-    enter_critical_fn = enter_critical;
-    exit_critical_fn = exit_critical;
 }
