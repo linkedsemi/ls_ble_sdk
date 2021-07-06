@@ -16,3 +16,4 @@
    ble_uart_server
    ble_single_role
    crypt_example
+   ble_hid_dmic
