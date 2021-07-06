@@ -1,7 +1,10 @@
     .syntax unified
     .arch armv7-m
-
+#if ROM_CODE = 1
+    .section .text.arm_cm_delay_asm
+#else
     .section .xip_banned,"x"
+#endif
     .thumb
     .thumb_func
     .align 1
