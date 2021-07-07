@@ -17,7 +17,7 @@ XIP_BANNED uint8_t lsqspi_rd_cap_dly_get()
 #else
 XIP_BANNED uint8_t lsqspi_rd_cap_dly_get()
 {
-    return 0;
+    return 1;
 }
 #endif
 

@@ -3,6 +3,10 @@
 #include <stdint.h>
 #include "sdk_config.h"
 
+void stack_assert_asm(uint32_t,uint32_t,uint32_t);
+
+void platform_reset(uint32_t);
+
 void clk_switch(void);
 
 void irq_priority(void);

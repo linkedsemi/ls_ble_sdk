@@ -1,3 +1,4 @@
+#include <string.h>
 #include "taurus.h"
 #include "core_rv32.h"
 #include "swint_call_asm.h"
@@ -10,66 +11,19 @@
 #include "platform.h"
 #include "spi_flash.h"
 #include "lscache.h"
+#include "io_config.h"
+#include "reg_sysc_ble.h"
+#include "tinyfs.h"
+#include "exception_isr.h"
 
-__attribute__((weak)) void SystemInit(){
-    disable_global_irq();
-    spi_flash_drv_var_init(false,false);
-    spi_flash_init();
-    spi_flash_xip_start();
-    lscache_cache_enable(0);
-    enable_global_irq();
-}
-
-void sys_init_itf()
-{
-    
-    
-}
-
-XIP_BANNED void flash_swint_set()
-{
-    SWINT_SET_INLINE_ASM(SWINT3_IRQn);
-}
-
-void clk_switch(void)
-{
-    
-}
-
-void irq_priority()
-{
-    MODIFY_REG(CLIC->CLICCFG,CLIC_CLICCFG_NLBIT_Msk,0xf<<CLIC_CLICCFG_NLBIT_Pos);
-    csi_vic_set_prio(RTC1_IRQn,7);
-    csi_vic_set_prio(IWDT_IRQn,7);
-    csi_vic_set_prio(RTC2_IRQn,7);
-    csi_vic_set_prio(EXT_IRQn,7);
-    csi_vic_set_prio(LVD33_IRQn,7);
-    csi_vic_set_prio(MAC_LP_IRQn,7);
-    csi_vic_set_prio(MAC1_IRQn,7);
-    csi_vic_set_prio(MAC2_IRQn,7);
-    csi_vic_set_prio(SWINT1_IRQn,7);
-    csi_vic_set_prio(USB_IRQn,7);
-    csi_vic_set_prio(QSPI_IRQn,7);
-    csi_vic_set_prio(CACHE_IRQn,7);
-    csi_vic_set_prio(GPTIMA1_IRQn,7);
-    csi_vic_set_prio(GPTIMB1_IRQn,7);
-    csi_vic_set_prio(GPTIMC1_IRQn,7);
-    csi_vic_set_prio(ADTIM1_IRQn,7);
-    csi_vic_set_prio(I2C1_IRQn,7);
-    csi_vic_set_prio(I2C2_IRQn,7);
-    csi_vic_set_prio(I2C3_IRQn,7);
-    csi_vic_set_prio(UART1_IRQn,7);
-    csi_vic_set_prio(UART2_IRQn,7);
-    csi_vic_set_prio(UART3_IRQn,7);
-    csi_vic_set_prio(SPI2_IRQn,7);
-    csi_vic_set_prio(GPIO_IRQn,7);
-    csi_vic_set_prio(WWDT_IRQn,7);
-    csi_vic_set_prio(ADC_IRQn,7);
-    csi_vic_set_prio(TK_IRQn,7);
-    csi_vic_set_prio(SWINT2_IRQn,7);
-    csi_vic_set_prio(SWINT3_IRQn,7);
-
-}
+void ble_pkt_isr(void);
+void ble_util_isr(void);
+void SWINT_Handler_ASM(void);
+void swint2_process(void);
+void main_task_app_init(void);
+void main_task_itf_init(void);
+void stack_var_ptr_init(void);
+void modem_rf_init(void);
 
 static bool lock_check()
 {
@@ -80,7 +34,6 @@ static bool lock_check()
     DELAY_US(1000);
     return REG_FIELD_RD(SYSC_AWO->ANA_STAT,SYSC_AWO_DPLL_LOCK);
 }
-
 
 void pll_enable()
 {
@@ -97,12 +50,155 @@ void pll_enable()
     MODIFY_REG(SYSC_AWO->PD_AWO_CLK_CTRL,SYSC_AWO_CLK_SEL_QSPI_MASK,4<<SYSC_AWO_CLK_SEL_QSPI_POS);
 }
 
+__attribute__((weak)) void SystemInit(){
+    clk_switch();
+    disable_global_irq();
+    qspi_flash_io_init();
+    spi_flash_drv_var_init(false,false);
+    spi_flash_init();
+    spi_flash_software_reset();
+    DELAY_US(500);
+    spi_flash_xip_start();
+    lscache_cache_enable(0);
+    enable_global_irq();
+}
+
+void irq_priority()
+{
+    MODIFY_REG(CLIC->CLICCFG,CLIC_CLICCFG_NLBIT_Msk,0xf<<CLIC_CLICCFG_NLBIT_Pos);
+    csi_vic_set_prio(RV_TIME_IRQn,5);
+    csi_vic_set_prio(RTC1_IRQn,0);
+    csi_vic_set_prio(IWDT_IRQn,0);
+    csi_vic_set_prio(RTC2_IRQn,0);
+    csi_vic_set_prio(EXT_IRQn,0);
+    csi_vic_set_prio(LVD33_IRQn,0);
+    csi_vic_set_prio(MAC_LP_IRQn,5);
+    csi_vic_set_prio(MAC1_IRQn,7);
+    csi_vic_set_prio(MAC2_IRQn,5);
+    csi_vic_set_prio(SWINT1_IRQn,5);
+    csi_vic_set_prio(USB_IRQn,0);
+    csi_vic_set_prio(QSPI_IRQn,0);
+    csi_vic_set_prio(CACHE_IRQn,0);
+    csi_vic_set_prio(GPTIMA1_IRQn,0);
+    csi_vic_set_prio(GPTIMB1_IRQn,0);
+    csi_vic_set_prio(GPTIMC1_IRQn,0);
+    csi_vic_set_prio(ADTIM1_IRQn,0);
+    csi_vic_set_prio(I2C1_IRQn,0);
+    csi_vic_set_prio(I2C2_IRQn,0);
+    csi_vic_set_prio(I2C3_IRQn,0);
+    csi_vic_set_prio(UART1_IRQn,0);
+    csi_vic_set_prio(UART2_IRQn,0);
+    csi_vic_set_prio(UART3_IRQn,0);
+    csi_vic_set_prio(SPI2_IRQn,0);
+    csi_vic_set_prio(GPIO_IRQn,0);
+    csi_vic_set_prio(WWDT_IRQn,0);
+    csi_vic_set_prio(ADC_IRQn,0);
+    csi_vic_set_prio(TK_IRQn,0);
+    csi_vic_set_prio(SWINT2_IRQn,5);
+    csi_vic_set_prio(SWINT3_IRQn,4);
+}
+
+static void ble_irq_config()
+{
+    rv_set_int_isr(MAC1_IRQn,ble_pkt_isr);
+    csi_vic_enable_irq(MAC1_IRQn);
+    rv_set_int_isr(MAC2_IRQn,ble_util_isr);
+    csi_vic_enable_irq(MAC2_IRQn);
+
+    rv_set_int_isr(SWINT1_IRQn,SWINT_Handler_ASM);
+    CLIC->CLICINT[SWINT1_IRQn].ATTR = 1 << CLIC_INTATTR_TRIG_Pos;
+    csi_vic_enable_irq(SWINT1_IRQn);
+    rv_set_int_isr(SWINT2_IRQn,swint2_process);
+    CLIC->CLICINT[SWINT2_IRQn].ATTR = 1 << CLIC_INTATTR_TRIG_Pos;
+    csi_vic_enable_irq(SWINT2_IRQn);
+}
+
+static void flash_swint_enable()
+{
+    rv_set_int_isr(SWINT3_IRQn,SWINT_Handler_ASM);
+    CLIC->CLICINT[SWINT3_IRQn].ATTR = 1 << CLIC_INTATTR_TRIG_Pos;
+    csi_vic_enable_irq(SWINT3_IRQn);
+}
+
+static void module_init()
+{
+    SYSC_BLE->PD_BLE_CLKG = SYSC_BLE_CLKG_SET_MAC_MASK | SYSC_BLE_CLKG_SET_MDM_MASK | SYSC_BLE_CLKG_SET_RF_MASK;
+    LOG_INIT();
+    irq_priority();
+    flash_swint_enable();
+    ble_irq_config();
+    tinyfs_init(0x855000);
+    modem_rf_init();
+    systick_start();
+}
+
+#if defined(__CC_ARM)
+__attribute__((weak)) uint32_t __stack_bss_start__;
+__attribute__((weak)) uint32_t __stack_bss_end__;
+__attribute__((weak)) uint32_t __stack_data_lma__;
+__attribute__((weak)) uint32_t __stack_data_end__;
+__attribute__((weak)) uint32_t __stack_data_start__;
+#elif defined(__GNUC__)
+extern uint32_t __stack_bss_start__;
+extern uint32_t __stack_bss_end__;
+extern uint32_t __stack_data_lma__;
+extern uint32_t __stack_data_end__;
+extern uint32_t __stack_data_start__;
+#endif
+static void stack_data_bss_init()
+{
+    memset(&__stack_bss_start__,0,(uint32_t)&__stack_bss_end__-(uint32_t)&__stack_bss_start__);
+    memcpy(&__stack_data_start__,&__stack_data_lma__,(uint32_t)&__stack_data_end__-(uint32_t)&__stack_data_start__);
+}
+
+static void var_init()
+{
+    stack_data_bss_init();
+    stack_var_ptr_init();
+    //spi_flash_drv_var_init(true,false);
+}
+
+static void analog_init()
+{
+    clk_switch();
+}
+
+void sys_init_itf()
+{
+    analog_init();
+    var_init();
+    main_task_itf_init();
+    module_init();
+}
+
+void sys_init_app()
+{
+    analog_init();
+    var_init();
+    main_task_app_init();
+    module_init();
+}
+
+XIP_BANNED void flash_swint_set()
+{
+    SWINT_SET_INLINE_ASM(SWINT3_IRQn);
+}
+
+void clk_switch(void)
+{
+    pll_enable();
+}
+
 void sys_init_none()
 {
-    enable_global_irq();
+    analog_init();
     LOG_INIT();
     systick_start();
-    pll_enable();
+}
+
+void platform_reset(uint32_t error)
+{
+    while(1);
 }
 
 int _close (int fildes){  return -1;}

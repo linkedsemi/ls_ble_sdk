@@ -8,12 +8,12 @@ static uint32_t total_ticks;
 
 XIP_BANNED void SysTick_Handler()
 {
-    uint64_t target;
+    unsigned long long target;
     do{
         total_ticks += 1;
         target = CORET->MTIMECMP + SDK_HCLK_MHZ*1000000/SYSTICK_RATE_HZ;
         CORET->MTIMECMP = target;
-    }while(target<=CORET->MTIME);
+    }while(target<CORET->MTIME);
 }
 
 void systick_start(void)

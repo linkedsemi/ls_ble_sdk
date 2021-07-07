@@ -6,6 +6,7 @@
 #include "platform.h"
 #include "io_config.h"
 #include "cpu.h"
+#include "lscache.h"
 /**
  * ERROR TYPE. MUST NOT BE MODIFIED
  */
@@ -27,6 +28,7 @@
  */
 int  flashInit(){
     disable_global_irq();
+    lscache_cache_disable();
     clk_switch();
     qspi_flash_io_init();
     spi_flash_drv_var_init(false,false);
@@ -188,6 +190,8 @@ int flashChecksum(char*dst, int length, int checksum) {
     return sum == checksum ? 0 : ERROR_CHECKSUM;
 }
 
+void SystemInit(){}
+
 // NOTING: when debug the driver, this macro defined as 1, and then
 // it must be set as 0, for release to flash programmer library
 #define DEBUG_DRIVER	0
@@ -198,20 +202,65 @@ int flashChecksum(char*dst, int length, int checksum) {
  * @return : if this method returns an error,MUST RUTURN ERROR_CHIPERASE,
  * Otherwise return 0.
  */
-int flashTest(){
 #if DEBUG_DRIVER
-
-	unsigned int ID;
-	// read flash id
-	flashID(&ID);
-
-    flashProgram(FLASH_BASE_ADDR,0x780000,0x1000);
-    // other drivers test
-    return ID;
-#else
-	return 0;
-#endif
+#include <string.h>
+#include <stdlib.h>
+uint32_t rand_buf[64];
+uint32_t result[64];
+int sum2,sum;
+int flashTest(){
+    char *dst = (char *)0x858000;
+    int length = 0x225fc;
+    int i;
+    sum = 0;
+    spi_flash_xip_start();
+    for (i = 0; i < length; i++) {
+        sum += dst[i];
+    }
+    spi_flash_xip_stop();
+    char data;
+    sum2 = 0;
+    for (i = 0; i < length; i++){
+        spi_flash_quad_io_read(i+0x58000,&data,1);
+        sum2 += data;
+    }
+    return sum;
+/*
+    while(1)
+    {
+        spi_flash_chip_erase();
+        uint32_t offset;
+        for(offset = 0;offset<0x80000;offset += 0x100)
+        {
+            uint8_t i;
+            for(i = 0;i<64;++i)
+            {
+                rand_buf[i] = rand();
+            }
+            spi_flash_page_program(offset,(void *)rand_buf,sizeof(rand_buf));
+            spi_flash_xip_start();
+            for(i=0;i<64;++i)
+            {
+                uint32_t *val = (uint32_t *)(0x800000 + offset + 4*i);
+                if(*val!=rand_buf[i])
+                {
+                    io_set_pin(PA00);
+                    spi_flash_quad_io_read(offset,(void *)result,sizeof(result));
+                    __asm("ebreak"::);
+                    while(1);
+                }
+            }
+            spi_flash_xip_stop();
+        }
+    }
+    return 0;
+*/
 }
+#else
+int flashTest(){
+	return 0;
+}
+#endif
 
 void __bkpt_label()
 {

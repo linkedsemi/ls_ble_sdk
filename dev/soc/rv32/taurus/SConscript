@@ -11,6 +11,8 @@ src = [
     'lsqspi_msp.c',
     'i2c_msp.c',
     'lscache_msp.c',
+    'stack_var.c',
+    'modem_rf_taurus.c',
 ]
 inc = [
     '.',

@@ -6,3 +6,7 @@ XIP_BANNED void lscache_msp_init()
     
 }
 
+void lscache_msp_deinit()
+{
+    
+}

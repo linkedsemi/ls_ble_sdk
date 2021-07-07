@@ -69,7 +69,10 @@
         "reg_sysc_cpu_type.h": "c",
         "gemini.h": "c",
         "sha_msp.h": "c",
-        "io_config.h": "c"
+        "io_config.h": "c",
+        "reg_sysc_ble.h": "c",
+        "reg_sysc_ble_type.h": "c",
+        "lscache_msp.h": "c"
     },
     "editor.detectIndentation": false,
     "restructuredtext.confPath": "${workspaceFolder}\\doc",

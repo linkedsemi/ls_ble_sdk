@@ -13,3 +13,8 @@ XIP_BANNED void lscache_cache_enable(uint8_t prefetch)
 }
 
 
+void lscache_cache_disable()
+{
+    LSCACHE->CCR = FIELD_BUILD(LSCACHE_EN, 0);
+    lscache_msp_deinit();
+}

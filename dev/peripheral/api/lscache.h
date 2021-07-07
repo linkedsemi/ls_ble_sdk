@@ -4,4 +4,5 @@
 
 void lscache_cache_enable(uint8_t prefetch);
 
+void lscache_cache_disable(void);
 #endif

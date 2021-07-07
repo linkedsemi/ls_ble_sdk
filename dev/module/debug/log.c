@@ -8,7 +8,13 @@
 #define UART_LOG           2
 #define RAM_LOG             4
 #ifndef LOG_BACKEND
+#if __arm__
 #define LOG_BACKEND (JLINK_RTT)
+#elif __riscv
+#define LOG_BACKEND (0)
+#else
+#error arch not supported
+#endif
 #endif
 
 #define LOG_UART_TXD (PB00)

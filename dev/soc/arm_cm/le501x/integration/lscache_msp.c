@@ -10,4 +10,8 @@ XIP_BANNED void lscache_msp_init()
     REG_FIELD_WR(RCC->APB2EN,RCC_APB_CACHE, 1);
 }
 
-
+void lscache_msp_deinit()
+{
+    REG_FIELD_WR(RCC->AHBEN,RCC_CACHE,0);
+    REG_FIELD_WR(RCC->APB2EN,RCC_APB_CACHE, 0);
+}

@@ -20,6 +20,7 @@ env['IC'] = ic
 env['CPU'] = cpu
 env['BASE_ARCH'] = base_arch
 env["OPERATION"] = operation
+env['OPT_LVL'] = '-Os'
 env.VariantDir('build/$IC', '.',duplicate=0)
 
 if env['IC'] == 'le501x':
@@ -44,11 +45,11 @@ if 'mdk' in env['TOOLS']:
     
 else:
     env['COMPILER'] = 'gnu'
-    env['C_CXX_FLAGS'] = '${ARCH_FLAGS} -Os -g -ffunction-sections -fdata-sections -fstrict-volatile-bitfields -fno-common -Wall'
+    env['C_CXX_FLAGS'] = '${ARCH_FLAGS} ${OPT_LVL} -g3 -ffunction-sections -fdata-sections -fstrict-volatile-bitfields -fno-common -Wall'
     env['CFLAGS'] = '-std=c11 ${C_CXX_FLAGS}'
     env['CXXFLAGS'] = '${C_CXX_FLAGS} -fno-exceptions '
-    env['ASFLAGS'] = '${AS_ARCH_FLAGS} -g '
-    env['LINKFLAGS'] = '${ARCH_FLAGS} -g -specs=nosys.specs -specs=nano.specs -T ${LINKSCRIPT} -Wl,-Map=${TARGET.base}.map -Wl,--cref ${LD_ARCH_FLAGS} '
+    env['ASFLAGS'] = '${AS_ARCH_FLAGS} -g3 '
+    env['LINKFLAGS'] = '${ARCH_FLAGS} -g3 -specs=nosys.specs -specs=nano.specs -T ${LINKSCRIPT} -Wl,-Map=${TARGET.base}.map -Wl,--cref ${LD_ARCH_FLAGS} '
     env['GC_OPTION'] = ' -Wl,--gc-sections '
 
 env['CPPDEFINES'] = ['-D{}'.format(env['IC'].upper())]

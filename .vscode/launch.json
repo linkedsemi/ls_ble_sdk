@@ -15,6 +15,7 @@
             "externalConsole": false,
             "MIMode": "gdb",
             "miDebuggerPath": "riscv64-unknown-elf-gdb",
+            "miDebuggerArgs":"",
             "setupCommands": [
                 {
                     "description": "为 gdb 启用整齐打印",
@@ -50,6 +51,56 @@
             ],
         },
         {
+            "name": "TAURUS HOST_TEST",
+            "type": "gdb",
+            "request": "attach",
+            "target": "localhost:1025",
+            "executable": "build/taurus/examples/host_test.elf",
+            "cwd": "${workspaceFolder}",
+            "remote": true,
+            "gdbpath": "riscv64-unknown-elf-gdb",
+            "autorun": [
+                "source tools/taurus/.gdbinit",
+                "set output-radix 16",
+                "load",
+                "load build/taurus/stack.elf",
+                "add-symbol-file build/taurus/stack.elf",
+                "interrupt",
+                "monitor sreset -c 2",
+                "interrupt",
+                "flushregs",
+                "set $pc = 0x400000",
+
+                //"i all-reg"
+                
+            ],
+        },
+        {
+            "name": "TAURUS BLE_DIS",
+            "type": "gdb",
+            "request": "attach",
+            "target": "localhost:1025",
+            "executable": "build/taurus/examples/ble_dis.elf",
+            "cwd": "${workspaceFolder}",
+            "remote": true,
+            "gdbpath": "riscv64-unknown-elf-gdb",
+            "autorun": [
+                "source tools/taurus/.gdbinit",
+                "set output-radix 16",
+                "load",
+                "load build/taurus/stack.elf",
+                "add-symbol-file build/taurus/stack.elf",
+                "interrupt",
+                "monitor sreset -c 2",
+                "interrupt",
+                "flushregs",
+                "set $pc = 0x400000",
+
+                //"i all-reg"
+                
+            ],
+        },
+        {
             "name": "TAURUS COREMARK",
             "type": "gdb",
             "request": "attach",
@@ -76,18 +127,24 @@
             "name": "TAURUS FLASH PROG",
             "type": "gdb",
             "request": "attach",
-            "target": "172.31.16.1:1025",
+            "target": "localhost:1025",
             "executable": "build/taurus/examples/flash_prog.elf",
             "cwd": "${workspaceFolder}",
             "remote": true,
             "gdbpath": "riscv64-unknown-elf-gdb",
-            "debugger_args": ["-iex \"set arch riscv:rv32\""],
             "autorun": [
+                "source tools/taurus/.gdbinit",
+                "set output-radix 16",
+                "load",
+                "interrupt",
+                "monitor sreset -c 2",
+                "interrupt",
+                "flushregs",
+                "set $pc = 0x4007b4",
 
+                //"i all-reg"
                 
             ],
-            "printCalls":true,
-            "showDevDebugOutput":true,
         },
         {
             "name": "Python: info sbl merge",

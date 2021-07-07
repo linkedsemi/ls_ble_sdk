@@ -10,6 +10,9 @@ SECTIONS
     {
         *(.text.Reset_Handler)
         *(.text.SystemInit)
+        *(.text.qspi_flash_io_init)
+        *(.text.pll_enable)
+        *(.text.exception_entry)        
 		KEEP(*(.init))
 		KEEP(*(.fini))
         *(STACK_CODE_RAM)
@@ -17,7 +20,7 @@ SECTIONS
     }>RAM
 	.text :
 	{
-
+        LONG(0xa5a53c3c)
 
 		*crtbegin.o(.ctors)
 		*crtbegin?.o(.ctors)
@@ -39,14 +42,14 @@ SECTIONS
     __data_lma__ = .;
 	.data :
 	{
-		__data_start__ = .;
         *(.sdata*)
 		*(.data*)
 		*(.xip_banned)
 		*(vtable)
+		__data_start__ = .;
 		__data_end__ = ALIGN(4);
         _edata = __data_end__;
-	}>RAM AT>FLASH
+	}>RAM
 
 	.bss (NOLOAD):
 	{

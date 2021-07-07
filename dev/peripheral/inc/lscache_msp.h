@@ -4,5 +4,6 @@
 
 void lscache_msp_init(void);
 
+void lscache_msp_deinit(void);
 #endif
 

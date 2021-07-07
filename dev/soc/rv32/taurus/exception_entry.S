@@ -1,11 +1,13 @@
 
     .option rvc
-    .section .xip_banned,"x"
-    .align 6
+    .section .text.exception_entry
     .global exception_entry
     .type   exception_entry, %function
 exception_entry:
+    .cfi_sections .debug_frame
+    .cfi_startproc
     addi    sp, sp, -48
+    .cfi_def_cfa_offset 48
     sw      a0, 36(sp)
     csrr    a0, mcause
     sw      a0, 44(sp)
@@ -20,6 +22,7 @@ exception_entry:
     sw      t1, 8(sp)
     sw      t2, 4(sp)
     sw      ra, 0(sp)
+    .cfi_offset ra,-48
     bgtz    a0, trap_handler
 int_call:
     csrrwi  t0, mnxti, 8
@@ -29,6 +32,7 @@ int_call:
     j       int_call
 exception_exit:
     lw      ra, 0(sp)
+    .cfi_restore ra
     lw      t2, 4(sp)
     lw      t1, 8(sp)
     lw      t0, 12(sp)
@@ -44,7 +48,9 @@ exception_exit:
     csrw    mcause, a0
     lw      a0, 36(sp)
     addi    sp, sp, 48
+    .cfi_def_cfa_offset 0
     mret
+    .cfi_endproc
     .size	exception_entry, . - exception_entry
 
     .global trap_handler

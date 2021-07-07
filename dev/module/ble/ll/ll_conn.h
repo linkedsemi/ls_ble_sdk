@@ -410,6 +410,8 @@ extern uint8_t tx_data_buf_num;
 
 enum co_error ll_conn_rd_rem_ver_info(uint16_t conhdl);
 
+void ll_conn_channel_map_update_all(void);
+
 enum co_error get_ll_conn_rssi(uint16_t idx,uint8_t *rssi);
 
 enum co_error ll_conn_disconnect(uint16_t idx,uint8_t reason);

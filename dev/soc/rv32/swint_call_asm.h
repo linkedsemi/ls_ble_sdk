@@ -3,8 +3,7 @@
 
 #define SWINT_FUNC_CALL_INLINE_ASM(func,swint_set)\
         __asm ("la a4,"#func"\n"\
-               "j "#swint_set"\n"\
-               "ret" : : : )
+               "j "#swint_set"" : : : )
 
 #define SWINT_SET_INLINE_ASM(irq_num) \
         uint32_t mask = 1;\
