@@ -1,6 +1,7 @@
 
     .option rvc
     .section .text.exception_entry
+    .align 6
     .global exception_entry
     .type   exception_entry, %function
 exception_entry:
