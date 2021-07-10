@@ -7,4 +7,8 @@
     <ChipInfo Vendor="LinkedSemi" Name="SAGI" Core="JLINK_CORE_CORTEX_M3" WorkRAMAddr="0x00400000" WorkRAMSize="0x10000"/>
     <FlashBankInfo Name="QSPI Flash" BaseAddr="0x00800000" MaxSize="0x80000" Loader="LinkedSemi/sagi_flash_algo.elf" LoaderType="FLASH_ALGO_TYPE_OPEN" />
   </Device>
+  <Device>
+    <ChipInfo Vendor="LinkedSemi" Name="GEMINI" Core="JLINK_CORE_CORTEX_M4" WorkRAMAddr="0x00400000" WorkRAMSize="0x10000"/>
+    <FlashBankInfo Name="QSPI Flash" BaseAddr="0x00800000" MaxSize="0x80000" Loader="LinkedSemi/gemini_flash_algo.elf" LoaderType="FLASH_ALGO_TYPE_OPEN" />
+  </Device>
 </DataBase>

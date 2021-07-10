@@ -16,53 +16,43 @@ gpio_pin_t iic1_sda;
 
 __attribute__((weak)) void io_exti_callback(uint8_t pin){}
 
-static void exti_io_handler(uint8_t port,uint8_t num,uint8_t edge)
-{
-    uint8_t pin = port<<4 | num;
-    if(edge == INT_EDGE_RISING)
-    {
-        V33_RG->EXTI_CTRL2 = 1<<num;
-    }
-    else
-    {
-        V33_RG->EXTI_CTRL2 = 1<<(num+16);
-    }
-    V33_RG->EXTI_CTRL2 = 0;
-    io_exti_callback(pin);
-}
-
 void EXTI_Handler(void)
 {
-    uint8_t port,i;
+    uint8_t port,i,pin;
     uint32_t int_stat = V33_RG->GPIO_INTR;
     for(i=0;i<16;i++)
     {
         if ((1<<i) & int_stat)
         {
-            port = V33_RG->GPIO_SEL<<(2*i);
-            exti_io_handler(port,i,INT_EDGE_RISING);
+            V33_RG->EXTI_CTRL2 = 1<<i;
+            V33_RG->EXTI_CTRL2 = 0;
+            port = (V33_RG->GPIO_SEL>>(2*i)) & 0x03;
+            pin = (port<<4) | i;
+            io_exti_callback(pin);
         }
     }
     for(i=16;i<32;i++)
     {
         if ((1<<i) & int_stat)
         {
-            port = V33_RG->GPIO_SEL<<(2*(i-16));
-            exti_io_handler(port,i,INT_EDGE_FALLING);
+            V33_RG->EXTI_CTRL2 = 1<<i;
+            V33_RG->EXTI_CTRL2 = 0;
+            port = (V33_RG->GPIO_SEL>>(2*(i-16))) & 0x03;  //
+            pin = (port<<4) | (i-16);
+            io_exti_callback(pin);
         }
     }
-
 }
 
 void io_init(void)
 {
-    SYSC_AWO->IO[0].IE_OD = 0;
+    SYSC_AWO->IO[0].IE_OD = 0x9fff0000;
     SYSC_AWO->IO[0].OE_DOT= 0;
-    SYSC_AWO->IO[1].IE_OD = 0;
+    SYSC_AWO->IO[1].IE_OD = 0xffff0000;
     SYSC_AWO->IO[1].OE_DOT = 0;
-    SYSC_AWO->IO[2].IE_OD = 0;
+    SYSC_AWO->IO[2].IE_OD = 0xffff0000;
     SYSC_AWO->IO[2].OE_DOT = 0;
-    SYSC_AWO->IO[3].IE_OD = 0;
+    SYSC_AWO->IO[3].IE_OD = 0x03ff0000;
     SYSC_AWO->IO[3].OE_DOT = 0;
     arm_cm_set_int_isr(EXT_IRQn,EXTI_Handler);
     __NVIC_EnableIRQ(EXT_IRQn);

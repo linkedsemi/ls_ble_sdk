@@ -13,6 +13,7 @@ SECTIONS
 		. = ALIGN(4);
 		__data_start__ = .;
 		KEEP(*(.vectors))
+		*(.text.cpu_recover_asm)
 		*(.data*)
 		*(.xip_banned)
 		__data_end__ = ALIGN(4);

@@ -13,7 +13,7 @@ void spi_flash_dual_mode_set(bool dual)
     flash_dual_mode_only= true;
 }
 
-bool spi_flash_dual_mode_get()
+XIP_BANNED bool spi_flash_dual_mode_get()
 {
     return flash_dual_mode_only;
 }
