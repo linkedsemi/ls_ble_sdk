@@ -83,8 +83,6 @@ void ll_sync_per_adv_start(struct sync_env *env,uint32_t anchor,enum ble_phy phy
 
 void ll_sync_scan_sync_start(struct sync_env *env,struct ll_evt *aux_evt,struct SyncInfo_field *SyncInfo);
 
-uint8_t ll_sync_scan_peer_sca_get(struct sync_env *env);
-
 void sync_evt_end_handler(struct ll_evt *evt);
 
 void sync_evt_terminate_handler(struct ll_evt * evt);

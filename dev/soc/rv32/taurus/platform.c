@@ -15,7 +15,8 @@
 #include "reg_sysc_ble.h"
 #include "tinyfs.h"
 #include "exception_isr.h"
-
+#include "reg_v33_rg.h"
+#include "evt_ctrl.h"
 void ble_pkt_isr(void);
 void ble_util_isr(void);
 void SWINT_Handler_ASM(void);
@@ -63,9 +64,62 @@ __attribute__((weak)) void SystemInit(){
     enable_global_irq();
 }
 
+bool mac_lp_irq_status_get()
+{
+    return csi_vic_get_pending_irq(MAC_LP_IRQn);
+}
+
+void mac_lp_irq_clr_reset()
+{
+    REG_FIELD_WR(V33_RG->MISC_CTRL0,V33_RG_MAC_SLP_INTR_CLR,0);
+}
+
+void mac_wakeup_prepare_time_set(uint16_t time)
+{
+    V33_RG->MAC_WAKEUP_PREPARE_TIME = time;
+}
+
+void mac_clk_clr()
+{
+    SYSC_BLE->PD_BLE_CLKG = SYSC_BLE_CLKG_CLR_MAC_MASK;
+}
+
+void mac_clk_set()
+{
+    SYSC_BLE->PD_BLE_CLKG = SYSC_BLE_CLKG_SET_MAC_MASK;
+}
+
+void mac_srst()
+{
+    SYSC_BLE->PD_BLE_SRST = SYSC_BLE_SRST_CLR_MAC_N_MASK;
+    SYSC_BLE->PD_BLE_SRST = SYSC_BLE_SRST_SET_MAC_N_MASK;
+}
+
+void idle_process()
+{
+    uint32_t cpu_stat = enter_critical();
+    uint32_t sleep_dur = mac_sleep();
+    if(sleep_dur)
+    {
+        mac_wakeup_prepare_time_set(30);
+        mac_lp_irq_clr_reset();
+        mac_sleep_status_sync();
+        mac_clk_clr();
+        while(mac_lp_irq_status_get()==false);
+        mac_srst();
+        mac_clk_set();
+        mac_hw_init();
+    }else
+    {
+
+    }
+    exit_critical(cpu_stat);
+}
+
 void irq_priority()
 {
     MODIFY_REG(CLIC->CLICCFG,CLIC_CLICCFG_NLBIT_Msk,0xf<<CLIC_CLICCFG_NLBIT_Pos);
+    csi_vic_set_prio(RV_SOFT_IRQn,4);
     csi_vic_set_prio(RV_TIME_IRQn,5);
     csi_vic_set_prio(RTC1_IRQn,0);
     csi_vic_set_prio(IWDT_IRQn,0);
@@ -95,38 +149,56 @@ void irq_priority()
     csi_vic_set_prio(ADC_IRQn,0);
     csi_vic_set_prio(TK_IRQn,0);
     csi_vic_set_prio(SWINT2_IRQn,5);
-    csi_vic_set_prio(SWINT3_IRQn,4);
+    csi_vic_set_prio(SWINT3_IRQn,0);
+}
+
+static void MAC_LP_Handler()
+{
+    REG_FIELD_WR(V33_RG->MISC_CTRL0,V33_RG_MAC_SLP_INTR_CLR,1);
+}
+
+static void ble_irq_handler_set()
+{
+    rv_set_int_isr(MAC_LP_IRQn,MAC_LP_Handler);
+    rv_set_int_isr(MAC1_IRQn,ble_pkt_isr);
+    rv_set_int_isr(MAC2_IRQn,ble_util_isr);
+    rv_set_int_isr(SWINT1_IRQn,SWINT_Handler_ASM);
+    rv_set_int_isr(SWINT2_IRQn,swint2_process);
 }
 
 static void ble_irq_config()
 {
-    rv_set_int_isr(MAC1_IRQn,ble_pkt_isr);
+    csi_vic_enable_irq(MAC_LP_IRQn);
     csi_vic_enable_irq(MAC1_IRQn);
-    rv_set_int_isr(MAC2_IRQn,ble_util_isr);
     csi_vic_enable_irq(MAC2_IRQn);
-
-    rv_set_int_isr(SWINT1_IRQn,SWINT_Handler_ASM);
     CLIC->CLICINT[SWINT1_IRQn].ATTR = 1 << CLIC_INTATTR_TRIG_Pos;
     csi_vic_enable_irq(SWINT1_IRQn);
-    rv_set_int_isr(SWINT2_IRQn,swint2_process);
     CLIC->CLICINT[SWINT2_IRQn].ATTR = 1 << CLIC_INTATTR_TRIG_Pos;
     csi_vic_enable_irq(SWINT2_IRQn);
 }
 
+static void flash_swint_handler_set()
+{
+    rv_set_int_isr(RV_SOFT_IRQn,SWINT_Handler_ASM);
+}
+
 static void flash_swint_enable()
 {
-    rv_set_int_isr(SWINT3_IRQn,SWINT_Handler_ASM);
-    CLIC->CLICINT[SWINT3_IRQn].ATTR = 1 << CLIC_INTATTR_TRIG_Pos;
-    csi_vic_enable_irq(SWINT3_IRQn);
+    CLIC->CLICINT[RV_SOFT_IRQn].ATTR = 1 << CLIC_INTATTR_TRIG_Pos;
+    csi_vic_enable_irq(RV_SOFT_IRQn);
 }
 
 static void module_init()
 {
-    SYSC_BLE->PD_BLE_CLKG = SYSC_BLE_CLKG_SET_MAC_MASK | SYSC_BLE_CLKG_SET_MDM_MASK | SYSC_BLE_CLKG_SET_RF_MASK;
+    V33_RG->CLKG_SRST = V33_RG_CLKG_SET_MAC_SLP_MASK | V33_RG_SRST_SET_MAC_SLP_N_MASK;
+    REG_FIELD_WR(V33_RG->MISC_CTRL0,V33_RG_MAC_SLP_INTR_EN,1);
     LOG_INIT();
     irq_priority();
+    flash_swint_handler_set();
+    ble_irq_handler_set();
     flash_swint_enable();
     ble_irq_config();
+    mac_clk_set();
     tinyfs_init(0x855000);
     modem_rf_init();
     systick_start();
@@ -181,7 +253,7 @@ void sys_init_app()
 
 XIP_BANNED void flash_swint_set()
 {
-    SWINT_SET_INLINE_ASM(SWINT3_IRQn);
+    SWINT_SET_INLINE_ASM(RV_SOFT_IRQn);
 }
 
 void clk_switch(void)

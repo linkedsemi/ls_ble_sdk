@@ -21,8 +21,6 @@ struct ll_crypto_env
 
 void mac_hw_init(void);
 
-void ble_mac_config_set(void);
-
 uint32_t htimer_current_get(void);
 
 bool evt_cancel(bool ongoing,struct ll_evt *evt);
@@ -79,7 +77,11 @@ void crc_init_config(uint32_t crc_init);
 
 void whiten_init_config(uint8_t whiten_init);
 
-uint32_t mac_sleep_swint(void);
+void mac_sleep_status_sync(void);
+
+uint32_t mac_sleep(void);
+
+void mac_wakeup_req(void);
 
 void ble_timer2_irq_clr(void);
 

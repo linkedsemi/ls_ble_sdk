@@ -72,7 +72,9 @@
         "io_config.h": "c",
         "reg_sysc_ble.h": "c",
         "reg_sysc_ble_type.h": "c",
-        "lscache_msp.h": "c"
+        "lscache_msp.h": "c",
+        "ll_port.h": "c",
+        "reg_v33_rg.h": "c"
     },
     "editor.detectIndentation": false,
     "restructuredtext.confPath": "${workspaceFolder}\\doc",

@@ -229,6 +229,8 @@ void bt_set_evt_mask(const struct evt_mask *mask);
 
 void le_set_rand_addr(struct bd_addr *addr);
 
+void le_set_public_addr(const uint8_t *addr);
+
 void get_local_le_supported_features(struct le_features *features);
 
 void le_set_evt_mask(const struct evt_mask *mask);

@@ -33,6 +33,10 @@ typedef struct
     volatile uint32_t PMU_CTRL;
     volatile uint32_t RST_SRC;
     volatile uint32_t EXT_INTR;
+    volatile uint32_t RESERVED5[1];
+    volatile uint32_t MAC_SLEEP_EXPECTED;
+    volatile uint32_t MAC_WAKEUP_PREPARE_TIME;
+    volatile uint32_t MAC_SLEEP_DURATION;
 }reg_v33_rg_t;
 
 enum V33_RG_REG_SFT_CTRL00_FIELD

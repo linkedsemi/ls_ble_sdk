@@ -105,6 +105,7 @@ void prf_fn_init(void);
 void ble_storage_max_num_init(uint8_t num);
 uint32_t ble_hclk2lpclk(uint32_t cycles);
 uint32_t ble_lpclk2hclk(uint32_t cycles);
+void ll_buf_init(void);
 
 void stack_var_ptr_init()
 {
@@ -130,4 +131,6 @@ void stack_var_ptr_init()
     ke_mem_func_init();
     prf_fn_init();
     ble_storage_max_num_init(SDK_BLE_STORAGE_PEER_MAX);
+    ll_buf_init();
+
 }

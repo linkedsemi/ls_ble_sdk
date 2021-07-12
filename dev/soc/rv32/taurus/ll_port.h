@@ -13,6 +13,12 @@ void ble_pkt_irq_unmask(void);
 
 void ble_pkt_irq_clr(void);
 
+void ble_util_irq_clr(void);
+
+void sleep_expected_time_set(uint32_t time);
+
+uint32_t sleep_duration_get();
+
 void mac_reg_sync(void);
 
 #endif

@@ -36,14 +36,13 @@ typedef struct
     volatile uint32_t CURRENT_TIME;	// 0x74
     volatile uint32_t RX_TIME;		// 0x78
     volatile uint32_t DBG_STAT;		// 0x7c
-    volatile uint32_t SLEEP_DURATION;		// 0x80
+    volatile uint32_t DUMMY0;		// 0x80
     volatile uint32_t RX_STATUS;	// 0x84
-    volatile uint32_t SLEEP_TIME;	// 0x88
+    volatile uint32_t SLEEP_ANCHOR;	// 0x88
     volatile uint32_t RX_RSSI;		// 0x8c
-    volatile uint32_t SLEEP_EXPECTED;		// 0x90
-    volatile uint32_t WAKEUP_DELAY;	// 0x94
+    volatile uint32_t DUMMY1[2];    // 0x90 0x94
     volatile uint32_t CTE_CTRL;		// 0x98
-    volatile uint32_t DUMMY1;		// 0x9c
+    volatile uint32_t DUMMY2;		// 0x9c
     union
     {
         struct {
@@ -56,7 +55,7 @@ typedef struct
     }CRYPTO;
     volatile uint32_t AES_KEY[4];	// 0xb0 0xb4 0xb8 0xbc
     volatile uint32_t CRYPTO_CTRL;	// 0xc0
-    volatile uint32_t DUMMY2[3];    // 0xc4 0xc8 0xcc
+    volatile uint32_t DUMMY3[3];    // 0xc4 0xc8 0xcc
     volatile uint32_t PKT_CTRL0;    // 0xd0
     volatile uint32_t PKT_CTRL1;    // 0xd4
     volatile uint32_t ANT_CTRL0;    // 0xd8
@@ -64,7 +63,7 @@ typedef struct
     volatile uint32_t TARGET_TIME2; // 0xe0
     volatile uint32_t INT_MASK2;    // 0xe4
     volatile uint32_t INT_STAT2;    // 0xe8
-    volatile uint32_t DUMMY3;       // 0xec
+    volatile uint32_t DUMMY4;       // 0xec
     volatile uint32_t AES_RSLT[4];  // 0xf0 0xf4 0xf8 0xfc
 }reg_mac_t;
 
