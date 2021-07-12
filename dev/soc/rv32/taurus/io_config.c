@@ -1,16 +1,41 @@
 #include "io_config.h"
 #include "reg_sysc_awo.h"
+#include "reg_v33_rg.h"
 #include "field_manipulate.h"
 #include "per_func_mux.h"
 #include "reg_sysc_per.h"
+#include "exception_isr.h"
+#include "taurus.h"
+#include "core_rv32.h"
 gpio_pin_t uart1_txd;
 gpio_pin_t uart1_rxd;
 gpio_pin_t iic1_scl;
 gpio_pin_t iic1_sda;
+__attribute__((weak)) void io_exti_callback(uint8_t pin){}
+void EXTI_Handler(void)
+{
+    uint8_t i;
+    uint32_t int_stat = V33_RG->GPIO_INTR;
+    for(i=0;i<32;i++)
+    {
+        if ((1<<i) & int_stat)
+        {
+            V33_RG->EXTI_CTRL2 = 1<<i;
+            V33_RG->EXTI_CTRL2 = 0;
+            io_exti_callback(i);
+        }
+    }
+}
 
 void io_init(void)
 {
-    
+    SYSC_AWO->IO[0].OE_DOT=0X0;
+    SYSC_AWO->IO[0].IE_OD = 0XFFFF0000;
+    SYSC_AWO->IO[1].OE_DOT=0X0;
+    SYSC_AWO->IO[1].IE_OD = 0X30000;  //disable 
+    rv_set_int_isr(EXT_IRQn,EXTI_Handler);
+    csi_vic_clear_pending_irq(EXT_IRQn);
+    csi_vic_enable_irq(EXT_IRQn);
 }
 
 void io_cfg_output(uint8_t pin)
@@ -99,11 +124,63 @@ io_pull_type_t io_pull_read(uint8_t pin)
     }
 }
 
-void io_exti_config(uint8_t pin,exti_edge_t edge);
+void io_exti_config(uint8_t pin,exti_edge_t edge)
+{
+    gpio_pin_t *x = (gpio_pin_t *)&pin;
+    switch (x->port)
+    {
+        case 0:
+            if(edge == INT_EDGE_FALLING)
+            {
+                V33_RG->EXTI_CTRL1 |= 1<<(x->num);
+            }
+            else
+            {
+                V33_RG->EXTI_CTRL1 &= ~(1<<(x->num));
+            }
+        break;
+        case 1:
+            if(edge == INT_EDGE_FALLING)
+            {
+                V33_RG->EXTI_CTRL1 |= 1<<(x->num-16);
+            }
+            else
+            {
+                V33_RG->EXTI_CTRL1 &= ~(1<<(x->num-16));
+            }
+        break;
+    }
+}
 
-void io_exti_enable(uint8_t pin,bool enable);
-
-void io_exti_callback(uint8_t pin);
+void io_exti_enable(uint8_t pin,bool enable)
+{
+    gpio_pin_t *x = (gpio_pin_t *)&pin;
+    V33_RG->EXTI_CTRL2 =0XFFFFFFFF;
+    V33_RG->EXTI_CTRL2 =0;
+    switch (x->port)
+    {
+        case 0:
+            if(enable)
+            {
+                V33_RG->EXTI_CTRL0 |= 1<<(x->num);
+            }
+            else
+            {
+                V33_RG->EXTI_CTRL0 &= ~(1<<(x->num));
+            }
+        break;
+        case 1:
+            if(enable)
+            {
+                V33_RG->EXTI_CTRL0 |= 1<<(x->num+16);
+            }
+            else
+            {
+                V33_RG->EXTI_CTRL0 &= ~(1<<(x->num+16));
+            }
+        break;
+    }
+}
 
 static void uart_io_cfg(uint8_t txd,uint8_t rxd)
 {

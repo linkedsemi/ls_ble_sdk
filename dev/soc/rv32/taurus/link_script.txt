@@ -42,6 +42,7 @@ SECTIONS
     __data_lma__ = .;
 	.data :
 	{
+        *(.text.cpu_recover_asm)
         *(.sdata*)
 		*(.data*)
 		*(.xip_banned)

@@ -10,7 +10,7 @@ cpu_sleep_asm:
     wfi
     .size	cpu_sleep_asm, . - cpu_sleep_asm
 
-    .section .xip_banned,"x"
+    .section .text.cpu_recover_asm,"x"
     .global cpu_recover_asm
     .type   cpu_recover_asm, %function
 cpu_recover_asm:
