@@ -149,25 +149,6 @@ static void mac_init()
     RCC->BLECFG &= ~(1<<RCC_BLE_MRST_POS | 1<<RCC_BLE_CRYPT_RST_POS | 1<<RCC_BLE_LCK_RST_POS | 1<<RCC_BLE_AHB_RST_POS | 1<<RCC_BLE_WKUP_RST_POS);
 }
 
-void rco_calib_mode_set(uint8_t mode)
-{
-    REG_FIELD_WR(SYSCFG->ANACFG1, SYSCFG_RCO_MODE_SEL, mode);
-}
-
-void rco_calibration_start()
-{
-    REG_FIELD_WR(SYSCFG->ANACFG1, SYSCFG_EN_RCO_DIG_PWR, 1);
-    REG_FIELD_WR(SYSCFG->ANACFG1, SYSCFG_RCO_CAL_START, 1);
-    uint16_t cal_code;
-    while(REG_FIELD_RD(SYSCFG->ANACFG1, SYSCFG_RCO_CAL_DONE)==0)
-    {
-        cal_code = REG_FIELD_RD(SYSCFG->ANACFG1, SYSCFG_RCO_CAL_CODE);
-        SYSCFG->PMU_ANALOG = cal_code;
-    }
-    REG_FIELD_WR(SYSCFG->ANACFG1, SYSCFG_RCO_CAL_START, 0);
-    REG_FIELD_WR(SYSCFG->ANACFG1, SYSCFG_EN_RCO_DIG_PWR, 0);
-}
-
 static uint16_t lsi_cnt_val;
 static uint16_t lsi_dummy_cnt;
 #define LSI_CNT_CYCLES (100)
@@ -291,13 +272,16 @@ static void module_init()
     tinyfs_init(base_offset);
     tinyfs_print_dir_tree();
     mac_init();
-    rco_calib_mode_set(0);
-    rco_calibration_start();
     modem_rf_init();
     irq_init();
     systick_start();
     rco_freq_counting_config();
     rco_freq_counting_start();
+}
+
+static void rco_val_init()
+{
+    SYSCFG->PMU_ANALOG = 0;
 }
 
 static void analog_init()
@@ -311,7 +295,7 @@ static void analog_init()
     REG_FIELD_WR(SYSCFG->ANACFG1, SYSCFG_OSCRC_DIG_PWR_EN,0);
     //REG_FIELD_WR(SYSCFG->ANACFG1, SYSCFG_ADC12B_DIG_PWR_EN, 0);
     REG_FIELD_WR(SYSCFG->PMU_TRIM, SYSCFG_XTAL_STBTIME, XTAL_STB_VAL);
-
+    rco_val_init();
 }
 
 static void var_init()
@@ -369,8 +353,6 @@ void sys_init_24g(void)
     // tinyfs_init(base_offset);
     // tinyfs_print_dir_tree();
     mac_init();
-    rco_calib_mode_set(0);
-    rco_calibration_start();
     modem_rf_init_24g();
     irq_init();
     systick_start();
@@ -398,8 +380,6 @@ void sys_init_ll()
     calc_acc_init();
     cpu_sleep_recover_init();
     mac_init();
-    rco_calib_mode_set(0);
-    rco_calibration_start();
     modem_rf_init();
     irq_init();
     systick_start();
