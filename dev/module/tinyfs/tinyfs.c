@@ -52,7 +52,7 @@ typedef struct __attribute__((packed))
     uint16_t name;
     uint16_t parent_id;
     uint16_t data_length;
-    uint16_t crc16;
+    uint8_t data[];
 } record_add_t;
 #define RECORD_ADD_LENGTH (sizeof(record_add_t))
 
@@ -62,7 +62,7 @@ typedef struct __attribute__((packed))
     uint16_t name;
     uint16_t parent_id;
     uint16_t id;
-    uint16_t crc16;
+    uint16_t crc16[];
 } dir_add_t;
 #define DIR_ADD_LENGTH (sizeof(dir_add_t))
 
@@ -71,7 +71,7 @@ typedef struct __attribute__((packed))
     enum node_enum type;
     uint16_t name;
     uint16_t parent_id;
-    uint16_t crc16;
+    uint16_t crc16[];
 } record_remove_t;
 #define RECORD_REMOVE_LENGTH (sizeof(record_remove_t))
 
@@ -79,9 +79,11 @@ typedef struct __attribute__((packed))
 {
     enum node_enum type;
     uint16_t id;
-    uint16_t crc16;
+    uint16_t crc16[];
 } dir_remove_t;
 #define DIR_REMOVE_LENGTH (sizeof(dir_remove_t))
+
+#define RECORD_DATA_MAX_LENGTH (TINYFS_SECTION_SIZE - sizeof(section_head_t) - RECORD_ADD_LENGTH - 2*TINYFS_CRC_LENGTH)
 
 typedef struct __attribute__((packed))
 {
@@ -295,6 +297,36 @@ static void nvm_read_node(uint16_t section,uint16_t offset,uint16_t length,uint8
     }
 }
 
+static void section_offset_calc(uint16_t *section,uint16_t *offset,uint16_t length)
+{
+    if(*offset+length>=TINYFS_SECTION_SIZE)
+    {
+        *section = get_next_section(*section);
+        *offset = *offset + length - TINYFS_SECTION_SIZE + sizeof(section_head_t);
+    }else
+    {
+        *offset = *offset + length;
+    }
+}
+
+static bool node_crc_check(uint8_t type,uint16_t section,uint16_t offset,uint8_t *buf)
+{
+    uint8_t payload_length = node_metadata_length[type];
+    uint16_t calc_crc = crc16calc(TINYFS_CRC_INIT_VAL,buf,payload_length);
+    uint16_t origin_crc;
+    if(type==RECORD_ADD)
+    {
+        record_add_t *ptr = (record_add_t *)buf;
+        if(ptr->data_length>RECORD_DATA_MAX_LENGTH) return false;
+        section_offset_calc(&section,&offset,payload_length + ptr->data_length + TINYFS_CRC_LENGTH);
+    }else
+    {
+        section_offset_calc(&section,&offset,payload_length);
+    }
+    nvm_read_node(section,offset,TINYFS_CRC_LENGTH,(uint8_t *)&origin_crc);
+    return calc_crc == origin_crc;
+}
+
 static bool node_metadata_read(uint16_t section, uint16_t offset, uint8_t *buf)
 {
     nvm_read_node(section,offset,NODE_METADATA_LENGTH_MAX,buf);
@@ -302,10 +334,7 @@ static bool node_metadata_read(uint16_t section, uint16_t offset, uint8_t *buf)
     uint8_t type = buf[0];
     if(type<NODE_TYPE_MAX)
     {
-        uint16_t crc;
-        uint8_t payload_length = node_metadata_length[type]-TINYFS_CRC_LENGTH;
-        memcpy(&crc,&buf[payload_length],TINYFS_CRC_LENGTH);
-        crc_match = crc16calc(TINYFS_CRC_INIT_VAL,buf,payload_length) == crc;
+        crc_match = node_crc_check(type,section,offset,buf);
     }else
     {
         crc_match = false;
@@ -325,7 +354,7 @@ static void node_free(tinyfs_node_t *ptr)
 
 static uint16_t node_total_length(const tinyfs_node_t *const ptr)
 {
-    return ptr->child?sizeof(dir_add_t):sizeof(record_add_t) + ptr->u.data_length + TINYFS_CRC_LENGTH;
+    return ptr->child?sizeof(dir_add_t) + TINYFS_CRC_LENGTH :sizeof(record_add_t) + ptr->u.data_length + 2*TINYFS_CRC_LENGTH;
 }
 
 static void tinyfs_list_push(tinyfs_list_t *env,tinyfs_node_t *ptr)
@@ -442,7 +471,7 @@ static uint16_t record_add_parse(uint16_t section,uint16_t offset,void *buf)
     ptr->addr.offset = offset;
     ptr->u.data_length = node->data_length;
     tinyfs_list_push(&tinyfs_list[section],ptr);
-    return sizeof(record_add_t) + node->data_length + TINYFS_CRC_LENGTH;
+    return sizeof(record_add_t) + node->data_length + 2*TINYFS_CRC_LENGTH;
 }
 
 static bool dir_compare(void *item,va_list *param)
@@ -478,7 +507,7 @@ static uint16_t dir_add_parse(uint16_t section,uint16_t offset,void *buf)
         tinyfs_env.dir_id_max = node->id;
     }
     tinyfs_list_push(&tinyfs_list[section],ptr);
-    return sizeof(dir_add_t);
+    return sizeof(dir_add_t) + TINYFS_CRC_LENGTH;
 }
 
 static uint16_t record_remove_parse(uint16_t section,uint16_t offset,void *buf)
@@ -493,7 +522,7 @@ static uint16_t record_remove_parse(uint16_t section,uint16_t offset,void *buf)
     {
         LOG_W("record remove parse warning:flash addr:%x",offset);
     }
-    return sizeof(record_remove_t);
+    return sizeof(record_remove_t) + TINYFS_CRC_LENGTH;
 }
 
 static uint16_t dir_remove_parse(uint16_t section,uint16_t offset,void *buf)
@@ -508,20 +537,9 @@ static uint16_t dir_remove_parse(uint16_t section,uint16_t offset,void *buf)
     {
         LOG_W("dir remove parse warning:flash addr:%x",offset);
     }
-    return sizeof(dir_remove_t);
+    return sizeof(dir_remove_t) + TINYFS_CRC_LENGTH;
 }
 
-static void section_offset_calc(uint16_t *section,uint16_t *offset,uint16_t length)
-{
-    if(*offset+length>=TINYFS_SECTION_SIZE)
-    {
-        *section = get_next_section(*section);
-        *offset = *offset + length - TINYFS_SECTION_SIZE + sizeof(section_head_t);
-    }else
-    {
-        *offset = *offset + length;
-    }
-}
 
 static bool node_data_read(uint16_t section,uint16_t offset,uint16_t length,uint8_t *buf)
 {
@@ -564,7 +582,7 @@ static void nodes_info_load(section_head_data_t *section_head_data,uint8_t *vali
     {
         i = get_next_valid_section(valid_mask,i);
         offset = section_head_data[i].node_offset;
-        while (offset > 5 && offset < TINYFS_SECTION_SIZE)
+        while (offset >= sizeof(section_head_t) && offset < TINYFS_SECTION_SIZE)
         {
             uint8_t buf[NODE_METADATA_LENGTH_MAX];
             if(node_metadata_read(i,offset,buf))
@@ -583,6 +601,7 @@ static void nodes_info_load(section_head_data_t *section_head_data,uint8_t *vali
         }
     }while(i!=tinyfs_env.tail_section);
     tinyfs_env.tail_available_offset = offset;
+    TINYFS_ASSERT(tinyfs_env.tail_available_offset<=TINYFS_SECTION_SIZE);
     tinyfs_env.free_bytes = TINYFS_SECTION_SIZE - tinyfs_env.tail_available_offset;
     if(tinyfs_env.tail_section>=tinyfs_env.head_section)
     {
@@ -866,51 +885,54 @@ static storage_addr_t node_write(uint8_t *buf,uint16_t length,enum node_write_ty
     return addr;
 }
 
-static storage_addr_t record_add_write(uint16_t name,uint16_t parent_id,uint16_t data_length)
+static storage_addr_t record_add_write(uint16_t name,uint16_t parent_id,uint16_t data_length,uint16_t *meta_crc)
 {
-    record_add_t node;
-    node.type = RECORD_ADD;
-    node.name = name;
-    node.parent_id = parent_id;
-    node.data_length = data_length;
-    node.crc16 = crc16calc(TINYFS_CRC_INIT_VAL,&node,sizeof(record_add_t)-TINYFS_CRC_LENGTH);
-    return node_write((uint8_t *)&node,sizeof(node),PROGRAM_START,data_length + TINYFS_CRC_LENGTH);
+    uint8_t buf[sizeof(record_add_t)];
+    record_add_t *node = (record_add_t *)buf;
+    node->type = RECORD_ADD;
+    node->name = name;
+    node->parent_id = parent_id;
+    node->data_length = data_length;
+    *meta_crc = crc16calc(TINYFS_CRC_INIT_VAL,node,sizeof(record_add_t));
+    return node_write(buf,sizeof(buf),PROGRAM_START,data_length + 2*TINYFS_CRC_LENGTH);
 }
 
 static storage_addr_t record_remove_write(uint16_t name,uint16_t parent_id)
 {
-    record_remove_t node;
-    node.type = RECORD_REMOVE;
-    node.name = name;
-    node.parent_id = parent_id;
-    node.crc16 = crc16calc(TINYFS_CRC_INIT_VAL,&node,sizeof(record_remove_t)-TINYFS_CRC_LENGTH);
-    return node_write((uint8_t *)&node,sizeof(node),PROGRAM_START,0);
+    uint8_t buf[sizeof(record_remove_t)+TINYFS_CRC_LENGTH];
+    record_remove_t *node = (record_remove_t *)buf;
+    node->type = RECORD_REMOVE;
+    node->name = name;
+    node->parent_id = parent_id;
+    node->crc16[0] = crc16calc(TINYFS_CRC_INIT_VAL,node,sizeof(record_remove_t));
+    return node_write(buf,sizeof(buf),PROGRAM_START,0);
 }
 
 static storage_addr_t dir_remove_write(uint16_t id)
 {
-    dir_remove_t node;
-    node.type = DIR_REMOVE;
-    node.id = id;
-    node.crc16 = crc16calc(TINYFS_CRC_INIT_VAL,&node,sizeof(dir_remove_t)-TINYFS_CRC_LENGTH);
-    return node_write((uint8_t *)&node,sizeof(node),PROGRAM_START,0);
+    uint8_t buf[sizeof(dir_remove_t) + TINYFS_CRC_LENGTH];
+    dir_remove_t *node = (dir_remove_t *)buf;
+    node->type = DIR_REMOVE;
+    node->id = id;
+    node->crc16[0] = crc16calc(TINYFS_CRC_INIT_VAL,node,sizeof(dir_remove_t));
+    return node_write(buf,sizeof(buf),PROGRAM_START,0);
 }
 
 static storage_addr_t dir_add_write(uint16_t name,uint16_t id,uint16_t parent_id)
 {
-    dir_add_t node;
-    node.type = DIR_ADD;
-    node.name = name;
-    node.id = id;
-    node.parent_id = parent_id;
-    node.crc16 = crc16calc(TINYFS_CRC_INIT_VAL,&node,sizeof(dir_add_t)-TINYFS_CRC_LENGTH);
-    return node_write((uint8_t *)&node,sizeof(node),PROGRAM_START,0);
+    uint8_t buf[sizeof(dir_add_t)+TINYFS_CRC_LENGTH];
+    dir_add_t *node = (dir_add_t *)buf;
+    node->type = DIR_ADD;
+    node->name = name;
+    node->id = id;
+    node->parent_id = parent_id;
+    node->crc16[0] = crc16calc(TINYFS_CRC_INIT_VAL,node,sizeof(dir_add_t));
+    return node_write(buf,sizeof(buf),PROGRAM_START,0);
 
 }
 
 static void record_data_copy(storage_addr_t src,uint16_t length)
 {
-   
     uint16_t buf_size = length>RECORD_DATA_COPY_BUF_SIZE ? RECORD_DATA_COPY_BUF_SIZE : length;
     uint8_t buf[buf_size];
     section_offset_calc(&src.section, &src.offset, RECORD_ADD_LENGTH);
@@ -932,8 +954,9 @@ static void node_copy(tinyfs_node_t *ptr)
         ptr->addr = dir_add_write(ptr->name,ptr->u.id,node_ptr(ptr->parent_dir)->u.id);
     }else
     {
-        storage_addr_t dst = record_add_write(ptr->name,node_ptr(ptr->parent_dir)->u.id,ptr->u.data_length);
-        record_data_copy(ptr->addr,ptr->u.data_length+TINYFS_CRC_LENGTH);
+        uint16_t meta_crc;
+        storage_addr_t dst = record_add_write(ptr->name,node_ptr(ptr->parent_dir)->u.id,ptr->u.data_length,&meta_crc);
+        record_data_copy(ptr->addr,ptr->u.data_length+2*TINYFS_CRC_LENGTH);
         ptr->addr = dst;
     }
     tinyfs_list_push(&tinyfs_list[ptr->addr.section],ptr);
@@ -1196,7 +1219,7 @@ uint8_t tinyfs_mkdir(tinyfs_dir_t *dir_to_make, tinyfs_dir_t upper_dir, uint16_t
             parent->child = node_idx(new_dir_node);
             new_dir_node->child = INVALID_NODE_IDX;
             new_dir_node->parent_dir = node_idx(parent);
-            garbage_collect_try(sizeof(dir_add_t));
+            garbage_collect_try(sizeof(dir_add_t)+TINYFS_CRC_LENGTH);
             new_dir_node->addr = dir_add_write(dir_name, new_dir_node->u.id,parent->u.id);
             tinyfs_list_push(&tinyfs_list[new_dir_node->addr.section],new_dir_node);
             *dir_to_make = new_dir_node;
@@ -1212,19 +1235,22 @@ ret:
     return error;
 }
 
-static void record_data_write(uint8_t *buf,uint16_t length)
+static void record_data_write(uint8_t *buf,uint16_t length,uint16_t meta_crc)
 {
-    node_write(buf,length,PROGRAM_CONTINUE,TINYFS_CRC_LENGTH);
-    uint16_t crc16 = crc16calc(TINYFS_CRC_INIT_VAL,buf,length);
-    node_write((uint8_t *)&crc16,sizeof(crc16),PROGRAM_CONTINUE,0);
+    node_write(buf,length,PROGRAM_CONTINUE,2*TINYFS_CRC_LENGTH);
+    uint16_t crc16[2];
+    crc16[0] = crc16calc(TINYFS_CRC_INIT_VAL,buf,length);
+    crc16[1] = meta_crc;
+    node_write((uint8_t *)crc16,sizeof(crc16),PROGRAM_CONTINUE,0);
 }
 
 static void record_write(tinyfs_node_t *record,uint8_t *data,uint16_t length,uint16_t parent_id)
 {
-    garbage_collect_try(length + TINYFS_CRC_LENGTH + sizeof(record_add_t));
+    garbage_collect_try(length + 2*TINYFS_CRC_LENGTH + sizeof(record_add_t));
     record->u.data_length = length;
-    record->addr = record_add_write(record->name,parent_id, length);
-    record_data_write(data,length);
+    uint16_t meta_crc;
+    record->addr = record_add_write(record->name,parent_id, length,&meta_crc);
+    record_data_write(data,length,meta_crc);
     tinyfs_list_push(&tinyfs_list[record->addr.section],record);
 }
 
@@ -1281,11 +1307,11 @@ static void node_del(tinyfs_node_t *parent,tinyfs_node_t *node_to_del,tinyfs_nod
 {
     if(node_to_del->child)
     {
-        garbage_collect_try(sizeof(dir_remove_t));
+        garbage_collect_try(sizeof(dir_remove_t)+TINYFS_CRC_LENGTH);
         dir_remove_write(node_to_del->u.id);
     }else
     {
-        garbage_collect_try(sizeof(record_remove_t));
+        garbage_collect_try(sizeof(record_remove_t)+TINYFS_CRC_LENGTH);
         record_remove_write(node_to_del->name, parent->u.id);
     }
     if(prev)
