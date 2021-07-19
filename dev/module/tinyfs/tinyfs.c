@@ -25,10 +25,6 @@
 #define TINYFS_CRC_LENGTH 2
 
 #define RECORD_DATA_COPY_BUF_SIZE 64
-#define BUFFERING_SECTION_NUM 1
-#if (BUFFERING_SECTION_NUM>=TINYFS_SECTION_NUM)
-#error BUFFERING_SECTION_NUM must be less than TINYFS_SECTION_NUM
-#endif
 #define crc16calc (crc16ccitt)
 #define NODE_METADATA_LENGTH_MAX sizeof(record_add_t)
 enum node_enum
@@ -135,7 +131,7 @@ typedef struct
 static struct
 {
     uint32_t base;
-    uint32_t free_bytes;
+    uint16_t gc_section;
     uint16_t tail_available_offset;
     uint16_t head_section;
     uint16_t tail_section;
@@ -602,15 +598,6 @@ static void nodes_info_load(section_head_data_t *section_head_data,uint8_t *vali
     }while(i!=tinyfs_env.tail_section);
     tinyfs_env.tail_available_offset = offset;
     TINYFS_ASSERT(tinyfs_env.tail_available_offset<=TINYFS_SECTION_SIZE);
-    tinyfs_env.free_bytes = TINYFS_SECTION_SIZE - tinyfs_env.tail_available_offset;
-    if(tinyfs_env.tail_section>=tinyfs_env.head_section)
-    {
-        tinyfs_env.free_bytes += (TINYFS_SECTION_SIZE - sizeof(section_head_t))*(TINYFS_SECTION_NUM -1 - tinyfs_env.tail_section + tinyfs_env.head_section);
-    }else
-    {
-        tinyfs_env.free_bytes += (TINYFS_SECTION_SIZE - sizeof(section_head_t))*(tinyfs_env.head_section - tinyfs_env.tail_section - 1);
-    }
-
 }
 
 static void root_dir_init(tinyfs_node_t *root)
@@ -792,6 +779,20 @@ static bool all_section_empty(uint8_t *valid_mask,uint32_t size)
     return true;
 }
 
+static bool valid_data_in_section(uint16_t section)
+{
+    return tinyfs_list[section].list.head != INVALID_NODE_IDX;
+}
+
+static uint16_t gc_section_find(uint16_t section)
+{
+    while(valid_data_in_section(section)==false)
+    {
+        section = get_next_section(section);
+    }
+    return section;
+}
+
 void tinyfs_init(uint32_t base)
 {
     TINYFS_ASSERT(base % TINYFS_SECTION_SIZE == 0);
@@ -808,6 +809,7 @@ void tinyfs_init(uint32_t base)
         find_head_tail_section(head_data,valid_section,
             &tinyfs_env.head_section, &tinyfs_env.tail_section,&tinyfs_env.tail_count);
         nodes_info_load(head_data,valid_section);
+        tinyfs_env.gc_section = gc_section_find(tinyfs_env.head_section);
         dir_tree_build();
     }else
     {
@@ -816,7 +818,7 @@ void tinyfs_init(uint32_t base)
         tinyfs_env.tail_available_offset = TINYFS_SECTION_SIZE;
         tinyfs_env.tail_count = 0;
         tinyfs_env.dir_id_max = 0;
-        tinyfs_env.free_bytes = TINYFS_SECTION_NUM * (TINYFS_SECTION_SIZE - sizeof(section_head_t));
+        tinyfs_env.gc_section = INVALID_SECTION;
     }
     tinyfs_mutex_create();
 }
@@ -833,7 +835,6 @@ static void section_head_write(uint16_t section,uint16_t loop_count,uint16_t nod
 
 static storage_addr_t node_write(uint8_t *buf,uint16_t length,enum node_write_type type,uint16_t subsequent_length)
 {
-    tinyfs_env.free_bytes -= length;
     storage_addr_t addr;
     if(tinyfs_env.tail_available_offset == TINYFS_SECTION_SIZE)
     {
@@ -843,6 +844,10 @@ static storage_addr_t node_write(uint8_t *buf,uint16_t length,enum node_write_ty
     {
         addr.offset = tinyfs_env.tail_available_offset;
         addr.section = tinyfs_env.tail_section;
+    }
+    if(tinyfs_env.gc_section == INVALID_SECTION)
+    {
+        tinyfs_env.gc_section = tinyfs_env.head_section;
     }
     while(length)
     {
@@ -863,6 +868,12 @@ static storage_addr_t node_write(uint8_t *buf,uint16_t length,enum node_write_ty
                }
            }
            tinyfs_env.tail_section=get_next_section(tinyfs_env.tail_section);
+           if(tinyfs_env.head_section == tinyfs_env.tail_section)
+           {
+                TINYFS_ASSERT(valid_data_in_section(tinyfs_env.head_section)==false);
+                tinyfs_env.head_section = get_next_section(tinyfs_env.head_section);
+           }
+           tinyfs_section_erase(tinyfs_env.tail_section);
            section_head_write(tinyfs_env.tail_section,++tinyfs_env.tail_count,node_offset);
            tinyfs_env.tail_available_offset = sizeof(section_head_t);
         }
@@ -980,43 +991,18 @@ static void section_garbage_collection(uint16_t section)
 {
     section_copy(section);
     data_write_through();
-    tinyfs_section_erase(section);
-    tinyfs_env.free_bytes += TINYFS_SECTION_SIZE - sizeof(section_head_t);
-}
-
-static bool section_wipe_check(uint16_t size,uint16_t *num)
-{
-    int32_t released_data_size = 0;
-    uint16_t section = tinyfs_env.head_section;
-    uint16_t i;
-    for(i=0;i<TINYFS_SECTION_NUM;++i)
-    {
-        released_data_size += TINYFS_SECTION_SIZE - sizeof(section_head_t) - tinyfs_list[section].size;
-        if(released_data_size > size)
-        {
-            *num = i+1;
-            return true;
-        }
-        section=get_next_section(section);
-    }
-    return false;
 }
 
 static void garbage_collect_try(uint16_t size)
 {
-    uint16_t num = 0;
-    bool wipe = section_wipe_check(size, &num);
-    (void)wipe;
-    TINYFS_ASSERT(wipe);
-    uint16_t i=0;
-    while(tinyfs_env.free_bytes <= size + tinyfs_list[tinyfs_env.head_section].size
-        + BUFFERING_SECTION_NUM*(TINYFS_SECTION_SIZE-sizeof(section_head_t)) 
-        && tinyfs_env.head_section != tinyfs_env.tail_section)
+    if(tinyfs_env.gc_section != INVALID_SECTION)
     {
-        TINYFS_ASSERT(i<=num);
-        section_garbage_collection(tinyfs_env.head_section);
-        tinyfs_env.head_section = get_next_section(tinyfs_env.head_section);
-        ++i;
+        if( get_next_section(tinyfs_env.tail_section) == get_prev_section(tinyfs_env.gc_section) 
+            && tinyfs_env.tail_available_offset + tinyfs_list[tinyfs_env.gc_section].size > TINYFS_SECTION_SIZE)
+        {
+            section_garbage_collection(tinyfs_env.gc_section);
+            tinyfs_env.gc_section = get_next_section(tinyfs_env.gc_section);
+        }
     }
 }
 
@@ -1541,7 +1527,6 @@ static uint16_t data_write_through()
     if(tinyfs_env.tail_available_offset % TINYFS_WRITE_CACHE_SIZE)
     {
         padding_length = TINYFS_WRITE_CACHE_SIZE - tinyfs_env.tail_available_offset % TINYFS_WRITE_CACHE_SIZE;
-        tinyfs_env.free_bytes -= padding_length;
         tinyfs_env.tail_available_offset =  (tinyfs_env.tail_available_offset + TINYFS_WRITE_CACHE_SIZE) & ~(TINYFS_WRITE_CACHE_SIZE - 1);
 
     }
